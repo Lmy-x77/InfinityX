@@ -1,6 +1,6 @@
 -- mod detector
 pcall(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/scripts/games/Dig/Security/Admin_Detector/source.lua", true))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Dig/Admin-Detector/source.lua", true))()
 end)
 print('[ BYPASS ] - Mod detector 🟢')
 
