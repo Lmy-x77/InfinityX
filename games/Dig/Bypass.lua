@@ -1,0 +1,5 @@
+pcall(function()
+    print('[ BYPASS ] loading...')
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Dig/Security/Hook.lua", true))()
+    print('[ BYPASS ] applied successfully')
+end)
