@@ -154,7 +154,7 @@ end
 if not bypassed then
   if hookmetamethod and getnamecallmethod and hookfunction then
     pcall(function()
-      loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/scripts/games/Dig/Bypass/source.lua",true))()
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Dig/Bypass.lua", true))()
     end)
 
     local Event = game:GetService("ReplicatedStorage").Remotes.Notification_Universal_Top
