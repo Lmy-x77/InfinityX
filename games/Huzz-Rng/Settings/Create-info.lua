@@ -1,0 +1,25 @@
+local Time = ""
+function startTimer()
+    local start = os.clock()
+    game:GetService("RunService").RenderStepped:Connect(function()
+      Time = tostring(math.floor(os.clock() - start)) .. " seconds"
+    end)
+end
+local Info = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/library/Info/source.lua", true))()
+local UI = Info:CreateWindow("InfinityX - Auto Execute")
+UI:AddLabel("Server Stats", "center")
+UI:AddInfo("JobId", game.JobId, Color3.fromRGB(0, 255, 170))
+local timeInfo = UI:AddInfo("Time", '0 seconds', Color3.fromRGB(0, 255, 170), { align = "left", divider = true })
+UI:AddLabel("Player Stats", "center")
+local rollsInfo = UI:AddInfo("Your Rolls", game:GetService("Players").LocalPlayer.leaderstats.Rolls.Value)
+local coinsInfo = UI:AddInfo("Your Coins", game:GetService("Players").LocalPlayer.Coins.Value)
+local levelInfo = UI:AddInfo("Your Level", game:GetService("Players").LocalPlayer.PlayerGui.Game.PlayerF.Player.Level.LevelT.Text)
+startTimer()
+task.spawn(function()
+  while true do task.wait(1)
+    timeInfo:Update(Time)
+    rollsInfo:Update(game:GetService("Players").LocalPlayer.leaderstats.Rolls.Value)
+    coinsInfo:Update(game:GetService("Players").LocalPlayer.Coins.Value)
+    levelInfo:Update(game:GetService("Players").LocalPlayer.PlayerGui.Game.PlayerF.Player.Level.LevelT.Text)
+  end
+end)
