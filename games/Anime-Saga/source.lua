@@ -5,7 +5,7 @@ local places = {
 
 
 if game.PlaceId == places.Lobby then
-  loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/scripts/games/AnimeSaga/Places/lobby.lua", true))()
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Saga/Place-Id/Lobby.lua", true))()
 elseif game.PlaceId == places.Dungeon then
-  loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/scripts/games/AnimeSaga/Places/dungeon.lua", true))()
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Saga/Place-Id/Dungeon.lua", true))()
 end
