@@ -81,6 +81,7 @@ local Tabs = {
 -- source
 local RollGroupBox = Tabs.Main:AddLeftGroupbox("Rolls", "refresh-cw")
 local TeleportGroupBox = Tabs.Main:AddRightGroupbox("Teleport", "locate")
+local MiscGroupBox = Tabs.Main:AddRightGroupbox("Misc", "layers")
 RollGroupBox:AddDropdown("PlayersDropdown", {
 	Values = {'Token', 'Gems', 'Coins'},
 	Default = '...',
@@ -213,6 +214,31 @@ TeleportGroupBox:AddButton("Teleport to training", function()
 end)
 TeleportGroupBox:AddButton("Teleport to trait reroll", function()
   game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1439, 4066, -149)
+end)
+MiscGroupBox:AddButton("Reedem all codes", function()
+  local codes = {'WelcomeNewAnimeManiaPlayers!', 'THANKSFOR175KLIKES', 'SOLOLEVELINGBUFFS', 'MONEYMONEY', 'FIRSTFREECODE'}
+  for _, v in ipairs(codes) do
+    local args = {
+      [1] = v
+    }
+    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("SubmitCode"):InvokeServer(unpack(args))
+    task.wait(0.2)
+  end
+end)
+MiscGroupBox:AddButton("Claim all gems / coins", function()
+  while true do task.wait()
+    for i = 1, 1000 do
+      local Event = game:GetService("ReplicatedStorage").Remotes.Claim
+      Event:FireServer()
+    end
+    for i = 1, 1000 do
+      local Event = game:GetService("ReplicatedStorage").Remotes.Claim
+      Event:FireServer()
+    end
+  end
+end)
+MiscGroupBox:AddButton("Rejoin", function()
+  game:GetService("TeleportService"):Teleport(game.PlaceId, game:GetService("Players").LocalPlayer)
 end)
 
 
