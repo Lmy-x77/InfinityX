@@ -1,9 +1,9 @@
 -- intro
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/main/Software/Custom/Intro/source.lua",true))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/main/Software/Custom/Intro/source.lua",true))()
 wait(.8)
 
 
--- variables
+-- supported games
 local currentPlaceId = game.PlaceId
 local supportedGames = {
     [{893973440}] = 'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Flee-The-Facility/source.lua',
@@ -41,6 +41,6 @@ if scriptUrl then
     loadstring(game:HttpGet(scriptUrl))()
 else
     print("[ InfinityX ] - Game not supported 🔴")
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/main/Software/notification.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/main/Software/Items/notification.lua"))()
 end
 warn("[ InfinityX ] - Thanks for using my script ❤️")
