@@ -2566,7 +2566,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 			local Paragraph = Elements.Template.Paragraph:Clone()
 			Paragraph.Title.Text = ParagraphSettings.Title
 			Paragraph.Content.Text = ParagraphSettings.Content
-      Paragraph.Contect.RichText = true
+      			Paragraph.Contect.RichText = true
 			Paragraph.Visible = true
 			Paragraph.Parent = TabPage
 
