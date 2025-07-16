@@ -105,7 +105,7 @@ elseif game.PlaceId == placeIds.Arena then
       }
     })
   else
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/scripts/games/AnimeMania/Main/source.lua", true))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Mania/Main/source.lua", true))()
   end
 end
 
