@@ -5,7 +5,7 @@ function startTimer()
       Time = tostring(math.floor(os.clock() - start)) .. " seconds"
     end)
 end
-local Info = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/library/Info/source.lua", true))()
+local Info = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Info/source.lua", true))()
 local UI = Info:CreateWindow("InfinityX - Auto Execute")
 UI:AddLabel("Server Stats", "center")
 UI:AddInfo("JobId", game.JobId, Color3.fromRGB(0, 255, 170))
