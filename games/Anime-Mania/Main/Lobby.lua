@@ -94,7 +94,6 @@ RollGroupBox:AddDropdown("PlayersDropdown", {
 
 	Callback = function(Value)
 		selectedMethod = Value
-    print(selectedPlayer)
 	end,
 
 	Disabled = false,
@@ -113,7 +112,6 @@ RollGroupBox:AddDropdown("PlayersDropdown", {
 
 	Callback = function(Value)
 		selectedAmount = Value
-    print(selectedPlayer)
 	end,
 
 	Disabled = false,
