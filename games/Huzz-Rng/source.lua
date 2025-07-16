@@ -384,15 +384,15 @@ local Toggle = Tabs.Op:Toggle({
         return
       end
 
-      loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/scripts/games/HuzzRng/create_info.lua",true))()
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Huzz-Rng/Settings/Create-info.lua",true))()
       wait(.5)
-      loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/scripts/games/HuzzRng/auto_execute.lua",true))()
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Huzz-Rng/Settings/Auto-execute.lua",true))()
 
       local TeleportCheck = false
       Game.Players.LocalPlayer.OnTeleport:Connect(function(State)
         if (not TeleportCheck) and queueteleport then
           TeleportCheck = true
-          queueteleport('repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.LoadingScreen.Enabled == false wait(2) loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/scripts/games/HuzzRng/create_info.lua",true))() wait(0.5) getgenv().infiniteSpinSettings = {Keep = false, Delete = false} loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/scripts/games/HuzzRng/auto_execute.lua",true))()')
+          queueteleport('repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.LoadingScreen.Enabled == false wait(2) loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Huzz-Rng/Settings/Create-info.lua",true))() wait(0.5) getgenv().infiniteSpinSettings = {Keep = false, Delete = false} loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Huzz-Rng/Settings/Auto-execute.lua",true))()')
         end
       end)
     end
