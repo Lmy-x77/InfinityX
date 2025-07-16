@@ -3513,7 +3513,7 @@ function RayfieldLibrary:CreateWindow(Settings)
 	Topbar.Divider.BackgroundColor3 = SelectedTheme.ElementStroke
 	Topbar.CornerRepair.BackgroundTransparency = 1
 	Topbar.Title.TextTransparency = 1
-  Topbar.RichText = true
+  	Topbar.Title.RichText = true
 	Topbar.Search.ImageTransparency = 1
 	if Topbar:FindFirstChild('Settings') then
 		Topbar.Settings.ImageTransparency = 1
