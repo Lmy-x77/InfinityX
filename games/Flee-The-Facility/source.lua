@@ -38,7 +38,7 @@ print[[
 
 -- load preference
 if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.MouseEnabled then
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/main/Software/button.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/main/Software/Items/button.lua"))()
 end
 
 
@@ -66,7 +66,7 @@ if hookmetamethod then
         return OldNameCall(...)
     end)
 else
-    local Info = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/library/Info/source.lua", true))()
+    local Info = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Info/source.lua", true))()
     Info:Notify('Waring', 'your exploit does not support hookmetamethod. Please use a better exploit', 5)
     return
 end
@@ -222,7 +222,7 @@ scriptVersion = '3.2a'
 
 
 -- ui library
-local MacLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/library/Maclib/src.lua"))()
+local MacLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Maclib/source.lua"))()
 local Window = MacLib:Window({
 	Title = "InfinityX "..scriptVersion,
 	Subtitle = "By lmy77 | "..game:GetService('MarketplaceService'):GetProductInfo(game.PlaceId).Name,
@@ -462,7 +462,7 @@ sections.GameSection2:Button({
         })
         for _, v in pairs(game:GetService('CoreGui'):GetChildren()) do
             if v:IsA('ScreenGui') and v.Name == 'Button' then
-                v:Destroy() wait() loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/main/Software/button.lua"))()
+                v:Destroy() wait() loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/main/Software/Items/button.lua"))()
             end
         end
 	end,
