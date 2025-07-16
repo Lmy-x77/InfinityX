@@ -1,14 +1,3 @@
--- detect service
-local UserInputService = game:GetService("UserInputService")
-IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS}, UserInputService:GetPlatform())
-if IsOnMobile then
-  print("Mobile device")
-elseif not IsOnMobile then
-  print("Computer device")
-end
-
-
-
 -- variables
 local function GetHumanoidRootPart()
   local player = game:GetService("Players").LocalPlayer
