@@ -1,14 +1,3 @@
--- detect service
-local UserInputService = game:GetService("UserInputService")
-IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS}, UserInputService:GetPlatform())
-if IsOnMobile then
-  print("Mobile device")
-elseif not IsOnMobile then
-  print("Computer device")
-end
-
-
-
 -- variables
 local LibrarySettings = {
   Title = '<font color="rgb(110, 48, 160)" size="24"><b>InfinityX</b></font>',
