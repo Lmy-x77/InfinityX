@@ -29,6 +29,12 @@ print[[
 
 
 -- variables
+local visualTeeth = {
+    Teeth = 1000,
+    Time = 0.0001,
+    TeethAnimation = true,
+    Stoped = false
+}
 local EspSettings = {
     SharkColor = Color3.fromRGB(0, 200, 255),
     SurvivalColor = Color3.fromRGB(61, 240, 61),
@@ -70,7 +76,14 @@ local function connectPlayer(player)
         createSurvivalESP(player)
     end
 end
-scriptVersion = '4.2a'
+local LibrarySettings = {
+    Title = '<font color="rgb(110, 48, 160)" size="24"><b>InfinityX</b></font>',
+    Footer = {
+      GameName = '<font color="rgb(180,180,255)"><i>Shark Bite Classic</i></font> · ',
+      Version = '<font color="rgb(160,160,160)">Version 4.2a</font> · ',
+      DiscordLink = '<font color="rgb(100,200,255)">Join us: discord.gg/emKJgWMHAr</font>'
+    }
+  }
 
 
 
@@ -92,8 +105,8 @@ local Toggles = Library.Toggles
 Library.ForceCheckbox = true
 
 local Window = Library:CreateWindow({
-    Title = "InfinityX",
-    Footer = "Shark Bite · ".. scriptVersion .. " · discord.gg/emKJgWMHAr",
+    Title = LibrarySettings.Title,
+    Footer = LibrarySettings.Footer.GameName .. LibrarySettings.Footer.Version .. LibrarySettings.Footer.DiscordLink,
     Icon = 126527122577864,
     NotifySide = "Right",
     ShowCustomCursor = false,
@@ -109,6 +122,7 @@ local Window = Library:CreateWindow({
 -- tabs
 local Tabs = {
   Main = Window:AddTab("Main", "layers"),
+  Visual = Window:AddTab("Visual", "eye"),
   Settings = Window:AddTab("Config.", "settings"),
 }
 
@@ -796,6 +810,109 @@ CharacterGroupBox:AddButton({
 	Visible = true,
 	Risky = false,
 })
+
+
+local InfiniteTeethGroupBox = Tabs.Visual:AddLeftGroupbox("Infinite Teeth", 'waves')
+Library.ForceCheckbox = false
+InfiniteTeethGroupBox:AddToggle("MyToggle", {
+	Text = "Start",
+	Tooltip = "Active to start a inf teeth visual",
+	DisabledTooltip = "I am disabled!",
+
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+
+	Callback = function(Value)
+        startTeeth = Value
+        if startTeeth and visualTeeth.Stoped then
+            Library:Notify({
+                Title = "InfinityX",
+                Description = "Wait for more time to execute this function again",
+                Time = 6,
+            })
+        end
+        if startTeeth then
+            local Teeths = game:GetService("Players").LocalPlayer.PlayerGui.CoreGuis.Coins.Scorebox:FindFirstChild('TextLabel').Text
+            local CurrentTheets = tonumber(Teeths)
+            wait(.5)
+            if not visualTeeth.TeethAnimation then
+                for i = CurrentTheets, visualTeeth.Teeth do
+                    if visualTeeth.Stoped then return end
+                    local Event = workspace.Events.Save.SaveRemoteFunction
+                    local Callback = getcallbackvalue(Event, "OnClientInvoke")
+                    Callback(
+                        "Teeth",
+                        i
+                    )
+                    wait(visualTeeth.Time)
+                end
+            elseif visualTeeth.TeethAnimation then
+                for i = CurrentTheets, visualTeeth.Teeth do
+                    if visualTeeth.Stoped then return end
+                    local Event = workspace.Events.SpawnShark.SharkTeethDisplayOneTooth
+                    firesignal(Event.OnClientEvent)
+                    local Event = workspace.Events.Save.SaveRemoteFunction
+                    local Callback = getcallbackvalue(Event, "OnClientInvoke")
+                    Callback(
+                        "Teeth",
+                        i
+                    )
+                    wait(visualTeeth.Time)
+                end
+            end
+        end
+	end,
+})
+InfiniteTeethGroupBox:AddButton("Stop", function()
+	visualTeeth.Stoped = true
+    wait(5.2)
+    visualTeeth.Stoped = false
+end)
+InfiniteTeethGroupBox:AddDivider()
+InfiniteTeethGroupBox:AddInput("MyTextbox", {
+    Default = "1000",
+    Numeric = true,
+    Finished = false,
+    ClearTextOnFocus = false,
+
+    Text = "Teeth",
+    Placeholder = "10000",
+
+    Callback = function(Value)
+        visualTeeth.Teeth = Value
+    end,
+})
+InfiniteTeethGroupBox:AddInput("MyTextbox", {
+    Default = "0.0001",
+    Numeric = true,
+    Finished = false,
+    ClearTextOnFocus = false,
+
+    Text = "Time",
+    Placeholder = "0.0001",
+
+    Callback = function(Value)
+        visualTeeth.Time = tonumber(Value)
+    end,
+})
+Library.ForceCheckbox = true
+InfiniteTeethGroupBox:AddToggle("TeethToggle", {
+	Text = "Use teeth animation",
+	Tooltip = "",
+	DisabledTooltip = "I am disabled!",
+
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+
+	Callback = function(Value)
+        visualTeeth.TeethAnimation = Value
+	end,
+})
+Toggles.TeethToggle:SetValue(true)
 
 
 local UiSettingsGroubBox = Tabs.Settings:AddLeftGroupbox("Ui Settings", "brush")
