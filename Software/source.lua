@@ -3,12 +3,12 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/ref
 wait(.8)
 
 
--- supported games
+-- variables
 local currentPlaceId = game.PlaceId
 local supportedGames = {
     [{893973440}] = 'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Flee-The-Facility/source.lua',
     [{10260193230}] = 'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Meme-Sea/source.lua',
-    [{1962086868, 3582763398, 2127551566}] = 'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Tower-of-Hell/source.lua',
+    [{1962086868, 3582763398, 2127551566, 94971861814985}] = 'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Tower-of-Hell/source.lua',
     [{6284881984, 6314042276}] = 'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Mania/source.lua',
     [{72992062125248}] = 'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Hunters/source.lua',
     [{126884695634066}] = "https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Grow-a-Garden/source.lua",
