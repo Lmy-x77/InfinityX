@@ -24,6 +24,28 @@ pcall(function()
     for _, conn in pairs(getconnections(ls1.Changed)) do
         conn:Disable()
     end
+    for _, v in pairs(game:GetService("ReplicatedStorage").Remotes.Moderation:GetChildren()) do
+      if v:IsA('RemoteFunction') then
+        local remoteF = v
+        local bypass;
+        bypass = hookmetamethod(game, "__namecall", function(method, ...)
+          if getnamecallmethod() == "InvokeServer" and method == remoteF then
+            return
+          end
+          return bypass(method, ...)
+        end)
+      end
+      if v:IsA('RemoteEvent') then
+        local remoteE = v
+        local bypass;
+        bypass = hookmetamethod(game, "__namecall", function(method, ...)
+          if getnamecallmethod() == "FireServer" and method == remoteE then
+            return
+          end
+          return bypass(method, ...)
+        end)
+      end
+    end
     task.spawn(function() while true do task.wait() ls1.Disabled = true ls2.Disabled = true end end)
 
     print('[ BYPASS ] - Disconnected functions ✅')
@@ -31,6 +53,8 @@ pcall(function()
     print('[ BYPASS ] - Hokked kick functions ✅')
     task.wait(.5)
     print('[ BYPASS ] - Disabled changed function ✅')
+    task.wait(.5)
+    print('[ BYPASS ] - Hokked admin remotes ✅')
     task.wait(.5)
     print('[ BYPASS ] - Auto disable local scripts ✅')
   end
