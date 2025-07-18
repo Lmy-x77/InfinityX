@@ -24,6 +24,7 @@ pcall(function()
     for _, conn in pairs(getconnections(ls1.Changed)) do
         conn:Disable()
     end
+    task.spawn(function() while true do task.wait() ls1.Disabled = true ls2.Disabled = true end end)
     for _, v in pairs(game:GetService("ReplicatedStorage").Remotes.Moderation:GetChildren()) do
       if v:IsA('RemoteFunction') then
         local remoteF = v
@@ -46,7 +47,6 @@ pcall(function()
         end)
       end
     end
-    task.spawn(function() while true do task.wait() ls1.Disabled = true ls2.Disabled = true end end)
 
     print('[ BYPASS ] - Disconnected functions ✅')
     task.wait(.5)
