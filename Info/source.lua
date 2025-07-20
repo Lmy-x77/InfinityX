@@ -1,3 +1,10 @@
+--[[
+    Info Ui Library
+    by Lmy77
+
+    Lmy77 | Programming
+]]--
+
 local UiLibrary = {}
 UiLibrary.__index = UiLibrary
 
