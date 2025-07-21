@@ -28,7 +28,7 @@ local function updateNotificationPositions()
 	end
 end
 
-local function notify:notify(text)
+function notify.notify(text)
 	local note = create("Frame", {
 		Parent = gui,
 		Size = UDim2.new(0, 300, 0, 40),
