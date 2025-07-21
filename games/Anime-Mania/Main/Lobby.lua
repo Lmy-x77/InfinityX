@@ -53,6 +53,7 @@ local Tabs = {
 -- source
 local RollGroupBox = Tabs.Main:AddLeftGroupbox("Rolls", "refresh-cw")
 local TeleportGroupBox = Tabs.Main:AddRightGroupbox("Teleport", "locate")
+local SlotGroupBox = Tabs.Main:AddLeftGroupbox("Slot", "inbox")
 local MiscGroupBox = Tabs.Main:AddRightGroupbox("Misc", "layers")
 RollGroupBox:AddDropdown("PlayersDropdown", {
 	Values = {'Token', 'Gems', 'Coins'},
@@ -186,6 +187,34 @@ TeleportGroupBox:AddButton("Teleport to training", function()
 end)
 TeleportGroupBox:AddButton("Teleport to trait reroll", function()
   game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1439, 4066, -149)
+end)
+local selectedSlot = 0
+local l1 = SlotGroupBox:AddLabel('')
+task.spawn(function()
+  while true do task.wait()
+    if selectedSlot ~= nil then
+      l1:SetText('Cost: ' .. selectedSlot * 50 .. ' gems')
+    end
+  end
+end)
+SlotGroupBox:AddInput("MyTextbox", {
+  Default = "0",
+  Numeric = true,
+  Finished = false,
+  ClearTextOnFocus = false,
+
+  Text = "Slots",
+  Placeholder = "0",
+
+  Callback = function(Value)
+    selectedSlot = tonumber(Value)
+  end,
+})
+SlotGroupBox:AddButton("Buy slots", function()
+  local Event = game:GetService("ReplicatedStorage").Remotes.BuySlots
+  Event:InvokeServer(
+    selectedSlot
+  )
 end)
 MiscGroupBox:AddButton("Reedem all codes", function()
   local codes = {'WelcomeNewAnimeManiaPlayers!', 'THANKSFOR175KLIKES', 'SOLOLEVELINGBUFFS', 'MONEYMONEY', 'FIRSTFREECODE'}
