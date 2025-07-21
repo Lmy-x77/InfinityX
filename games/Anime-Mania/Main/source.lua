@@ -5,6 +5,9 @@ local function GetHumanoidRootPart()
   local char = player.Character or player.CharacterAdded:Wait()
   return char:FindFirstChild("HumanoidRootPart")
 end
+function KeyPress(v)
+  return game:GetService("VirtualInputManager"):SendKeyEvent(true, v, false, game)
+end
 function GetCharName()
   local charNames = {}
   for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('CharacterSelection'):WaitForChild('TeamNew'):GetDescendants()) do
@@ -108,7 +111,6 @@ WaveGroupBox:AddToggle("MyToggle", {
 	Callback = function(Value)
     skills = Value
     while skills do task.wait()
-      game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Input"):FireServer({'Light'}, false)
       game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Input"):FireServer({'Skill', 1})
       game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Input"):FireServer({'Skill', 2})
       game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Input"):FireServer({'Skill', 3})
@@ -185,7 +187,7 @@ for _, v in pairs(skills) do
     Risky = false,
 
     Callback = function(Value)
-      local skillsSelected = x  
+      local skillsSelected = Value
       while skillsSelected do task.wait()
         game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Input"):FireServer({'Skill', v})
       end
@@ -222,30 +224,45 @@ CharacterSelectionGroupBox:AddToggle("MyToggle", {
 
 	Callback = function(Value)
     autoSelect = Value
-    local Players = game:GetService("Players")
-    local VirtualInputManager = game:GetService("VirtualInputManager")
-    local UserInputService = game:GetService("UserInputService")
 
-    local player = Players.LocalPlayer
-    local gui = player:WaitForChild("PlayerGui"):WaitForChild("SelectCharacterScreen")
+    local Players = game:GetService("Players")
+    local UserInputService = game:GetService("UserInputService")
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+
     local function moveAndClick(button)
       if not button or not button:IsA("ImageButton") or not button.Visible then return end
       local pos = button.AbsolutePosition + (button.AbsoluteSize / 2)
-      VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, true, game, 0)
-      task.wait(0.05)
-      VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, false, game, 0)
-    end
 
-    while autoSelect do task.wait(1)
-      for _, v in pairs(gui:GetDescendants()) do
-        if v:IsA('TextLabel') and v.Name == 'CharName' then
-          if v.Text == selectedCharacter then
-            v.Size = UDim2.new(10, 0, 10, 0)
-            moveAndClick(v.Parent)
-          end
-        end
+      if UserInputService.TouchEnabled then
+        VirtualInputManager:SendTouchEvent(pos.X, pos.Y, 0, true, game, 0)
+        task.wait(0.05)
+        VirtualInputManager:SendTouchEvent  (pos.X, pos.Y, 0, false, game, 0.05)
+      else
+        VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, true, game, 0)
+        task.wait(0.05)
+        VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, false, game, 0)
       end
     end
+
+    task.spawn(function()
+      while true do
+        if autoSelect then
+          local player = Players.LocalPlayer
+          if player then
+            local gui = player:WaitForChild("PlayerGui"):WaitForChild("SelectCharacterScreen")
+            if gui then
+              for _, v in pairs(gui:GetDescendants()) do
+                if v:IsA('TextLabel') and v.Name == 'CharName' and v.Text == selectedCharacter and v.Visible then
+                  v.Size = UDim2.new(10, 0, 10, 0)
+                  moveAndClick(v.Parent)
+                end
+              end
+            end
+          end
+        end
+        task.wait(1)
+      end
+    end)
 	end,
 })
 CharacterSelectionGroupBox:AddToggle("MyToggle", {
@@ -260,28 +277,48 @@ CharacterSelectionGroupBox:AddToggle("MyToggle", {
 
 	Callback = function(Value)
     autoReplay = Value
-    local Players = game:GetService("Players")
-    local VirtualInputManager = game:GetService("VirtualInputManager")
-    local UserInputService = game:GetService("UserInputService")
 
-    local player = Players.LocalPlayer
-    local gui = player:WaitForChild("PlayerGui"):WaitForChild("Result")
+    local Players = game:GetService("Players")
+    local UserInputService = game:GetService("UserInputService")
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+
     local function moveAndClick(button)
       if not button or not button:IsA("ImageButton") or not button.Visible then return end
       local pos = button.AbsolutePosition + (button.AbsoluteSize / 2)
-      VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, true, game, 0)
-      task.wait(0.05)
-      VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, false, game, 0)
-    end
 
-    while autoReplay do task.wait(1)
-      for _, v in pairs(gui:GetDescendants()) do
-        if v:IsA("ImageButton") and v.Name == "Replay" then
-          v.Size = UDim2.new(10, 0, 10, 0)
-          moveAndClick(v)
-        end
+      if UserInputService.TouchEnabled then
+        VirtualInputManager:SendTouchEvent(pos.X, pos.Y, 0, true, game, 0)
+        task.wait(0.05)
+        VirtualInputManager:SendTouchEvent  (pos.X, pos.Y, 0, false, game, 0.05)
+      else
+        VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, true, game, 0)
+        task.wait(0.05)
+        VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, false, game, 0)
       end
     end
+
+    task.spawn(function()
+      while true do
+        if autoReplay then
+          local player = Players.LocalPlayer
+          if player then
+            local gui = player:FindFirstChild("PlayerGui")
+            if gui then
+              local result = gui:FindFirstChild("Result")
+              if result then
+                for _, v in pairs(result:GetDescendants()) do
+                  if v:IsA("ImageButton") and v.Name == "Replay" and v.Visible then
+                    v.Size = UDim2.new(10, 0, 10, 0)
+                    moveAndClick(v)
+                  end
+                end
+              end
+            end
+          end
+        end
+        task.wait(1)
+      end
+    end)
 	end,
 })
 MiscGroupBox:AddToggle("MyToggle", {
