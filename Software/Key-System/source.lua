@@ -253,7 +253,32 @@ CheckKey.MouseButton1Click:Connect(function()
 	if readfile('InfinityX/Key-System/key.lua') == key then
 		notify("Key is valid.")
 		wait(1.2)
-		gui.Enabled = false
+		for _, v in ipairs(gui:GetDescendants()) do
+			if v:IsA("GuiObject") and not v:IsA('Frame') and not v:IsA('ImageLabel') then
+				TweenService:Create(v, TweenInfo.new(0.3), {
+					BackgroundTransparency = 1,
+					TextTransparency = 1
+				}):Play()
+			end
+		end
+		for _, v in ipairs(gui:GetDescendants()) do
+			if v:IsA('Frame') then
+				TweenService:Create(v, TweenInfo.new(0.3), {
+					BackgroundTransparency = 1,
+				}):Play()
+			end
+		end
+		for _, v in ipairs(gui:GetDescendants()) do
+			if v:IsA('ImageLabel') then
+				TweenService:Create(v, TweenInfo.new(0.3), {
+					ImageTransparency = 1,
+				}):Play()
+			end
+		end
+		CLoseKeySystem()
+		wait(0.5)
+		gui:Destroy()
+		correctKey = true
 	else
 		notify("Invalid key.")
 		wait(1)
