@@ -1,4 +1,5 @@
 -- variables
+local isMobile = game.UserInputService.TouchEnabled
 local function GetHumanoidRootPart()
   local player = game:GetService("Players").LocalPlayer
   local char = player.Character or player.CharacterAdded:Wait()
@@ -14,7 +15,7 @@ function GetCharName()
   return charNames
 end
 local LibrarySettings = {
-  Title = '<font color="rgb(110, 48, 160)" size="24"><b>InfinityX</b></font>',
+  Title = '<font color="rgb(110, 48, 160)" size="' .. (isMobile and '18' or '24') .. '"><b>InfinityX</b></font>',
   Footer = {
     GameName = '<font color="rgb(180,180,255)"><i>Anime Mania [ Arena ]</i></font> · ',
     Version = '<font color="rgb(160,160,160)">Version 4.2a</font> · ',
