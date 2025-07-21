@@ -264,7 +264,6 @@ end)
 local GetKey = makeButton("Get Key", UDim2.new(0.525, 0, 0, 150))
 GetKey.MouseButton1Click:Connect(function()
 	setclipboard(url)
-	GetKey.Text = "Copied!"
 	notify("Key URL copied to clipboard.")
 	wait(1)
 	GetKey.Text = "Get Key"
