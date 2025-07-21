@@ -30,6 +30,7 @@ print[[
 
 
 -- variables
+local isMobile = game.UserInputService.TouchEnabled
 function GetTools()
   local toolsNames = {}
   for _, v in pairs(game:GetService("ReplicatedStorage").Assets.Gear:GetChildren()) do
@@ -44,9 +45,9 @@ function GetItem(kind, item, method)
   return Event:InvokeServer({kind = kind, item = item, method = method})
 end
 local LibrarySettings = {
-  Title = '<font color="rgb(110, 48, 160)" size="24"><b>InfinityX</b></font>',
+  Title = '<font color="rgb(110, 48, 160)" size="' .. (isMobile and '18' or '24') .. '"><b>InfinityX</b></font>',
   Footer = {
-    GameName = '<font color="rgb(180,180,255)"><i>Tower of Hell</i></font> · ',
+    GameName = '<font color="rgb(180,180,255)"><i>Tower Of Hell</i></font> · ',
     Version = '<font color="rgb(160,160,160)">Version 4.2a</font> · ',
     DiscordLink = '<font color="rgb(100,200,255)">Join us: discord.gg/emKJgWMHAr</font>'
   }
