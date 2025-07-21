@@ -1,12 +1,14 @@
 -- variables
+local isMobile = game.UserInputService.TouchEnabled
 local LibrarySettings = {
-  Title = '<font color="rgb(110, 48, 160)" size="24"><b>InfinityX</b></font>',
+  Title = '<font color="rgb(110, 48, 160)" size="' .. (isMobile and '18' or '24') .. '"><b>InfinityX</b></font>',
   Footer = {
     GameName = '<font color="rgb(180,180,255)"><i>Anime Mania [ Lobby ]</i></font> · ',
     Version = '<font color="rgb(160,160,160)">Version 4.2a</font> · ',
     DiscordLink = '<font color="rgb(100,200,255)">Join us: discord.gg/emKJgWMHAr</font>'
   }
 }
+
 
 
 
