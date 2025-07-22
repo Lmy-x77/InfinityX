@@ -165,13 +165,28 @@ WaveGroupBox:AddToggle("MyToggle", {
 
 	Callback = function(Value)
     gd = Value
-    while gd do task.wait()
-      if GetHumanoidRootPart() then
-        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("clCheck"):InvokeServer(
-          'Dash'
-        )
-      end
+
+    local RunService = game:GetService('RunService')
+    local ReplicatedStorage = game:GetService('ReplicatedStorage')
+
+    local success, clCheck = pcall(function()
+        return ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("clCheck")
+    end)
+    if not success or not clCheck then
+        return
     end
+
+    RunService.RenderStepped:Connect(function()
+        if gd then
+          local successInvoke, errorMessage = pcall(function()
+              clCheck:InvokeServer('Dash')
+          end)
+
+          if not successInvoke then
+            warn("Error: ".. errorMessage)
+          end
+        end
+    end)
 	end,
 })
 local skills = {1, 2, 3, 4}
