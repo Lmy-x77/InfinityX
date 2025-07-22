@@ -18,7 +18,7 @@ function GetCharName()
   return charNames
 end
 local LibrarySettings = {
-  Title = '<font color="rgb(110, 48, 160)" size="' .. (isMobile and '18' or '24') .. '"><b>InfinityX</b></font>',
+  Title = '<font color="rgb(110, 48, 160)" size="' .. (isMobile and '14' or '24') .. '"><b>'.. (isMobile and ' InfinityX' or 'InfintyX') ..'</b></font>',
   Footer = {
     GameName = '<font color="rgb(180,180,255)"><i>Anime Mania [ Arena ]</i></font> · ',
     Version = '<font color="rgb(160,160,160)">Version 4.2a</font> · ',
@@ -289,7 +289,7 @@ CharacterSelectionGroupBox:AddToggle("MyToggle", {
       if UserInputService.TouchEnabled then
         VirtualInputManager:SendTouchEvent(pos.X, pos.Y, 0, true, game, 0)
         task.wait(0.05)
-        VirtualInputManager:SendTouchEvent  (pos.X, pos.Y, 0, false, game, 0.05)
+        VirtualInputManager:SendTouchEvent(pos.X, pos.Y, 0, false, game, 0.05)
       else
         VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, true, game, 0)
         task.wait(0.05)
