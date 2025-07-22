@@ -45,7 +45,7 @@ function GetItem(kind, item, method)
   return Event:InvokeServer({kind = kind, item = item, method = method})
 end
 local LibrarySettings = {
-  Title = '<font color="rgb(110, 48, 160)" size="' .. (isMobile and '18' or '24') .. '"><b>InfinityX</b></font>',
+  Title = '<font color="rgb(110, 48, 160)" size="' .. (isMobile and '14' or '24') .. '"><b>'.. (isMobile and ' InfinityX' or 'InfintyX') ..'</b></font>',
   Footer = {
     GameName = '<font color="rgb(180,180,255)"><i>Tower Of Hell</i></font> · ',
     Version = '<font color="rgb(160,160,160)">Version 4.2a</font> · ',
