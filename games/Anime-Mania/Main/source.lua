@@ -336,6 +336,62 @@ CharacterSelectionGroupBox:AddToggle("MyToggle", {
     end)
 	end,
 })
+CharacterSelectionGroupBox:AddToggle("MyToggle", {
+	Text = "Auto next",
+	Tooltip = "Active to replay mode automatically",
+	DisabledTooltip = "I am disabled!",
+
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+
+	Callback = function(Value)
+    autoNext = Value
+
+    local Players = game:GetService("Players")
+    local UserInputService = game:GetService("UserInputService")
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+
+    local function moveAndClick(button)
+      if not button or not button:IsA("ImageButton") or not button.Visible then return end
+      local pos = button.AbsolutePosition + (button.AbsoluteSize / 2)
+
+      if UserInputService.TouchEnabled then
+        VirtualInputManager:SendTouchEvent(pos.X, pos.Y, 0, true, game, 0)
+        task.wait(0.05)
+        VirtualInputManager:SendTouchEvent(pos.X, pos.Y, 0, false, game, 0.05)
+      else
+        VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, true, game, 0)
+        task.wait(0.05)
+        VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, false, game, 0)
+      end
+    end
+
+    task.spawn(function()
+      while true do
+        if autoNext then
+          local player = Players.LocalPlayer
+          if player then
+            local gui = player:FindFirstChild("PlayerGui")
+            if gui then
+              local result = gui:FindFirstChild("Result")
+              if result then
+                for _, v in pairs(result:GetDescendants()) do
+                  if v:IsA("ImageButton") and v.Name == "Nex" and v.Visible then
+                    v.Size = UDim2.new(10, 0, 10, 0)
+                    moveAndClick(v)
+                  end
+                end
+              end
+            end
+          end
+        end
+        task.wait(1)
+      end
+    end)
+	end,
+})
 MiscGroupBox:AddToggle("MyToggle", {
 	Text = "Auto next wave [Dungeon]",
 	Tooltip = "Teleport you to wave point",
