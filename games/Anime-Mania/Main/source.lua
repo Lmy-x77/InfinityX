@@ -322,6 +322,29 @@ CharacterSelectionGroupBox:AddToggle("MyToggle", {
 	end,
 })
 MiscGroupBox:AddToggle("MyToggle", {
+	Text = "Auto next wave [Dungeon]",
+	Tooltip = "Teleport you to wave point",
+	DisabledTooltip = "I am disabled!",
+
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+
+	Callback = function(Value)
+    AutoWave = Value
+    while AutoWave do task.wait()
+      for _, v in pairs(workspace.FX:GetChildren()) do
+        if v:IsA('MeshPart') and v.Name == 'WaveSilo' then
+          if GetHumanoidRootPart() then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
+          end
+        end
+      end
+    end
+	end,
+})
+MiscGroupBox:AddToggle("MyToggle", {
 	Text = "Anti afk",
 	Tooltip = "Active for dont have kiked at 20 minutes idled",
 	DisabledTooltip = "I am disabled!",
