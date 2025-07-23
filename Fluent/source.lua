@@ -4296,7 +4296,7 @@ ElementsTable.Dropdown = (function()
 
 	return Element
 end)()
-ElementsTable.Paragraph = (function()
+ElementsTable. = (function()
 	local Paragraph = {}
 	Paragraph.__index = Paragraph
 	Paragraph.__type = "Paragraph"
@@ -4308,6 +4308,8 @@ ElementsTable.Paragraph = (function()
 		local Paragraph = Components.Element(Config.Title, Config.Content, Paragraph.Container, false, Config)
 		Paragraph.Frame.BackgroundTransparency = 0.92
 		Paragraph.Border.Transparency = 0.6
+		Paragraph.Title.RichText = true
+		Paragraph.Content.RichText = true
 
 		Paragraph.SetTitle = Paragraph.SetTitle
 		Paragraph.SetDesc = Paragraph.SetDesc
