@@ -249,9 +249,16 @@ CharacterSelectionGroupBox:AddToggle("MyToggle", {
       local pos = button.AbsolutePosition + (button.AbsoluteSize / 2)
 
       if UserInputService.TouchEnabled then
-        VirtualInputManager:SendTouchEvent(pos.X, pos.Y, 0, true, game, 0)
-        task.wait(0.05)
-        VirtualInputManager:SendTouchEvent  (pos.X, pos.Y, 0, false, game, 0.05)
+        if not movemouseabs and not mouse1click then
+          Library:Notify({
+            Title = "InfinityX",
+            Description = "Your mobile exploit dont support this function, i reccomend use the KRNL for more experience",
+            Time = 6,
+          })
+          return
+        end
+        mousemoveabs(pos.X, pos.Y)
+        mouse1click()
       else
         VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, true, game, 0)
         task.wait(0.05)
@@ -302,9 +309,16 @@ CharacterSelectionGroupBox:AddToggle("MyToggle", {
       local pos = button.AbsolutePosition + (button.AbsoluteSize / 2)
 
       if UserInputService.TouchEnabled then
-        VirtualInputManager:SendTouchEvent(pos.X, pos.Y, 0, true, game, 0)
-        task.wait(0.05)
-        VirtualInputManager:SendTouchEvent(pos.X, pos.Y, 0, false, game, 0.05)
+        if not movemouseabs and not mouse1click then
+          Library:Notify({
+            Title = "InfinityX",
+            Description = "Your mobile exploit dont support this function, i reccomend use the KRNL for more experience",
+            Time = 6,
+          })
+          return
+        end
+        mousemoveabs(pos.X, pos.Y)
+        mouse1click()
       else
         VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, true, game, 0)
         task.wait(0.05)
@@ -358,9 +372,16 @@ CharacterSelectionGroupBox:AddToggle("MyToggle", {
       local pos = button.AbsolutePosition + (button.AbsoluteSize / 2)
 
       if UserInputService.TouchEnabled then
-        VirtualInputManager:SendTouchEvent(pos.X, pos.Y, 0, true, game, 0)
-        task.wait(0.05)
-        VirtualInputManager:SendTouchEvent(pos.X, pos.Y, 0, false, game, 0.05)
+        if not movemouseabs and not mouse1click then
+          Library:Notify({
+            Title = "InfinityX",
+            Description = "Your mobile exploit dont support this function, i reccomend use the KRNL for more experience",
+            Time = 6,
+          })
+          return
+        end
+        mousemoveabs(pos.X, pos.Y)
+        mouse1click()
       else
         VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, true, game, 0)
         task.wait(0.05)
