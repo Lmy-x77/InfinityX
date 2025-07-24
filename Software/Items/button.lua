@@ -54,8 +54,8 @@ UIStroke.Color = Color3.new(1, 1, 1)
 UIGradient.Parent = UIStroke
 UIGradient.Rotation = 0
 UIGradient.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 255)), -- rosa
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(130, 0, 255))  -- roxo
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(130, 0, 255))
 }
 
 
