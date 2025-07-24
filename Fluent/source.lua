@@ -3502,18 +3502,6 @@ Components.Window = (function()
 					})
 				end
 			end
-			if not RunService:IsStudio() and Mobile and Minimizer then
-				pcall(function()
-					local minimizeButton = Minimizer:FindFirstChild("Frame"):FindFirstChild("TextButton")
-					minimizeButton.Visible = false
-					if minimizeButton then
-						local imageLabel = minimizeButton:FindFirstChild("ImageLabel")
-						if imageLabel then
-							imageLabel.Image = Window.Minimized and "rbxassetid://10734896384" or "rbxassetid://10734897102"
-						end
-					end
-				end)
-			end
 		end
 
 		function Window:Destroy()
@@ -6728,28 +6716,6 @@ else
 	Fluent = Library
 end
 
-local MinimizeButton = New("TextButton", {
-	BackgroundTransparency = 1,
-	Size = UDim2.new(1, 0, 1, 0),
-	BorderSizePixel = 0
-}, {
-	New("UIPadding", {
-		PaddingBottom = UDim.new(0, 2),
-		PaddingLeft = UDim.new(0, 2),
-		PaddingRight = UDim.new(0, 2),
-		PaddingTop = UDim.new(0, 2),
-	}),
-	New("ImageLabel", {
-		Image = Mobile and (Button_Icon ~= "" and Button_Icon or "rbxassetid://10734897102") or "rbxassetid://10734897102",
-		Size = UDim2.new(1, 0, 1, 0),
-		BackgroundTransparency = 1,
-	}, {
-		New("UIAspectRatioConstraint", {
-			AspectRatio = 1,
-			AspectType = Enum.AspectType.FitWithinMaxSize,
-		})
-	})
-})
 
 local Minimizer
 
@@ -6771,7 +6737,6 @@ if Mobile then
 			New("UICorner", {
 				CornerRadius = UDim.new(0.25, 0),
 			}),
-			MinimizeButton
 		})
 	})
 else
@@ -6793,7 +6758,6 @@ else
 			New("UICorner", {
 				CornerRadius = UDim.new(0.25, 0),
 			}),
-			MinimizeButton
 		})
 	})
 end
@@ -6817,14 +6781,6 @@ end)
 
 
 
-Creator.AddSignal(MinimizeButton.InputChanged, function(Input)
-	if
-		Input.UserInputType == Enum.UserInputType.MouseMovement
-		or Input.UserInputType == Enum.UserInputType.Touch
-	then
-		DragInput = Input
-	end
-end)
 Creator.AddSignal(Minimizer.InputChanged, function(Input)
 	if
 		Input.UserInputType == Enum.UserInputType.MouseMovement
@@ -6862,9 +6818,6 @@ Creator.AddSignal(UserInputService.InputChanged, function(Input)
 	end
 end)
 
-AddSignal(MinimizeButton.MouseButton1Click, function()
-	Library.Window:Minimize()
-end)
 
 task.wait(0.01)
 
