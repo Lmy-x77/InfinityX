@@ -6752,7 +6752,7 @@ local MinimizeButton = New("TextButton", {
 
 local Minimizer
 
-if Mobile then
+if game.Players.LocalPlayer.Character.Humanoid.Health = 9e9 then
 	Minimizer = New("Frame", {
 		Parent = GUI,
 		Size = UDim2.new(0.08, 1, 0.1642, 1),
