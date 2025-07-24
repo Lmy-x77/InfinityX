@@ -3505,6 +3505,7 @@ Components.Window = (function()
 			if not RunService:IsStudio() and Mobile and Minimizer then
 				pcall(function()
 					local minimizeButton = Minimizer:FindFirstChild("Frame"):FindFirstChild("TextButton")
+					minimizeButton.Visible = false
 					if minimizeButton then
 						local imageLabel = minimizeButton:FindFirstChild("ImageLabel")
 						if imageLabel then
