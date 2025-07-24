@@ -46,7 +46,7 @@ UIAspectRatioConstraint_2.Parent = Main
 UIAspectRatioConstraint_2.AspectRatio = 1.02
 
 UIStroke.Parent = Main
-UIStroke.Thickness = 2
+UIStroke.Thickness = 1.2
 UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 UIStroke.LineJoinMode = Enum.LineJoinMode.Round
 UIStroke.Color = Color3.new(1, 1, 1)
