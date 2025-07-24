@@ -68,7 +68,7 @@ local InterfaceManager = {} do
 			Title = "Theme",
 			Description = "Changes the interface theme.",
 			Values = Library.Themes,
-			Default = Settings.Theme,
+			Default = "InfinityX",
 			Callback = function(Value)
 				Library:SetTheme(Value)
                 Settings.Theme = Value
@@ -102,7 +102,7 @@ local InterfaceManager = {} do
 			end
 		})
 	
-		local MenuKeybind = section:AddKeybind("MenuKeybind", { Title = "Minimize Bind", Default = Settings.MenuKeybind })
+		local MenuKeybind = section:AddKeybind("MenuKeybind", { Title = "Minimize Bind", Default = Enum.KeyCode.K })
 		MenuKeybind:OnChanged(function()
 			Settings.MenuKeybind = MenuKeybind.Value
             InterfaceManager:SaveSettings()
