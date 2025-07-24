@@ -87,9 +87,15 @@ local function MHFYJL_fake_script() -- Main.hideUi
         local button = script.Parent
         local function toggleVisibility()
 			local VirtualInputManager = game:GetService("VirtualInputManager")
-			VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.K, false, nil)
-			task.wait(0.1)
-			VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.K, false, nil)
+            if game.PlaceId == 537413528 then
+			    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.LeftControl, false, nil)
+			    task.wait(0.1)
+			    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.LeftControl, false, nil)
+            else
+			    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.K, false, nil)
+			    task.wait(0.1)
+			    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.K, false, nil)
+            end
         end
 
         button.TouchTap:Connect(toggleVisibility)
