@@ -36,10 +36,6 @@ else
 	Mobile = table.find({Enum.Platform.IOS, Enum.Platform.Android}, UserInputService:GetPlatform()) ~= nil
 end
 
-if Show_Button then
-	Mobile = true
-end
-
 local fischbypass
 
 if game.GameId == 5750914919 then
