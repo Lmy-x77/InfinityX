@@ -1095,7 +1095,7 @@ UiSettingsGroubBox:AddButton("Unload", function()
 	Library:Unload()
 end)
 CreditsGroupBox:AddLabel("Script made by Lmy77")
-CreditsGroupBox:AddButton("Discor server", function()
+CreditsGroupBox:AddButton("Discord server", function()
 	setclipboard("https://discord.gg/emKJgWMHAr")
     Library:Notify({
         Title = "InfinityX",
