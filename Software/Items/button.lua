@@ -1,54 +1,85 @@
--- (VOID) : Gui to Lua
--- Version: 1.4
-
--- Instances:
-
 local Button = Instance.new("ScreenGui")
 local Main = Instance.new("TextButton")
 local UICorner = Instance.new("UICorner")
 local Icon = Instance.new("ImageLabel")
 local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
 local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
+local UIStroke = Instance.new("UIStroke")
+local UIGradient = Instance.new("UIGradient")
 
---Properties:
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
 
 Button.Name = "Button"
 Button.Parent = (game:GetService("CoreGui") or gethui())
 Button.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+Button.ResetOnSpawn = false
 
 Main.Name = "Main"
 Main.Parent = Button
-Main.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
-Main.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Main.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
 Main.BorderSizePixel = 0
-Main.Position = UDim2.new(0.0429799445, 0, 0.117917307, 0)
-Main.Size = UDim2.new(0.0486237705, 0, 0.0842266455, 0)
+Main.Position = UDim2.new(0.043, 0, 0.12, 0)
+Main.Size = UDim2.new(0.05, 0, 0.085, 0)
 Main.AutoButtonColor = false
-Main.Font = Enum.Font.SourceSans
+Main.Font = Enum.Font.GothamBold
 Main.Text = ""
-Main.TextColor3 = Color3.fromRGB(0, 0, 0)
-Main.TextSize = 14.000
+Main.TextColor3 = Color3.fromRGB(255, 255, 255)
+Main.TextSize = 14
 
-UICorner.CornerRadius = UDim.new(0.100000001, 0)
+UICorner.CornerRadius = UDim.new(0.25, 0)
 UICorner.Parent = Main
 
 Icon.Name = "Icon"
 Icon.Parent = Main
-Icon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Icon.BackgroundTransparency = 1.000
-Icon.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Icon.BorderSizePixel = 0
-Icon.Position = UDim2.new(0.0447446592, 1, 0.114989087, 0)
-Icon.Size = UDim2.new(0.886666656, 0, 1.3909086, 0)
+Icon.BackgroundTransparency = 1
+Icon.Size = UDim2.new(0.85, 0, 0.85, 0)
+Icon.Position = UDim2.new(0.075, 0, 0.075, 0)
 Icon.Image = "http://www.roblox.com/asset/?id=126527122577864"
+Icon.ImageColor3 = Color3.fromRGB(220, 220, 220)
 
 UIAspectRatioConstraint.Parent = Icon
-UIAspectRatioConstraint.AspectRatio = 1.154
+UIAspectRatioConstraint.AspectRatio = 1.1
 
 UIAspectRatioConstraint_2.Parent = Main
-UIAspectRatioConstraint_2.AspectRatio = 1.023
+UIAspectRatioConstraint_2.AspectRatio = 1.02
 
--- Scripts:
+UIStroke.Parent = Main
+UIStroke.Thickness = 2
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+UIStroke.LineJoinMode = Enum.LineJoinMode.Round
+UIStroke.Color = Color3.new(1, 1, 1)
+
+UIGradient.Parent = UIStroke
+UIGradient.Rotation = 0
+UIGradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 255)), -- rosa
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(130, 0, 255))  -- roxo
+}
+
+
+task.spawn(function()
+	while true do
+		UIGradient.Rotation = (UIGradient.Rotation + 1) % 360
+		RunService.RenderStepped:Wait()
+	end
+end)
+
+
+local defaultColor = Main.BackgroundColor3
+local hoverColor = Color3.fromRGB(55, 55, 60)
+
+Main.MouseEnter:Connect(function()
+	TweenService:Create(Main, TweenInfo.new(0.2), {BackgroundColor3 = hoverColor}):Play()
+end)
+
+Main.MouseLeave:Connect(function()
+	TweenService:Create(Main, TweenInfo.new(0.2), {BackgroundColor3 = defaultColor}):Play()
+end)
+
+
+
 
 local function MHFYJL_fake_script() -- Main.hideUi 
 	local script = Instance.new('LocalScript', Main)
