@@ -218,6 +218,8 @@ function NOFLY()
 	end
 	pcall(function() workspace.CurrentCamera.CameraType = Enum.CameraType.Custom end)
 end
+local lastValue = game:GetService("Players").LocalPlayer.Data.Gold.Value
+local totalGained = 0
 local MoneyFarm = {
 	Enabled = false,
 	method = 'Teleport',
@@ -535,21 +537,18 @@ task.spawn(function()
   while true do task.wait()
     local player = game:GetService("Players").LocalPlayer
     local gold = player:WaitForChild("Data"):WaitForChild("Gold")
-    local lastValue = gold.Value
 
     p3:SetDesc(gold.Value)
     WebHookSettings.Items.CurrentGold = tostring(gold.Value)
 
-    gold:GetPropertyChangedSignal("Value"):Connect(function()
-      local newValue = gold.Value
-      if newValue > lastValue then
-        local diff = newValue - lastValue
-        wait(2)
-        p2:SetDesc(diff)
-        WebHookSettings.Items.ObtaindedGold = tostring(diff)
-      end
-      lastValue = newValue
-    end)
+    local currentValue = tonumber(gold.Value)
+    if currentValue > lastValue then
+      local diff = currentValue - lastValue
+      totalGained += diff
+      WebHookSettings.Items.ObtaindedGold = tostring(totalGained)
+      p2:SetDesc(tostring(totalGained))
+      lastValue = currentValue
+    end
   end
 end)
 Tabs.AutoFarm:AddSection("[🤖] - Webhook")
