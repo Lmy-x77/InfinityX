@@ -279,23 +279,21 @@ function GetPlayersName()
   end
   return players
 end
-function GetOneZone()
-  for _, v in pairs(workspace:GetChildren()) do
-    if v:IsA('Part') and v.Name:lower():find('zone') then
-      return v
-    end
-  end
-end
 function GetPlayerZone()
 	local player = game.Players.LocalPlayer
 	local teamName = tostring(player.Team):lower()
+
 	for _, v in pairs(workspace:GetChildren()) do
-    local TeamZone = v.Name:lower():find(teamName .. "zone")
-    if TeamZone then
-      return v
-    elseif not TeamZone then
-      return GetOneZone()
-    end
+		local TeamZone = v.Name:lower():find(teamName .. "zone")
+		if TeamZone then
+			return v
+		end
+	end
+
+	if teamName == "yellow" then
+		return workspace["New YellerZone"]
+	elseif teamName == "green" then
+		return workspace["CamoZone"]
 	end
 end
 function TpFarm()
