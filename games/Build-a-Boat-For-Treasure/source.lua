@@ -985,9 +985,26 @@ ThinToggle:OnChanged(function(Value)
     local Event = GetPlayerZone().VoteLaunchRE
     Event:FireServer()
     wait(.2)
-    MoneyFarm.Enabled = true
-    TpFarm()
-    MoneyFarm.Enabled = false
+    local oldPos = ''
+    oldPos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+    local character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+    local hrp = character:WaitForChild("HumanoidRootPart")
+
+    local BV = Instance.new("BodyVelocity", hrp)
+    BV.Velocity = Vector3.new(0, -0.1, 0)
+
+    hrp.CFrame = CFrame.new(-135.900, 72, 623.750)
+    while hrp.CFrame.Z < 8600.750 do
+      for _ = 1, 50 do
+        hrp.CFrame = hrp.CFrame + Vector3.new(0, 0, 1)
+      end
+      wait()
+    end
+
+    BV:Destroy()
+    hrp.CFrame = CFrame.new(-51, -360, 9329)
+    wait(2)
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(oldPos)
   end
 end)
 
