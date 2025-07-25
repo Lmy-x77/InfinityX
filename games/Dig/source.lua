@@ -10,11 +10,6 @@ end
 
 
 -- start
-local Event = game:GetService("ReplicatedStorage").Remotes.Notification_Universal_Top
-firesignal(Event.OnClientEvent,
-    "Loading script...",
-    game:GetService("ReplicatedStorage").Resources.Sounds.SFX._UI.NPC_TravelingMerchant
-)
 wait(.5)
 print[[                                                                     
  /$$$$$$            /$$$$$$  /$$           /$$   /$$               /$$   /$$
@@ -33,6 +28,9 @@ print[[
 
 
 -- variables
+local AppraiserSettings = {
+  Time = 0.5
+}
 local DigFarmSettings = {
   InstantDelay = 0.5,
   NormalDelay = 2,
@@ -57,6 +55,15 @@ local function keysOf(dict)
     end
   end
   return list
+end
+function GetAllTools()
+  local tools = {}
+  for _, v in pairs(game:GetService('Players').LocalPlayer.Backpack:GetChildren()) do
+    if v:IsA('Tool') and not v.Name:lower():find('shovel') and not v.Name:lower():find('equipment') and not v.Name:lower():find('journal') then
+      table.insert(tools, v.Name)
+    end
+  end
+  return tools
 end
 function GetPurchasable()
   local PurcheShovels = {}
@@ -126,13 +133,6 @@ function EnableUi()
     game:GetService("Players").LocalPlayer.PlayerGui.Backpack.Backpack.Visible = true
   end
 end
-function Instant()
-  local Event = game:GetService("ReplicatedStorage").Remotes.Dig_Finished
-  Event:FireServer(
-    0,
-    {{}}
-  )
-end
 function GetBosses()
   local bossName = {}
   for _, v in pairs(game:GetService("ReplicatedStorage").Resources.Gameplay.Bosses:GetChildren()) do
@@ -151,42 +151,93 @@ function GetCars()
   end
   return carsName
 end
-if not bypassed then
-  if hookmetamethod and getnamecallmethod and hookfunction then
-    pcall(function()
-      loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/scripts/games/Dig/Bypass/source.lua",true))()
-    end)
-
-    local Event = game:GetService("ReplicatedStorage").Remotes.Notification_Universal_Top
-    firesignal(Event.OnClientEvent,
-        "<font color = '#03fc13'>Sucess:</font> Bypass in execution",
-        game:GetService("ReplicatedStorage").Resources.Sounds.SFX._UI.NPC_TravelingMerchant
-    )
-    wait(1.2)
-
-  else
-
-    local Event = game:GetService("ReplicatedStorage").Remotes.Notification_Universal_Top
-    firesignal(Event.OnClientEvent,
-        "<font color = '#fc3a4a'>Error:</font> Your exploit does not support bypassing",
-        game:GetService("ReplicatedStorage").Resources.Sounds.SFX._UI.NPC_TravelingMerchant
-    )
-    print('Your exploit does not support bypassing')
-    wait(1.2)
+local function safeFire(eventPath, ...)
+  local args = {...}
+  local success, err = pcall(function()
+      if eventPath then
+          local event = eventPath()
+          if event then
+            local realArgs = {}
+            for _, v in ipairs(args) do
+              table.insert(realArgs, (type(v) == "function") and v() or v)
+            end
+            event:FireServer(unpack(realArgs))
+          else
+            error("Event not found")
+          end
+      else
+          local realArgs = {}
+          for _, v in ipairs(args) do
+              if type(v) == "function" then
+                table.insert(realArgs, v())
+              else
+                table.insert(realArgs, v)
+              end
+          end
+      end
+  end)
+  if not success then
+    print('Error')
   end
-elseif bypassed then
-  firesignal(Event.OnClientEvent,
-  "<font color = '#03fc13'>Sucess:</font> Bypass already applied",
-  game:GetService("ReplicatedStorage").Resources.Sounds.SFX._UI.NPC_TravelingMerchant
-  )
-  print('Bypass already applied')
 end
-pcall(function() getgenv().bypassed = true end)
-local Event = game:GetService("ReplicatedStorage").Remotes.Notification_Universal_Top
-firesignal(Event.OnClientEvent,
-    "Script loaded successfully!",
-    game:GetService("ReplicatedStorage").Resources.Sounds.SFX._UI.NPC_TravelingMerchant
-)
+function Instant()
+  local vector = Vector3
+  local finishArgs = {
+      0,
+    {
+      {
+        Orientation = vector.zero,
+        Transparency = 1,
+        Name = "PositionPart",
+        Position = vector.new(2048.3315, 108.6206, -321.5524),
+        Color = Color3.fromRGB(163, 162, 165),
+        Material = Enum.Material.Plastic,
+        Shape = Enum.PartType.Block,
+        Size = vector.new(0.1, 0.1, 0.1)
+      },
+      {
+        Orientation = vector.new(0, 90, 90),
+        Transparency = 0,
+        Name = "CenterCylinder",
+        Position = vector.new(2048.3315, 108.5706, -321.5524),
+        Color = Color3.fromRGB(135, 114, 85),
+        Material = Enum.Material.Pebble,
+        Shape = Enum.PartType.Cylinder,
+        Size = vector.new(0.2, 6.4162, 5.5873)
+      }
+    }
+  }
+  safeFire(function()
+      return game.ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Dig_Finished")
+  end, unpack(finishArgs))
+end
+function EquipShovel()
+  local player = game:GetService("Players").LocalPlayer
+  local backpack = player:WaitForChild("Backpack")
+  local character = player.Character or player.CharacterAdded:Wait()
+  local validShovelsFolder = game.ReplicatedStorage:WaitForChild("PlayerItems"):WaitForChild("Shovels")
+  local validShovelNames = {}
+  for _, shovel in ipairs(validShovelsFolder:GetChildren()) do
+      validShovelNames[shovel.Name] = true
+  end
+  task.wait(0)
+  for _, tool in ipairs(backpack:GetChildren()) do
+      if tool:IsA("Tool") and validShovelNames[tool.Name] then
+          tool.Parent = character
+          break
+      end
+  end
+end
+function UnnequipShovel()
+  local player = game:GetService("Players").LocalPlayer
+  local backpack = player:WaitForChild("Backpack")
+  local character = player.Character or player.CharacterAdded:Wait()
+  for _, tool in ipairs(character:GetChildren()) do
+    if tool:IsA("Tool") then
+        tool.Parent = backpack
+    end
+  end
+end
 wait(.5)
 scriptVersion = '4.2a'
 
@@ -238,6 +289,7 @@ local Tabs = {
 -- source
 local DigGroupBox = Tabs.Farm:AddLeftGroupbox("Dig", "shovel")
 local DigSettingsGroupBox = Tabs.Farm:AddRightGroupbox("Dig Settings", "settings")
+local AppraiserGroupBox = Tabs.Farm:AddLeftGroupbox("Appraiser", 'dices')
 local TeleportGroupBox = Tabs.Farm:AddLeftGroupbox("Teleport", "locate")
 DigGroupBox:AddDropdown("", {
 	Values = {'Legit', 'Normal', 'Instant'},
@@ -457,6 +509,90 @@ DigSettingsGroupBox:AddToggle("EnableUiToggle", {
       EnableUi()
     end
   end
+})
+AppraiserGroupBox:AddDropdown("", {
+	Values = GetAllTools(),
+	Default = '...',
+	Multi = false,
+
+	Text = "Select item",
+	Tooltip = "Select a item you want to appraiser",
+	DisabledTooltip = "I am disabled!",
+
+	Searchable = true,
+
+	Callback = function(Value)
+    selectedItem = Value
+	end,
+
+	Disabled = false,
+	Visible = true,
+})
+AppraiserGroupBox:AddToggle("EnableUiToggle", {
+  Text = "Auto appraiser",
+  Tooltip = 'Activate to appraiser selected item automatically',
+  Default = false,
+  Callback = function(Value)
+    autoAprraiser = Value
+    while autoAprraiser do
+      for _, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+        if v:IsA('Tool') and v.Name == selectedItem then
+          v.Parent = game.Players.LocalPlayer.Character
+        end
+      end
+      wait(0.2)
+      game:GetService("ReplicatedStorage").DialogueRemotes.Appraiser_Appraise:InvokeServer()
+      task.wait(AppraiserSettings.Time)
+    end
+  end
+})
+AppraiserGroupBox:AddButton({
+	Text = "Appraiser",
+	Func = function()
+    for _, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+      if v:IsA('Tool') and v.Name == selectedItem then
+        v.Parent = game.Players.LocalPlayer.Character
+      end
+    end
+    wait(0.2)
+    game:GetService("ReplicatedStorage").DialogueRemotes.Appraiser_Appraise:InvokeServer()
+	end,
+	DoubleClick = false,
+
+	Tooltip = "Click to save your current position",
+	DisabledTooltip = "I am disabled!",
+
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+})
+AppraiserGroupBox:AddButton({
+	Text = "Teleport to npc",
+	Func = function()
+    TeleportTo(false, nil, false, nil, true, 2060, 113, -465)
+	end,
+	DoubleClick = false,
+
+	Tooltip = "Click to save your current position",
+	DisabledTooltip = "I am disabled!",
+
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+})
+AppraiserGroupBox:AddDivider()
+AppraiserGroupBox:AddInput("MyTextbox", {
+  Default = "",
+  Numeric = true,
+  Finished = false,
+  ClearTextOnFocus = false,
+
+  Text = "Appraiser speed",
+  Placeholder = "0.5",
+
+  Callback = function(Value)
+    AppraiserSettings.Time = Value
+  end,
 })
 TeleportGroupBox:AddButton({
 	Text = "Save positon",
@@ -754,63 +890,32 @@ DeliveryGroupBox:AddToggle("EnableUiToggle", {
   Tooltip = 'Activate to complete event automatically',
   Default = false,
   Callback = function(Value)
-    autoEvent = Value
+    runningPenguinQuest = Value
+    if Value then
+        task.spawn(function()
+            while runningPenguinQuest do
+                local args = { "Pizza Penguin" }
+                game:GetService("ReplicatedStorage"):WaitForChild("DialogueRemotes"):WaitForChild("StartInfiniteQuest"):InvokeServer(unpack(args))
+                task.wait(1)
 
-    local back = false
-    local start = true
-    if not autoEvent then
-      back = false
-      start = true
-    end
-    while autoEvent do task.wait()
-      if not autoEvent then return end
-      local findCostumer = workspace.Active.PizzaCustomers:FindFirstChildWhichIsA('Model')
-      if (not findCostumer or start) and not back then
-        for _, v in pairs(workspace.World.NPCs:GetChildren()) do
-          if v:IsA('Model') and v.Name == 'Pizza Penguin' then
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(v.WorldPivot.Position)
+                local penguin = workspace:FindFirstChild("Active") and workspace.Active:FindFirstChild("PizzaCustomers") and workspace.Active.PizzaCustomers:FindFirstChild("Valued Customer") and workspace.Active.PizzaCustomers["Valued Customer"]:FindFirstChild("Penguin")
+                if penguin and penguin:IsA("Model") and penguin.PrimaryPart then
+                    local char = game:GetService("Players").LocalPlayer.Character or game:GetService("Players").LocalPlayer.CharacterAdded:Wait()
+                    local hrp = char:WaitForChild("HumanoidRootPart")
+                    hrp.CFrame = penguin.PrimaryPart.CFrame + Vector3.new(0, 5, 0)
+                    task.wait(1)
+                    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Quest_DeliverPizza"):InvokeServer()
+                end
+                task.wait(1)
 
-            local h1 = v:WaitForChild('HumanoidRootPart')
-            if h1 then
-              wait(2)
-              local Event = game:GetService("ReplicatedStorage").DialogueRemotes.StartInfiniteQuest
-              Event:InvokeServer(
-                "Pizza Penguin"
-              )
-              start = false
+                game:GetService("ReplicatedStorage"):WaitForChild("DialogueRemotes"):WaitForChild("CompleteInfiniteQuest"):InvokeServer(unpack(args))
+
+                local char = game:GetService("Players").LocalPlayer.Character or game:GetService("Players").LocalPlayer.CharacterAdded:Wait()
+                local hrp = char:WaitForChild("HumanoidRootPart")
+                hrp.CFrame = CFrame.new(4173, 1193, -4329)
+                task.wait(60)
             end
-          end
-        end
-      elseif findCostumer and not back and not start then
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(findCostumer.WorldPivot.Position)
-
-        local h2 = findCostumer:WaitForChild('HumanoidRootPart')
-        if h2 then
-          wait(2)
-          local Event = game:GetService("ReplicatedStorage").Remotes.Quest_DeliverPizza
-          Event:InvokeServer()
-          wait(.2)
-          back = true
-        end
-      end
-      if back and not start then
-        for _, v in pairs(workspace.World.NPCs:GetChildren()) do
-          if v:IsA('Model') and v.Name == 'Pizza Penguin' then
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(v.WorldPivot.Position)
-
-            local h3 = v:WaitForChild('HumanoidRootPart')
-            if h3 then
-              wait(2)
-              local Event = game:GetService("ReplicatedStorage").DialogueRemotes.CompleteInfiniteQuest
-              Event:InvokeServer(
-                "Pizza Penguin"
-              )
-              back = false
-              start = true
-            end
-          end
-        end
-      end
+        end)
     end
   end
 })
@@ -826,10 +931,9 @@ CodesGroupBox:AddButton({
 	Func = function()
     local validCodes = {'release', 'evilcode', 'plsdevshovel'}
     for _, v in pairs(validCodes) do
-      local Event = game:GetService("ReplicatedStorage").Remotes.Complete_Code
-      Event:InvokeServer(
-        v
-      )
+      safeFire(function()
+        return game:GetService("ReplicatedStorage").Remotes.Complete_Code
+      end, v)
     end
 	end,
 	DoubleClick = false,
@@ -1107,18 +1211,6 @@ end)
 
 -- extra functions
 getDpiScale()
-game:GetService("ReplicatedStorage").Resources.Sounds.SFX._UI.Boss_Alert.Volume = 6
-local Event = game:GetService("ReplicatedStorage").Remotes.Notification_Universal_Top
-firesignal(Event.OnClientEvent,
-    "Welcome to <font color = '#821de0'>InfinityX</font>!", game:GetService("ReplicatedStorage").Resources.Sounds.SFX._UI.Boss_Alert
-)
-wait(1)
-Library:Notify({
-  Title = "<font color='#d63031'><b>⚠️ ATTENTION — SECURITY NOTICE ⚠️</b></font>",
-  Description = "<font color='#00b894'>This script integrates a high-level Anti-Cheat bypass</font>, engineered to intercept and block <font color='#fdcb6e'>suspicious functions</font> and <font color='#ffeaa7'>remotes associated with moderation systems</font>.\nIt leverages <font color='#74b9ff'>advanced protection mechanisms</font> to minimize detection.\n\n<font color='#fab1a0'>However, it does <u>not</u> guarantee immunity from player reports.</font>\n\n<font color='#ff7675'><b>Recommended Use:</b></font> <font color='#d63031'>Run on alternate accounts only.</font>\n<font color='#e17055'><b>Do not overuse or exploit.</b></font>\n\n<font color='#d63031'><b>Abuse may result in account suspension or permanent ban.</b></font>\n\n<font color='#55efc4'>Use responsibly and at your own risk.</font>",
-  Time = 30,
-})
-
 workspace.World.Interactive.Purchaseable.ChildAdded:Connect(function()
   Options.PurchasebleDropdown:SetValues(GetPurchasable())
 end)
