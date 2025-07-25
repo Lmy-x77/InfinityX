@@ -425,6 +425,7 @@ local Tabs = {
   Quest = Window:AddTab({ Title = "Quest", Icon = "scroll" }),
   Character = Window:AddTab({ Title = "Character", Icon = "user" }),
   Teleport = Window:AddTab({ Title = "Teleport", Icon = "locate" }),
+  Changelog = Window:AddTab({ Title = "Changelog", Icon = "list" }),
   Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 Window:SelectTab(1)
@@ -1237,6 +1238,60 @@ SpectatePlayer:OnChanged(function(Value)
     end
   end
 end)
+local DeleteIsolation = Tabs.Character:AddToggle("", {
+  Title = "Delete isolation mode",
+  Description = "Automatically identifies and removes all invisible or non-collidable barriers present within any base that has Isolation Mode currently enabled, ensuring unrestricted access or visibility as required.",
+  Default = false,
+})
+DeleteIsolation:OnChanged(function(Value)
+  delete = Value
+  local deletelist = {'IsolationBeams', 'Lock'}
+  while delete do task.wait()
+    for _, v in pairs(workspace:GetChildren()) do
+      if v:IsA('Part') and v.Name:lower():find('zone') then
+        for _, x in pairs(v:GetDescendants()) do
+          if table.find(deletelist, x.Name) then
+            x:Destroy()
+          end
+        end
+      end
+    end
+  end
+end)
+Tabs.Character:AddButton({
+  Title = "Rejoin smallest server",
+  Callback = function()
+    local HttpService = game:GetService("HttpService")
+    local TeleportService = game:GetService("TeleportService")
+    local Players = game:GetService("Players")
+
+    local PlaceId = game.PlaceId
+    local JobId = game.JobId
+
+    local function GetServer()
+      local servers = {}
+      local req = request({
+        Url = string.format("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100", PlaceId)
+      })
+      local data = HttpService:JSONDecode(req.Body)
+
+      for _, v in pairs(data.data) do
+        if v.playing < v.maxPlayers and v.id ~= JobId then
+          table.insert(servers, v.id)
+        end
+      end
+
+      if #servers > 0 then
+        return servers[math.random(1, #servers)]
+      end
+    end
+
+    local serverId = GetServer()
+    if serverId then
+      TeleportService:TeleportToPlaceInstance(PlaceId, serverId, Players.LocalPlayer)
+    end
+  end
+})
 
 
 Tabs.Teleport:AddSection("[🌍] - Places Teleport")
@@ -1257,6 +1312,51 @@ Tabs.Teleport:AddButton({
   Callback = function()
     game:GetService("TeleportService"):Teleport(1930665568, game:GetService("Players").LocalPlayer)
   end
+})
+
+
+Tabs.Changelog:AddSection("[🥳] - Changelog List")
+Tabs.Changelog:AddParagraph({
+  Title = "InfinityX Update - Changelog [v4.2a] - New",
+  Content = '\n' .. [[
+> Added
+  • New UI design for the script hub
+  • New mobile button
+  • Force delete all isolation mode
+  • Rejoin smallest servers
+  • New method to auto thin ice quest
+  • New tab changelog
+
+> Fixed
+  • Auto thin ice quest
+  • Auto tween speed
+  • Auto teleport part
+  ]]
+})
+Tabs.Changelog:AddParagraph({
+  Title = "InfinityX Update - Changelog [v4.2a] - Old",
+  Content = '\n' .. [[
+> Fixed
+  • Improved auto quest
+  • Improved thin ice quest
+  ]]
+})
+Tabs.Changelog:AddParagraph({
+  Title = "InfinityX Update - Changelog [v4.2a] - Old",
+  Content = '\n' .. [[
+> Fixed
+  • Obtained gold
+  • Obtained gold webhook
+  • Improved auto farm
+  ]]
+})
+Tabs.Changelog:AddParagraph({
+  Title = "InfinityX Update - Changelog [v4.2a] - Old",
+  Content = '\n' .. [[
+> Fixed
+  • Auto farm in yellow or green zone
+  • Get players zone
+  ]]
 })
 
 
