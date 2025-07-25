@@ -516,7 +516,7 @@ local p1 = Tabs.AutoFarm:AddParagraph({
   Content = "None"
 })
 local p2 = Tabs.AutoFarm:AddParagraph({
-  Title = "Obtained Gold",
+  Title = "Obtainded Gold",
   Content = "None"
 })
 local p3 = Tabs.AutoFarm:AddParagraph({
