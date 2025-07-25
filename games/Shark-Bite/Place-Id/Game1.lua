@@ -256,6 +256,34 @@ SurvivalGroupBox:AddToggle("MyToggle", {
 	end,
 })
 SurvivalGroupBox:AddToggle("MyToggle", {
+	Text = "Auto lobby",
+	Tooltip = "When the match starts and you're innocent, it automatically teleports you to the lobby",
+	DisabledTooltip = "I am disabled!",
+
+	Default = false,
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+
+	Callback = function(Value)
+        autoLobby = Value
+        if autoLobby then
+            Library:Notify({
+                Title = "InfinityX",
+                Description = "Auto lobby enabled",
+                Time = 4,
+            })
+        end
+        while autoLobby do task.wait()
+            local team = "Survivor"
+            local playerTeam = game.Players.LocalPlayer.Team
+            if playerTeam and playerTeam.Name == team then
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(27, 465, 16)
+            end
+        end
+	end,
+})
+SurvivalGroupBox:AddToggle("MyToggle", {
 	Text = "Auto chest",
 	Tooltip = "Active to automatically collect the chest",
 	DisabledTooltip = "I am disabled!",
@@ -277,7 +305,7 @@ SurvivalGroupBox:AddToggle("MyToggle", {
         while autoChest do task.wait()
             for _, v in pairs(workspace:GetDescendants()) do
                 if v:IsA('Model') and v.Name == 'ChestDrop' then
-                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v:FindFirstChild('PrimaryPart').CFrame
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v:FindFirstAncestorWhichIsA('Part').CFrame
                 end
             end
         end
