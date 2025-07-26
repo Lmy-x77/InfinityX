@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 -- detect service
 local UserInputService = game:GetService("UserInputService")
 IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS}, UserInputService:GetPlatform())
@@ -221,8 +222,8 @@ end
 local lastValue = game:GetService("Players").LocalPlayer.Data.Gold.Value
 local totalGained = 0
 local MoneyFarm = {
-	Enabled = false,
-	method = 'Teleport',
+  Enabled = false,
+  method = 'Teleport',
   Teleport = {
     Time = 2
   },
@@ -238,6 +239,14 @@ local WebHookSettings = {
     ObtaindedGold = '',
     CurrentGold = ''
   }
+}
+getgenv().EspSettings = {
+  Enabled = false,
+  TeamColor = true,
+  Name = true,
+  Tracers = true,
+  Studs = true,
+  BoxType = "2d"
 }
 local farmTime = 0
 local function formatTime(seconds)
@@ -817,7 +826,7 @@ JoinRequest:OnChanged(function(Value)
     Request
   )
 end)
-local PvpMode = Tabs.Shop:AddToggle("AutoMoneyToggle", {
+local PvpMode = Tabs.Shop:AddToggle("", {
   Title = "Pvp mode",
   Description = 'Turning this setting on will allow other players using pvp mode to damage you and your blocks using weapons. This includes blocks that are in your building area',
   Default = false,
@@ -1044,13 +1053,6 @@ Tabs.Character:AddInput("Input", {
     game.Players.LocalPlayer.Character.Humanoid.JumpPower = Value
   end
 })
-Tabs.Character:AddButton({
-  Title = "Reset values",
-  Callback = function()
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
-    game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50
-  end
-})
 local WalkOnWater = Tabs.Character:AddToggle("AutoMoneyToggle", {
   Title = "Walk on water",
   Default = false,
@@ -1113,6 +1115,40 @@ FlyToggle:OnChanged(function(Value)
     if not IsOnMobile then NOFLY() else unmobilefly(game.Players.LocalPlayer) end
   end
 end)
+Tabs.Character:AddButton({
+  Title = "Rejoin smallest server",
+  Callback = function()
+    local HttpService = game:GetService("HttpService")
+    local TeleportService = game:GetService("TeleportService")
+    local Players = game:GetService("Players")
+
+    local PlaceId = game.PlaceId
+    local JobId = game.JobId
+
+    local function GetServer()
+      local servers = {}
+      local req = request({
+        Url = string.format("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100", PlaceId)
+      })
+      local data = HttpService:JSONDecode(req.Body)
+
+      for _, v in pairs(data.data) do
+        if v.playing < v.maxPlayers and v.id ~= JobId then
+          table.insert(servers, v.id)
+        end
+      end
+
+      if #servers > 0 then
+        return servers[math.random(1, #servers)]
+      end
+    end
+
+    local serverId = GetServer()
+    if serverId then
+      TeleportService:TeleportToPlaceInstance(PlaceId, serverId, Players.LocalPlayer)
+    end
+  end
+})
 Tabs.Character:AddSection("[🚩] - Team Options")
 local teams = GetTeams()
 if #teams > 0 then
@@ -1269,40 +1305,48 @@ DeleteIsolation:OnChanged(function(Value)
     end
   end
 end)
-Tabs.Character:AddButton({
-  Title = "Rejoin smallest server",
-  Callback = function()
-    local HttpService = game:GetService("HttpService")
-    local TeleportService = game:GetService("TeleportService")
-    local Players = game:GetService("Players")
-
-    local PlaceId = game.PlaceId
-    local JobId = game.JobId
-
-    local function GetServer()
-      local servers = {}
-      local req = request({
-        Url = string.format("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100", PlaceId)
-      })
-      local data = HttpService:JSONDecode(req.Body)
-
-      for _, v in pairs(data.data) do
-        if v.playing < v.maxPlayers and v.id ~= JobId then
-          table.insert(servers, v.id)
-        end
-      end
-
-      if #servers > 0 then
-        return servers[math.random(1, #servers)]
-      end
-    end
-
-    local serverId = GetServer()
-    if serverId then
-      TeleportService:TeleportToPlaceInstance(PlaceId, serverId, Players.LocalPlayer)
-    end
+Tabs.Character:AddSection("[👀] - Esp Players")
+local EnableEsp = Tabs.Character:AddToggle("", {
+  Title = "Enable",
+  Default = false,
+})
+EnableEsp:OnChanged(function(Value)
+  getgenv().EspSettings.Enabled = Value
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Esp/source.lua",true))()
+end)
+Tabs.Character:AddDropdown("", {
+  Title = "Box style",
+  Description = "Enter the mode you want to view the player in, either 2d or 3d",
+  Values = {'2d', '3d'},
+  Default = "2d",
+  Callback = function(Value)
+    getgenv().EspSettings.BoxType = Value
   end
 })
+local TeamColor = Tabs.Character:AddToggle("", {
+  Title = "Team color",
+  Description = "Changes the color of the esp to the color of the team the player is on",
+  Default = true,
+})
+TeamColor:OnChanged(function(Value)
+  getgenv().EspSettings.TeamColor = Value
+end)
+local Tracers = Tabs.Character:AddToggle("", {
+  Title = "Tracers",
+  Description = "Creates a line between you and the desired player",
+  Default = true,
+})
+Tracers:OnChanged(function(Value)
+  getgenv().EspSettings.Tracers = Value
+end)
+local Studs = Tabs.Character:AddToggle("", {
+  Title = "Studs",
+  Description = "Shows how far you are from another player",
+  Default = true,
+})
+Studs:OnChanged(function(Value)
+  getgenv().EspSettings.Studs = Value
+end)
 
 
 Tabs.Teleport:AddSection("[🌍] - Places Teleport")
@@ -1329,6 +1373,22 @@ Tabs.Teleport:AddButton({
 Tabs.Changelog:AddSection("[🥳] - Changelog List")
 Tabs.Changelog:AddParagraph({
   Title = "InfinityX Update - Changelog [v4.2a] - New",
+  Content = '\n' .. [[
+> Added
+  • Added esp players in character tab
+  • Box type to esp
+  • Rejoin smallest server in character options section
+
+> Fixed
+  • Pvp mode
+
+> Removed
+  • Reset values button in character options section
+  • Auto ui transparency
+  ]]
+})
+Tabs.Changelog:AddParagraph({
+  Title = "InfinityX Update - Changelog [v4.2a] - Old",
   Content = '\n' .. [[
 > Added
   • New UI design for the script hub
@@ -1392,7 +1452,7 @@ Tabs.Settings:AddToggle("AcrylicToggle", {
 Tabs.Settings:AddToggle("TransparentToggle", {
   Title = "Transparency",
   Description = "Makes the interface transparent.",
-  Default = true,
+  Default = false,
   Callback = function(Value)
     Fluent:ToggleTransparency(Value)
   end
