@@ -38,7 +38,7 @@ print[[
 
 -- load preference
 if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.MouseEnabled then
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/main/Software/Items/button.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/main/Software/button.lua"))()
 end
 
 
@@ -66,7 +66,7 @@ if hookmetamethod then
         return OldNameCall(...)
     end)
 else
-    local Info = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Info/source.lua", true))()
+    local Info = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/library/Info/source.lua", true))()
     Info:Notify('Waring', 'your exploit does not support hookmetamethod. Please use a better exploit', 5)
     return
 end
@@ -92,73 +92,158 @@ local function JumpPowerBypass()
         return oldIndex(self, b)
     end)
 end
+getgenv().EspSettings = {
+    Enabled = true,
+    Name = true,
+    Tracers = true,
+    Studs = true,
+    Box3D = true,
+    BeastColor = Color3.fromRGB(255, 0, 0),
+    InnocentColor = Color3.fromRGB(70, 243, 84)
+}
 local Players = game:GetService("Players")
-local BeastColor = Color3.new(255, 0, 0)
-local InoccentColor = Color3.new(255, 255, 255)
-local ESPEnabled = nil
-local ESPComputer = nil
-local function createESP(player, color)
-    if player.Character and player.Character:FindFirstChild("Humanoid") then
-        for _, part in pairs(player.Character:GetChildren()) do
-            if part:IsA("BasePart") and not part:FindFirstChild("ESPBox") then
-                local box = Instance.new("BoxHandleAdornment")
-                box.Name = "ESPBox"
-                box.Size = part.Size + Vector3.new(0.1, 0.1, 0.1)
-                box.Adornee = part
-                box.AlwaysOnTop = true
-                box.ZIndex = 5
-                box.Transparency = 0.5
-                box.Color3 = color
-                box.Parent = part
-            end
-        end
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+local Drawings = {}
+local function createESP(player)
+    local drawings = {}
+
+    drawings.name = Drawing.new("Text")
+    drawings.name.Size = 13
+    drawings.name.Center = true
+    drawings.name.Outline = true
+
+    drawings.distance = Drawing.new("Text")
+    drawings.distance.Size = 13
+    drawings.distance.Center = true
+    drawings.distance.Outline = true
+
+    drawings.tracer = Drawing.new("Line")
+    drawings.tracer.Thickness = 1
+    drawings.tracer.Transparency = 1
+
+    if getgenv().EspSettings.Box3D then
+        local box = Instance.new("BoxHandleAdornment")
+        box.Name = "ESP3DBox"
+        box.Size = Vector3.new(4, 6, 2)
+        box.Transparency = 0.5
+        box.ZIndex = 5
+        box.AlwaysOnTop = true
+        box.Adornee = nil
+        box.Parent = game.CoreGui
+        drawings.box = box
+    else
+        drawings.box = Drawing.new("Square")
+        drawings.box.Thickness = 2
+        drawings.box.Transparency = 1
+        drawings.box.Filled = false
     end
-end
-local function removeESP(player)
-    if player.Character then
-        for _, part in pairs(player.Character:GetChildren()) do
-            if part:IsA("BasePart") then
-                local box = part:FindFirstChild("ESPBox")
-                if box then
-                    box:Destroy()
-                end
-            end
-        end
-    end
-end
-local function updateESPColors()
-    for _, player in pairs(game:GetService("Players"):GetPlayers()) do
-        if player.Name ~= game:GetService("Players").LocalPlayer.Name then
-            if player.Character then
-                for _, part in pairs(player.Character:GetChildren()) do
-                    if part:IsA("BasePart") then
-                        local box = part:FindFirstChild("ESPBox")
-                        if box then
-                            if player.Character:FindFirstChild("BeastPowers") then
-                                box.Color3 = BeastColor
-                            else
-                                box.Color3 = InoccentColor
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-local function updateESP()
-    for _, player in pairs(game:GetService("Players"):GetPlayers()) do
-        if player.Name ~= game:GetService("Players").LocalPlayer.Name then
-            removeESP(player)
-            if ESPEnabled then
-                if player.Character and player.Character:FindFirstChild("BeastPowers") then
-                    createESP(player, BeastColor)
+
+    Drawings[player] = drawings
+
+    local function update()
+        if not getgenv().EspSettings.Enabled then
+            for _, d in pairs(drawings) do
+                if typeof(d) == "Instance" then
+                    d.Adornee = nil
                 else
-                    createESP(player, InoccentColor)
+                    d.Visible = false
                 end
+            end
+            return
+        end
+
+        local char = player.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        local humanoid = char and char:FindFirstChild("Humanoid")
+        if not hrp or not humanoid or humanoid.Health <= 0 then
+            for _, d in pairs(drawings) do
+                if typeof(d) ~= "Instance" then d.Visible = false end
+            end
+            return
+        end
+
+        local pos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
+        if not onScreen then
+            for _, d in pairs(drawings) do
+                if typeof(d) ~= "Instance" then d.Visible = false end
+            end
+            return
+        end
+
+        local color = char:FindFirstChild("BeastPowers") and getgenv().EspSettings.BeastColor or getgenv().EspSettings.InnocentColor
+
+        if getgenv().EspSettings.Box3D then
+            drawings.box.Adornee = char
+            drawings.box.Color3 = color
+        else
+            local size = Vector3.new(2, 3, 1.5)
+            local topLeft = Camera:WorldToViewportPoint(hrp.Position + Vector3.new(-size.X, size.Y, 0))
+            local bottomRight = Camera:WorldToViewportPoint(hrp.Position + Vector3.new(size.X, -size.Y, 0))
+            drawings.box.Size = Vector2.new(math.abs(topLeft.X - bottomRight.X), math.abs(topLeft.Y - bottomRight.Y))
+            drawings.box.Position = Vector2.new(math.min(topLeft.X, bottomRight.X), math.min(topLeft.Y, bottomRight.Y))
+            drawings.box.Color = color
+            drawings.box.Visible = true
+        end
+
+        if getgenv().EspSettings.Name then
+            drawings.name.Position = Vector2.new(pos.X, pos.Y - 20)
+            drawings.name.Text = player.Name
+            drawings.name.Color = color
+            drawings.name.Visible = true
+        else
+            drawings.name.Visible = false
+        end
+
+        if getgenv().EspSettings.Studs then
+            local dist = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                and math.floor((hrp.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude) or 0
+            drawings.distance.Position = Vector2.new(pos.X, pos.Y + 20)
+            drawings.distance.Text = tostring(dist) .. "m"
+            drawings.distance.Color = color
+            drawings.distance.Visible = true
+        else
+            drawings.distance.Visible = false
+        end
+
+        if getgenv().EspSettings.Tracers then
+            drawings.tracer.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)
+            drawings.tracer.To = Vector2.new(pos.X, pos.Y)
+            drawings.tracer.Color = color
+            drawings.tracer.Visible = true
+        else
+            drawings.tracer.Visible = false
+        end
+    end
+
+    local conn = RunService.RenderStepped:Connect(update)
+
+    player.AncestryChanged:Connect(function(_, parent)
+        if not parent then
+            for _, d in pairs(drawings) do
+                if typeof(d) == "Instance" then
+                    d:Destroy()
+                else
+                    d:Remove()
+                end
+            end
+            conn:Disconnect()
+            Drawings[player] = nil
+        end
+    end)
+end
+local function deleteESP()
+    for _, drawings in pairs(Drawings) do
+        for _, d in pairs(drawings) do
+            if typeof(d) == "Instance" then
+                d:Destroy()
+            else
+                d:Remove()
             end
         end
     end
+    Drawings = {}
 end
 local function updateComputerESP()
     local map = workspace:FindFirstChild(tostring(game.ReplicatedStorage.CurrentMap.Value))
@@ -222,7 +307,7 @@ scriptVersion = '3.2a'
 
 
 -- ui library
-local MacLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Maclib/source.lua"))()
+local MacLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/library/Maclib/src.lua"))()
 local Window = MacLib:Window({
 	Title = "InfinityX "..scriptVersion,
 	Subtitle = "By lmy77 | "..game:GetService('MarketplaceService'):GetProductInfo(game.PlaceId).Name,
@@ -305,7 +390,7 @@ sections.GameSection3:Header({
 	Name = "[🎮] Game Stats"
 })
 sections.GameSection4:Header({
-	Name = "[🗡️] Arsenal Event"
+	Name = "[🌍] Places Teleport"
 })
 sections.GameSection5:Header({
 	Name = "[📶] Misc"
@@ -462,7 +547,7 @@ sections.GameSection2:Button({
         })
         for _, v in pairs(game:GetService('CoreGui'):GetChildren()) do
             if v:IsA('ScreenGui') and v.Name == 'Button' then
-                v:Destroy() wait() loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/main/Software/Items/button.lua"))()
+                v:Destroy() wait() loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/main/Software/button.lua"))()
             end
         end
 	end,
@@ -504,7 +589,7 @@ local function updateStats()
                 local HealthValue = tempStatsModule:FindFirstChild("Health") and tempStatsModule.Health.Value or "N/A"
                 local BeastValue = tempStatsModule:FindFirstChild("IsBeast") and (tempStatsModule.IsBeast.Value and "Yes" or "No") or "N/A"
 
-                label:UpdateName(player.Name .. " |\n  - Level: " .. LevelValue .. "\n  - Captured: " .. CapturedValue .. "\n  - Health: " .. HealthValue .. "\n  - Is Beast: " .. BeastValue)
+                label:UpdateName("<b>-> " .. player.Name .. " </b>\n  • Level: " .. LevelValue .. "\n  • Captured: " .. CapturedValue .. "\n  • Health: " .. HealthValue .. "\n  • Is Beast: " .. BeastValue)
             else
                 label:UpdateName(player.Name .. " | Loading stats...")
             end
@@ -522,78 +607,30 @@ task.spawn(function()
         task.wait(1)
     end
 end)
-
-sections.GameSection4:Toggle({
-	Name = "Collect all drops",
-	Default = false,
-	Callback = function(bool)
-        event = bool
-        while event do task.wait()
-            local map = workspace:FindFirstChild(tostring(game.ReplicatedStorage.CurrentMap.Value))
-            local path = map:WaitForChild('ArsenalSpawnPoint')
-            if path:FindFirstChild('ClickDetector') then
-                fireclickdetector(path.ClickDetector)
-            elseif not path:FindFirstChild('ClickDetector') then
-                for _, v in pairs(map:GetDescendants()) do
-                    if v:IsA('ClickDetector') then
-                        fireclickdetector(v)
-                    end
-                end
-            end
-        end
+sections.GameSection4:Button({
+	Name = "Lobby",
+	Callback = function()
+        game:GetService("TeleportService"):Teleport(893973440, game:GetService("Players").LocalPlayer)
 	end,
-}, "Toggle")
-sections.GameSection4:Toggle({
-	Name = "Esp spawn",
-	Default = false,
-	Callback = function(bool)
-        espEvent = bool
-        if espEvent then
-            local createEps = Instance.new('Highlight')
-            createEps.Name = 'INFX_Esp'
-            createEps.FillColor = Color3.fromRGB(255, 0, 0)
-            for _, v in pairs(workspace:GetDescendants()) do
-                if v:IsA('Part') and v.Name == 'ArsenalSpawnPoint' then
-                    createEps.Parent = v
-                    v.Transparency = 0
-                end
-            end
-
-            workspace.ChildAdded:Connect(function(drop)
-                if espEvent then
-                    local createEps = Instance.new('Highlight')
-                    createEps.Name = 'INFX_Esp'
-                    createEps.FillColor = Color3.fromRGB(255, 0, 0)
-                    for _, v in pairs(workspace:GetDescendants()) do
-                        if v:IsA('Part') and v.Name == 'ArsenalSpawnPoint' then
-                            createEps.Parent = v
-                            v.Transparency = 0
-                        end
-                    end
-                end
-            end)
-        else
-            for _, v in pairs(game:GetDescendants()) do
-                if v:IsA('Highlight') and v.Name == 'INFX_Esp' then
-                    v:Destroy()
-                end
-            end
-        end
+})
+sections.GameSection4:Button({
+	Name = "Trading Post",
+	Callback = function()
+        game:GetService("TeleportService"):Teleport(1738581510, game:GetService("Players").LocalPlayer)
 	end,
-}, "Toggle")
-sections.GameSection4:Divider()
-local progressLabel = sections.GameSection4:Label({ Text = 'error' }, nil)
-task.spawn(function()
-    while true do task.wait()
-        local count = 0
-        for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.ArsenalScreenGui.ArsenalFrame:GetChildren()) do
-            if v:IsA('ImageLabel') and v.ImageColor3 == Color3.fromRGB(255, 255, 255) then
-                count = count + 1
-                progressLabel:UpdateName('Progress of items collected: ' .. tostring(count))
-            end
-        end
-    end
-end)
+})
+sections.GameSection4:Button({
+	Name = "Voice Server",
+	Callback = function()
+        game:GetService("TeleportService"):Teleport(125624013879756, game:GetService("Players").LocalPlayer)
+	end,
+})
+sections.GameSection4:Button({
+	Name = "Pro Server",
+	Callback = function()
+        game:GetService("TeleportService"):Teleport(132745842491660, game:GetService("Players").LocalPlayer)
+	end,
+})
 sections.GameSection5:Toggle({
 	Name = "Fly",
 	Default = false,
@@ -1281,28 +1318,57 @@ sections.EspSection1:Toggle({
 	Callback = function(bool)
         ESPEnabled = bool
         if not ESPEnabled then
-            for _, player in pairs(game:GetService("Players"):GetPlayers()) do
-                if player.Name ~= game:GetService("Players").LocalPlayer.Name then
-                    removeESP(player)
+            deleteESP()
+        else
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer then
+                    createESP(player)
                 end
             end
-        else
-            Window:Notify({
-                Title = 'InfinityX',
-                Description = "Esp players actived!"
-            })
-            updateESP()
-            game.Players.PlayerAdded:Connect(function(player)
-                if ESPEnabled then
-                    local character = player.CharacterAdded:Wait()
-                    character:WaitForChild("HumanoidRootPart")
-                    updateESP()
+            Players.PlayerAdded:Connect(function(player)
+                if player ~= LocalPlayer then
+                    createESP(player)
                 end
             end)
         end
-        while ESPEnabled do task.wait()
-            updateESPColors()
+	end,
+}, "Toggle")
+sections.EspSection1:Divider()
+local StyleDropdown = sections.EspSection1:Dropdown({
+	Name = "Box style",
+	Search = false,
+	Multi = false,
+	Required = false,
+	Options = {'3d', '2d'},
+	Default = '3d',
+	Callback = function(Options)
+        selectedBoxStyle = Options
+        if selectedBoxStyle == '3d' then
+            getgenv().EspSettings.Box3D = true
+        elseif selectedBoxStyle == '2d' then
+            getgenv().EspSettings.Box3D = false
         end
+	end,
+}, "Dropdown")
+sections.EspSection1:Toggle({
+	Name = "Names",
+	Default = true,
+	Callback = function(bool)
+        getgenv().EspSettings.Name = bool
+	end,
+}, "Toggle")
+sections.EspSection1:Toggle({
+	Name = "Tracers",
+	Default = true,
+	Callback = function(bool)
+        getgenv().EspSettings.Tracers = bool
+	end,
+}, "Toggle")
+sections.EspSection1:Toggle({
+	Name = "Studs",
+	Default = true,
+	Callback = function(bool)
+        getgenv().EspSettings.Studs = bool
 	end,
 }, "Toggle")
 sections.EspSection2:Toggle({
@@ -1345,10 +1411,10 @@ sections.EspSeettingsSection1:Header({
 })
 local playerPicker = sections.EspSeettingsSection1:Colorpicker({
 	Name = "Set the player's colour",
-	Default = Color3.fromRGB(255, 255, 255),
+	Default = Color3.fromRGB(70, 243, 84),
 	Alpha = 0,
 	Callback = function(color, alpha)
-        InoccentColor = color
+        getgenv().EspSettings.InnocentColor = color
 	end,
 }, "ESPColorToggle")
 local beastPicker = sections.EspSeettingsSection1:Colorpicker({
@@ -1356,7 +1422,7 @@ local beastPicker = sections.EspSeettingsSection1:Colorpicker({
 	Default = Color3.fromRGB(255, 0, 0),
 	Alpha = 0,
 	Callback = function(color, alpha)
-        BeastColor = color
+        getgenv().EspSettings.BeastColor = color
 	end,
 }, "ESPColorToggle")
 sections.EspSeettingsSection1:Button({
