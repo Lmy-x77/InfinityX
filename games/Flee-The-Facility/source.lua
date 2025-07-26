@@ -302,7 +302,7 @@ function GetSize()
         return UDim2.fromOffset(830, 525)
     end
 end
-scriptVersion = '3.2a'
+scriptVersion = '4.2a'
 
 
 
