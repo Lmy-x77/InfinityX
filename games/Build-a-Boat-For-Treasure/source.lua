@@ -298,6 +298,17 @@ function GetPlayerZone()
 		return workspace["CamoZone"]
 	end
 end
+function GetPlayerBlocks()
+  for _, v in pairs(workspace.Blocks:GetChildren()) do
+    if v:IsA('Folder') and v.Name == game.Players.LocalPlayer.Name then
+      for _, x in pairs(v:GetChildren()) do
+        if x:IsA('Model') then
+          return x
+        end
+      end
+    end
+  end
+end
 function TpFarm()
 	if not MoneyFarm.Enabled then return end
 	task.wait(1.4)
@@ -543,7 +554,7 @@ task.spawn(function()
     WebHookSettings.Items.CurrentGold = tostring(gold.Value)
 
     local currentValue = tonumber(gold.Value)
-    if currentValue > lastValue then
+    if MoneyFarm.Enabled and currentValue > lastValue then
       local diff = currentValue - lastValue
       totalGained += diff
       WebHookSettings.Items.ObtaindedGold = tostring(totalGained)
