@@ -24,7 +24,7 @@ local function createESP(player)
     elseif getgenv().EspSettings.BoxType == "3d" then
         local box = Instance.new("BoxHandleAdornment")
         box.Size = Vector3.new(4, 6, 2)
-        box.Transparency = 0.4
+        box.Transparency = 0.5
         box.AlwaysOnTop = true
         box.ZIndex = 10
         box.Adornee = nil
