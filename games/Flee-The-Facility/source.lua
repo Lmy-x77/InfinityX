@@ -1326,7 +1326,7 @@ sections.EspSection1:Toggle({
                 end
             end
             Players.PlayerAdded:Connect(function(player)
-                if player ~= LocalPlayer then
+                if ESPEnabled and player ~= LocalPlayer then
                     createESP(player)
                 end
             end)
