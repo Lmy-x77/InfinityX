@@ -1452,7 +1452,7 @@ Tabs.Settings:AddToggle("AcrylicToggle", {
 Tabs.Settings:AddToggle("TransparentToggle", {
   Title = "Transparency",
   Description = "Makes the interface transparent.",
-  Default = false,
+  Default = true,
   Callback = function(Value)
     Fluent:ToggleTransparency(Value)
   end
