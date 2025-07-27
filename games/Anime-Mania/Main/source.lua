@@ -1,4 +1,8 @@
 -- variables
+local FarmSettings = {
+  Method = 'Above',
+  Distance = 5.5
+}
 local isMobile = game.UserInputService.TouchEnabled
 local function GetHumanoidRootPart()
   local player = game:GetService("Players").LocalPlayer
@@ -73,6 +77,7 @@ local WaveGroupBox = Tabs.Farm:AddLeftGroupbox("Clear Wave", "waves")
 local SkillsGroupBox = Tabs.Farm:AddRightGroupbox("Skills", "atom")
 local CharacterSelectionGroupBox = Tabs.Farm:AddLeftGroupbox("Select Character", "users")
 local MiscGroupBox = Tabs.Farm:AddRightGroupbox("Misc", "layers")
+local FarmSettingsGroupBox = Tabs.Farm:AddRightGroupbox("Farm Settings", "settings")
 WaveGroupBox:AddToggle("MyToggle", {
 	Text = "Teleport to all mobs",
 	Tooltip = "Active to teleport character to all mobs",
@@ -87,10 +92,20 @@ WaveGroupBox:AddToggle("MyToggle", {
     tpMobs = Value
     while tpMobs do task.wait()
       if GetHumanoidRootPart() then
-        for _, v in pairs(workspace.Living:GetChildren()) do
-          if v:IsA('Model') and not game.Players:FindFirstChild(v.Name) then
-            if v:FindFirstChild('HumanoidRootPart') then
-              game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame * CFrame.new(0, 5.5, 0) * CFrame.Angles(math.rad(270), 0, 0)
+        if FarmSettings.Method == 'Above' then
+          for _, v in pairs(workspace.Living:GetChildren()) do
+            if v:IsA('Model') and not game.Players:FindFirstChild(v.Name) then
+              if v:FindFirstChild('HumanoidRootPart') then
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame * CFrame.new(0, FarmSettings.Distance, 0) * CFrame.Angles(math.rad(270), 0, 0)
+              end
+            end
+          end
+        elseif FarmSettings.Method == 'Behind' then
+          for _, v in pairs(workspace.Living:GetChildren()) do
+            if v:IsA('Model') and not game.Players:FindFirstChild(v.Name) then
+              if v:FindFirstChild('HumanoidRootPart') then
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame * CFrame.new(0, 0, FarmSettings.Distance)
+              end
             end
           end
         end
@@ -457,6 +472,37 @@ MiscGroupBox:AddToggle("MyToggle", {
       end)
     end
 	end,
+})
+FarmSettingsGroupBox:AddDropdown("MyDropdown", {
+	Values = { 'Above', 'Behind' },
+	Default = 'Above',
+	Multi = false,
+
+	Text = "Select method",
+	Tooltip = "Select a method to teleport to mob",
+	DisabledTooltip = "I am disabled!",
+
+	Searchable = false,
+
+	Callback = function(Value)
+		FarmSettings.Method = Value
+	end,
+
+	Disabled = false,
+	Visible = true,
+})
+FarmSettingsGroupBox:AddInput("MyTextbox", {
+  Default = "5.5",
+  Numeric = true,
+  Finished = false,
+  ClearTextOnFocus = false,
+
+  Text = "Enter distance",
+  Placeholder = "5.5",
+
+  Callback = function(Value)
+    FarmSettings.Distance = tonumber(Value)
+  end,
 })
 
 
