@@ -404,7 +404,7 @@ local KillAuraSettings = {
 function GetItems()
   local items = {}
   for _, v in pairs(game:GetService("Players").LocalPlayer.Inventory:GetChildren()) do
-    if v:IsA('Model') and (v.Name:lower():find('axe') or v.Name:find():lower('sword') or v.Name == 'Chainsaw') then
+    if v:IsA('Model') and (v.Name:lower():find('axe') or v.Name:lower():find('sword') or v.Name == 'Chainsaw') then
       table.insert(items, v.Name)
     end
   end
@@ -475,7 +475,7 @@ local Window = Fluent:CreateWindow({
 
 
 -- tabs
-local WelcomeTab = Window:AddTab({ Title = "Welcome", Icon = "hand-heart" })
+local WelcomeTab = Window:AddTab({ Title = "Welcome", Icon = "heart" })
 local InterfaceTab = Window:AddTab({ Title = "Interface", Icon = "crosshair" })
 local TeleportTab = Window:AddTab({ Title = "Teleport", Icon = "locate" })
 local AttackAuraTab = Window:AddTab({ Title = "Attack Aura", Icon = "sword" })
@@ -1171,7 +1171,7 @@ end)
 
 
 MiscTab:AddSection("[🔧] - Extras Options")
-MiscTabs:AddButton({
+MiscTab:AddButton({
   Title = "Remove all prompts cooldown",
   Callback = function()
     for _, v in pairs(workspace:GetDescendants()) do
@@ -1181,7 +1181,7 @@ MiscTabs:AddButton({
     end
   end
 })
-MiscTabs:AddButton({
+MiscTab:AddButton({
   Title = "Reset mobile button",
   Callback = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/main/Software/Items/button.lua",true))()
