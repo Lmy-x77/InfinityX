@@ -1,5 +1,6 @@
 ---@diagnostic disable: undefined-global
 -- detect service
+if game.PlaceId == 79546208627805 then return end
 local UserInputService = game:GetService("UserInputService")
 IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS}, UserInputService:GetPlatform())
 if IsOnMobile then
