@@ -1,10 +1,11 @@
 -- detect service
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
-if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.MouseEnabled then
-	print("Mobile device")
-elseif not UserInputService.TouchEnabled and UserInputService.KeyboardEnabled and UserInputService.MouseEnabled then
-	print("Computer device")
+IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS}, UserInputService:GetPlatform())
+if IsOnMobile then
+    print("Mobile device")
+elseif not IsOnMobile then
+    print("Computer device")
 end
 
 
@@ -170,27 +171,6 @@ function GetPlayersName()
   end
   return plrs
 end
-function GetDinoCrafts()
-  local crafts = {}
-  for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('RecipeSelection_UI').Frame.ScrollingFrame:GetChildren()) do
-      if v:IsA('Frame') and v.Name ~= 'ItemPadding' then
-          if not string.find(v.Name, "_") then
-              table.insert(crafts, v.Name)
-          end
-      end
-  end
-  return crafts
-end
-function GetDinoPets()
-  local pets = {}
-  local mscript = require(game:GetService("ReplicatedStorage").Data.PetRegistry.PetList)
-  for _, v in pairs(mscript) do
-    if type(v) == 'table' then
-      table.insert(pets, _)
-    end
-  end
-  return pets
-end
 local function highlightBiggestFruit()
   local farm = nil
   for _, f in ipairs(workspace.Farm:GetChildren()) do
@@ -284,44 +264,6 @@ function GetPets()
     end
   end
   return petsName
-end
-local function getFormattedTimerText()
-  local textLabel = GetTimeEvent()
-  local originalText = textLabel.Text
-
-  local minutes = 0
-  local seconds = 0
-
-  local minuteMatch = string.match(originalText, "(%d+) Minu?te?s?")
-  if minuteMatch then
-      minutes = tonumber(minuteMatch)
-  end
-
-  local secondMatch = string.match(originalText, "(%d+) Second?s?")
-  if secondMatch then
-      seconds = tonumber(secondMatch)
-  end
-
-  local formattedString = ""
-
-  if minutes > 0 then
-      formattedString = minutes .. "m"
-  end
-
-  if seconds > 0 then
-      if minutes > 0 then
-          formattedString = formattedString .. " "
-      end
-      formattedString = formattedString .. seconds .. "s"
-  end
-
-  if formattedString == "" and (minutes == 0 and seconds == 0) then
-      return "0s"
-  elseif formattedString == "" then
-      return originalText
-  end
-
-  return formattedString
 end
 local function keysOf(dict)
   local list = {}
@@ -993,173 +935,7 @@ Toggles.PetButtonsToggle:SetValue(true)
 Toggles.GearButtonsToggle:SetValue(true)
 
 
-local DinoGroupBox = Tabs.Event:AddLeftGroupbox("🦖 Dino Event")
-local DinoQuestGroupBox = Tabs.Event:AddRightGroupbox("🚩 Dino Quest")
-local DinoCraftGroupBox = Tabs.Event:AddLeftGroupbox("🔨 Dino Craft")
-local DinoEggGroupBox = Tabs.Event:AddRightGroupbox("🥚 Dino Egg")
-DinoGroupBox:AddButton("Teleport to event", function()
-  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-100, 4, -31)
-end)
-local Quest1 = DinoQuestGroupBox:AddLabel({
-  Text = "1",
-  DoesWrap = true
-})
-local p1 = DinoQuestGroupBox:AddLabel({
-  Text = "p1",
-  DoesWrap = true
-})
-DinoQuestGroupBox:AddDivider()
-local Quest2 = DinoQuestGroupBox:AddLabel({
-  Text = "2",
-  DoesWrap = true
-})
-local p2 = DinoQuestGroupBox:AddLabel({
-  Text = "p2",
-  DoesWrap = true
-})
-DinoQuestGroupBox:AddDivider()
-local Quest3 = DinoQuestGroupBox:AddLabel({
-  Text = "3",
-  DoesWrap = true
-})
-local p3 = DinoQuestGroupBox:AddLabel({
-  Text = "p3",
-  DoesWrap = true
-})
-spawn(function()
-  while true do task.wait()
-    local taskNames = {}
-    local progressQuest = {}
-
-    for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('DinoQuests_UI').Frame.Main.Holder.Tasks:GetChildren()) do
-      if v:IsA('Frame') and v.Name:match('Segment') then
-        for _, x in pairs(v:GetChildren()) do
-          if x:IsA('TextLabel') and x.Name == 'TASK_NAME' then
-            table.insert(taskNames, x.Text)
-          end
-        end
-      end
-    end
-    for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild('DinoQuests_UI').Frame.Main.Holder.Tasks:GetChildren()) do
-      if v:IsA('Frame') and v.Name:match('Segment') then
-        for _, x in pairs(v:GetChildren()) do
-          if x:IsA('TextLabel') and x.Name == 'PROGRESS' then
-            table.insert(progressQuest, x.Text)
-          end
-        end
-      end
-    end
-
-    if taskNames[1] and progressQuest[1] then
-      Quest1:SetText("1 - " .. taskNames[1])
-      p1:SetText("  - " .. progressQuest[1])
-    end
-    if taskNames[2] and progressQuest[2] then
-      Quest2:SetText("2 - " .. taskNames[2])
-      p2:SetText("  - " .. progressQuest[2])
-    end
-    if taskNames[3] and progressQuest[3] then
-      Quest3:SetText("3 - " .. taskNames[3])
-      p3:SetText("  - " .. progressQuest[3])
-    end
-  end
-end)
-DinoCraftGroupBox:AddDropdown("DinoCraftDropdown", {
-	Values = GetDinoCrafts(),
-	Default = '...',
-	Multi = false,
-
-	Text = "Select craft",
-	Tooltip = "Select a craft you want to make",
-	DisabledTooltip = "I am disabled!",
-
-	Searchable = true,
-
-	Callback = function(Value)
-    selectedQuest = Value
-	end,
-
-	Disabled = false,
-	Visible = true,
-})
-DinoCraftGroupBox:AddButton("Place selected quest", function()
-  local args = {
-    "SetRecipe",
-    workspace:WaitForChild("Interaction"):WaitForChild("UpdateItems"):WaitForChild("DinoEvent"):WaitForChild("DinoCraftingTable"),
-    "DinoEventWorkbench",
-    selectedQuest
-  }
-  game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("CraftingGlobalObjectService"):FireServer(unpack(args))  
-end)
-DinoCraftGroupBox:AddButton("Cancel quest", function()
-  local args = {
-    "Cancel",
-    workspace:WaitForChild("Interaction"):WaitForChild("UpdateItems"):WaitForChild("DinoEvent"):WaitForChild("DinoCraftingTable"),
-    "DinoEventWorkbench"
-  }
-  game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("CraftingGlobalObjectService"):FireServer(unpack(args))
-end)
-DinoCraftGroupBox:AddDivider()
-DinoCraftGroupBox:AddButton("Refresh craft list", function()
-  Options.DinoCraftDropdown:SetValues(GetDinoCrafts())
-end)
-DinoEggGroupBox:AddDropdown("DinoPetsDropdown", {
-	Values = GetDinoPets(),
-	Default = "...",
-
-  Searchable = true,
-
-	Text = "Select pet",
-  Tooltip = 'Select pet your want to add to dna machine',
-
-	Callback = function(Value)
-		selectedDinoPet = Value
-	end,
-})
-DinoEggGroupBox:AddButton("Teleport dna machine", function()
-  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-114, 4, -13)
-end)
-DinoEggGroupBox:AddButton("Place pet", function()
-  for _, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
-    if v:IsA('Tool') and v.Name:find(selectedDinoPet) then
-      v.Parent = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
-      task.wait(0.25)
-      local args = {
-        "MachineInteract"
-      }
-      game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("DinoMachineService_RE"):FireServer(unpack(args))      
-    end
-  end
-end)
-DinoEggGroupBox:AddButton("Collect egg", function()
-  local args = {
-    "ClaimReward"
-  }
-  game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("DinoMachineService_RE"):FireServer(unpack(args))  
-end)
-local EggTime = DinoEggGroupBox:AddLabel({
-  Text = "Time: ",
-  DoesWrap = true
-})
-spawn(function()
-  spawn(function()
-    while true do
-      task.wait()
-      local findBoard = workspace.Interaction.UpdateItems.DinoEvent.DNAmachine.SideTable:GetChildren()[4]:FindFirstChild('BillboardPart'):FindFirstChild('BillboardGui')
-      if findBoard and findBoard.Enabled then
-        local textLabel = findBoard:FindFirstChildWhichIsA('TextLabel')
-        if textLabel then
-          local text = textLabel.Text
-          if string.find(text, "%d") then
-            EggTime:SetText('Time: ' .. text)
-          else
-            EggTime:SetText('Time: nil')
-          end
-        end
-      end
-    end
-  end)
-end)
+local DinoGroupBox = Tabs.Event:AddLeftGroupbox("Event in soon")
 
 
 local FeedGroupBox = Tabs.Pets:AddLeftGroupbox("Feed", "beef")
@@ -1446,10 +1222,6 @@ local SeedRestockLabel = StatusGroupBox:AddLabel({
   Text = "Seed: ",
   DoesWrap = true
 })
-local PetsRestockLabel = StatusGroupBox:AddLabel({
-  Text = "Pets: ",
-  DoesWrap = true
-})
 local GearRestockLabel = StatusGroupBox:AddLabel({
   Text = "Gear: ",
   DoesWrap = true
@@ -1457,7 +1229,6 @@ local GearRestockLabel = StatusGroupBox:AddLabel({
 task.spawn(function()
   while true do task.wait(1)
     SeedRestockLabel:SetText(game:GetService("Players").LocalPlayer.PlayerGui.Seed_Shop.Frame.Frame.Timer.Text)
-    PetsRestockLabel:SetText('New pets eggs in '.. workspace.NPCS["Pet Stand"].Timer.SurfaceGui.ResetTimeLabel.Text)
     GearRestockLabel:SetText(game:GetService("Players").LocalPlayer.PlayerGui.Gear_Shop.Frame.Frame.Timer.Text)
   end
 end)
