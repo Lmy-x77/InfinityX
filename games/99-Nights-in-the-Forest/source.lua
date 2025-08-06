@@ -399,6 +399,7 @@ end)
 local KillAuraSettings = {
   Range = 50,
   ToolName = '',
+  WeaponName = '',
   Tool = '',
   Tree = ''
 }
@@ -649,7 +650,7 @@ AttackAuraTab:AddToggle("AcrylicToggle", {
           if (v:FindFirstChild("HumanoidRootPart") and (v.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= KillAuraSettings.Range) then
             game:GetService("ReplicatedStorage").RemoteEvents.ToolDamageObject:InvokeServer(
               v,
-              game:GetService("Players").LocalPlayer.Inventory[KillAuraSettings.ToolName],
+              game:GetService("Players").LocalPlayer.Inventory[KillAuraSettings.WeaponName],
               "18_9014810216",
               v:FindFirstChild("HumanoidRootPart").CFrame
             )
@@ -670,7 +671,7 @@ AttackAuraTab:AddToggle("AcrylicToggle", {
           if (v.Trunk.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= KillAuraSettings.Range then
             game:GetService("ReplicatedStorage").RemoteEvents.ToolDamageObject:InvokeServer(
               v,
-              game:GetService("Players").LocalPlayer.Inventory[KillAuraSettings.ToolName],
+              game:GetService("Players").LocalPlayer.Inventory[KillAuraSettings.WeaponName],
               "18_9014810216",
               v:FindFirstChild("HumanoidRootPart").CFrame
             )
@@ -693,7 +694,7 @@ local WeaponsDropdown = AttackAuraTab:AddDropdown("Dropdown", {
   Default = selectedItem,
 })
 WeaponsDropdown:OnChanged(function(Value)
-  KillAuraSettings.ToolName = Value
+  KillAuraSettings.WeaponName = Value
 end)
 local TreeDropdown = AttackAuraTab:AddDropdown("Dropdown", {
   Title = "Select tree",
