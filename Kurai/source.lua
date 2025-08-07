@@ -324,7 +324,7 @@ function Kurai_Lib:_internal_createloader(options)
     self.StatusText.Parent = self.Loader
 
     self.LoaderLogo = Instance.new("ImageLabel")
-    self.LoaderLogo.Image = "rbxassetid://126527122577864"
+    self.LoaderLogo.Image = ""
     self.LoaderLogo.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     self.LoaderLogo.BackgroundTransparency = 1
     self.LoaderLogo.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -335,7 +335,7 @@ function Kurai_Lib:_internal_createloader(options)
 
     self.LoaderCredits = Instance.new("TextLabel")
     self.LoaderCredits.Font = Enum.Font.RobotoMono
-    self.LoaderCredits.Text = "暗い - kurai."
+    self.LoaderCredits.Text = "by lmy77"
     self.LoaderCredits.TextColor3 = Color3.fromRGB(89.00000229477882, 89.00000229477882, 89.00000229477882)
     self.LoaderCredits.TextSize = 12
     self.LoaderCredits.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
