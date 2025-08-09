@@ -65,6 +65,8 @@ end
 
 -- source
 OpenKeySystem()
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
@@ -88,7 +90,37 @@ local main = create("Frame", {
 	BackgroundColor3 = Color3.fromRGB(28, 28, 30),
 	BorderSizePixel = 0
 })
+local UIGradient = Instance.new("UIGradient")
+local UIStroke = Instance.new("UIStroke")
+
+UIStroke.Parent = main
+UIStroke.Thickness = 0.8
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+UIStroke.LineJoinMode = Enum.LineJoinMode.Round
+UIStroke.Color = Color3.new(1, 1, 1)
+
+UIGradient.Parent = UIStroke
+UIGradient.Rotation = 180
+UIGradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(130, 0, 255)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(130, 0, 255)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(130, 0, 255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(130, 0, 255))
+}
+UIGradient.Transparency = NumberSequence.new{
+	NumberSequenceKeypoint.new(0, 0),
+	NumberSequenceKeypoint.new(0.5, 1),
+	NumberSequenceKeypoint.new(1, 0)
+}
+
+task.spawn(function()
+	while true do
+		UIGradient.Rotation = (UIGradient.Rotation + 3) % 360 -- rotação rápida
+		RunService.RenderStepped:Wait()
+	end
+end)
 create("UICorner", {Parent = main, CornerRadius = UDim.new(0, 8)})
+
 
 TweenService:Create(main, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
 	Position = UDim2.new(0.5, -210, 0.5, -150)
@@ -275,6 +307,7 @@ CheckKey.MouseButton1Click:Connect(function()
 				}):Play()
 			end
 		end
+        UIStroke:Destroy()
 		CLoseKeySystem()
 		wait(0.5)
 		gui:Destroy()
@@ -352,7 +385,8 @@ closeBtn.MouseButton1Click:Connect(function()
 			}):Play()
 		end
 	end
-  CLoseKeySystem()
-  wait(0.5)
-  gui:Destroy()
+    UIStroke:Destroy()
+    CLoseKeySystem()
+    wait(0.5)
+    gui:Destroy()
 end)
