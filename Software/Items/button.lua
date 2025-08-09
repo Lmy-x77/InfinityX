@@ -45,26 +45,35 @@ UIAspectRatioConstraint.AspectRatio = 1.1
 UIAspectRatioConstraint_2.Parent = Main
 UIAspectRatioConstraint_2.AspectRatio = 1.02
 
+
+
 UIStroke.Parent = Main
-UIStroke.Thickness = 1.2
+UIStroke.Thickness = 0.8
 UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 UIStroke.LineJoinMode = Enum.LineJoinMode.Round
 UIStroke.Color = Color3.new(1, 1, 1)
 
 UIGradient.Parent = UIStroke
-UIGradient.Rotation = 0
+UIGradient.Rotation = 180
 UIGradient.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 255)),
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(130, 0, 255)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(130, 0, 255)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(130, 0, 255)),
 	ColorSequenceKeypoint.new(1, Color3.fromRGB(130, 0, 255))
 }
-
+UIGradient.Transparency = NumberSequence.new{
+	NumberSequenceKeypoint.new(0, 0),
+	NumberSequenceKeypoint.new(0.5, 1),
+	NumberSequenceKeypoint.new(1, 0)
+}
 
 task.spawn(function()
 	while true do
-		UIGradient.Rotation = (UIGradient.Rotation + 1) % 360
+		UIGradient.Rotation = (UIGradient.Rotation + 3) % 360 -- rotação rápida
 		RunService.RenderStepped:Wait()
 	end
 end)
+
 
 
 local defaultColor = Main.BackgroundColor3
