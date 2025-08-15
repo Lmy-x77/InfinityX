@@ -334,7 +334,12 @@ end)
 local GetKey = makeButton("Get Key", UDim2.new(0.525, 0, 0, 150))
 GetKey.MouseButton1Click:Connect(function()
 	setclipboard(url)
-	notify("Key URL copied to clipboard.")
+    local Notifications = Starlight:Notification({
+        Title = "Notification",
+        Icon = NebulaIcons:GetIcon('sparkle', 'Material'),
+        Content = "Key URL copied to clipboard.",
+        Duration = 2.5
+    }, "INDEX")
 	wait(1)
 	GetKey.Text = "Get Key"
 end)
@@ -369,7 +374,12 @@ end)
 
 discordBtn.MouseButton1Click:Connect(function()
 	setclipboard("https://discord.gg/emKJgWMHAr")
-	notify("Discord invite copied.")
+    local Notifications = Starlight:Notification({
+        Title = "Notification",
+        Icon = NebulaIcons:GetIcon('sparkle', 'Material'),
+        Content = "Discord invite copied.",
+        Duration = 2.5
+    }, "INDEX")
 	wait(1)
 	discordBtn.Text = "Join our Discord"
 end)
