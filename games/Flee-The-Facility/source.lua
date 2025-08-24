@@ -8,6 +8,54 @@ wait(2.5)
 
 
 
+-- Watermark
+local Compkiller = loadstring(game:HttpGet("https://raw.githubusercontent.com/4lpaca-pin/CompKiller/refs/heads/main/src/source.luau"))();
+Compkiller.Colors.Highlight = Color3.fromRGB(140, 0, 255)
+local Window = Compkiller.new({
+	Name = "INFINITYX",
+	Keybind = "delete",
+	Logo = "rbxassetid://72212320253117",
+	Scale = Compkiller.Scale.Window,
+	TextSize = 15,
+});
+local CoreGui = game:GetService("CoreGui")
+local targetPosition = UDim2.new(1, -10, 0, 10)
+for _, gui in pairs(CoreGui:GetDescendants()) do
+    if gui:IsA("ScreenGui") and gui.Name:lower():find("compkiller") then
+        for _, obj in pairs(gui:GetChildren()) do
+            if obj:IsA("Frame") then
+                if obj.Position ~= targetPosition then
+                    obj:Destroy()
+                end
+            end
+        end
+    end
+end
+local Watermark = Window:Watermark();
+Watermark:AddText({
+	Icon = "user",
+	Text = game.Players.LocalPlayer.Name,
+});
+Watermark:AddText({
+	Icon = "clock",
+	Text = Compkiller:GetDate(),
+});
+local Time = Watermark:AddText({
+	Icon = "timer",
+	Text = "TIME",
+});
+task.spawn(function()
+	while true do task.wait()
+		Time:SetText(Compkiller:GetTimeNow());
+	end
+end)
+Watermark:AddText({
+	Icon = "server",
+	Text = "4.2a",
+});
+
+
+
 -- detect service
 local UserInputService = game:GetService("UserInputService")
 if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.MouseEnabled then
@@ -1428,10 +1476,10 @@ local beastPicker = sections.EspSeettingsSection1:Colorpicker({
 sections.EspSeettingsSection1:Button({
 	Name = "Reset colors",
 	Callback = function()
-        BeastColor = Color3.new(255, 0, 0)
-        InoccentColor = Color3.new(255, 255, 255)
-        playerPicker:SetColor(Color3.new(255, 255, 255))
-        beastPicker:SetColor(Color3.new(255, 0, 0))
+        BeastColor = Color3.fromRGB(255, 0, 0)
+        InoccentColor = Color3.fromRGB(70, 243, 84)
+        playerPicker:SetColor(Color3.fromRGB(70, 243, 84))
+        beastPicker:SetColor(Color3.fromRGB(255, 0, 0))
 	end,
 })
 
