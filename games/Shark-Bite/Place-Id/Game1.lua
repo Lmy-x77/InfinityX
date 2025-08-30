@@ -40,6 +40,15 @@ local EspSettings = {
     SurvivalColor = Color3.fromRGB(61, 240, 61),
     BoatColor = Color3.fromRGB(255, 62, 62),
 }
+function GetHumanoidRootPart()
+    local char = game.Players.LocalPlayer.Character or game.Players.CharacterAdded:Wait()
+    local hrp = char:FindFirstChild('HumanoidRootPart')
+    if hrp then
+        return true
+    else
+        return false
+    end
+end
 local function createSurvivalESP(player)
     if not player.Character then return end
     local char = player.Character
@@ -84,6 +93,54 @@ local LibrarySettings = {
       DiscordLink = '<font color="rgb(100,200,255)">Join us: discord.gg/emKJgWMHAr</font>'
     }
 }
+
+
+
+-- Watermark
+local Compkiller = loadstring(game:HttpGet("https://raw.githubusercontent.com/4lpaca-pin/CompKiller/refs/heads/main/src/source.luau"))();
+Compkiller.Colors.Highlight = Color3.fromRGB(140, 0, 255)
+local Window = Compkiller.new({
+	Name = "INFINITYX",
+	Keybind = "delete",
+	Logo = "rbxassetid://72212320253117",
+	Scale = Compkiller.Scale.Window,
+	TextSize = 15,
+});
+local CoreGui = game:GetService("CoreGui")
+local targetPosition = UDim2.new(1, -10, 0, 10)
+for _, gui in pairs(CoreGui:GetDescendants()) do
+    if gui:IsA("ScreenGui") and gui.Name:lower():find("compkiller") then
+        for _, obj in pairs(gui:GetChildren()) do
+            if obj:IsA("Frame") then
+                if obj.Position ~= targetPosition then
+                    obj:Destroy()
+                end
+            end
+        end
+    end
+end
+local Watermark = Window:Watermark();
+Watermark:AddText({
+	Icon = "user",
+	Text = game.Players.LocalPlayer.Name,
+});
+Watermark:AddText({
+	Icon = "clock",
+	Text = Compkiller:GetDate(),
+});
+local Time = Watermark:AddText({
+	Icon = "timer",
+	Text = "TIME",
+});
+task.spawn(function()
+	while true do task.wait()
+		Time:SetText(Compkiller:GetTimeNow());
+	end
+end)
+Watermark:AddText({
+	Icon = "server",
+	Text = "4.2a",
+});
 
 
 
@@ -275,10 +332,12 @@ SurvivalGroupBox:AddToggle("MyToggle", {
             })
         end
         while autoLobby do task.wait()
-            local team = "Survivor"
-            local playerTeam = game.Players.LocalPlayer.Team
-            if playerTeam and playerTeam.Name == team then
-                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(27, 465, 16)
+            if GetHumanoidRootPart() then
+                local team = "Survivor"
+                local playerTeam = game.Players.LocalPlayer.Team
+                if playerTeam and playerTeam.Name == team then
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(27, 465, 16)
+                end
             end
         end
 	end,
@@ -305,7 +364,13 @@ SurvivalGroupBox:AddToggle("MyToggle", {
         while autoChest do task.wait()
             for _, v in pairs(workspace:GetDescendants()) do
                 if v:IsA('Model') and v.Name == 'ChestDrop' then
-                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v:FindFirstAncestorWhichIsA('Part').CFrame
+                    for _, x in pairs(v:GetDescendants()) do
+                        if x:IsA('UnionOperation') then
+                            if GetHumanoidRootPart() then
+                                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = x.CFrame
+                            end
+                        end
+                    end
                 end
             end
         end
