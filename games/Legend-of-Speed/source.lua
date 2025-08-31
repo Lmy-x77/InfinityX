@@ -100,10 +100,10 @@ local Window = Fluent:CreateWindow({
 
 -- tabs
 local Tabs = {
-  AutoFarm = Window:AddTab({ Title = "Autofarm", Icon = "refresh-cw" }),
-  Pet = Window:AddTab({ Title = "Pets", Icon = "cat" }),
-  Misc = Window:AddTab({ Title = "Misc", Icon = "layers" }),
-  Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+  AutoFarm = Window:AddTab({ Title = "| Autofarm", Icon = "refresh-cw" }),
+  Pet = Window:AddTab({ Title = "| Pets", Icon = "cat" }),
+  Misc = Window:AddTab({ Title = "| Misc", Icon = "layers" }),
+  Settings = Window:AddTab({ Title = "| Settings", Icon = "settings" })
 }
 Window:SelectTab(1)
 
