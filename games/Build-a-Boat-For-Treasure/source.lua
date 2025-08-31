@@ -440,13 +440,13 @@ local Window = Fluent:CreateWindow({
 
 -- tabs
 local Tabs = {
-  AutoFarm = Window:AddTab({ Title = "Autofarm", Icon = "refresh-cw" }),
-  Shop = Window:AddTab({ Title = "Shop", Icon = "shopping-cart" }),
-  Quest = Window:AddTab({ Title = "Quest", Icon = "scroll" }),
-  Character = Window:AddTab({ Title = "Character", Icon = "user" }),
-  Teleport = Window:AddTab({ Title = "Teleport", Icon = "locate" }),
-  Changelog = Window:AddTab({ Title = "Changelog", Icon = "list" }),
-  Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+  AutoFarm = Window:AddTab({ Title = "| Autofarm", Icon = "refresh-cw" }),
+  Shop = Window:AddTab({ Title = "| Shop", Icon = "shopping-cart" }),
+  Quest = Window:AddTab({ Title = "| Quest", Icon = "scroll" }),
+  Character = Window:AddTab({ Title = "| Character", Icon = "user" }),
+  Teleport = Window:AddTab({ Title = "| Teleport", Icon = "locate" }),
+  Changelog = Window:AddTab({ Title = "| Changelog", Icon = "list" }),
+  Settings = Window:AddTab({ Title = "| Settings", Icon = "settings" })
 }
 Window:SelectTab(1)
 
