@@ -61,8 +61,6 @@ function CLoseKeySystem()
   removeReverbs(0.5)
   task.wait(0.52)
 end
-local Starlight = loadstring(game:HttpGet("https://raw.nebulasoftworks.xyz/starlight"))()
-local NebulaIcons = loadstring(game:HttpGet("https://raw.nebulasoftworks.xyz/nebula-icon-library-loader"))()
 
 
 -- source
@@ -285,12 +283,7 @@ CheckKey.MouseButton1Click:Connect(function()
 	writefile('InfinityX/Key-System/key.lua', textbox.Text)
 	wait(1)
 	if readfile('InfinityX/Key-System/key.lua') == key then
-        local Notifications = Starlight:Notification({
-            Title = "Notification",
-            Icon = NebulaIcons:GetIcon('sparkle', 'Material'),
-            Content = "Key is valid",
-            Duration = 2.5
-        }, "INDEX")
+        CheckKey.Text = 'Key is valid!'
 		wait(1.2)
 		for _, v in ipairs(gui:GetDescendants()) do
 			if v:IsA("GuiObject") and not v:IsA('Frame') and not v:IsA('ImageLabel') then
@@ -320,12 +313,7 @@ CheckKey.MouseButton1Click:Connect(function()
 		gui:Destroy()
 		correctKey = true
 	else
-        local Notifications = Starlight:Notification({
-            Title = "Notification",
-            Icon = NebulaIcons:GetIcon('sparkle', 'Material'),
-            Content = "Invalid key",
-            Duration = 2.5
-        }, "INDEX")
+        CheckKey.Text = 'Invalid key!'
 		wait(1)
 		CheckKey.Text = "Check Key"
 	end
@@ -334,12 +322,7 @@ end)
 local GetKey = makeButton("Get Key", UDim2.new(0.525, 0, 0, 150))
 GetKey.MouseButton1Click:Connect(function()
 	setclipboard(url)
-    local Notifications = Starlight:Notification({
-        Title = "Notification",
-        Icon = NebulaIcons:GetIcon('sparkle', 'Material'),
-        Content = "Key URL copied to clipboard.",
-        Duration = 2.5
-    }, "INDEX")
+    GetKey.Text = 'Key URL Copied!'
 	wait(1)
 	GetKey.Text = "Get Key"
 end)
@@ -374,12 +357,7 @@ end)
 
 discordBtn.MouseButton1Click:Connect(function()
 	setclipboard("https://discord.gg/emKJgWMHAr")
-    local Notifications = Starlight:Notification({
-        Title = "Notification",
-        Icon = NebulaIcons:GetIcon('sparkle', 'Material'),
-        Content = "Discord invite copied.",
-        Duration = 2.5
-    }, "INDEX")
+    discordBtn.Text = 'Copied!'
 	wait(1)
 	discordBtn.Text = "Join our Discord"
 end)
