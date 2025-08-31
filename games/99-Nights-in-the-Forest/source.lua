@@ -477,14 +477,14 @@ local Window = Fluent:CreateWindow({
 
 
 -- tabs
-local WelcomeTab = Window:AddTab({ Title = "Welcome", Icon = "heart" })
-local InterfaceTab = Window:AddTab({ Title = "Interface", Icon = "crosshair" })
-local TeleportTab = Window:AddTab({ Title = "Teleport", Icon = "locate" })
-local AttackAuraTab = Window:AddTab({ Title = "Attack Aura", Icon = "sword" })
-local CharacterTab = Window:AddTab({ Title = "Character", Icon = "user" })
-local BringTab = Window:AddTab({ Title = "Bring Item", Icon = "hammer" })
-local VisualTab = Window:AddTab({ Title = "Visual", Icon = "eye" })
-local MiscTab = Window:AddTab({ Title = "Misc", Icon = "layers" })
+local WelcomeTab = Window:AddTab({ Title = "| Welcome", Icon = "heart" })
+local InterfaceTab = Window:AddTab({ Title = "| Interface", Icon = "crosshair" })
+local TeleportTab = Window:AddTab({ Title = "| Teleport", Icon = "locate" })
+local AttackAuraTab = Window:AddTab({ Title = "| Attack Aura", Icon = "sword" })
+local CharacterTab = Window:AddTab({ Title = "| Character", Icon = "user" })
+local BringTab = Window:AddTab({ Title = "| Bring Item", Icon = "hammer" })
+local VisualTab = Window:AddTab({ Title = "| Visual", Icon = "eye" })
+local MiscTab = Window:AddTab({ Title = "| Misc", Icon = "layers" })
 local Tabs = {
   Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
