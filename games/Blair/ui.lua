@@ -9,7 +9,7 @@ local T5 = Instance.new("TextLabel")
 --Properties:
 
 GameStatus.Name = "GameStatus"
-GameStatus.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+GameStatus.Parent = game:GetService('CoreGui')
 GameStatus.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 Main.Name = "Main"
