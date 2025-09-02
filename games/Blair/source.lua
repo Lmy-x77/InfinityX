@@ -344,15 +344,12 @@ function GetWritingBook()
   if not itemsFolder then
     return 'no'
   end
+
   for _, v in pairs(itemsFolder:GetChildren()) do
     if v:IsA('Tool') and v.Name == 'Ghost Writing Book' then
       local writtenValue = v:FindFirstChild('Written')
-      if writtenValue then
-        if writtenValue.Value == true then
-          return 'yes'
-        else
-          return 'no'
-        end
+      if writtenValue and writtenValue.Value == true then
+        return 'yes'
       end
     end
   end
@@ -363,8 +360,9 @@ local FreezeTemperatureConnection = nil
 function GetFreezeTemperature()
   local lowestValue = math.huge
   local lowestParent = nil
+
   for _, v in pairs(workspace.Map.Zones:GetDescendants()) do
-    if v:IsA("NumberValue") and v.Name:find('LocalBaseTemp') and v.Parent.Parent.Name ~= 'Outside' then
+    if v:IsA("NumberValue") and v.Name:find("LocalBaseTemp") and v.Parent.Parent.Name ~= "Outside" then
       if v.Value < lowestValue then
         lowestValue = v.Value
         lowestParent = v.Parent.Parent
@@ -372,10 +370,14 @@ function GetFreezeTemperature()
     end
   end
 
-  FreezeTemperatureConnection = game:GetService('RunService').Stepped:Connect(function()
-    if lowestParent and lowestParent:FindFirstChildWhichIsA('NumberValue') then
-      local temp = lowestParent:FindFirstChildWhichIsA('NumberValue').Value
-      if temp < 0 then
+  if FreezeTemperatureConnection then
+      FreezeTemperatureConnection:Disconnect()
+  end
+
+  FreezeTemperatureConnection = game:GetService("RunService").Stepped:Connect(function()
+    if lowestParent then
+      local tempValue = lowestParent:lower():find('temperature')
+      if tempValue and tempValue.Value < 0 then
         GetFreezeTemperatureStatus = "yes"
         if FreezeTemperatureConnection then
           FreezeTemperatureConnection:Disconnect()
@@ -384,7 +386,7 @@ function GetFreezeTemperature()
     end
   end)
 
-  GetFreezeTemperatureStatus = 'no'
+  GetFreezeTemperatureStatus = "no"
 end
 GetFreezeTemperature()
 function GetGhostRoomTemperature()
