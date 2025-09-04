@@ -1,8 +1,16 @@
-function missing(t, f, fallback)
-    if type(f) == t then return f end
-    return fallback
+local function queueTeleport(scriptStr)
+    if queue_on_teleport then
+        queue_on_teleport(scriptStr)
+    elseif syn and syn.queue_on_teleport then
+        syn.queue_on_teleport(scriptStr)
+    elseif fluxus and fluxus.queue_on_teleport then
+        fluxus.queue_on_teleport(scriptStr)
+    elseif wave and wave.queue_on_teleport then
+        wave.queue_on_teleport(scriptStr)
+    else
+        warn("Shit exploit")
+    end
 end
-queueteleport =  missing("function", queue_on_teleport or (syn and syn.queue_on_teleport) or (fluxus and fluxus.queue_on_teleport))
 
 
 local TweenService = game:GetService("TweenService")
@@ -123,8 +131,7 @@ Button1.MouseButton1Click:Connect(function()
     game.Players.LocalPlayer.OnTeleport:Connect(function(State)
     	if not TeleportCheck and queueteleport then
     		TeleportCheck = true
-			wait(4)
-    		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Blair/source.lua'))()")
+            queueTeleport(" wait(8) loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Blair/source.lua'))()")
     	end
     end)
 
