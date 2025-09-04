@@ -86,7 +86,7 @@ T5.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Scripts:
 
-local function JPQB_fake_script() -- Main.LocalScript 
+local function RIMAAA_fake_script() -- Main.LocalScript 
 	local script = Instance.new('LocalScript', Main)
 
 	local FreezeTemperatureText = script.Parent.T1
@@ -99,49 +99,57 @@ local function JPQB_fake_script() -- Main.LocalScript
 	function GetWritingBook()
 		local itemsFolder = workspace.Map:FindFirstChild("Items")
 		if not itemsFolder then
-			return 'no'
+			return "no"
 		end
+	
 		for _, v in pairs(itemsFolder:GetChildren()) do
-			if v:IsA('Tool') and v.Name == 'Ghost Writing Book' then
-				local writtenValue = v:FindFirstChild('Written')
-				if writtenValue then
-					if writtenValue.Value == true then
-						return 'yes'
-					else
-						return 'no'
-					end
-				end
-			end
-		end
-		return 'no'
-	end
-	local GetFreezeTemperatureStatus = 'no'
-	local FreezeTemperatureConnection = nil
-	function GetFreezeTemperature()
-		local lowestValue = math.huge
-		local lowestParent = nil
-		for _, v in pairs(workspace.Map.Zones:GetDescendants()) do
-			if v:IsA("NumberValue") and v.Name:find('LocalBaseTemp') and v.Parent.Parent.Name ~= 'Outside' then
-				if v.Value < lowestValue then
-					lowestValue = v.Value
-					lowestParent = v.Parent.Parent
+			if v:IsA("Tool") and v.Name == "Ghost Writing Book" then
+				local writtenValue = v:FindFirstChild("Written")
+				if writtenValue and writtenValue.Value == true then
+					return "yes"
 				end
 			end
 		end
 	
-		FreezeTemperatureConnection = game:GetService('RunService').Stepped:Connect(function()
-			if lowestParent and lowestParent:FindFirstChildWhichIsA('NumberValue') then
-				local temp = lowestParent:FindFirstChildWhichIsA('NumberValue').Value
-				if temp < 0 then
-					GetFreezeTemperatureStatus = "yes"
-					if FreezeTemperatureConnection then
-						FreezeTemperatureConnection:Disconnect()
+		return "no"
+	end
+	local GetFreezeTemperatureStatus = 'no'
+	local CurrentGhostRoom = 'none'
+	local FreezeTemperatureConnection = nil
+	function GetFreezeTemperature()
+		local lowestValue = math.huge
+		local lowestParent = nil
+	
+		for _, v in pairs(workspace.Map.Zones:GetDescendants()) do
+			if v:IsA("NumberValue") and v.Name:lower():find("temperature") and v.Parent.Parent.Name ~= "Outside" then
+				if v.Value < lowestValue then
+					lowestValue = v.Value
+					lowestParent = v.Parent
+				end
+			end
+		end
+	
+		if FreezeTemperatureConnection then
+			FreezeTemperatureConnection:Disconnect()
+		end
+	
+		FreezeTemperatureConnection = game:GetService("RunService").Stepped:Connect(function()
+			if lowestParent then
+				for _, val in pairs(lowestParent:GetChildren()) do
+					if val:IsA("NumberValue") and val.Name:lower():find("temperature") then
+						if val.Value < 0 then
+							GetFreezeTemperatureStatus = "yes"
+							if FreezeTemperatureConnection then
+								FreezeTemperatureConnection:Disconnect()
+							end
+							break
+						end
 					end
 				end
 			end
 		end)
 	
-		GetFreezeTemperatureStatus = 'no'
+		GetFreezeTemperatureStatus = "no"
 	end
 	GetFreezeTemperature()
 	function GetGhostRoomTemperature()
@@ -152,6 +160,7 @@ local function JPQB_fake_script() -- Main.LocalScript
 				if v.Value < lowestValue then
 					lowestValue = v.Value
 					lowestParent = v.Parent.Parent
+					CurrentGhostRoom = v.Parent.Parent.Name
 				end
 			end
 		end
@@ -207,4 +216,4 @@ local function JPQB_fake_script() -- Main.LocalScript
 	
 	
 end
-coroutine.wrap(JPQB_fake_script)()
+coroutine.wrap(RIMAAA_fake_script)()
