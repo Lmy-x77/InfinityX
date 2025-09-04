@@ -27,6 +27,9 @@ print[[
                                                        \______/           
 ]]
 if game.PlaceId == 6137321701 then
+  loadstring(game:HttpGetAsync(
+    'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Blair/Notification.lua'
+  ))()
   return
 end
 local findprompt = workspace.Map.Van.Van.Door.Center:FindFirstChild('ProximityPrompt')
@@ -278,27 +281,34 @@ end
 function GetCursedObjects()
   local objects = {}
   for _, v in pairs(workspace.Map.CursedSpawns:GetChildren()) do
-    if v:IsA('Part') then
+    if v:IsA("Part") then
       table.insert(objects, v.Name)
     end
   end
   return objects
 end
 function GetCurrentCursedObject()
-  local cursed = GetCursedObjects()
-  for _, v in pairs(workspace:GetChildren()) do
-    if v:IsA("Model") and table.find(cursed, v.Name) then
+  local cursedfunc = GetCursedObjects()
+  for _, v in pairs(workspace:GetDescendants()) do
+    if (v:IsA("Model") or v:IsA('Tool')) and table.find(cursedfunc, v.Name) then
       return v
     end
   end
-  return 'Not spawned'
+  return "Not spawned"
 end
 function CheckCursedObjects()
-  if workspace:FindFirstChild('Music Box') or workspace:FindFirstChild('Spirit Board') or workspace:FindFirstChild('SummoningCircle') or workspace:FindFirstChild('Tarot Cards') then
-    return true
-  elseif not workspace:FindFirstChild('Music Box') or workspace:FindFirstChild('Spirit Board') or workspace:FindFirstChild('SummoningCircle') or workspace:FindFirstChild('Tarot Cards') then
-    return false
+  local cursedNames = {
+    "Music Box",
+    "Spirit Board",
+    "SummoningCircle",
+    "Tarot Cards"
+  }
+  for _, v in pairs(workspace:GetDescendants()) do
+    if (v:IsA("Model") or v:IsA("Tool")) and table.find(cursedNames, v.Name) then
+      return true
+    end
   end
+  return false
 end
 function CreateEsp(path: Instance, name: string, color)
   if not path:FindFirstChild("Esp") then
@@ -342,22 +352,49 @@ end
 function GetWritingBook()
   local itemsFolder = workspace.Map:FindFirstChild("Items")
   if not itemsFolder then
-    return 'no'
+      return "no"
   end
 
   for _, v in pairs(itemsFolder:GetChildren()) do
-    if v:IsA('Tool') and v.Name == 'Ghost Writing Book' then
-      local writtenValue = v:FindFirstChild('Written')
+    if v:IsA("Tool") and v.Name == "Ghost Writing Book" then
+      local writtenValue = v:FindFirstChild("Written")
       if writtenValue and writtenValue.Value == true then
-        return 'yes'
+        return "yes"
       end
     end
   end
-  return 'no'
+
+  return "no"
 end
-local GetFreezeTemperatureStatus = 'no'
+local GetFreezeTemperatureStatus = "no"
 local FreezeTemperatureConnection = nil
-function GetFreezeTemperature()
+function StartFreezeTemperatureCheck()
+  if FreezeTemperatureConnection then
+    FreezeTemperatureConnection:Disconnect()
+  end
+
+  FreezeTemperatureConnection = game:GetService("RunService").Stepped:Connect(function()
+    local lowestValue = math.huge
+    local lowestParent = nil
+
+    for _, v in pairs(workspace.Map.Zones:GetDescendants()) do
+      if v:IsA("NumberValue") and v.Name:lower():find("temperature") and v.Parent.Parent.Name ~= "Outside" then
+        if v.Value < lowestValue then
+          lowestValue = v.Value
+          lowestParent = v
+        end
+      end
+    end
+
+    if lowestParent and lowestValue < 0 then
+      GetFreezeTemperatureStatus = "yes"
+    else
+      GetFreezeTemperatureStatus = "no"
+    end
+  end)
+end
+StartFreezeTemperatureCheck()
+function GetGhostRoomTemperature()
   local lowestValue = math.huge
   local lowestParent = nil
 
@@ -370,43 +407,17 @@ function GetFreezeTemperature()
     end
   end
 
-  if FreezeTemperatureConnection then
-      FreezeTemperatureConnection:Disconnect()
-  end
-
-  FreezeTemperatureConnection = game:GetService("RunService").Stepped:Connect(function()
-    if lowestParent then
-      local tempValue = lowestParent:lower():find('temperature')
-      if tempValue and tempValue.Value < 0 then
-        GetFreezeTemperatureStatus = "yes"
-        if FreezeTemperatureConnection then
-          FreezeTemperatureConnection:Disconnect()
-        end
-      end
-    end
-  end)
-
-  GetFreezeTemperatureStatus = "no"
-end
-GetFreezeTemperature()
-function GetGhostRoomTemperature()
-  local lowestValue = math.huge
-  local lowestParent = nil
-  for _, v in pairs(workspace.Map.Zones:GetDescendants()) do
-    if v:IsA("NumberValue") and v.Name:find('LocalBaseTemp') and v.Parent.Parent.Name ~= 'Outside' then
-      if v.Value < lowestValue then
-        lowestValue = v.Value
-        lowestParent = v.Parent.Parent
-      end
+  if lowestParent then
+    local tempValue = lowestParent:FindFirstChildWhichIsA("NumberValue")
+    if tempValue then
+      local temp = math.floor(tempValue.Value * 1000 + 0.5) / 1000
+      return temp, lowestParent.Name
     end
   end
 
-  if lowestParent and lowestParent:FindFirstChildWhichIsA('NumberValue') then
-    local temp = lowestParent:FindFirstChildWhichIsA('NumberValue').Value
-    temp = math.floor(temp * 1000 + 0.5) / 1000
-    return tostring(temp)
-  end
+  return nil, nil
 end
+local lastRoom = "Unknown"
 function GetOrbs()
   local findpart = workspace.Map.Orbs:FindFirstChild('OrbPart')
   if findpart then
@@ -483,15 +494,28 @@ local p4 = Tabs.Game:AddParagraph({
   Content = "None"
 })
 spawn(function()
-  while true do task.wait()
+  while true do
+    task.wait()
+
+    local temp, room = GetGhostRoomTemperature()
+    if room then
+      lastRoom = room
+    end
+
+    local freeze = GetFreezeTemperatureStatus or "?"
+    local orbs = GetOrbs() or "?"
+    local book = GetWritingBook() or "?"
+    local prints = GetPrints() or "?"
+    local spirit = GetSpiritBoxStatus or "?"
+
     p4:SetDesc(
-      '• Freeze Temperature: ' .. GetFreezeTemperatureStatus..
-      '\n• Orbs | Particle: ' .. GetOrbs()..
-      '\n• Writing Book: ' .. GetWritingBook()..
-      '\n• Prints | UV: ' .. GetPrints()..
-      '\n• Spirit Box: ' .. GetSpiritBoxStatus..
-      '\n\n• Ghost Room Current Temperature: ' .. GetGhostRoomTemperature()..
-      '\n• Activity: unknown'
+      "• Freeze Temperature: " .. freeze ..
+      "\n• Orbs | Particle: " .. orbs ..
+      "\n• Writing Book: " .. book ..
+      "\n• Prints | UV: " .. prints ..
+      "\n• Spirit Box: " .. spirit ..
+      "\n\n• Ghost Room Current Temperature: " .. (temp or "?") ..
+      "\n• Current Ghost Room: " .. lastRoom
     )
   end
 end)
@@ -573,8 +597,8 @@ Tabs.Esp:AddToggle("AcrylicToggle", {
       if not CheckCursedObjects() then return end
       CreateEsp(GetCurrentCursedObject(), GetCurrentCursedObject().Name, Color3.new(0.913725, 0.196078, 0.196078))
     elseif not espobject then
-      for _, v in pairs(workspace:GetChildren()) do
-        if v:IsA('Model') and table.find(GetCursedObjects(), v.Name) then
+      for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA('Model') or v:IsA('Tool') and table.find(GetCursedObjects(), v.Name) then
           if v:FindFirstChild('Esp') then
             v:FindFirstChildWhichIsA('BoxHandleAdornment'):Destroy()
             v:FindFirstChildWhichIsA('BillboardGui'):Destroy()
@@ -610,7 +634,26 @@ Tabs.Esp:AddToggle("AcrylicToggle", {
     end
   end
 })
-
+Tabs.Esp:AddToggle("AcrylicToggle", {
+  Title = "All items esp",
+  Default = false,
+  Callback = function(Value)
+    espitems = Value
+    if espitems then
+      for _, v in pairs(workspace.Map.Items:GetChildren()) do
+        if v:IsA('Tool') then
+          CreateEsp(v, v.Name, Color3.new(0.192156, 0.6, 0.654901))
+        end
+      end
+    else
+      for _, v in pairs(workspace.Map.Items:GetDescendants()) do
+        if (v:IsA('BillboardGui') and v.Name == 'EspName' or v:IsA('BoxHandleAdornment') and v.Name == 'Esp') then
+          v:Destroy()
+        end
+      end
+    end
+  end
+})
 
 Tabs.Teleport:AddSection("[🌍] - Zone Teleport")
 local ZonesTeleportDropdown = Tabs.Teleport:AddDropdown("", {
