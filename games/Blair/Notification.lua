@@ -127,13 +127,7 @@ TweenService:Create(Frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.Easing
 TweenService:Create(blur, TweenInfo.new(0.5), {Size = 20}):Play()
 
 Button1.MouseButton1Click:Connect(function()
-    local TeleportCheck = false
-    game.Players.LocalPlayer.OnTeleport:Connect(function(State)
-    	if not TeleportCheck and queueteleport then
-    		TeleportCheck = true
-            queueTeleport(" wait(8) loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Blair/source.lua'))()")
-    	end
-    end)
+    queueTeleport(" wait(8) loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Blair/source.lua'))()")
 
 	local fadeOut = TweenService:Create(Frame, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {
 		BackgroundTransparency = 1
