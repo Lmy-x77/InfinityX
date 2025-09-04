@@ -123,6 +123,7 @@ Button1.MouseButton1Click:Connect(function()
     game.Players.LocalPlayer.OnTeleport:Connect(function(State)
     	if not TeleportCheck and queueteleport then
     		TeleportCheck = true
+			wait(4)
     		queueteleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Blair/source.lua'))()")
     	end
     end)
