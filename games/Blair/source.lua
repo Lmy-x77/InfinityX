@@ -641,7 +641,7 @@ Tabs.Esp:AddToggle("AcrylicToggle", {
     espitems = Value
     if espitems then
       for _, v in pairs(workspace.Map.Items:GetChildren()) do
-        if v:IsA('Tool') then
+        if v:IsA('Tool') and v.Name ~= 'Photo Camera' then
           CreateEsp(v, v.Name, Color3.new(0.192156, 0.6, 0.654901))
         end
       end
