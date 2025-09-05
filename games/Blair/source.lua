@@ -451,6 +451,14 @@ end
 GetSpritBox()
 
 
+-- esp settings
+local EspLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Esp%20v2/source.lua", true))()
+EspLib.ESPValues.GhostESP = false
+EspLib.ESPValues.BooBooDollESP = false
+EspLib.ESPValues.CursedObjectESP = false
+EspLib.ESPValues.AllItemsESP = false
+
+
 -- ui library
 local isMobile = game.UserInputService.TouchEnabled
 local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Fluent/source.lua"))()
@@ -546,21 +554,17 @@ Tabs.Esp:AddToggle("AcrylicToggle", {
   Title = "Ghost esp",
   Default = false,
   Callback = function(Value)
-    espghost = Value
-    while espghost do task.wait()
-      if espghost then
+    EspLib.ESPValues.GhostESP = Value
+    while EspLib.ESPValues.GhostESP do task.wait()
+      if EspLib.ESPValues.GhostESP then
         for _, v in pairs(workspace:GetChildren()) do
           if v:IsA('Model') and v.Name == 'Ghost' then
-            CreateEsp(v, 'Ghost', Color3.new(0.588235, 0.011765, 0.011765))
-          end
-        end
-      elseif espghost then
-        for _, v in pairs(workspace:GetChildren()) do
-          if v:IsA('Model') and v.Name == 'Ghost' then
-            if v:FindFirstChildWhichIsA('BoxHandleAdornment') then
-              v:FindFirstChildWhichIsA('BoxHandleAdornment'):Destroy()
-              v:FindFirstChildWhichIsA('BillboardGui'):Destroy()
-            end
+            EspLib.ApplyESP(v, {
+              Color = Color3.fromRGB(159, 0, 0),
+              Text = v.Name,
+              ESPName = "GhostESP",
+              HighlightEnabled = true,
+            })
           end
         end
       end
@@ -571,19 +575,15 @@ Tabs.Esp:AddToggle("AcrylicToggle", {
   Title = "BooBooDoll esp",
   Default = false,
   Callback = function(Value)
-    espBooBooDoll = Value
-    if espBooBooDoll then
-      if workspace:FindFirstChild('BooBooDoll') then  
-        CreateEsp(workspace:FindFirstChild('BooBooDoll'), workspace:FindFirstChild('BooBooDoll').Name, Color3.new(0.541176, 0.541176, 0.541176))
-      end
-    elseif not espBooBooDoll then
-      for _, v in pairs(workspace:GetChildren()) do
-        if v:IsA('MeshPart') and v.Name == 'BooBooDoll' then
-          if v:FindFirstChild('Esp') then
-            v:FindFirstChildWhichIsA('BoxHandleAdornment'):Destroy()
-            v:FindFirstChildWhichIsA('BillboardGui'):Destroy()
-          end
-        end
+    EspLib.ESPValues.BooBooDollESP = Value
+    if EspLib.ESPValues.BooBooDollESP then
+      if workspace:FindFirstChild('BooBooDoll') then
+        EspLib.ApplyESP(workspace:FindFirstChild('BooBooDoll'), {
+          Color = Color3.fromRGB(184, 184, 184),
+          Text = workspace:FindFirstChild('BooBooDoll').Name,
+          ESPName = "BooBooDollESP",
+          HighlightEnabled = true,
+        })
       end
     end
   end
@@ -592,19 +592,15 @@ Tabs.Esp:AddToggle("AcrylicToggle", {
   Title = "Cursed object esp",
   Default = false,
   Callback = function(Value)
-    espobject = Value
-    if espobject then
+    EspLib.ESPValues.CursedObjectESP = Value
+    if EspLib.ESPValues.CursedObjectESP then
       if not CheckCursedObjects() then return end
-      CreateEsp(GetCurrentCursedObject(), GetCurrentCursedObject().Name, Color3.new(0.913725, 0.196078, 0.196078))
-    elseif not espobject then
-      for _, v in pairs(workspace:GetDescendants()) do
-        if v:IsA('Model') or v:IsA('Tool') and table.find(GetCursedObjects(), v.Name) then
-          if v:FindFirstChild('Esp') then
-            v:FindFirstChildWhichIsA('BoxHandleAdornment'):Destroy()
-            v:FindFirstChildWhichIsA('BillboardGui'):Destroy()
-          end
-        end
-      end
+      EspLib.ApplyESP(GetCurrentCursedObject(), {
+        Color = Color3.fromRGB(170, 68, 68),
+        Text = GetCurrentCursedObject().Name,
+        ESPName = "CursedObjectESP",
+        HighlightEnabled = true,
+      })
     end
   end
 })
@@ -638,17 +634,16 @@ Tabs.Esp:AddToggle("AcrylicToggle", {
   Title = "All items esp",
   Default = false,
   Callback = function(Value)
-    espitems = Value
-    if espitems then
+    EspLib.ESPValues.AllItemsESP = Value
+    if EspLib.ESPValues.AllItemsESP then
       for _, v in pairs(workspace.Map.Items:GetChildren()) do
         if v:IsA('Tool') and v.Name ~= 'Photo Camera' then
-          CreateEsp(v, v.Name, Color3.new(0.192156, 0.6, 0.654901))
-        end
-      end
-    else
-      for _, v in pairs(workspace.Map.Items:GetDescendants()) do
-        if (v:IsA('BillboardGui') and v.Name == 'EspName' or v:IsA('BoxHandleAdornment') and v.Name == 'Esp') then
-          v:Destroy()
+          EspLib.ApplyESP(v, {
+            Color = Color3.fromRGB(199, 96, 36),
+            Text = v.Name,
+            ESPName = "AllItemsESP",
+            HighlightEnabled = true,
+          })
         end
       end
     end
