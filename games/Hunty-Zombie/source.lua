@@ -1,3 +1,20 @@
+-- start
+-- start
+print[[                                                                     
+ /$$$$$$            /$$$$$$  /$$           /$$   /$$               /$$   /$$
+|_  $$_/           /$$__  $$|__/          |__/  | $$              | $$  / $$
+  | $$   /$$$$$$$ | $$  \__/ /$$ /$$$$$$$  /$$ /$$$$$$   /$$   /$$|  $$/ $$/
+  | $$  | $$__  $$| $$$$    | $$| $$__  $$| $$|_  $$_/  | $$  | $$ \  $$$$/ 
+  | $$  | $$  \ $$| $$_/    | $$| $$  \ $$| $$  | $$    | $$  | $$  >$$  $$ 
+  | $$  | $$  | $$| $$      | $$| $$  | $$| $$  | $$ /$$| $$  | $$ /$$/\  $$
+ /$$$$$$| $$  | $$| $$      | $$| $$  | $$| $$  |  $$$$/|  $$$$$$$| $$  \ $$
+|______/|__/  |__/|__/      |__/|__/  |__/|__/   \___/   \____  $$|__/  |__/
+                                                         /$$  | $$          
+                                                        |  $$$$$$/          
+                                                         \______/           
+]]
+
+
 -- variables
 local farmsettings = {
   Enabled = false
@@ -1353,13 +1370,6 @@ MiscTab:Button({
   Locked = false,
   Callback = function()
     fireproximityprompt(workspace.GUIPrompt.customquests.prompt)
-  end
-})
-MiscTab:Button({
-  Title = "Soon",
-  Locked = false,
-  Callback = function()
-
   end
 })
 
