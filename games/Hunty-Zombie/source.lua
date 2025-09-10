@@ -236,6 +236,11 @@ local CreateLobbyTab = LobbySection:Tab({
   Icon = "diamond-plus",
   Locked = false,
 })
+local ModificationTab = LobbySection:Tab({
+  Title = "Modification",
+  Icon = "crown",
+  Locked = false,
+})
 local AutoRollTab = LobbySection:Tab({
   Title = "Auto Rollㅤㅤ",
   Icon = "refresh-cw",
@@ -822,6 +827,39 @@ CreateLobbyTab:Toggle({
         end
       end
     end
+  end
+})
+
+ModificationTab:Section({ 
+  Title = "Mods Option",
+  TextXAlignment = "Left",
+  TextSize = 17,
+})
+ModificationTab:Dropdown({
+  Title = "Select slot",
+  Values = {'1', '2', '3', '4', '5', '6'},
+  Value = "none",
+  Callback = function(option)
+    selectedslotw = option
+  end
+})
+ModificationTab:Dropdown({
+  Title = "Select weapon",
+  Values = {'Dagger', 'Scythe'},
+  Value = "none",
+  Callback = function(option)
+    selectedweaponw = option
+  end
+})
+ModificationTab:Button({
+  Title = "Get weapon",
+  Locked = false,
+  Callback = function()
+    local args = {
+      tonumber(selectedslotw),
+      selectedweaponw
+    }
+    game:GetService("ReplicatedStorage").Packets.EquipWeaponByItem:InvokeServer(unpack(args))
   end
 })
 
@@ -1779,7 +1817,7 @@ if game.PlaceId == 103754275310547 then
   wait()
   LobbySection:Open()
 elseif game.PlaceId == 86076978383613 then
-  Window:SelectTab(5)
+  Window:SelectTab(6)
   wait()
   LobbySection:Close()
   ArenaSection:Close()
