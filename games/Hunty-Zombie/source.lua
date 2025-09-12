@@ -118,6 +118,7 @@ end
 -- esp library
 local EspLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Esp%20v2/source.lua", true))()
 EspLib.ESPValues.ZombieESP = false
+EspLib.ESPValues.DoorsESP = false
 EspLib.ESPValues.ItemESP = false
 EspLib.ESPValues.PlayerESP = false
 local function applyESPToZombie()
@@ -161,15 +162,21 @@ local function applyESPToPlayers(player)
     end
   end
 end
-function applyESPToItems()
-  for _, v in pairs(workspace.DropItems:GetChildren()) do
-    if v:IsA('Part') then
-      EspLib.ApplyESP(v, {
-        Color = Color3.new(0.694118, 0.596078, 0.047059),
-        Text = v.Name,
-        ESPName = "ItemESP",
-        HighlightEnabled = true,
-      })
+function applyESPToDoors()
+  for _, v in pairs(workspace:GetChildren()) do
+    if v:IsA('Model') and (v.Name == 'School' or v.Name == 'Sewers' or v.Name == 'Carnival') then
+    if v:FindFirstChild('Doors') then
+        for _, x in pairs(v:FindFirstChild('Doors'):GetChildren()) do
+          if x:IsA('Model') then
+            EspLib.ApplyESP(x, {
+              Color = Color3.new(0.152941, 0.400000, 0.772549),
+              Text = 'Door',
+              ESPName = "DoorsESP",
+              HighlightEnabled = true,
+            })
+          end
+        end
+      end
     end
   end
 end
@@ -290,7 +297,7 @@ CreateLobbyTab:Section({
 })
 CreateLobbyTab:Dropdown({
   Title = "Select map",
-  Values = { "School", "Sewers" },
+  Values = { "School", "Sewers", "Carnival" },
   Value = "none",
   Callback = function(option)
     selectedmap = option
@@ -824,6 +831,289 @@ CreateLobbyTab:Toggle({
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
           GuiService.GuiNavigationEnabled = false
           return
+
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Normal' and selectedPlayerSize == '1' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Normal' and selectedPlayerSize == '2' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Normal' and selectedPlayerSize == '3' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Normal' and selectedPlayerSize == '4' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Normal' and selectedPlayerSize == '5' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Normal' and selectedPlayerSize == '6' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Hard' and selectedPlayerSize == '1' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[3])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Hard' and selectedPlayerSize == '2' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[3])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Hard' and selectedPlayerSize == '3' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[3])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Hard' and selectedPlayerSize == '4' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[3])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Hard' and selectedPlayerSize == '5' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[3])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Hard' and selectedPlayerSize == '6' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[3])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '1' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '2' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '3' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '4' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '5' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Carnival' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '6' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[4])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
         end
       end
     end
@@ -831,7 +1121,7 @@ CreateLobbyTab:Toggle({
 })
 
 ModificationTab:Section({ 
-  Title = "Mods Option",
+  Title = "Mods Option [ PATCHED ]",
   TextXAlignment = "Left",
   TextSize = 17,
 })
@@ -870,7 +1160,7 @@ AutoRollTab:Section({
 })
 AutoRollTab:Dropdown({
   Title = "Select weapon",
-  Values = { "Baseball", "Axes", 'Guitar', 'Dual Gun', 'Katana', 'Greatsword' },
+  Values = { "Baseball", "Axes", 'Guitar', 'Dual Gun', 'Zombie Claws', 'Katana', 'Greatsword', 'Scissors' },
   Value = "none",
   Callback = function(option)
     selectedweapon = option
@@ -951,7 +1241,7 @@ AutoRollTab:Toggle({
     end
     while autorolll do task.wait()
       local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28].Header.Text
-      if verify == 'GUITAR' or verify == 'DUAL GUN' then
+      if verify == 'GUITAR' or verify == 'DUAL GUN' or verify == 'ZOMBIE CLAWS' then
         WindUI:Notify({
           Title = "Notification",
           Content = "The weapon: " .. verify .. ' has been collected',
@@ -994,7 +1284,7 @@ AutoRollTab:Toggle({
     end
     while autorollm do task.wait()
       local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28].Header.Text
-      if verify == 'KATANA' or verify == 'GREATSWORD' then
+      if verify == 'KATANA' or verify == 'GREATSWORD' or verify == 'SCISSORS' then
         WindUI:Notify({
           Title = "Notification",
           Content = "The weapon: " .. verify .. ' has been collected',
@@ -1386,12 +1676,13 @@ MiscTab:Button({
   Title = "Reedem all codes",
   Locked = false,
   Callback = function()
-    local codes = { '500KLIKES', '200K67', 'HZCrafting2', 'HZCrafting', 'B4UPD3', 'EMOTEISHERE' }
+    local codes = { '500KLIKES', '200K67', 'HZCrafting2', 'HZCrafting', 'B4UPD3', 'EMOTEISHERE', 'UPD3', 'ZOMBIECLAW', 'SCISSORS', 'latehunty' }
     for _, v in pairs(codes) do
       local Event = game:GetService("ReplicatedStorage").Packets.RedeemCode
       Event:InvokeServer(
         v
       )
+      task.wait()
     end
   end
 })
@@ -1457,7 +1748,8 @@ AutoFarmTab:Toggle({
   Default = false,
   Callback = function(state)
     attack = state
-    while farmsettings.Enabled and attack do task.wait()
+    while attack do task.wait()
+      if not farmsettings.Enabled then continue end
       for _, v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
         if v:IsA('Tool') then
           v:Activate()
@@ -1476,7 +1768,8 @@ AutoFarmTab:Toggle({
   Default = false,
   Callback = function(state)
     perk = state
-    while farmsettings.Enabled and perk do task.wait()
+    while perk do task.wait()
+      if not farmsettings.Enabled then continue end
       KeyPress('E')
     end
   end
@@ -1488,7 +1781,8 @@ AutoFarmTab:Toggle({
   Default = false,
   Callback = function(state)
     awakening = state
-    while farmsettings.Enabled and awakening do task.wait()
+    while awakening do task.wait()
+      if not farmsettings.Enabled then continue end
       KeyPress('G')
     end
   end
@@ -1500,7 +1794,8 @@ AutoFarmTab:Toggle({
   Default = false,
   Callback = function(state)
     collect = state
-    while farmsettings.Enabled and collect do task.wait()
+    while collect do task.wait()
+      if not farmsettings.Enabled then continue end
       for _, v in pairs(workspace.DropItems:GetChildren()) do
         if v:IsA('Part') then
           game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
@@ -1521,7 +1816,8 @@ AutoFarmTab:Toggle({
   Default = false,
   Callback = function(state)
     skillZ = state
-    while farmsettings.Enabled and skillZ do task.wait()
+    while skillZ do task.wait()
+      if not farmsettings.Enabled then continue end
       KeyPress('Z')
     end
   end
@@ -1545,7 +1841,8 @@ AutoFarmTab:Toggle({
   Default = false,
   Callback = function(state)
     skillC = state
-    while farmsettings.Enabled and skillC do task.wait()
+    while skillC do task.wait()
+      if not farmsettings.Enabled then continue end
       KeyPress('C')
     end
   end
@@ -1649,6 +1946,14 @@ AutomaticTab:Toggle({
       local school = workspace:FindFirstChild("School")
       if school and school:FindFirstChild("Doors") then
         for _, door in ipairs(school.Doors:GetChildren()) do
+          local args = { buffer.fromstring("\a\001"), {door} }
+          game.ReplicatedStorage:WaitForChild("ByteNetReliable"):FireServer(unpack(args))
+          task.wait(0.1)
+        end
+      end
+      local carnival = workspace:FindFirstChild("Carnival")
+      if carnival and carnival:FindFirstChild("Doors") then
+        for _, door in ipairs(carnival.Doors:GetChildren()) do
           local args = { buffer.fromstring("\a\001"), {door} }
           game.ReplicatedStorage:WaitForChild("ByteNetReliable"):FireServer(unpack(args))
           task.wait(0.1)
@@ -1775,6 +2080,27 @@ VisualTab:Toggle({
   end
 })
 VisualTab:Toggle({
+  Title = "Esp doors",
+  Icon = "check",
+  Type = "Checkbox",
+  Default = false,
+  Callback = function(state)
+    EspLib.ESPValues.DoorsESP = state
+    if EspLib.ESPValues.DoorsESP then
+      applyESPToDoors()
+      for _, v in pairs(workspace:GetChildren()) do
+        if v:IsA('Model') and (v.Name == 'School' or v.Name == 'Sewers' or v.Name == 'Carnival') then
+          v:FindFirstChild('Doors').ChildAdded:Connect(function(item)
+            if EspLib.ESPValues.DoorsESP and item:IsA('Model') then
+              applyESPToDoors()
+            end
+          end)
+        end
+      end
+    end
+  end
+})
+VisualTab:Toggle({
   Title = "Esp items",
   Icon = "check",
   Type = "Checkbox",
@@ -1814,13 +2140,13 @@ if game.PlaceId == 103754275310547 then
   wait()
   ArenaSection:Close()
   LobbySection:Close()
-  wait()
+  wait(.2)
   LobbySection:Open()
 elseif game.PlaceId == 86076978383613 then
   Window:SelectTab(6)
   wait()
   LobbySection:Close()
   ArenaSection:Close()
-  wait()
+  wait(.2)
   ArenaSection:Open()
 end
