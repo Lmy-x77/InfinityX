@@ -180,6 +180,18 @@ function applyESPToDoors()
     end
   end
 end
+function applyESPToItems()
+  for _, v in pairs(workspace.DropItems:GetChildren()) do
+    if v:IsA('Part') then
+      EspLib.ApplyESP(v, {
+        Color = Color3.new(0.792157, 0.752941, 0.188235),
+        Text = v.Name,
+        ESPName = "ItemESP",
+        HighlightEnabled = true,
+      })
+    end
+  end
+end
 
 
 -- ui library
@@ -285,6 +297,11 @@ local CharacterTab = ArenaSection:Tab({
 local VisualTab = ArenaSection:Tab({
   Title = "Visualㅤㅤㅤㅤ",
   Icon = "eye",
+  Locked = false,
+})
+local SettingsTab = ArenaSection:Tab({
+  Title = "Settingsㅤㅤ",
+  Icon = "settings",
   Locked = false,
 })
 
@@ -1741,7 +1758,7 @@ local tpzombieToggle = AutoFarmTab:Toggle({
     end
   end
 })
-AutoFarmTab:Toggle({
+local AutoAttackToggle = AutoFarmTab:Toggle({
   Title = "Auto attack",
   Icon = "check",
   Type = "Checkbox",
@@ -1918,6 +1935,25 @@ AutomaticTab:Toggle({
                   fireproximityprompt(v.ProximityPrompt)
                   wait(1)
                   game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame * CFrame.new(0, 1000, 0)
+                end
+              end
+            end
+          elseif string.find(string.lower(v.Text), 'defeat') then
+            for _, v in pairs(workspace.Entities.Zombie:GetChildren()) do
+              if v:IsA('Model') and v.Name == '1' and alive(v) then
+                p2:SetDesc('Boss Status: Alive\nTeleported player to kill the boss')
+                local hrpZombie = v:FindFirstChild("HumanoidRootPart")
+                local char = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+      
+                if not alive(v) then
+                  p2:SetDesc('Boss Status: Dead\nTeleport to player to safe zone\nWaiting to escape...')
+                  CreatePlataform()
+                  game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(15, 21, 54)
+                end
+                if hrpZombie and hrp then
+                  hrp.CFrame = hrpZombie.CFrame * CFrame.new(0, 5, 4.2)
+                  break
                 end
               end
             end
@@ -2130,6 +2166,37 @@ VisualTab:Toggle({
       end
       game.Players.PlayerAdded:Connect(applyESPToPlayers)
     end
+  end
+})
+
+local configName = 'SavedSettings'
+local ConfigManager = Window.ConfigManager
+local myConfig = ConfigManager:CreateConfig("SavedSettings")
+ConfigManager:Init(Window)
+SettingsTab:Section({ 
+  Title = "Save Manager [ BETA ]",
+  TextXAlignment = "Left",
+  TextSize = 17,
+})
+SettingsTab:Input({
+  Title = "Config Name",
+  Value = configName,
+  Callback = function(value)
+    configName = value or 'SavedSettings'
+  end
+})
+SettingsTab:Button({
+  Title = "Save settings",
+  Locked = false,
+  Callback = function()
+    myConfig:Save()
+  end
+})
+SettingsTab:Button({
+  Title = "Load settings",
+  Locked = false,
+  Callback = function()
+    myConfig:Load()
   end
 })
 
