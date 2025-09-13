@@ -1,3 +1,8 @@
+if game.PlaceId ~= 103754275310547 or game.PlaceId ~= 86076978383613 then
+  return
+end
+
+
 -- start
 print[[                                                                     
  /$$$$$$            /$$$$$$  /$$           /$$   /$$               /$$   /$$
@@ -2178,25 +2183,37 @@ SettingsTab:Section({
   TextXAlignment = "Left",
   TextSize = 17,
 })
-SettingsTab:Input({
+local saveInput = SettingsTab:Input({
   Title = "Config Name",
   Value = configName,
   Callback = function(value)
     configName = value or 'SavedSettings'
   end
 })
-SettingsTab:Button({
+local saveButton = SettingsTab:Button({
   Title = "Save settings",
+  Desc = "In dev",
   Locked = false,
   Callback = function()
     myConfig:Save()
   end
 })
-SettingsTab:Button({
+local loadButton = SettingsTab:Button({
   Title = "Load settings",
+  Desc = "In dev",
   Locked = false,
   Callback = function()
     myConfig:Load()
+  end
+})
+saveInput:Lock()
+saveButton:Lock()
+loadButton:Lock()
+SettingsTab:Button({
+  Title = "Active auto execute",
+  Locked = false,
+  Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Hunty-Zombie/ui.lua",true))()
   end
 })
 
