@@ -1,5 +1,15 @@
-if game.PlaceId ~= 103754275310547 or game.PlaceId ~= 86076978383613 then
-  return
+local allowedplaceid = {103754275310547, 86076978383613}
+local currentPlace = game.PlaceId
+local function isAllowed(id)
+    for _, v in ipairs(allowedplaceid) do
+        if v == id then
+            return true
+        end
+    end
+    return false
+end
+if not isAllowed(currentPlace) then
+    return
 end
 
 
