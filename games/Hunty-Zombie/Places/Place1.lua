@@ -250,6 +250,7 @@ local Minimizer = Fluent:CreateMinimizer({
   Draggable = true,
   Visible = true
 })
+Fluent:ToggleTransparency(false)
 
 
 -- tabs
