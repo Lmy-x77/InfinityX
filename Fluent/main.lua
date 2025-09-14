@@ -60,6 +60,7 @@ local Themes = {
 		"Bloody",
 		"Arctic",
 		"InfinityX",
+		"InfinityXPlus",
 	},
 	Dark = {
 		Name = "Dark",
@@ -802,7 +803,46 @@ local Themes = {
         SubText = Color3.fromRGB(180, 160, 200),
         Hover = Color3.fromRGB(140, 100, 200),
         HoverChange = 0.05
-    }
+    },
+	InfinityXPlus = {
+	    Name = "InfinityX",
+	    Accent = Color3.fromRGB(175, 120, 255),
+	    AcrylicMain = Color3.fromRGB(20, 15, 30),
+	    AcrylicBorder = Color3.fromRGB(35, 25, 50),
+	    AcrylicGradient = ColorSequence.new(Color3.fromRGB(25, 20, 40), Color3.fromRGB(45, 30, 65)),
+	    AcrylicNoise = 0.9,
+	    TitleBarLine = Color3.fromRGB(70, 50, 90),
+	    Tab = Color3.fromRGB(90, 60, 140),
+	    Element = Color3.fromRGB(50, 30, 75),
+	    ElementBorder = Color3.fromRGB(65, 40, 95),
+	    InElementBorder = Color3.fromRGB(75, 50, 110),
+	    ElementTransparency = 0.85,
+	    ToggleSlider = Color3.fromRGB(175, 120, 255),
+	    ToggleToggled = Color3.fromRGB(30, 20, 45),
+	    SliderRail = Color3.fromRGB(150, 100, 220),
+	    DropdownFrame = Color3.fromRGB(95, 65, 145),
+	    DropdownHolder = Color3.fromRGB(30, 20, 45),
+	    DropdownBorder = Color3.fromRGB(70, 50, 100),
+	    DropdownOption = Color3.fromRGB(120, 90, 170),
+	    Keybind = Color3.fromRGB(160, 110, 240),
+	    Input = Color3.fromRGB(150, 100, 220),
+	    InputFocused = Color3.fromRGB(25, 15, 35),
+	    InputIndicator = Color3.fromRGB(200, 150, 255),
+	    InputIndicatorFocus = Color3.fromRGB(175, 120, 255),
+	    Dialog = Color3.fromRGB(35, 25, 55),
+	    DialogHolder = Color3.fromRGB(25, 15, 40),
+	    DialogHolderLine = Color3.fromRGB(20, 10, 35),
+	    DialogButton = Color3.fromRGB(50, 35, 75),
+	    DialogButtonBorder = Color3.fromRGB(70, 50, 95),
+	    DialogBorder = Color3.fromRGB(55, 35, 80),
+	    DialogInput = Color3.fromRGB(45, 30, 70),
+	    DialogInputLine = Color3.fromRGB(120, 90, 170),
+	    Text = Color3.fromRGB(230, 220, 255),
+	    SubText = Color3.fromRGB(190, 170, 210),
+	    Hover = Color3.fromRGB(150, 110, 220),
+	    HoverChange = 0.05
+	}
+
 
 }
 
