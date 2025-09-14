@@ -4336,12 +4336,12 @@ ElementsTable.Dropdown = (function()
 			if SearchBox and not Dropdown.KeepSearch then
 				SearchBox.Text = ""
 			end
-			ScrollFrame.ScrollingEnabled = true
+			ScrollFrame.ScrollingEnabled = false
 			DropdownHolderCanvas.Visible = true
 			TweenService:Create(
 				DropdownHolderFrame,
 				TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-				{ Size = UDim2.fromScale(1, 0.6) }
+				{ Size = UDim2.fromScale(1, 1) }
 			):Play()
 			TweenService:Create(
 				DropdownIco,
