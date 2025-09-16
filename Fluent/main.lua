@@ -60,7 +60,6 @@ local Themes = {
 		"Bloody",
 		"Arctic",
 		"InfinityX",
-		"InfinityXPlus",
 	},
 	Dark = {
 		Name = "Dark",
@@ -766,83 +765,44 @@ local Themes = {
 		Hover = Color3.fromRGB(90, 140, 180),
 		HoverChange = 0.04
 	},
-    InfinityX = {
-        Name = "InfinityX",
-        Accent = Color3.fromRGB(175, 120, 255),
-        AcrylicMain = Color3.fromRGB(15, 10, 20),
-        AcrylicBorder = Color3.fromRGB(30, 20, 40),
-        AcrylicGradient = ColorSequence.new(Color3.fromRGB(20, 15, 30), Color3.fromRGB(35, 20, 45)),
-        AcrylicNoise = 0.9,
-        TitleBarLine = Color3.fromRGB(60, 40, 80),
-        Tab = Color3.fromRGB(80, 50, 120),
-        Element = Color3.fromRGB(50, 30, 70),
-        ElementBorder = Color3.fromRGB(60, 35, 85),
-        InElementBorder = Color3.fromRGB(70, 40, 100),
-        ElementTransparency = 0.85,
-        ToggleSlider = Color3.fromRGB(175, 120, 255),
-        ToggleToggled = Color3.fromRGB(25, 15, 35),
-        SliderRail = Color3.fromRGB(150, 100, 220),
-        DropdownFrame = Color3.fromRGB(90, 60, 140),
-        DropdownHolder = Color3.fromRGB(25, 15, 40),
-        DropdownBorder = Color3.fromRGB(60, 40, 90),
-        DropdownOption = Color3.fromRGB(110, 80, 160),
-        Keybind = Color3.fromRGB(160, 110, 240),
-        Input = Color3.fromRGB(150, 100, 220),
-        InputFocused = Color3.fromRGB(20, 10, 30),
-        InputIndicator = Color3.fromRGB(200, 150, 255),
-        InputIndicatorFocus = Color3.fromRGB(175, 120, 255),
-        Dialog = Color3.fromRGB(30, 20, 50),
-        DialogHolder = Color3.fromRGB(20, 10, 30),
-        DialogHolderLine = Color3.fromRGB(15, 5, 25),
-        DialogButton = Color3.fromRGB(40, 30, 60),
-        DialogButtonBorder = Color3.fromRGB(60, 40, 80),
-        DialogBorder = Color3.fromRGB(50, 30, 70),
-        DialogInput = Color3.fromRGB(40, 25, 60),
-        DialogInputLine = Color3.fromRGB(110, 80, 160),
-        Text = Color3.fromRGB(230, 220, 255),
-        SubText = Color3.fromRGB(180, 160, 200),
-        Hover = Color3.fromRGB(140, 100, 200),
-        HoverChange = 0.05
-    },
-	InfinityXPlus = {
-	    Name = "InfinityX",
-	    Accent = Color3.fromRGB(175, 120, 255),
-	    AcrylicMain = Color3.fromRGB(20, 15, 30),
-	    AcrylicBorder = Color3.fromRGB(35, 25, 50),
-	    AcrylicGradient = ColorSequence.new(Color3.fromRGB(25, 20, 40), Color3.fromRGB(45, 30, 65)),
-	    AcrylicNoise = 0.9,
-	    TitleBarLine = Color3.fromRGB(70, 50, 90),
-	    Tab = Color3.fromRGB(90, 60, 140),
-	    Element = Color3.fromRGB(50, 30, 75),
-	    ElementBorder = Color3.fromRGB(65, 40, 95),
-	    InElementBorder = Color3.fromRGB(75, 50, 110),
-	    ElementTransparency = 0.85,
-	    ToggleSlider = Color3.fromRGB(175, 120, 255),
-	    ToggleToggled = Color3.fromRGB(30, 20, 45),
-	    SliderRail = Color3.fromRGB(150, 100, 220),
-	    DropdownFrame = Color3.fromRGB(95, 65, 145),
-	    DropdownHolder = Color3.fromRGB(30, 20, 45),
-	    DropdownBorder = Color3.fromRGB(70, 50, 100),
-	    DropdownOption = Color3.fromRGB(120, 90, 170),
-	    Keybind = Color3.fromRGB(160, 110, 240),
-	    Input = Color3.fromRGB(150, 100, 220),
-	    InputFocused = Color3.fromRGB(25, 15, 35),
-	    InputIndicator = Color3.fromRGB(200, 150, 255),
-	    InputIndicatorFocus = Color3.fromRGB(175, 120, 255),
-	    Dialog = Color3.fromRGB(35, 25, 55),
-	    DialogHolder = Color3.fromRGB(25, 15, 40),
-	    DialogHolderLine = Color3.fromRGB(20, 10, 35),
-	    DialogButton = Color3.fromRGB(50, 35, 75),
-	    DialogButtonBorder = Color3.fromRGB(70, 50, 95),
-	    DialogBorder = Color3.fromRGB(55, 35, 80),
-	    DialogInput = Color3.fromRGB(45, 30, 70),
-	    DialogInputLine = Color3.fromRGB(120, 90, 170),
-	    Text = Color3.fromRGB(230, 220, 255),
-	    SubText = Color3.fromRGB(190, 170, 210),
-	    Hover = Color3.fromRGB(150, 110, 220),
-	    HoverChange = 0.05
+	InfinityX = {
+		Name = "InfinityX",
+		Accent = Color3.fromRGB(175, 120, 255),
+		AcrylicMain = Color3.fromRGB(15, 10, 20),
+		AcrylicBorder = Color3.fromRGB(30, 20, 40),
+		AcrylicGradient = ColorSequence.new(Color3.fromRGB(20, 15, 30), Color3.fromRGB(35, 20, 45)),
+		AcrylicNoise = 0.9,
+		TitleBarLine = Color3.fromRGB(60, 40, 80),
+		Tab = Color3.fromRGB(80, 50, 120),
+		Element = Color3.fromRGB(50, 30, 70),
+		ElementBorder = Color3.fromRGB(60, 35, 85),
+		InElementBorder = Color3.fromRGB(70, 40, 100),
+		ElementTransparency = 0.85,
+		ToggleSlider = Color3.fromRGB(175, 120, 255),
+		ToggleToggled = Color3.fromRGB(25, 15, 35),
+		SliderRail = Color3.fromRGB(150, 100, 220),
+		DropdownFrame = Color3.fromRGB(90, 60, 140),
+		DropdownHolder = Color3.fromRGB(25, 15, 40),
+		DropdownBorder = Color3.fromRGB(60, 40, 90),
+		DropdownOption = Color3.fromRGB(110, 80, 160),
+		Keybind = Color3.fromRGB(160, 110, 240),
+		Input = Color3.fromRGB(150, 100, 220),
+		InputFocused = Color3.fromRGB(20, 10, 30),
+		InputIndicator = Color3.fromRGB(200, 150, 255),
+		InputIndicatorFocus = Color3.fromRGB(175, 120, 255),
+		Dialog = Color3.fromRGB(30, 20, 50),
+		DialogHolder = Color3.fromRGB(20, 10, 30),
+		DialogHolderLine = Color3.fromRGB(15, 5, 25),
+		DialogButton = Color3.fromRGB(40, 30, 60),
+		DialogButtonBorder = Color3.fromRGB(60, 40, 80),
+		DialogBorder = Color3.fromRGB(50, 30, 70),
+		DialogInput = Color3.fromRGB(40, 25, 60),
+		DialogInputLine = Color3.fromRGB(110, 80, 160),
+		Text = Color3.fromRGB(230, 220, 255),
+		SubText = Color3.fromRGB(180, 160, 200),
+		Hover = Color3.fromRGB(140, 100, 200),
+		HoverChange = 0.05
 	}
-
 
 }
 
@@ -1505,6 +1465,7 @@ local GUI = New("ScreenGui", {
 	Parent = LocalPlayer:WaitForChild("PlayerGui"),
 })
 Library.GUI = GUI
+ProtectGui(GUI)
 
 function Library:SafeCallback(Function, ...)
 	if not Function then
@@ -1568,7 +1529,7 @@ local function createAcrylic()
 		CanCollide = false,
 		Locked = true,
 		CastShadow = false,
-		Transparency = 0.98,
+		Transparency = 0.95,
 	}, {
 		Creator.New("SpecialMesh", {
 			MeshType = Enum.MeshType.Brick,
@@ -1683,7 +1644,7 @@ function AcrylicBlur()
 		end
 
 		Blur.SetVisibility = function(Value)
-			model.Transparency = Value and 0.98 or 1
+			model.Transparency = Value and 0.95 or 1
 		end
 
 		Blur.Frame = comp
@@ -1820,47 +1781,16 @@ local Acrylic = {
 }
 
 function Acrylic.init()
-	local baseEffect = Instance.new("DepthOfFieldEffect")
-	baseEffect.FarIntensity = 0
-	baseEffect.InFocusRadius = 0.1
-	baseEffect.NearIntensity = 1
-
 	local depthOfFieldDefaults = {}
 
 	function Acrylic.Enable()
-		for _, effect in pairs(depthOfFieldDefaults) do
-			effect.Enabled = false
-		end
-		baseEffect.Parent = game:GetService("Lighting")
+	-- 1
 	end
 
 	function Acrylic.Disable()
-		for _, effect in pairs(depthOfFieldDefaults) do
-			effect.Enabled = effect.enabled
-		end
-		baseEffect.Parent = nil
+	-- 2
 	end
 
-	local function registerDefaults()
-		local function register(object)
-			if object:IsA("DepthOfFieldEffect") then
-				depthOfFieldDefaults[object] = { enabled = object.Enabled }
-			end
-		end
-
-		for _, child in pairs(game:GetService("Lighting"):GetChildren()) do
-			register(child)
-		end
-
-		if game:GetService("Workspace").CurrentCamera then
-			for _, child in pairs(game:GetService("Workspace").CurrentCamera:GetChildren()) do
-				register(child)
-			end
-		end
-	end
-
-	registerDefaults()
-	Acrylic.Enable()
 end
 
 local Components = {
@@ -2335,6 +2265,7 @@ Components.Tab = (function()
 			BorderSizePixel = 0,
 			CanvasSize = UDim2.fromScale(0, 0),
 			ScrollingDirection = Enum.ScrollingDirection.Y,
+			ScrollingEnabled = true,
 		}, {
 			ContainerLayout,
 			New("UIPadding", {
@@ -4336,12 +4267,11 @@ ElementsTable.Dropdown = (function()
 			if SearchBox and not Dropdown.KeepSearch then
 				SearchBox.Text = ""
 			end
-			ScrollFrame.ScrollingEnabled = false
 			DropdownHolderCanvas.Visible = true
 			TweenService:Create(
 				DropdownHolderFrame,
 				TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-				{ Size = UDim2.fromScale(1, 1) }
+				{ Size = UDim2.fromScale(1, 0.6) }
 			):Play()
 			TweenService:Create(
 				DropdownIco,
@@ -4352,7 +4282,6 @@ ElementsTable.Dropdown = (function()
 
 		function Dropdown:Close()
 			Dropdown.Opened = false
-			ScrollFrame.ScrollingEnabled = true
 			DropdownHolderFrame.Size = UDim2.fromScale(1, 0.6)
 			DropdownHolderCanvas.Visible = false
 			TweenService:Create(
@@ -4749,6 +4678,38 @@ ElementsTable.Slider = (function()
 			},
 		})
 
+		local SliderInput = New("TextBox", {
+			FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
+			Text = "",
+			TextSize = 12,
+			TextXAlignment = Enum.TextXAlignment.Right,
+			BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+			BackgroundTransparency = 0.8,
+			Size = UDim2.new(0, 0, 0, 14),
+			Position = UDim2.new(0, -4, 0.5, 0),
+			AnchorPoint = Vector2.new(1, 0.5),
+			PlaceholderText = "Value",
+			ClearTextOnFocus = false,
+			Visible = true,
+			TextWrapped = false,
+			TextTransparency = 1,
+			BackgroundTransparency = 1,
+			ThemeTag = {
+				TextColor3 = "SubText",
+				BackgroundColor3 = "Element",
+			},
+		}, {
+			New("UICorner", {
+				CornerRadius = UDim.new(0, 3),
+			}),
+			New("UIStroke", {
+				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+				Color = Color3.fromRGB(0, 0, 0),
+				Transparency = 1,
+				Thickness = 1,
+			}),
+		})
+
 		local SliderInner = New("Frame", {
 			Size = UDim2.new(1, 0, 0, 4),
 			AnchorPoint = Vector2.new(1, 0.5),
@@ -4766,9 +4727,129 @@ ElementsTable.Slider = (function()
 				MaxSize = Vector2.new(150, math.huge),
 			}),
 			SliderDisplay,
+			SliderInput,
 			SliderFill,
 			SliderRail,
 		})
+
+		local isHovering = false
+		local inputVisible = false
+
+		local function calculateInputWidth(text)
+			local textSize = game:GetService("TextService"):GetTextSize(
+				text or "0",
+				12,
+				Enum.Font.SourceSans,
+				Vector2.new(1000, 14)
+			)
+			local padding = 8
+			local minWidth = 25
+			local maxWidth = 80
+			return math.max(minWidth, math.min(maxWidth, textSize.X + padding))
+		end
+
+		Creator.AddSignal(SliderFrame.Frame.MouseEnter, function()
+			isHovering = true
+			if not SliderInput:IsFocused() then
+				SliderDisplay.Visible = false
+				SliderInput.Text = tostring(Slider.Value)
+				
+				local targetWidth = calculateInputWidth(tostring(Slider.Value))
+				SliderInput.Size = UDim2.new(0, targetWidth, 0, 14)
+				inputVisible = true
+				
+				local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+				
+				TweenService:Create(SliderInput, tweenInfo, {
+					TextTransparency = 0,
+					BackgroundTransparency = 0.8
+				}):Play()
+				
+				TweenService:Create(SliderInput.UIStroke, tweenInfo, {
+					Transparency = 0.7
+				}):Play()
+			end
+		end)
+
+		Creator.AddSignal(SliderFrame.Frame.MouseLeave, function()
+			isHovering = false
+			if not SliderInput:IsFocused() and inputVisible then
+				local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
+				
+				TweenService:Create(SliderInput, tweenInfo, {
+					TextTransparency = 1,
+					BackgroundTransparency = 1
+				}):Play()
+				
+				TweenService:Create(SliderInput.UIStroke, tweenInfo, {
+					Transparency = 1
+				}):Play()
+				
+				task.wait(0.2)
+				SliderDisplay.Visible = true
+				inputVisible = false
+			end
+		end)
+
+		Creator.AddSignal(SliderInput.Changed, function(property)
+			if property == "Text" then
+				local text = SliderInput.Text
+				local cleanText = text:gsub("[^%d%.%-]", "")
+				if cleanText:find("%-") and cleanText:find("%-") ~= 1 then
+					cleanText = cleanText:gsub("%-", "")
+				end
+				local dotCount = 0
+				cleanText = cleanText:gsub("%.", function()
+					dotCount = dotCount + 1
+					return dotCount == 1 and "." or ""
+				end)
+				
+				if cleanText ~= text then
+					SliderInput.Text = cleanText
+				end
+				
+				if SliderInput.Visible then
+					local targetWidth = calculateInputWidth(cleanText)
+					SliderInput.Size = UDim2.new(0, targetWidth, 0, 14)
+				end
+			end
+		end)
+
+		Creator.AddSignal(SliderInput.FocusLost, function(enterPressed)
+			local inputValue = tonumber(SliderInput.Text)
+			if inputValue then
+				Slider:SetValue(inputValue)
+			else
+				SliderInput.Text = tostring(Slider.Value)
+			end
+			
+			if not isHovering then
+				local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
+				
+				TweenService:Create(SliderInput, tweenInfo, {
+					TextTransparency = 1,
+					BackgroundTransparency = 1
+				}):Play()
+				
+				TweenService:Create(SliderInput.UIStroke, tweenInfo, {
+					Transparency = 1
+				}):Play()
+				
+				task.wait(0.2)
+				SliderDisplay.Visible = true
+				inputVisible = false
+			end
+		end)
+
+		Creator.AddSignal(SliderInput.Focused, function()
+			SliderInput.Text = tostring(Slider.Value)
+		end)
+
+		Creator.AddSignal(SliderInput.InputBegan, function(Input)
+			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+				Dragging = false
+			end
+		end)
 
 		Creator.AddSignal(SliderDot.InputBegan, function(Input)
 			if
@@ -4828,6 +4909,12 @@ ElementsTable.Slider = (function()
 			SliderDot.Position = UDim2.new((self.Value - Slider.Min) / (Slider.Max - Slider.Min), -7, 0.5, 0)
 			SliderFill.Size = UDim2.fromScale((self.Value - Slider.Min) / (Slider.Max - Slider.Min), 1)
 			SliderDisplay.Text = tostring(self.Value)
+			
+			if SliderInput.Visible then
+				SliderInput.Text = tostring(self.Value)
+				local targetWidth = calculateInputWidth(tostring(self.Value))
+				SliderInput.Size = UDim2.new(0, targetWidth, 0, 14)
+			end
 
 			Library:SafeCallback(Slider.Callback, self.Value)
 			Library:SafeCallback(Slider.Changed, self.Value)
@@ -7190,11 +7277,8 @@ function Library:ToggleAcrylic(Value)
 	if Library.Window then
 		if Library.UseAcrylic then
 			Library.Acrylic = Value
-			Library.Window.AcrylicPaint.Model.Transparency = Value and 0.98 or 1
-			if Value then
-				Acrylic.Enable()
-			else
-				Acrylic.Disable()
+			if Library.Window.AcrylicPaint and Library.Window.AcrylicPaint.Model then
+				Library.Window.AcrylicPaint.Model.Transparency = Value and 0.95 or 1
 			end
 		end
 	end
