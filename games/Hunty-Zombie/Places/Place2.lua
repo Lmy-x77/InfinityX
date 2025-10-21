@@ -11,7 +11,7 @@ end
 if not isAllowed(currentPlace) then
   return
 end
-
+setclipboard(tostring(game.PlaceId))
 
 -- start
 print[[                                                                     
@@ -299,7 +299,7 @@ Tabs.AutoFarm:AddToggle("TransparentToggle", {
   end
 })
 Tabs.AutoFarm:AddToggle("TransparentToggle", {
-  Title = "Auto attack",
+  Title = "Auto attack [ WEAPON ]",
   Default = false,
   Callback = function(Value)
     attack = Value
@@ -313,6 +313,23 @@ Tabs.AutoFarm:AddToggle("TransparentToggle", {
           wait(1)
         end
       end
+    end
+  end
+})
+Tabs.AutoFarm:AddToggle("TransparentToggle", {
+  Title = "Auto attack [ REMOTE ]",
+  Default = false,
+  Callback = function(Value)
+    attackr = Value
+    local ReplicatedStorage = game:GetService('ReplicatedStorage')
+    local ByteNetReliable = ReplicatedStorage:WaitForChild('ByteNetReliable')
+    local workspace = game:GetService('Workspace')
+    while attackr do task.wait()
+      local args = {
+          buffer.fromstring('\t\004\001'),
+          { workspace:GetServerTimeNow() },
+      }
+      ByteNetReliable:FireServer(unpack(args))
     end
   end
 })
@@ -483,7 +500,7 @@ Tabs.Automatic:AddToggle("TransparentToggle", {
       local sewers = workspace:FindFirstChild("Sewers")
       if sewers and sewers:FindFirstChild("Doors") then
         for _, door in ipairs(sewers.Doors:GetChildren()) do
-          local args = { buffer.fromstring("\a\001"), {door} }
+          local args = { buffer.fromstring("\b\001"), {door} }
           game.ReplicatedStorage:WaitForChild("ByteNetReliable"):FireServer(unpack(args))
           task.wait(0.1)
         end
@@ -491,7 +508,7 @@ Tabs.Automatic:AddToggle("TransparentToggle", {
       local school = workspace:FindFirstChild("School")
       if school and school:FindFirstChild("Doors") then
         for _, door in ipairs(school.Doors:GetChildren()) do
-          local args = { buffer.fromstring("\a\001"), {door} }
+          local args = { buffer.fromstring("\b\001"), {door} }
           game.ReplicatedStorage:WaitForChild("ByteNetReliable"):FireServer(unpack(args))
           task.wait(0.1)
         end
@@ -499,7 +516,7 @@ Tabs.Automatic:AddToggle("TransparentToggle", {
       local carnival = workspace:FindFirstChild("Carnival")
       if carnival and carnival:FindFirstChild("Doors") then
         for _, door in ipairs(carnival.Doors:GetChildren()) do
-          local args = { buffer.fromstring("\a\001"), {door} }
+          local args = { buffer.fromstring("\b\001"), {door} }
           game.ReplicatedStorage:WaitForChild("ByteNetReliable"):FireServer(unpack(args))
           task.wait(0.1)
         end
@@ -525,7 +542,7 @@ Tabs.Automatic:AddToggle("TransparentToggle", {
     changew = Value
     while changew do
       KeyPress(Enum.KeyCode.One.Name)
-      wait()
+      wait(.5)
     end
   end
 })
@@ -584,6 +601,30 @@ Tabs.Character:AddToggle("Toggle", {
           v.CanCollide = true
         end
       end
+    end
+  end
+})
+Tabs.Character:AddButton({
+  Title = "Change range of bow",
+  Callback = function()
+    local Bow = require(game:GetService("ReplicatedFirst").GameCore.Shared.AbilityService.CombatData.Bow)
+    for _, hitbox in pairs(Bow.hitboxes) do
+      if typeof(hitbox) == "table" then
+        if hitbox.lifetime then hitbox.lifetime = math.huge end
+        if hitbox.vel then hitbox.vel = hitbox.vel.Unit * 999999 end
+        hitbox.ignoreWalls = true
+        hitbox.static = false
+        hitbox.hitOnce = false
+      end
+    end
+    local old = Bow.newHitbox
+    Bow.newHitbox = function(data, ...)
+      local hb = old and old(data, ...) or data
+      if hb and hb.RaycastParams then
+        hb.RaycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+        hb.RaycastParams.FilterDescendantsInstances = {workspace.Terrain, workspace.Map}
+      end
+      return hb
     end
   end
 })
@@ -656,8 +697,8 @@ SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
 SaveManager:IgnoreThemeSettings()
 SaveManager:SetIgnoreIndexes({})
-InterfaceManager:SetFolder("FluentScriptHub")
-SaveManager:SetFolder("FluentScriptHub/specific-game")
+InterfaceManager:SetFolder("InfinityX")
+SaveManager:SetFolder("InfinityX/Library-Settings")
 SaveManager:BuildConfigSection(Tabs.Settings)
 Fluent:ToggleTransparency(false)
 SaveManager:LoadAutoloadConfig()
