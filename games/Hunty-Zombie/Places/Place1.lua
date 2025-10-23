@@ -1925,12 +1925,21 @@ Tabs.Modification:AddDropdown("InterfaceTheme", {
     selectedslotw = Value
   end
 })
+Tabs.Modification:AddDropdown("InterfaceTheme", {
+  Title = "Select weapon",
+  KeepSearch = false,
+  Values = {'Scythe', 'Dagger', 'Bow', 'Priest', 'Halloween Sword'},
+  Default = "--",
+  Callback = function(Value)
+    selectedweaponm = Value
+  end
+})
 Tabs.Modification:AddButton({
-  Title = "Get event weapon [ BOW ]",
+  Title = "Get event weapon",
   Callback = function()
     local args = {
       tonumber(selectedslotw),
-      'Bow'
+      selectedweaponm
     }
     game:GetService("ReplicatedStorage").Packets.EquipWeaponByItem:InvokeServer(unpack(args))
   end
