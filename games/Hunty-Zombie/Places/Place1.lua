@@ -2274,7 +2274,7 @@ Tabs.AutoRoll:AddSection("[🎲] - Trait Roll")
 Tabs.AutoRoll:AddDropdown("InterfaceTheme", {
   Title = "Select trait",
   KeepSearch = false,
-  Values = { 'Power I', 'Power II', 'Power III', 'Agility I', 'Agility II', 'Agility III', 'Focus I', 'Focus II', 'Focus III', 'Intelligent', 'Fortune', 'Beast', 'Prodigy' },
+  Values = { 'Power I', 'Power II', 'Power III', 'Agility I', 'Agility II', 'Agility III', 'Focus I', 'Focus II', 'Focus III', 'Intelligent', 'Fortune', 'Beast', 'Prodigy', 'Critical Chance', 'Critical Dmg'},
   Default = "--",
   Callback = function(Value)
     selectedtrait = Value
@@ -2348,7 +2348,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
     end
     while tautorolll do task.wait()
       local verifytl = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Traits.Content.Main.F1.Trait.Frame.TraitName.Text
-      if verifytl == "Intelligent" or verifytl == "Fortune" or verifytl == "Beats" then
+      if verifytl == "Intelligent" or verifytl == "Fortune" or verifytl == "Beast" or verifytl == "Critical Chance" then
         WindUI:Notify({
           Title = "Notification",
           Content = "The trait: " .. verifytl .. ' has been collected',
@@ -2386,7 +2386,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
     end
     while tautorolls do task.wait()
       local verifyts = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Traits.Content.Main.F1.Trait.Frame.TraitName.Text
-      if verifyts == "Prodigy" then
+      if verifyts == "Prodigy" or verifyts == "Critical Dmg" then
         WindUI:Notify({
           Title = "Notification",
           Content = "The trait: " .. verifyts .. ' has been collected',
