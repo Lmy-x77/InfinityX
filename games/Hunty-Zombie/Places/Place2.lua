@@ -277,6 +277,15 @@ spawn(function()
     p1:SetDesc('Zombies Left: ' .. game:GetService("Players").LocalPlayer.PlayerGui.MainScreen.ObjectiveDisplay.ObjectiveElement.List.Value.Label.Text)
   end
 end)
+Tabs.AutoFarm:AddDropdown("InterfaceTheme", {
+  Title = "Select auto attack mode",
+  KeepSearch = false,
+  Values = { "Normal", "Remote", "Fast" },
+  Default = "Normal",
+  Callback = function(Value)
+    selectedmethodtoattack = Value
+  end
+})
 Tabs.AutoFarm:AddToggle("TransparentToggle", {
   Title = "Auto teleport to zombies",
   Default = false,
@@ -299,37 +308,66 @@ Tabs.AutoFarm:AddToggle("TransparentToggle", {
   end
 })
 Tabs.AutoFarm:AddToggle("TransparentToggle", {
-  Title = "Auto attack [ WEAPON ]",
+  Title = "Auto attack",
   Default = false,
   Callback = function(Value)
     attack = Value
     while attack do task.wait()
       if not farmsettings.Enabled then continue end
-      for _, v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
-        if v:IsA('Tool') then
-          v:Activate()
-          wait(4)
-          v:Deactivate()
-          wait(1)
+      if selectedmethodtoattack == 'Normal' then
+        for _, v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+          if v:IsA('Tool') then
+            v:Activate()
+            wait(4)
+            v:Deactivate()
+            wait(1)
+          end
         end
-      end
-    end
-  end
-})
-Tabs.AutoFarm:AddToggle("TransparentToggle", {
-  Title = "Auto attack [ REMOTE ]",
-  Default = false,
-  Callback = function(Value)
-    attackr = Value
-    local ReplicatedStorage = game:GetService('ReplicatedStorage')
-    local ByteNetReliable = ReplicatedStorage:WaitForChild('ByteNetReliable')
-    local workspace = game:GetService('Workspace')
-    while attackr do task.wait()
-      local args = {
+      elseif selectedmethodtoattack == 'Remote' then
+        local ReplicatedStorage = game:GetService('ReplicatedStorage')
+        local ByteNetReliable = ReplicatedStorage:WaitForChild('ByteNetReliable')
+        local workspace = game:GetService('Workspace')
+        local args = {
           buffer.fromstring('\t\004\001'),
           { workspace:GetServerTimeNow() },
-      }
-      ByteNetReliable:FireServer(unpack(args))
+        }
+        ByteNetReliable:FireServer(unpack(args))
+      elseif selectedmethodtoattack == 'Fast' then
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local ByteNetReliable = ReplicatedStorage:WaitForChild("ByteNetReliable")
+        local Workspace = game:GetService("Workspace")
+        local RunService = game:GetService("RunService")
+        local fireCount = 99
+        local tickQueue = {}
+        local clientTick = 0
+        if _G.__ByteNetReliableConn then
+          pcall(function() _G.__ByteNetReliableConn:Disconnect() end)
+          _G.__ByteNetReliableConn = nil
+        end
+        local function queueTicks(baseTick)
+          clientTick = baseTick
+          tickQueue[1] = baseTick
+          if fireCount > 1000 then
+            for i = 1, 1e6 do
+              tickQueue[#tickQueue + 1] = baseTick + (i * 0.0001)
+            end
+          else
+            for i = 1, fireCount do
+              tickQueue[#tickQueue + 1] = baseTick + (i * 0.0001)
+            end
+          end
+        end
+        _G.__ByteNetReliableConn = RunService.Heartbeat:Connect(function()
+          if not attack then return end
+          if #tickQueue == 0 then
+            queueTicks(Workspace:GetServerTimeNow())
+          end
+          if #tickQueue > 0 then
+            local tickToFire = table.remove(tickQueue, 1)
+            ByteNetReliable:FireServer(buffer.fromstring("\t\004\001"), { tickToFire })
+          end
+        end)
+      end
     end
   end
 })
