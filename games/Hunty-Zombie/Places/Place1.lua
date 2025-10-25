@@ -1928,7 +1928,7 @@ Tabs.Modification:AddDropdown("InterfaceTheme", {
 Tabs.Modification:AddDropdown("InterfaceTheme", {
   Title = "Select weapon",
   KeepSearch = false,
-  Values = {'Scythe', 'Dagger', 'Bow', 'Priest', 'Halloween Sword'},
+  Values = {'Scythe', 'Dagger', 'Bow', 'Priest', 'Halloween Sword', 'Reapers Scythe'},
   Default = "--",
   Callback = function(Value)
     selectedweaponm = Value
