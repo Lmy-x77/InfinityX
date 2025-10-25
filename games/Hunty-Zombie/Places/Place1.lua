@@ -2473,6 +2473,11 @@ Tabs.Misc:AddButton({
       "NewSwordHW",
       "SIRJACKY",
       "SpookyPet",
+      "Reaper",
+      "RIP67",
+      "ScytheRP",
+      "NEWBOSSRAID123",
+      "HZ4EVER",
     }
     local remote = game:GetService("ReplicatedStorage"):WaitForChild("Packets"):WaitForChild("RedeemCode")
     for _, code in ipairs(codes) do
