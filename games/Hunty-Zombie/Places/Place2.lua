@@ -333,40 +333,27 @@ Tabs.AutoFarm:AddToggle("TransparentToggle", {
         }
         ByteNetReliable:FireServer(unpack(args))
       elseif selectedmethodtoattack == 'Fast' then
-        local ReplicatedStorage = game:GetService("ReplicatedStorage")
-        local ByteNetReliable = ReplicatedStorage:WaitForChild("ByteNetReliable")
-        local Workspace = game:GetService("Workspace")
-        local RunService = game:GetService("RunService")
-        local fireCount = 99
-        local tickQueue = {}
-        local clientTick = 0
-        if _G.__ByteNetReliableConn then
-          pcall(function() _G.__ByteNetReliableConn:Disconnect() end)
-          _G.__ByteNetReliableConn = nil
-        end
+        local ReplicatedStorage = game:GetService('ReplicatedStorage')
+        local ByteNetReliable = ReplicatedStorage:WaitForChild('ByteNetReliable')
+        local Workspace = game:GetService('Workspace')
+        local fireCount = 75
+        local packet = buffer.fromstring('\t\004\001')
+        local tickQueue = table.create(fireCount)
+        local queueIndex = 1
         local function queueTicks(baseTick)
-          clientTick = baseTick
-          tickQueue[1] = baseTick
-          if fireCount > 1000 then
-            for i = 1, 1e6 do
-              tickQueue[#tickQueue + 1] = baseTick + (i * 0.0001)
-            end
-          else
-            for i = 1, fireCount do
-              tickQueue[#tickQueue + 1] = baseTick + (i * 0.0001)
-            end
+          for i = 1, fireCount do
+            tickQueue[i] = baseTick
           end
+          queueIndex = 1
         end
-        _G.__ByteNetReliableConn = RunService.Heartbeat:Connect(function()
-          if not attack then return end
-          if #tickQueue == 0 then
+        while attack do task.wait()
+          if queueIndex > fireCount then
             queueTicks(Workspace:GetServerTimeNow())
           end
-          if #tickQueue > 0 then
-            local tickToFire = table.remove(tickQueue, 1)
-            ByteNetReliable:FireServer(buffer.fromstring("\t\004\001"), { tickToFire })
-          end
-        end)
+          local tickToFire = tickQueue[queueIndex]
+          queueIndex += 1
+          ByteNetReliable:FireServer(packet, { tickToFire })
+        end
       end
     end
   end
