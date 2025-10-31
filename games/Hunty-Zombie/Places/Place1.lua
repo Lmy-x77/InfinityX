@@ -272,7 +272,7 @@ Tabs.AutoLobby:AddSection("[📊] - Auto Create Lobby")
 Tabs.AutoLobby:AddDropdown("InterfaceTheme", {
   Title = "Select map",
   KeepSearch = false,
-  Values = { "School", "Sewers", "Carnival" },
+  Values = { "School", "Sewers", "Carnival", "Island" },
   Default = "--",
   Callback = function(Value)
     selectedmap = Value
@@ -306,7 +306,7 @@ Tabs.AutoLobby:AddToggle("", {
   Title = "Only friends",
   Default = false,
   Callback = function(Value)
-    OnlyFriends = Value
+    getgenv().OnlyFriends = Value
   end
 })
 Tabs.AutoLobby:AddToggle("AcrylicToggle", {
@@ -326,7 +326,9 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
           end
         end
       elseif gui.Visible == true then
-        if OnlyFriends then
+        if getgenv().OnlyFriends then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.friendonly)
+          wait(1)
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.friendonly)
         end
         if selectedmap == 'School' and selecteddifficulty == 'Normal' and selectedPlayerSize == '1' then
@@ -1909,6 +1911,534 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
           GuiService.GuiNavigationEnabled = false
           return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Normal' and selectedPlayerSize == '1' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes.difbutton)
+          wait()
+          for i = 0, 5 do
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+            wait(.2)
+          end
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Normal' and selectedPlayerSize == '2' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes.difbutton)
+          wait()
+          for i = 0, 4 do
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+            wait(.2)
+          end
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Normal' and selectedPlayerSize == '3' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes.difbutton)
+          wait()
+          for i = 0, 3 do
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+            wait(.2)
+          end
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Normal' and selectedPlayerSize == '4' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes.difbutton)
+          wait()
+          for i = 0, 2 do
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+            wait(.2)
+          end
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Normal' and selectedPlayerSize == '5' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes.difbutton)
+          wait()
+          for i = 0, 1 do
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+            wait(.2)
+          end
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Normal' and selectedPlayerSize == '6' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes.difbutton)
+          wait()
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Hard' and selectedPlayerSize == '1' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[3])
+          wait()
+          for i = 0, 5 do
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+            wait(.2)
+          end
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Hard' and selectedPlayerSize == '2' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[3])
+          wait()
+          for i = 0, 4 do
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+            wait(.2)
+          end
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Hard' and selectedPlayerSize == '3' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[3])
+          wait()
+          for i = 0, 3 do
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+            wait(.2)
+          end
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Hard' and selectedPlayerSize == '4' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[3])
+          wait()
+          for i = 0, 2 do
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+            wait(.2)
+          end
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Hard' and selectedPlayerSize == '5' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[3])
+          wait()
+          for i = 0, 1 do
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+            wait(.2)
+          end
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Hard' and selectedPlayerSize == '6' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[3])
+          wait()
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '1' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[4])
+          wait()
+          for i = 0, 5 do
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+            wait(.2)
+          end
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '2' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[4])
+          wait()
+          for i = 0, 4 do
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+            wait(.2)
+          end
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '3' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[4])
+          wait()
+          for i = 0, 3 do
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+            wait(.2)
+          end
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '4' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[4])
+          wait()
+          for i = 0, 2 do
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+            wait(.2)
+          end
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '5' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[4])
+          wait()
+          for i = 0, 1 do
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.playerselect.F.l)
+            wait(.2)
+          end
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
+        elseif selectedmap == 'Island' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '6' then
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.modes:GetChildren()[4])
+          wait()
+          if selectedModeJ == 'Campaign' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes.modebutton)
+          elseif selectedModeJ == 'Endless' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[3])
+          elseif selectedModeJ == 'Raid' then
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemodes)
+            wait()
+            ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.upmodes:GetChildren()[4])
+          end
+          wait()
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.Button)
+          GuiService.GuiNavigationEnabled = false
+          return
         end
       end
     end
@@ -1976,22 +2506,20 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
         GuiService.GuiNavigationEnabled = false
         wait(1)
       end
-      WindUI:Notify({
+      Fluent:Notify({
         Title = "Notification",
         Content = "Staring auto roll...",
         Duration = 3,
-        Icon = "rbxassetid://72212320253117",
       })
       wait(1.5)
     end
     while autoroll do task.wait()
       local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28].Header.Text
       if string.find(string.lower(verify), string.lower(selectedweapon)) then
-        WindUI:Notify({
+        Fluent:Notify({
           Title = "Notification",
           Content = "The weapon: " .. selectedweapon .. ' has been collected',
           Duration = 5,
-          Icon = "rbxassetid://72212320253117",
         })
         return
       else
@@ -2017,22 +2545,21 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
         GuiService.GuiNavigationEnabled = false
         wait(1)
       end
-      WindUI:Notify({
+      Fluent:Notify({
         Title = "Notification",
         Content = "Staring auto roll...",
         Duration = 3,
-        Icon = "rbxassetid://72212320253117",
       })
       wait(1.5)
     end
     while autorolll do task.wait()
       local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28].Header.Text
       if verify == 'GUITAR' or verify == 'DUAL GUN' or verify == 'ZOMBIE CLAWS' then
-        WindUI:Notify({
+        Fluent:Notify({
           Title = "Notification",
           Content = "The weapon: " .. verify .. ' has been collected',
           Duration = 5,
-          Icon = "rbxassetid://72212320253117",
+
         })
         return
       else
@@ -2058,22 +2585,21 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
         GuiService.GuiNavigationEnabled = false
         wait(1)
       end
-      WindUI:Notify({
+      Fluent:Notify({
         Title = "Notification",
         Content = "Staring auto roll...",
         Duration = 3,
-        Icon = "rbxassetid://72212320253117",
       })
       wait(1.5)
     end
     while autorollm do task.wait()
       local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28].Header.Text
       if verify == 'KATANA' or verify == 'GREATSWORD' or verify == 'SCISSORS' or verify == 'ANCHOR' then
-        WindUI:Notify({
+        Fluent:Notify({
           Title = "Notification",
           Content = "The weapon: " .. verify .. ' has been collected',
           Duration = 5,
-          Icon = "rbxassetid://72212320253117",
+
         })
         return
       else
@@ -2099,22 +2625,21 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
         GuiService.GuiNavigationEnabled = false
         wait(1)
       end
-      WindUI:Notify({
+      Fluent:Notify({
         Title = "Notification",
         Content = "Staring auto roll...",
         Duration = 3,
-        Icon = "rbxassetid://72212320253117",
       })
       wait(1.5)
     end
     while autorolld do task.wait()
       local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28].Header.Text
       if verify == 'SHOES' or verify == 'GHOST' or verify == 'SPINAL BLADE' then
-        WindUI:Notify({
+        Fluent:Notify({
           Title = "Notification",
           Content = "The weapon: " .. verify .. ' has been collected',
           Duration = 5,
-          Icon = "rbxassetid://72212320253117",
+
         })
         return
       else
@@ -2159,22 +2684,21 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
         GuiService.GuiNavigationEnabled = false
         wait(1)
       end
-      WindUI:Notify({
+      Fluent:Notify({
         Title = "Notification",
         Content = "Staring auto roll...",
         Duration = 3,
-        Icon = "rbxassetid://72212320253117",
       })
       wait(1.5)
     end
     while pautoroll do task.wait()
       local verifyp = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin.Header.Text
       if string.find(string.lower(verifyp), string.lower(selectedperk)) then
-        WindUI:Notify({
+        Fluent:Notify({
           Title = "Notification",
           Content = "The perk: " .. selectedperk .. ' has been collected',
           Duration = 5,
-          Icon = "rbxassetid://72212320253117",
+
         })
         return
       else
@@ -2200,22 +2724,21 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
         GuiService.GuiNavigationEnabled = false
         wait(1)
       end
-      WindUI:Notify({
+      Fluent:Notify({
         Title = "Notification",
         Content = "Staring auto roll...",
         Duration = 3,
-        Icon = "rbxassetid://72212320253117",
       })
       wait(1.5)
     end
     while pautorolll do task.wait()
       local verifyp = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin.Header.Text
       if verifyp == 'CRITICAL' or verifyp == 'UNDEAD' or verifyp == 'LASTHOPE' or verifyp == 'ADRENALINE' then
-        WindUI:Notify({
+        Fluent:Notify({
           Title = "Notification",
           Content = "The perk: " .. verifyp .. ' has been collected',
           Duration = 5,
-          Icon = "rbxassetid://72212320253117",
+
         })
         return
       else
@@ -2241,22 +2764,21 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
         GuiService.GuiNavigationEnabled = false
         wait(1)
       end
-      WindUI:Notify({
+      Fluent:Notify({
         Title = "Notification",
         Content = "Staring auto roll...",
         Duration = 3,
-        Icon = "rbxassetid://72212320253117",
       })
       wait(1.5)
     end
     while pautorollm do task.wait()
       local verifyp = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin.Header.Text
       if verifyp == 'VAMPIRE' or verifyp == 'DOUBLEDMG' or verifyp == 'DAMAGESHIELD' then
-        WindUI:Notify({
+        Fluent:Notify({
           Title = "Notification",
           Content = "The perk: " .. verifyp .. ' has been collected',
           Duration = 5,
-          Icon = "rbxassetid://72212320253117",
+
         })
         return
       else
@@ -2300,22 +2822,21 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
         game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-29, 10, 191)
         wait(0.5)
       end
-      WindUI:Notify({
+      Fluent:Notify({
         Title = "Notification",
         Content = "Staring auto roll...",
         Duration = 3,
-        Icon = "rbxassetid://72212320253117",
       })
       wait(1.5)
     end
     while tautoroll do task.wait()
       local verifyt = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Traits.Content.Main.F1.Trait.Frame.TraitName.Text
       if string.find(string.lower(verifyt), string.lower(selectedtrait)) then
-        WindUI:Notify({
+        Fluent:Notify({
           Title = "Notification",
           Content = "The trait: " .. selectedtrait .. ' has been collected',
           Duration = 5,
-          Icon = "rbxassetid://72212320253117",
+
         })
         return
       else
@@ -2338,22 +2859,21 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
         game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-29, 10, 191)
         wait(0.5)
       end
-      WindUI:Notify({
+      Fluent:Notify({
         Title = "Notification",
         Content = "Staring auto roll...",
         Duration = 3,
-        Icon = "rbxassetid://72212320253117",
       })
       wait(1.5)
     end
     while tautorolll do task.wait()
       local verifytl = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Traits.Content.Main.F1.Trait.Frame.TraitName.Text
       if verifytl == "Intelligent" or verifytl == "Fortune" or verifytl == "Beast" or verifytl == "Critical Chance" then
-        WindUI:Notify({
+        Fluent:Notify({
           Title = "Notification",
           Content = "The trait: " .. verifytl .. ' has been collected',
           Duration = 5,
-          Icon = "rbxassetid://72212320253117",
+
         })
         return
       else
@@ -2369,29 +2889,27 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
   Title = "Auto roll until secret",
   Default = false,
   Callback = function(Value)
-    tautorolls = state
+    tautorolls = Value
     if tautorolls then
       local traitgui = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Traits
       if traitgui.Visible == false then
-        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-29, 10, 191)
+        game:GetService("Players").LocalPlayer.PlayerGui.GUI.Traits.Visible = true
         wait(0.5)
       end
-      WindUI:Notify({
+      Fluent:Notify({
         Title = "Notification",
         Content = "Staring auto roll...",
         Duration = 3,
-        Icon = "rbxassetid://72212320253117",
       })
       wait(1.5)
     end
     while tautorolls do task.wait()
       local verifyts = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Traits.Content.Main.F1.Trait.Frame.TraitName.Text
       if verifyts == "Prodigy" or verifyts == "Critical Dmg" then
-        WindUI:Notify({
+        Fluent:Notify({
           Title = "Notification",
           Content = "The trait: " .. verifyts .. ' has been collected',
           Duration = 5,
-          Icon = "rbxassetid://72212320253117",
         })
         return
       else
@@ -2467,12 +2985,11 @@ Tabs.Misc:AddButton({
   Title = "Reedem all codes",
   Callback = function()
     local codes = {
-      "hwticket",
-      "Halloween",
-      "SpinalBlade",
-      "NewSwordHW",
-      "SIRJACKY",
-      "SpookyPet",
+      "Handfan",
+      "NewCamp",
+      "Beach",
+      "Pirate",
+      "ChasingDollars",
       "Reaper",
       "RIP67",
       "ScytheRP",
