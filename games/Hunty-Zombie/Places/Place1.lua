@@ -2445,14 +2445,17 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
   end
 })
 
-Tabs.Modification:AddSection("[👑] - Mods Options")
+Tabs.Modification:AddSection("[👑] - Mods Options [ BLOCKED ]")
+local p1 = Tabs.Modification:AddParagraph({
+  Title = "This function has been blocked",
+  Content = "In the new Hunty Zombie update, they've implemented a new anti-cheat weapon checker, already modified accounts have been banned and for security reasons this function has been blocked.\n\nThe script has a bypass and is currently safe, but this function is no longer available to ensure that the user is not detected."
+})
 Tabs.Modification:AddDropdown("InterfaceTheme", {
   Title = "Select slot",
   KeepSearch = false,
   Values = {'1', '2', '3', '4', '5', '6'},
   Default = "--",
   Callback = function(Value)
-    selectedslotw = Value
   end
 })
 Tabs.Modification:AddDropdown("InterfaceTheme", {
@@ -2461,17 +2464,11 @@ Tabs.Modification:AddDropdown("InterfaceTheme", {
   Values = {'Scythe', 'Dagger', 'Bow', 'Priest', 'Halloween Sword', 'Reapers Scythe'},
   Default = "--",
   Callback = function(Value)
-    selectedweaponm = Value
   end
 })
 Tabs.Modification:AddButton({
   Title = "Get event weapon",
   Callback = function()
-    local args = {
-      tonumber(selectedslotw),
-      selectedweaponm
-    }
-    game:GetService("ReplicatedStorage").Packets.EquipWeaponByItem:InvokeServer(unpack(args))
   end
 })
 
