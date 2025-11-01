@@ -546,6 +546,14 @@ Tabs.Automatic:AddToggle("TransparentToggle", {
           task.wait(0.1)
         end
       end
+      local island = workspace:FindFirstChild('Island')
+      if island and island:FindFirstChild("Doors") then
+        for _, door in ipairs(island.Doors:GetChildren()) do
+          local args = { buffer.fromstring("\b\001"), {door} }
+          game.ReplicatedStorage:WaitForChild("ByteNetReliable"):FireServer(unpack(args))
+          task.wait(0.1)
+        end
+      end
       task.wait(1)
     end
   end
