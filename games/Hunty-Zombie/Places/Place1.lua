@@ -2476,7 +2476,7 @@ Tabs.AutoRoll:AddSection("[⚔️] - Weapon Roll")
 Tabs.AutoRoll:AddDropdown("InterfaceTheme", {
   Title = "Select weapon",
   KeepSearch = false,
-  Values = { "Baseball", "Axes", 'Guitar', 'Dual Gun', 'Zombie Claws', 'Katana', 'Greatsword', 'Scissors', 'Anchor', 'HandFan', 'Shoes', 'Ghost', 'Spinal Blade'},
+  Values = { "Baseball", "Axes", 'Pure Hand', 'Guitar', 'Dual Gun', 'Zombie Claws', 'Chainsaw', 'Katana', 'Greatsword', 'Scissors', 'Anchor', 'HandFan', 'Shoes', 'Ghost', 'Spinal Blade'},
   Default = "--",
   Callback = function(Value)
     selectedweapon = Value
@@ -2551,7 +2551,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
     end
     while autorolll do task.wait()
       local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28].Header.Text
-      if verify == 'GUITAR' or verify == 'DUAL GUN' or verify == 'ZOMBIE CLAWS' then
+      if verify == 'GUITAR' or verify == 'DUAL GUN' or verify == 'ZOMBIE CLAWS' or verify == 'CHAINSAW' then
         Fluent:Notify({
           Title = "Notification",
           Content = "The weapon: " .. verify .. ' has been collected',
