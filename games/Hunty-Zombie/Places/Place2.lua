@@ -11,7 +11,7 @@ end
 if not isAllowed(currentPlace) then
   return
 end
-setclipboard(tostring(game.PlaceId))
+
 
 -- start
 print[[                                                                     
@@ -336,23 +336,27 @@ Tabs.AutoFarm:AddToggle("TransparentToggle", {
         local ReplicatedStorage = game:GetService('ReplicatedStorage')
         local ByteNetReliable = ReplicatedStorage:WaitForChild('ByteNetReliable')
         local Workspace = game:GetService('Workspace')
-        local fireCount = 75
+        getgenv().FireCount = 150
         local packet = buffer.fromstring('\t\004\001')
-        local tickQueue = table.create(fireCount)
-        local queueIndex = 1
-        local function queueTicks(baseTick)
-          for i = 1, fireCount do
-            tickQueue[i] = baseTick
+        local tickStep = 0.0001
+        local MAX_QUEUE = 65
+        local tickQueue = {}
+        local function enqueueTicks()
+          local currentTick = Workspace:GetServerTimeNow()
+          local count = math.clamp(getgenv().FireCount or 0, 0, 20)
+          for i = 1, count do
+            if #tickQueue >= MAX_QUEUE then
+              break
+            end
+            table.insert(tickQueue, currentTick + i * tickStep)
           end
-          queueIndex = 1
         end
-        while attack do task.wait()
-          if queueIndex > fireCount then
-            queueTicks(Workspace:GetServerTimeNow())
-          end
-          local tickToFire = tickQueue[queueIndex]
-          queueIndex += 1
-          ByteNetReliable:FireServer(packet, { tickToFire })
+        if #tickQueue < MAX_QUEUE then
+          enqueueTicks()
+        end
+        if #tickQueue > 0 then
+          local tickToSend = table.remove(tickQueue, 1)
+          ByteNetReliable:FireServer(packet, { tickToSend })
         end
       end
     end
