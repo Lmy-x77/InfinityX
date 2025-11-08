@@ -8,11 +8,9 @@
 ╚═╝░░░░░╚══════╝░╚═════╝░╚══════╝╚═╝░░╚══╝░░░╚═╝░░░  ╚═╝░░░░░╚══════╝░╚═════╝░╚═════╝░
 
 A modified version of Fluent
-github.com/discoart/FluentPlus | dsc.gg/hydrahub
+https://fluent-pl.us
 
 ]]
-
--- removed settings :)
 
 local Lighting = game:GetService("Lighting")
 local RunService = game:GetService("RunService")
@@ -1517,7 +1515,19 @@ end
 
 local viewportPointToWorld, getOffset = unpack({ viewportPointToWorld, getOffset })
 
-local BlurFolder = Instance.new("Folder", game:GetService("Workspace").CurrentCamera)
+local BlurFolder = Instance.new("Folder")
+BlurFolder.Name = "FluentBlur"
+do
+	local ws = game:GetService("Workspace")
+	local function attachToCurrentCamera()
+		local cam = ws.CurrentCamera
+		if cam and BlurFolder.Parent ~= cam then
+			BlurFolder.Parent = cam
+		end
+	end
+	attachToCurrentCamera()
+	ws:GetPropertyChangedSignal("CurrentCamera"):Connect(attachToCurrentCamera)
+end
 
 local function createAcrylic()
 	local Part = Creator.New("Part", {
@@ -1529,9 +1539,10 @@ local function createAcrylic()
 		CanCollide = false,
 		Locked = true,
 		CastShadow = false,
-		Transparency = 0.95,
+		Transparency = 0.98,
 	}, {
 		Creator.New("SpecialMesh", {
+			Name = "Mesh",
 			MeshType = Enum.MeshType.Brick,
 			Offset = Vector3.new(0, 0, -0.000001),
 		}),
@@ -1581,8 +1592,7 @@ function AcrylicBlur()
 			local width = (topRight3D - topLeft3D).Magnitude
 			local height = (topRight3D - bottomRight3D).Magnitude
 
-			model.CFrame =
-				CFrame.fromMatrix((topLeft3D + bottomRight3D) / 2, camera.XVector, camera.YVector, camera.ZVector)
+			model.CFrame = CFrame.fromMatrix((topLeft3D + bottomRight3D) / 2, camera.XVector, camera.YVector, camera.ZVector)
 			model.Mesh.Scale = Vector3.new(width, height, 0)
 		end
 
@@ -1600,7 +1610,6 @@ function AcrylicBlur()
 			if not camera then
 				return
 			end
-
 			table.insert(cleanups, camera:GetPropertyChangedSignal("CFrame"):Connect(render))
 			table.insert(cleanups, camera:GetPropertyChangedSignal("ViewportSize"):Connect(render))
 			table.insert(cleanups, camera:GetPropertyChangedSignal("FieldOfView"):Connect(render))
@@ -1644,7 +1653,7 @@ function AcrylicBlur()
 		end
 
 		Blur.SetVisibility = function(Value)
-			model.Transparency = Value and 0.95 or 1
+			model.Transparency = Value and 0.98 or 1
 		end
 
 		Blur.Frame = comp
@@ -1781,16 +1790,47 @@ local Acrylic = {
 }
 
 function Acrylic.init()
+	local baseEffect = Instance.new("DepthOfFieldEffect")
+	baseEffect.FarIntensity = 0
+	baseEffect.InFocusRadius = 0.1
+	baseEffect.NearIntensity = 1
+
 	local depthOfFieldDefaults = {}
 
 	function Acrylic.Enable()
-	-- 1
+		for _, effect in pairs(depthOfFieldDefaults) do
+			effect.Enabled = false
+		end
+		baseEffect.Parent = game:GetService("Lighting")
 	end
 
 	function Acrylic.Disable()
-	-- 2
+		for _, effect in pairs(depthOfFieldDefaults) do
+			effect.Enabled = effect.enabled
+		end
+		baseEffect.Parent = nil
 	end
 
+	local function registerDefaults()
+		local function register(object)
+			if object:IsA("DepthOfFieldEffect") then
+				depthOfFieldDefaults[object] = { enabled = object.Enabled }
+			end
+		end
+
+		for _, child in pairs(game:GetService("Lighting"):GetChildren()) do
+			register(child)
+		end
+
+		if game:GetService("Workspace").CurrentCamera then
+			for _, child in pairs(game:GetService("Workspace").CurrentCamera:GetChildren()) do
+				register(child)
+			end
+		end
+	end
+
+	registerDefaults()
+	Acrylic.Enable()
 end
 
 local Components = {
@@ -1989,7 +2029,9 @@ Components.Element = (function()
 				Element.DescLabel.LayoutOrder = 2
 				Element.DescLabel.Size = UDim2.new(1, 0, 0, 14)
 			end
-			if Library.Windows and #Library.Windows > 0 then
+			if Library.Window and Library.Window.AllElements and Library.Window.AllElements[Element.Frame] then
+				Library.Window.AllElements[Element.Frame].title = Set
+			elseif Library.Windows and #Library.Windows > 0 then
 				local currentWindow = Library.Windows[#Library.Windows]
 				if currentWindow and currentWindow.AllElements and currentWindow.AllElements[Element.Frame] then
 					currentWindow.AllElements[Element.Frame].title = Set
@@ -2011,7 +2053,9 @@ Components.Element = (function()
 				Element.DescLabel.Visible = true
 			end
 			Element.DescLabel.Text = Set
-			if Library.Windows and #Library.Windows > 0 then
+			if Library.Window and Library.Window.AllElements and Library.Window.AllElements[Element.Frame] then
+				Library.Window.AllElements[Element.Frame].description = Set
+			elseif Library.Windows and #Library.Windows > 0 then
 				local currentWindow = Library.Windows[#Library.Windows]
 				if currentWindow and currentWindow.AllElements and currentWindow.AllElements[Element.Frame] then
 					currentWindow.AllElements[Element.Frame].description = Set
@@ -2037,7 +2081,9 @@ Components.Element = (function()
 		Element:SetDesc(Desc)
 
 
-		if Library.Windows and #Library.Windows > 0 then
+		if Library.Window and Library.Window.RegisterElement then
+			Library.Window.RegisterElement(Element.Frame, Title, "Element", Desc)
+		elseif Library.Windows and #Library.Windows > 0 then
 			local currentWindow = Library.Windows[#Library.Windows]
 			if currentWindow and currentWindow.RegisterElement then
 				currentWindow.RegisterElement(Element.Frame, Title, "Element", Desc)
@@ -2143,7 +2189,9 @@ Components.Section = (function()
 		end)
 
 
-		if Library.Windows and #Library.Windows > 0 then
+		if Library.Window and Library.Window.RegisterElement then
+			Library.Window.RegisterElement(Section.Root, Title, "Section")
+		elseif Library.Windows and #Library.Windows > 0 then
 			local currentWindow = Library.Windows[#Library.Windows]
 			if currentWindow and currentWindow.RegisterElement then
 				currentWindow.RegisterElement(Section.Root, Title, "Section")
@@ -2204,8 +2252,9 @@ Components.Tab = (function()
 
 		Tab.Frame = New("TextButton", {
 			Size = UDim2.new(1, 0, 0, 34),
-			BackgroundTransparency = 1,
+			BackgroundTransparency = 0.92,
 			Parent = Parent,
+			ZIndex = 10,
 			ThemeTag = {
 				BackgroundColor3 = "Tab",
 			},
@@ -2230,6 +2279,7 @@ Components.Tab = (function()
 				TextYAlignment = "Center",
 				Size = UDim2.new(1, -12, 1, 0),
 				BackgroundTransparency = 1,
+				ZIndex = 11,
 				ThemeTag = {
 					TextColor3 = "Text",
 				},
@@ -2240,6 +2290,7 @@ Components.Tab = (function()
 				Position = UDim2.new(0, 8, 0.5, 0),
 				BackgroundTransparency = 1,
 				Image = Icon and Icon or nil,
+				ZIndex = 11,
 				ThemeTag = {
 					ImageColor3 = "Text",
 				},
@@ -2280,13 +2331,13 @@ Components.Tab = (function()
 			Tab.ContainerFrame.CanvasSize = UDim2.new(0, 0, 0, ContainerLayout.AbsoluteContentSize.Y + 2)
 		end)
 
-		Tab.Motor, Tab.SetTransparency = Creator.SpringMotor(1, Tab.Frame, "BackgroundTransparency")
+		Tab.Motor, Tab.SetTransparency = Creator.SpringMotor(0.92, Tab.Frame, "BackgroundTransparency")
 
 		Creator.AddSignal(Tab.Frame.MouseEnter, function()
-			Tab.SetTransparency(Tab.Selected and 0.85 or 0.89)
+			Tab.SetTransparency(Tab.Selected and 0.85 or 0.87)
 		end)
 		Creator.AddSignal(Tab.Frame.MouseLeave, function()
-			Tab.SetTransparency(Tab.Selected and 0.89 or 1)
+			Tab.SetTransparency(Tab.Selected and 0.89 or 0.92)
 		end)
 		Creator.AddSignal(Tab.Frame.MouseButton1Down, function()
 			Tab.SetTransparency(0.92)
@@ -2303,6 +2354,7 @@ Components.Tab = (function()
 
 		Tab.Container = Tab.ContainerFrame
 		Tab.ScrollFrame = Tab.Container
+
 
 		function Tab:AddSection(SectionTitle, SectionIcon)
 			local Section = { Type = "Section" }
@@ -2336,11 +2388,12 @@ Components.Tab = (function()
 		TabModule.SelectedTab = Tab
 
 		for _, TabObject in next, TabModule.Tabs do
-			TabObject.SetTransparency(1)
+			TabObject.SetTransparency(0.92)
 			TabObject.Selected = false
 		end
 		TabModule.Tabs[Tab].SetTransparency(0.89)
 		TabModule.Tabs[Tab].Selected = true
+
 
 		Window.TabDisplay.Text = TabModule.Tabs[Tab].Name
 		Window.SelectorPosMotor:setGoal(Spring(TabModule:GetCurrentTabPos(), { frequency = 6 }))
@@ -3150,6 +3203,8 @@ Components.Window = (function()
 			Position = UDim2.fromOffset(0, 0),
 		}
 
+		Library.Window = Window
+
 		local Dragging, DragInput, MousePos, StartPos = false
 		local Resizing, ResizePos = false
 		local MinimizeNotif = false
@@ -3172,6 +3227,7 @@ Components.Window = (function()
 			BackgroundColor3 = Color3.fromRGB(76, 194, 255),
 			Position = UDim2.fromOffset(0, (Window.TabHolderTop or 45) + 0),
 			AnchorPoint = Vector2.new(0, 0.5),
+			ZIndex = 1,
 			ThemeTag = {
 				BackgroundColor3 = "Accent",
 			},
@@ -3187,9 +3243,276 @@ Components.Window = (function()
 			Position = UDim2.new(1, -20, 1, -2),
 		})
 
+		local SearchElements = {}
+		local AllElements = {}
+
+		local function UpdateElementVisibility(searchTerm)
+			if not searchTerm then searchTerm = "" end
+			
+			local function normalizeText(text)
+				if not text then return "" end
+				text = tostring(text)
+				text = string.gsub(text, "^%s+", "")
+				text = string.gsub(text, "%s+$", "")
+				text = string.gsub(text, "%s+", " ")
+				return string.lower(text)
+			end
+			
+			local function getElementValues(elementFrame)
+				local values = {}
+				
+				local function addText(text)
+					if text and text ~= "" then
+						table.insert(values, tostring(text))
+					end
+				end
+				
+				local function findTextInDescendants(obj)
+					if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
+						addText(obj.Text)
+					end
+					for _, child in pairs(obj:GetChildren()) do
+						findTextInDescendants(child)
+					end
+				end
+				
+				findTextInDescendants(elementFrame)
+				
+				return values
+			end
+			
+			local function checkMatch(text, query)
+				if query == "" then
+					return true
+				end
+				
+				local normalizedText = normalizeText(text)
+				if normalizedText == "" then
+					return false
+				end
+				
+				local queryLower = normalizeText(query)
+				if queryLower == "" then
+					return true
+				end
+				
+				if string.find(queryLower, "%s", 1) then
+					local words = {}
+					for word in string.gmatch(queryLower, "%S+") do
+						if #word > 0 then
+							table.insert(words, word)
+						end
+					end
+					
+					if #words == 0 then
+						return true
+					end
+					
+					for _, word in ipairs(words) do
+						if not string.find(normalizedText, word, 1, true) then
+							return false
+						end
+					end
+					return true
+				else
+					return string.find(normalizedText, queryLower, 1, true) ~= nil
+				end
+			end
+			
+			local normalizedQuery = normalizeText(searchTerm)
+			
+			local matchedSectionFrames = {}
+			local elementsInMatchedSections = {}
+			
+			for element, data in pairs(AllElements) do
+				if element and element.Parent then
+					if data.type == "Section" then
+						local title = tostring(data.title or "")
+						if normalizedQuery ~= "" and checkMatch(title, normalizedQuery) then
+							matchedSectionFrames[element] = true
+							if element:FindFirstChild("Container") then
+								local container = element:FindFirstChild("Container")
+								for _, child in pairs(container:GetChildren()) do
+									if not child:IsA("UIListLayout") and not child:IsA("UIPadding") then
+										elementsInMatchedSections[child] = true
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+			
+			for element, data in pairs(AllElements) do
+				if element and element.Parent then
+					if normalizedQuery == "" then
+						element.Visible = true
+					else
+						local title = tostring(data.title or "")
+						local desc = tostring(data.description or "")
+						local matchesTitle = checkMatch(title, normalizedQuery)
+						local matchesDesc = checkMatch(desc, normalizedQuery)
+						local matchesValues = false
+						
+						local elementValues = getElementValues(element)
+						for _, value in ipairs(elementValues) do
+							if checkMatch(value, normalizedQuery) then
+								matchesValues = true
+								break
+							end
+						end
+						
+						local matchesSection = elementsInMatchedSections[element] == true
+						
+						if not matchesSection and data.section then
+							for sectionFrame, _ in pairs(matchedSectionFrames) do
+								if data.section == sectionFrame then
+									matchesSection = true
+									break
+								end
+							end
+						end
+						
+						element.Visible = matchesTitle or matchesDesc or matchesValues or matchesSection
+					end
+				end
+			end
+
+			local searchTermForClosure = searchTerm
+			task.spawn(function()
+				task.wait(0.05)
+				
+				if not Window or not Window.ContainerHolder then return end
+				
+				for _, tabContainer in pairs(Window.ContainerHolder:GetChildren()) do
+					if tabContainer:IsA("ScrollingFrame") then
+						local containerLayout = tabContainer:FindFirstChild("UIListLayout")
+						if containerLayout then
+							local containerPadding = tabContainer:FindFirstChild("UIPadding")
+							local paddingTop = containerPadding and containerPadding.PaddingTop.Offset or 1
+							local paddingBottom = containerPadding and containerPadding.PaddingBottom.Offset or 1
+							local contentSize = containerLayout.AbsoluteContentSize.Y + paddingTop + paddingBottom
+							tabContainer.CanvasSize = UDim2.new(0, 0, 0, math.max(0, contentSize))
+						end
+						
+						for _, section in pairs(tabContainer:GetChildren()) do
+							if section:IsA("Frame") and section.Name ~= "UIPadding" then
+								local sectionContainer = section:FindFirstChild("Container")
+								
+								if sectionContainer and sectionContainer:IsA("Frame") then
+									local containerLayout = sectionContainer:FindFirstChild("UIListLayout")
+									if containerLayout then
+										local hasVisibleChild = false
+										for _, element in pairs(sectionContainer:GetChildren()) do
+											if not element:IsA("UIListLayout") and element.Visible then
+												hasVisibleChild = true
+												break
+											end
+										end
+										
+										if searchTermForClosure == "" or hasVisibleChild then
+											section.Visible = true
+											local containerPadding = sectionContainer:FindFirstChild("UIPadding")
+											local containerPaddingTop = containerPadding and containerPadding.PaddingTop.Offset or 0
+											local containerPaddingBottom = containerPadding and containerPadding.PaddingBottom.Offset or 0
+											local containerContentSize = containerLayout.AbsoluteContentSize.Y + containerPaddingTop + containerPaddingBottom
+											sectionContainer.Size = UDim2.new(1, 0, 0, math.max(0, containerContentSize))
+										else
+											section.Visible = false
+											sectionContainer.Size = UDim2.new(1, 0, 0, 0)
+										end
+									end
+								end
+								
+								local sectionLayout = section:FindFirstChild("UIListLayout")
+								if sectionLayout then
+									local sectionPadding = section:FindFirstChild("UIPadding")
+									local sectionPaddingTop = sectionPadding and sectionPadding.PaddingTop.Offset or 0
+									local sectionPaddingBottom = sectionPadding and sectionPadding.PaddingBottom.Offset or 0
+									local sectionContentSize = sectionLayout.AbsoluteContentSize.Y + sectionPaddingTop + sectionPaddingBottom
+									section.Size = UDim2.new(1, 0, 0, math.max(0, sectionContentSize + 25))
+								end
+							end
+						end
+					end
+				end
+			end)
+		end
+
+		local function RegisterElement(elementFrame, title, elementType, description)
+			if elementFrame then
+				local sectionFrame = nil
+				local parent = elementFrame.Parent
+				
+				while parent do
+					if parent:FindFirstChild("Container") then
+						local sectionRoot = parent
+						local sectionContainer = parent:FindFirstChild("Container")
+						if sectionContainer and elementFrame.Parent == sectionContainer then
+							sectionFrame = sectionRoot
+							break
+						end
+					end
+					parent = parent.Parent
+				end
+				
+				AllElements[elementFrame] = {
+					title = tostring(title or ""),
+					type = elementType or "Element",
+					description = tostring(description or ""),
+					section = sectionFrame
+				}
+			end
+		end
+
+		Window.ShowSearch = (Config.Search == nil) and true or (Config.Search and true or false)
+
+		local ImageAsset = Config.Image
+		local hasImage = ImageAsset and type(ImageAsset) == "string" and ImageAsset ~= ""
+		local imageSize = Window.TabWidth - 24
+		local topOffset = 0
+
+		local ImageFrame = hasImage and New("ImageLabel", {
+			Size = UDim2.new(0, imageSize, 0, imageSize),
+			Position = UDim2.new(0.5, 0, 0, topOffset),
+			AnchorPoint = Vector2.new(0.5, 0),
+			BackgroundTransparency = 1,
+			Image = ImageAsset,
+			ZIndex = 5,
+			Visible = true,
+		}, {
+			New("UICorner", {
+				CornerRadius = UDim.new(0, 6),
+			}),
+		}) or nil
+
+		Window.HasImage = hasImage
+		Window.ImageFrame = ImageFrame
+		Window.ImageSize = imageSize
+		Window.TopOffset = topOffset
+
+		local searchOffset = hasImage and (imageSize + 10 + topOffset) or topOffset
+		local searchHeight = 28
+
+		local tabHolderTop
+		if hasImage then
+			if Window.ShowSearch then
+				tabHolderTop = imageSize + 10 + topOffset + searchHeight + 6
+			else
+				tabHolderTop = imageSize + 10 + topOffset
+			end
+		else
+			if Window.ShowSearch then
+				tabHolderTop = topOffset + searchHeight + 6
+			else
+				tabHolderTop = 45
+			end
+		end
+		Window.TabHolderTop = tabHolderTop
+
 		Window.TabHolder = New("ScrollingFrame", {
-			Size = UDim2.new(1, 0, 1, -45),
-			Position = UDim2.new(0, 0, 0, 45),
+			Size = UDim2.new(1, 0, 1, -(tabHolderTop + 6)),
+			Position = UDim2.new(0, 0, 0, tabHolderTop),
 			BackgroundTransparency = 1,
 			ScrollBarImageTransparency = 1,
 			ScrollBarThickness = 0,
@@ -3202,126 +3525,100 @@ Components.Window = (function()
 			}),
 		})
 
-
-		local SearchElements = {}
-		local AllElements = {}
-
-		local function UpdateElementVisibility(searchTerm)
-			searchTerm = string.lower(searchTerm or "")
-
-			for element, data in pairs(AllElements) do
-				if element and element.Parent then
-					local shouldShow = searchTerm == "" or 
-						string.find(string.lower(data.title), searchTerm, 1, true) or
-						(data.description and string.find(string.lower(data.description), searchTerm, 1, true))
-					element.Visible = shouldShow
-				end
-			end
-
-			task.spawn(function()
-				task.wait(0.01)
-				if Window and Window.TabHolder then
-					for _, child in pairs(Window.TabHolder:GetChildren()) do
-						if child:IsA("ScrollingFrame") then
-							local layout = child:FindFirstChild("UIListLayout")
-							if layout then
-								child.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 2)
-							end
-						end
-					end
-				end
-			end)
-		end
-
-		local function RegisterElement(elementFrame, title, elementType, description)
-			if elementFrame and title then
-				AllElements[elementFrame] = {
-					title = title,
-					type = elementType or "Element",
-					description = description or ""
-				}
-			end
-		end
-
-
-		Window.ShowSearch = (Config.Search == nil) and true or (Config.Search and true or false)
-
 		local SearchFrame = New("Frame", {
-			Size = UDim2.new(1, 0, 0, 35),
-			Position = UDim2.new(0, 0, 0, 0),
-			BackgroundTransparency = 0.9,
+			Size = UDim2.new(1, 0, 0, 28),
+			Position = UDim2.new(0, 0, 0, searchOffset),
+			BackgroundTransparency = 0.7,
 			ZIndex = 10,
 			Visible = Window.ShowSearch,
+			BackgroundColor3 = Color3.fromRGB(20, 20, 20),
 			ThemeTag = {
 				BackgroundColor3 = "Element",
 			},
 		}, {
 			New("UICorner", {
-				CornerRadius = UDim.new(0, 6),
-			}),
-			New("UIStroke", {
-				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-				Transparency = 0.8,
-				Thickness = 1,
-				ThemeTag = {
-					Color = "ElementBorder",
-				},
+				CornerRadius = UDim.new(0, 4),
 			}),
 		})
 
-		local SearchTextbox = Components.Textbox(SearchFrame, true)
-		SearchTextbox.Frame.Size = UDim2.new(1, -44, 1, -8)
-		SearchTextbox.Frame.Position = UDim2.new(0, 10, 0, 4)
-		SearchTextbox.Input.PlaceholderText = "Search..."
-		SearchTextbox.Input.Text = ""
+		local SearchInput = New("TextBox", {
+			FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
+			TextColor3 = Color3.fromRGB(200, 200, 200),
+			TextSize = 13,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Center,
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, -36, 1, 0),
+			Position = UDim2.new(0, 8, 0, 0),
+			PlaceholderText = "Search...",
+			PlaceholderColor3 = Color3.fromRGB(120, 120, 120),
+			ClearTextOnFocus = false,
+			Text = "",
+			Parent = SearchFrame,
+			ThemeTag = {
+				TextColor3 = "Text",
+				PlaceholderColor3 = "SubText",
+			},
+		})
 
 		local SearchIcon = New("ImageLabel", {
-			Size = UDim2.fromOffset(18, 18),
-			Position = UDim2.new(1, -18, 0.5, 0),
+			Size = UDim2.fromOffset(16, 16),
+			Position = UDim2.new(1, -13, 0.5, 0),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			BackgroundTransparency = 1,
 			Image = "rbxassetid://10734943674",
 			Parent = SearchFrame,
+			ImageTransparency = 0.3,
 			ThemeTag = {
 				ImageColor3 = "SubText",
 			},
 		})
 
+		local SearchTextbox = {
+			Input = SearchInput,
+			Frame = SearchFrame,
+		}
 
 		Creator.AddSignal(SearchTextbox.Input:GetPropertyChangedSignal("Text"), function()
-			local searchText = SearchTextbox.Input.Text
+			local searchText = SearchTextbox.Input.Text or ""
 			UpdateElementVisibility(searchText)
 		end)
-
 
 		Creator.AddSignal(SearchTextbox.Input.FocusLost, function(enterPressed)
 		end)
 
 		Creator.AddSignal(UserInputService.InputBegan, function(input, gameProcessed)
 			if gameProcessed then return end
-
 			if input.KeyCode == Enum.KeyCode.Escape and SearchTextbox.Input:IsFocused() then
 				SearchTextbox.Input.Text = ""
 				SearchTextbox.Input:ReleaseFocus()
 			end
 		end)
 
-
 		Window.SearchElements = SearchElements
 		Window.AllElements = AllElements
 		Window.RegisterElement = RegisterElement
 		Window.UpdateElementVisibility = UpdateElementVisibility
 
+		local imageSize = Window.TabWidth - 24
+		local topOffset = Window.TopOffset or 25
+		local imageOffset = hasImage and (imageSize + 10 + topOffset) or topOffset
+		local searchHeight = 28
+		local totalOffset = (Window.ShowSearch and searchHeight or 0) + imageOffset
+
 		local TabFrame = New("Frame", {
-			Size = UDim2.new(0, Window.TabWidth, 1, Window.ShowSearch and -66 or -31),
+			Size = UDim2.new(0, Window.TabWidth, 1, Window.ShowSearch and -63 or -31),
 			Position = UDim2.new(0, 12, 0, Window.ShowSearch and 54 or 19),
 			BackgroundTransparency = 1,
 			ClipsDescendants = true,
 		}, {
+			ImageFrame,
+			SearchFrame,
 			Window.TabHolder,
 			Selector,
-			SearchFrame,
 		})
+
+		Window.TabFrame = TabFrame
 
 		Window.TabDisplay = New("TextLabel", {
 			RichText = true,
@@ -3376,6 +3673,7 @@ Components.Window = (function()
 			CenterWindow()
 		end)
 
+
 		Window.TitleBar = Components.TitleBar({
 			Title = Config.Title,
 			SubTitle = Config.SubTitle,
@@ -3395,11 +3693,14 @@ Components.Window = (function()
 			end
 
 			local userInfoHeight = 56
+			Window.UserInfoHeight = userInfoHeight
+			Window.UserInfoTop = Config.UserInfoTop
 			local UserInfoSection = New("Frame", {
 				Name = "UserInfoSection",
 				BackgroundTransparency = 1,
 				Size = UDim2.new(1, 0, 0, userInfoHeight),
-				Position = Config.UserInfoTop and UDim2.fromOffset(0, 0) or UDim2.new(0, 12, 1, -(userInfoHeight + 2)),
+				Position = Config.UserInfoTop and UDim2.fromOffset(0, 0) or UDim2.new(0, 0, 1, -(userInfoHeight + 2)),
+				ZIndex = 15,
 				Parent = TabFrame,
 			})
 
@@ -3407,7 +3708,8 @@ Components.Window = (function()
 				Name = "UserInfoSeparator",
 				BackgroundTransparency = 0.5,
 				Size = UDim2.new(1, 0, 0, 1),
-				Position = Config.UserInfoTop and UDim2.fromOffset(0, userInfoHeight + 2) or UDim2.new(0, 12, 1, -(userInfoHeight + 10)),
+				Position = Config.UserInfoTop and UDim2.fromOffset(0, userInfoHeight + 4) or UDim2.new(0, 0, 1, -(userInfoHeight + 4)),
+				ZIndex = 15,
 				Parent = TabFrame,
 				ThemeTag = {
 					BackgroundColor3 = "TitleBarLine",
@@ -3469,15 +3771,27 @@ Components.Window = (function()
 			})
 
 			if Config.UserInfoTop then
+				local topOffset = Window.TopOffset or 0
+				local imageOffset = hasImage and (imageSize + 10 + topOffset) or topOffset
 				TabFrame.Position = UDim2.new(0, 12, 0, 39)
-				TabFrame.Size = UDim2.new(0, Window.TabWidth, 1, -31)
-				SearchFrame.Position = UDim2.new(0, 0, 0, userInfoHeight + 6)
-				Window.TabHolder.Position = UDim2.new(0, 0, 0, 45 + userInfoHeight + 6)
-				Window.TabHolder.Size = UDim2.new(1, 0, 1, -(45 + userInfoHeight + 24))
-				Window.TabHolderTop = 45 + userInfoHeight + 6
+				TabFrame.Size = UDim2.new(0, Window.TabWidth, 1, -(31 + imageOffset + userInfoHeight))
+				local searchOffset = hasImage and (imageSize + 10 + topOffset) or topOffset
+				SearchFrame.Position = UDim2.new(0, 0, 0, userInfoHeight + 6 + searchOffset)
+				if ImageFrame then
+					ImageFrame.Position = UDim2.new(0.5, 0, 0, userInfoHeight + topOffset)
+				end
+				local newTabHolderTop = userInfoHeight + 6 + (hasImage and (imageSize + 10 + topOffset) or topOffset) + (Window.ShowSearch and (searchHeight + 6) or 0)
+				Window.TabHolderTop = newTabHolderTop
+				Window.TabHolder.Position = UDim2.new(0, 0, 0, newTabHolderTop)
+				Window.TabHolder.Size = UDim2.new(1, 0, 1, -(newTabHolderTop + 6 + userInfoHeight))
+				if Window.UpdateTabHolderLayout then
+					Window:UpdateTabHolderLayout(newTabHolderTop)
+				end
 			else
-				Window.TabHolder.Size = UDim2.new(1, 0, 1, -(45 + userInfoHeight + 24))
-				Window.TabHolderTop = 45
+				Window.TabHolder.Size = UDim2.new(1, 0, 1, -(tabHolderTop + 6 + userInfoHeight))
+				if Window.UpdateTabHolderLayout then
+					Window:UpdateTabHolderLayout(tabHolderTop)
+				end
 			end
 		end
 
@@ -3504,6 +3818,12 @@ Components.Window = (function()
 		SizeMotor:onStep(function(values)
 			task.wait(_G.CDDrag / 10)
 			Window.Root.Size = UDim2.new(0, values.X, 0, values.Y)
+			task.spawn(function()
+				task.wait(0.01)
+				if Window.UpdateTabHolderLayout then
+					Window:UpdateTabHolderLayout()
+				end
+			end)
 		end)
 
 		PosMotor:onStep(function(values)
@@ -3516,7 +3836,40 @@ Components.Window = (function()
 		Window.SelectorPosMotor:onStep(function(Value)
 			local base = Window.TabHolderTop or 45
 			local verticalInset = 16
-			Selector.Position = UDim2.new(0, 0, 0, base + Value + verticalInset)
+			local selectorY = base + Value + verticalInset
+
+			local searchOffset = Window.HasImage and (Window.ImageSize + Window.TopOffset + 10) or Window.TopOffset
+			local searchTop = searchOffset
+			local searchBottom = searchTop + 28
+
+			if Window.HasImage and Window.ImageSize then
+				local imageBottom = Window.ImageSize + Window.TopOffset + 10
+				if selectorY < imageBottom then
+					Selector.Visible = false
+					return
+				end
+			end
+
+			if Window.ShowSearch then
+				if selectorY >= searchTop and selectorY <= searchBottom then
+					Selector.Visible = false
+					return
+				end
+			end
+
+			if Window.UserInfoHeight then
+				local tabFrameSize = Window.TabFrame and Window.TabFrame.Size.Y.Offset or 0
+				local userInfoTop = Window.UserInfoTop and 0 or (tabFrameSize - Window.UserInfoHeight - 2)
+				local userInfoBottom = userInfoTop + Window.UserInfoHeight
+				
+				if selectorY >= userInfoTop and selectorY <= userInfoBottom then
+					Selector.Visible = false
+					return
+				end
+			end
+
+			Selector.Visible = true
+			Selector.Position = UDim2.new(0, 0, 0, selectorY)
 			local Now = tick()
 			local DeltaTime = Now - LastTime
 
@@ -3648,7 +4001,15 @@ Components.Window = (function()
 		end)
 
 		Creator.AddSignal(Window.TabHolder.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
-			Window.TabHolder.CanvasSize = UDim2.new(0, 0, 0, Window.TabHolder.UIListLayout.AbsoluteContentSize.Y)
+			if Window.TabHolder and Window.TabHolder.UIListLayout then
+				local padding = Window.TabHolder:FindFirstChild("UIPadding")
+				local paddingTop = padding and padding.PaddingTop.Offset or 6
+				local paddingBottom = padding and padding.PaddingBottom.Offset or 6
+				local contentSize = Window.TabHolder.UIListLayout.AbsoluteContentSize.Y + paddingTop + paddingBottom
+				if contentSize > 0 then
+					Window.TabHolder.CanvasSize = UDim2.new(0, 0, 0, contentSize)
+				end
+			end
 		end)
 
 		Creator.AddSignal(UserInputService.InputBegan, function(Input)
@@ -3664,6 +4025,22 @@ Components.Window = (function()
 				Window:Minimize()
 			end
 		end)
+
+		function Window:ToggleSearch()
+			Window.ShowSearch = not Window.ShowSearch
+			SearchFrame.Visible = Window.ShowSearch
+			local topOffset = Window.TopOffset or 25
+			local searchOffset = Window.HasImage and (Window.ImageSize + 10 + topOffset) or topOffset
+			SearchFrame.Position = UDim2.new(0, 0, 0, searchOffset)
+			local imageOffset = Window.HasImage and (Window.ImageSize + 10 + topOffset) or topOffset
+			local searchHeight = 28
+			local totalOffset = (Window.ShowSearch and searchHeight or 0) + imageOffset
+			TabFrame.Size = UDim2.new(0, Window.TabWidth, 1, -(totalOffset + 31))
+
+			if Window.UpdateTabHolderLayout then
+				Window:UpdateTabHolderLayout()
+			end
+		end
 
 		function Window:Minimize()
 			Window.Minimized = not Window.Minimized
@@ -3691,13 +4068,6 @@ Components.Window = (function()
 						Duration = 6
 					})
 				end
-			end
-
-			function Window:ToggleSearch()
-				Window.ShowSearch = not Window.ShowSearch
-				SearchFrame.Visible = Window.ShowSearch
-				TabFrame.Size = UDim2.new(0, Window.TabWidth, 1, Window.ShowSearch and -66 or -31)
-				TabFrame.Position = UDim2.new(0, 12, 0, Window.ShowSearch and 54 or 19)
 			end
 
 			if not RunService:IsStudio() and Library.Minimizer then
@@ -3790,7 +4160,8 @@ Components.Window = (function()
 
 		local TabModule = Components.Tab:Init(Window)
 		function Window:AddTab(TabConfig)
-			return TabModule:New(TabConfig.Title, TabConfig.Icon, Window.TabHolder)
+			local tab = TabModule:New(TabConfig.Title, TabConfig.Icon, Window.TabHolder)
+			return tab
 		end
 
 		function Window:SelectTab(Tab)
@@ -3802,6 +4173,7 @@ Components.Window = (function()
 			LastTime = 0
 			Window.SelectorPosMotor:setGoal(Instant(TabModule:GetCurrentTabPos()))
 		end)
+
 
 		return Window
 	end
@@ -4056,63 +4428,58 @@ ElementsTable.Dropdown = (function()
 			SearchBar = New("Frame", {
 				Size = UDim2.new(1, -10, 0, 28),
 				Position = UDim2.fromOffset(5, 5),
-				BackgroundTransparency = 0.15,
-				ThemeTag = { BackgroundColor3 = "DropdownFrame" },
+				BackgroundTransparency = 0.7,
+				BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+				ThemeTag = { BackgroundColor3 = "Element" },
 				ZIndex = 24,
 			}, {
-				New("UICorner", { CornerRadius = UDim.new(0, 8) }),
-				New("UIStroke", { Name = "Stroke", Transparency = 0.45, ApplyStrokeMode = Enum.ApplyStrokeMode.Border, ThemeTag = { Color = "DropdownBorder" } }),
-				New("ImageLabel", {
-					Image = "rbxassetid://10734943674",
-					BackgroundTransparency = 1,
-					Size = UDim2.fromOffset(16, 16),
-					Position = UDim2.fromOffset(8, 6),
-					ZIndex = 25,
-					ThemeTag = { ImageColor3 = "SubText" },
-				}),
+				New("UICorner", { CornerRadius = UDim.new(0, 4) }),
 			})
 
 			SearchBox = New("TextBox", {
-				PlaceholderText = "Search",
+				FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
+				TextColor3 = Color3.fromRGB(200, 200, 200),
+				TextSize = 13,
+				TextXAlignment = Enum.TextXAlignment.Left,
+				TextYAlignment = Enum.TextYAlignment.Center,
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, -36, 1, 0),
+				Position = UDim2.new(0, 8, 0, 0),
+				PlaceholderText = "Search...",
+				PlaceholderColor3 = Color3.fromRGB(120, 120, 120),
 				ClearTextOnFocus = false,
 				Text = "",
-				TextSize = 14,
-				FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Medium, Enum.FontStyle.Normal),
-				TextXAlignment = Enum.TextXAlignment.Left,
-				TextColor3 = Color3.fromRGB(225, 225, 225),
-				TextTransparency = 0.05,
-				BackgroundTransparency = 1,
-				ThemeTag = { TextColor3 = "SubText", PlaceholderColor3 = "SubText" },
 				Parent = SearchBar,
-				Size = UDim2.new(1, -34, 1, 0),
-				Position = UDim2.fromOffset(28, 0),
+				ThemeTag = {
+					TextColor3 = "Text",
+					PlaceholderColor3 = "SubText",
+				},
 				ZIndex = 24,
 			})
 
-			local SearchStroke = SearchBar:FindFirstChild("Stroke")
-			Creator.AddSignal(SearchBox.Focused, function()
-				Creator.OverrideTag(SearchBar, { BackgroundColor3 = "DropdownFrame" })
-				if SearchStroke then
-					Creator.OverrideTag(SearchStroke, { Color = "Accent" })
-					SearchStroke.Transparency = 0.25
-				end
-			end)
-			Creator.AddSignal(SearchBox.FocusLost, function()
-				Creator.OverrideTag(SearchBar, { BackgroundColor3 = "DropdownFrame" })
-				if SearchStroke then
-					Creator.OverrideTag(SearchStroke, { Color = "DropdownBorder" })
-					SearchStroke.Transparency = 0.45
-				end
-			end)
+			local SearchIcon = New("ImageLabel", {
+				Size = UDim2.fromOffset(16, 16),
+				Position = UDim2.new(1, -13, 0.5, 0),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				BackgroundTransparency = 1,
+				Image = "rbxassetid://10734943674",
+				Parent = SearchBar,
+				ImageTransparency = 0.3,
+				ZIndex = 25,
+				ThemeTag = {
+					ImageColor3 = "SubText",
+				},
+			})
 
 			DropdownScrollFrame.Position = UDim2.fromOffset(5, 38)
 			DropdownScrollFrame.Size = UDim2.new(1, -5, 1, -43)
 
 			local filterToken = 0
 			local function ApplyFilter()
-				filterToken += 1
+				filterToken = filterToken + 1
 				local myToken = filterToken
-				task.delay(0.03, function()
+				task.spawn(function()
+					task.wait(0.01)
 					if myToken ~= filterToken then return end
 					local text = (SearchBox.Text or ""):lower()
 					for _, element in next, DropdownScrollFrame:GetChildren() do
@@ -4121,8 +4488,12 @@ ElementsTable.Dropdown = (function()
 							element.Visible = text == "" or value:lower():find(text, 1, true) ~= nil
 						end
 					end
+					task.wait()
 					RecalculateCanvasSize()
+					task.wait()
 					RecalculateListSize()
+					task.wait()
+					RecalculateListPosition()
 				end)
 			end
 
@@ -4172,29 +4543,56 @@ ElementsTable.Dropdown = (function()
 		table.insert(Library.OpenFrames, DropdownHolderCanvas)
 
 		local function RecalculateListPosition()
-			local Add = -40
-			if Camera.ViewportSize.Y - DropdownInner.AbsolutePosition.Y < DropdownHolderCanvas.AbsoluteSize.Y - 5 then
-				Add = DropdownHolderCanvas.AbsoluteSize.Y
-				- 5
-				- (Camera.ViewportSize.Y - DropdownInner.AbsolutePosition.Y)
-					+ 40
+			if not DropdownHolderCanvas or not DropdownInner then return end
+			
+			local dropdownY = DropdownInner.AbsolutePosition.Y
+			local dropdownHeight = DropdownInner.AbsoluteSize.Y
+			local canvasHeight = DropdownHolderCanvas.AbsoluteSize.Y
+			local viewportHeight = Camera.ViewportSize.Y
+			
+			local spaceBelow = viewportHeight - (dropdownY + dropdownHeight)
+			local spaceAbove = dropdownY
+			
+			local targetY
+			if canvasHeight <= spaceBelow then
+				targetY = dropdownY + dropdownHeight + 5
+			elseif canvasHeight <= spaceAbove then
+				targetY = dropdownY - canvasHeight - 5
+			else
+				if spaceBelow > spaceAbove then
+					targetY = dropdownY + dropdownHeight + 5
+				else
+					targetY = math.max(5, dropdownY - canvasHeight - 5)
+				end
 			end
-			DropdownHolderCanvas.Position =
-				UDim2.fromOffset(DropdownInner.AbsolutePosition.X - 1, DropdownInner.AbsolutePosition.Y - 5 - Add)
+			
+			DropdownHolderCanvas.Position = UDim2.fromOffset(DropdownInner.AbsolutePosition.X - 1, targetY)
 		end
 
 		local ListSizeX = 0
 		local function RecalculateListSize()
-			local totalCount = #Dropdown.Values
+			if not DropdownHolderCanvas or not DropdownHolderFrame then return end
+			
+			local visibleCount = 0
+			for _, element in next, DropdownScrollFrame:GetChildren() do
+				if not element:IsA("UIListLayout") and element.Visible then
+					visibleCount = visibleCount + 1
+				end
+			end
+			
 			local itemHeight = 32
 			local padding = 3
+			local searchHeight = Dropdown.Search and 38 or 0
 			local innerMargins = 10
-			local estimatedContent = (totalCount > 0) and (totalCount * itemHeight + (totalCount - 1) * padding + innerMargins) or innerMargins
+			local estimatedContent = (visibleCount > 0) and (visibleCount * itemHeight + (visibleCount - 1) * padding + innerMargins + searchHeight) or (innerMargins + searchHeight)
 			local maxHeight = 392
-			local many = totalCount > 10
 			local targetHeight = math.min(estimatedContent, maxHeight)
-			DropdownHolderCanvas.Size = UDim2.fromOffset(ListSizeX, targetHeight)
-			DropdownHolderFrame.Size = UDim2.fromScale(1, many and 0.6 or 1)
+			
+			local canvasWidth = math.max(170, ListSizeX > 0 and (ListSizeX + 20) or 170)
+			DropdownHolderCanvas.Size = UDim2.fromOffset(canvasWidth, targetHeight)
+			
+			local many = visibleCount > 10
+			DropdownHolderFrame.Size = UDim2.fromScale(1, many and (targetHeight / math.max(targetHeight, 1)) or 1)
 		end
 
 		local function RecalculateCanvasSize()
@@ -4208,7 +4606,10 @@ ElementsTable.Dropdown = (function()
 		Creator.AddSignal(DropdownInner:GetPropertyChangedSignal("AbsolutePosition"), RecalculateListPosition)
 		Creator.AddSignal(DropdownListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
 			RecalculateCanvasSize()
+			task.wait()
 			RecalculateListSize()
+			task.wait()
+			RecalculateListPosition()
 		end)
 
 		Creator.AddSignal(DropdownInner.MouseButton1Click, function()
@@ -4268,10 +4669,14 @@ ElementsTable.Dropdown = (function()
 				SearchBox.Text = ""
 			end
 			DropdownHolderCanvas.Visible = true
+			RecalculateListPosition()
+			RecalculateListSize()
+			RecalculateCanvasSize()
+			task.wait()
 			TweenService:Create(
 				DropdownHolderFrame,
 				TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-				{ Size = UDim2.fromScale(1, 0.6) }
+				{ Size = UDim2.fromScale(1, 1) }
 			):Play()
 			TweenService:Create(
 				DropdownIco,
@@ -4282,7 +4687,7 @@ ElementsTable.Dropdown = (function()
 
 		function Dropdown:Close()
 			Dropdown.Opened = false
-			DropdownHolderFrame.Size = UDim2.fromScale(1, 0.6)
+			DropdownHolderFrame.Size = UDim2.fromScale(1, 1)
 			DropdownHolderCanvas.Visible = false
 			TweenService:Create(
 				DropdownIco,
@@ -4481,12 +4886,13 @@ ElementsTable.Dropdown = (function()
 			ListSizeX = 0
 			for Button, Table in next, Buttons do
 				if Button.ButtonLabel then
-					if Button.ButtonLabel.TextBounds.X > ListSizeX then
-						ListSizeX = Button.ButtonLabel.TextBounds.X
+					local textSize = Button.ButtonLabel.TextBounds.X
+					if textSize > ListSizeX then
+						ListSizeX = textSize
 					end
 				end
 			end
-			ListSizeX = ListSizeX + 30
+			ListSizeX = math.max(150, ListSizeX + 40)
 
 			RecalculateCanvasSize()
 			RecalculateListSize()
@@ -4753,18 +5159,18 @@ ElementsTable.Slider = (function()
 			if not SliderInput:IsFocused() then
 				SliderDisplay.Visible = false
 				SliderInput.Text = tostring(Slider.Value)
-				
+
 				local targetWidth = calculateInputWidth(tostring(Slider.Value))
 				SliderInput.Size = UDim2.new(0, targetWidth, 0, 14)
 				inputVisible = true
-				
+
 				local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
-				
+
 				TweenService:Create(SliderInput, tweenInfo, {
 					TextTransparency = 0,
 					BackgroundTransparency = 0.8
 				}):Play()
-				
+
 				TweenService:Create(SliderInput.UIStroke, tweenInfo, {
 					Transparency = 0.7
 				}):Play()
@@ -4775,16 +5181,16 @@ ElementsTable.Slider = (function()
 			isHovering = false
 			if not SliderInput:IsFocused() and inputVisible then
 				local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
-				
+
 				TweenService:Create(SliderInput, tweenInfo, {
 					TextTransparency = 1,
 					BackgroundTransparency = 1
 				}):Play()
-				
+
 				TweenService:Create(SliderInput.UIStroke, tweenInfo, {
 					Transparency = 1
 				}):Play()
-				
+
 				task.wait(0.2)
 				SliderDisplay.Visible = true
 				inputVisible = false
@@ -4803,11 +5209,11 @@ ElementsTable.Slider = (function()
 					dotCount = dotCount + 1
 					return dotCount == 1 and "." or ""
 				end)
-				
+
 				if cleanText ~= text then
 					SliderInput.Text = cleanText
 				end
-				
+
 				if SliderInput.Visible then
 					local targetWidth = calculateInputWidth(cleanText)
 					SliderInput.Size = UDim2.new(0, targetWidth, 0, 14)
@@ -4822,19 +5228,19 @@ ElementsTable.Slider = (function()
 			else
 				SliderInput.Text = tostring(Slider.Value)
 			end
-			
+
 			if not isHovering then
 				local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
-				
+
 				TweenService:Create(SliderInput, tweenInfo, {
 					TextTransparency = 1,
 					BackgroundTransparency = 1
 				}):Play()
-				
+
 				TweenService:Create(SliderInput.UIStroke, tweenInfo, {
 					Transparency = 1
 				}):Play()
-				
+
 				task.wait(0.2)
 				SliderDisplay.Visible = true
 				inputVisible = false
@@ -4909,7 +5315,7 @@ ElementsTable.Slider = (function()
 			SliderDot.Position = UDim2.new((self.Value - Slider.Min) / (Slider.Max - Slider.Min), -7, 0.5, 0)
 			SliderFill.Size = UDim2.fromScale((self.Value - Slider.Min) / (Slider.Max - Slider.Min), 1)
 			SliderDisplay.Text = tostring(self.Value)
-			
+
 			if SliderInput.Visible then
 				SliderInput.Text = tostring(self.Value)
 				local targetWidth = calculateInputWidth(tostring(self.Value))
@@ -6591,942 +6997,2817 @@ if RunService:IsStudio() then
 end
 
 local SaveManager = {} do
+
+
+
 	SaveManager.Folder = "FluentSettings"
+
+
 	SaveManager.Ignore = {}
+
+
 	SaveManager.Parser = {
+
+
 		Toggle = {
+
+
 			Save = function(idx, object) 
+
+
 				return { type = "Toggle", idx = idx, value = object.Value } 
+
+
 			end,
+
+
 			Load = function(idx, data)
+
+
 				if SaveManager.Options[idx] then 
+
+
 					SaveManager.Options[idx]:SetValue(data.value)
+
+
 				end
+
+
 			end,
+
+
 		},
+
+
 		Slider = {
+
+
 			Save = function(idx, object)
+
+
 				return { type = "Slider", idx = idx, value = tostring(object.Value) }
+
+
 			end,
+
+
 			Load = function(idx, data)
+
+
 				if SaveManager.Options[idx] then 
+
+
 					SaveManager.Options[idx]:SetValue(data.value)
+
+
 				end
+
+
 			end,
+
+
 		},
+
+
 		Dropdown = {
+
+
 			Save = function(idx, object)
+
+
 				return { type = "Dropdown", idx = idx, value = object.Value, mutli = object.Multi }
+
+
 			end,
+
+
 			Load = function(idx, data)
+
+
 				if SaveManager.Options[idx] then 
+
+
 					SaveManager.Options[idx]:SetValue(data.value)
+
+
 				end
+
+
 			end,
+
+
 		},
+
+
 		Colorpicker = {
+
+
 			Save = function(idx, object)
+
+
 				return { type = "Colorpicker", idx = idx, value = object.Value:ToHex(), transparency = object.Transparency }
+
+
 			end,
+
+
 			Load = function(idx, data)
+
+
 				if SaveManager.Options[idx] then 
+
+
 					SaveManager.Options[idx]:SetValueRGB(Color3.fromHex(data.value), data.transparency)
+
+
 				end
+
+
 			end,
+
+
 		},
+
+
 		Keybind = {
+
+
 			Save = function(idx, object)
+
+
 				return { type = "Keybind", idx = idx, mode = object.Mode, key = object.Value }
+
+
 			end,
+
+
 			Load = function(idx, data)
+
+
 				if SaveManager.Options[idx] then 
+
+
 					SaveManager.Options[idx]:SetValue(data.key, data.mode)
+
+
 				end
+
+
 			end,
+
+
 		},
+
+
+
+
 
 		Input = {
+
+
 			Save = function(idx, object)
+
+
 				return { type = "Input", idx = idx, text = object.Value }
+
+
 			end,
+
+
 			Load = function(idx, data)
+
+
 				if SaveManager.Options[idx] and type(data.text) == "string" then
+
+
 					SaveManager.Options[idx]:SetValue(data.text)
+
+
 				end
+
+
 			end,
+
+
 		},
+
+
 	}
 
+
+
+
+
 	function SaveManager:SetIgnoreIndexes(list)
+
+
 		for _, key in next, list do
+
+
 			self.Ignore[key] = true
+
+
 		end
-	end
-	function SaveManager:SetFolder(folder)
-		self.Folder = folder;
-		self:BuildFolderTree()
+
+
 	end
 
+
+	function SaveManager:SetFolder(folder)
+
+
+		self.Folder = folder;
+
+
+		self:BuildFolderTree()
+
+
+	end
+
+
+
+
+
 	function SaveManager:Save(name)
+
+
 		if (not name) then
+
+
 			return false, "no config file is selected"
+
+
 		end
+
+
+
+
 
 		local fullPath = self.Folder .. "/" .. name .. ".json"
 
+
+
+
+
 		local data = {
+
+
 			objects = {}
+
+
 		}
+
+
+
+
+
+
 
 
 		for idx, option in next, SaveManager.Options do
+
+
 			if self.Parser[option.Type] and not self.Ignore[idx] then
+
+
 				table.insert(data.objects, self.Parser[option.Type].Save(idx, option))
+
+
 			end
+
+
 		end	
 
+
+
+
+
 		local success, encoded = pcall(httpService.JSONEncode, httpService, data)
+
+
 		if not success then
+
+
 			return false, "failed to encode data"
+
+
 		end
 
+
+
+
+
 		writefile(fullPath, encoded)
+
+
 		return true
+
+
 	end
 
+
+
+
+
 	if not RunService:IsStudio() then
+
+
 		function SaveManager:Load(name)
+
+
 			if (not name) then
+
+
 				return false, "no config file is selected"
+
+
 			end
+
+
+
+
 
 			local file = self.Folder .. "/" .. name .. ".json"
+
+
 			if not isfile(file) then return false, "Create Config Save File" end
 
+
+
+
+
 			local success, decoded = pcall(httpService.JSONDecode, httpService, readfile(file))
+
+
 			if not success then return false, "decode error" end
 
+
+
+
+
 			for _, option in next, decoded.objects do
+
+
 				if self.Parser[option.type] and not self.Ignore[option.idx] then
+
+
 					task.spawn(function() self.Parser[option.type].Load(option.idx, option) end)
+
+
 				end
+
+
 			end
+
+
+
+
 
 			Fluent.SettingLoaded = true
 
+
+
+
+
 			return true, decoded
+
+
 		end
+
+
 	end
 
-	function SaveManager:IgnoreThemeSettings()
+
+
+
+
+	SaveManager.IgnoreThemeSettings = function(self)
+
+
 		self:SetIgnoreIndexes({ 
+
+
 			"InterfaceTheme", "AcrylicToggle", "TransparentToggle", "MenuKeybind"
+
+
 		})
+
+
 	end
+
+
+
+
 
 	function SaveManager:BuildFolderTree()
+
+
 		local paths = {
+
+
 			self.Folder,
+
+
 			self.Folder .. "/"
+
+
 		}
 
+
+
+
+
 		for i = 1, #paths do
+
+
 			local str = paths[i]
+
+
 			if not isfolder(str) then
+
+
 				makefolder(str)
+
+
 			end
+
+
 		end
+
+
 	end
+
+
+
+
 
 	function SaveManager:RefreshConfigList()
+
+
 		local list = listfiles(self.Folder .. "/")
 
+
+
+
+
 		local out = {}
+
+
 		for i = 1, #list do
+
+
 			local file = list[i]
+
+
 			if file:sub(-5) == ".json" then
+
+
 				local pos = file:find(".json", 1, true)
+
+
 				local start = pos
 
+
+
+
+
 				local char = file:sub(pos, pos)
+
+
 				while char ~= "/" and char ~= "\\" and char ~= "" do
+
+
 					pos = pos - 1
+
+
 					char = file:sub(pos, pos)
+
+
 				end
+
+
+
+
 
 				if char == "/" or char == "\\" then
+
+
 					local name = file:sub(pos + 1, start - 1)
+
+
 					if name ~= "options" then
+
+
 						table.insert(out, name)
+
+
 					end
+
+
 				end
+
+
 			end
+
+
 		end
+
+
+
+
 
 		return out
+
+
 	end
+
+
+
+
 
 	function SaveManager:SetLibrary(library)
+
+
 		self.Library = library
+
+
 		self.Options = library.Options
+
+
 	end
+
+
+
+
 
 	if not RunService:IsStudio() then
+
+
 		function SaveManager:LoadAutoloadConfig()
+
+
 			if isfile(self.Folder .. "/autoload.txt") then
+
+
 				local name = readfile(self.Folder .. "/autoload.txt")
 
+
+
+
+
 				local success, err = self:Load(name)
+
+
 				if not success then
+
+
 					return self.Library:Notify({
+
+
 						Title = "Interface",
+
+
 						Content = "Config loader",
+
+
 						SubContent = "Failed to load autoload config: " .. err,
+
+
 						Duration = 7
+
+
 					})
+
+
 				end
 
+
+
+
+
 				self.Library:Notify({
+
+
 					Title = "Interface",
+
+
 					Content = "Config loader",
+
+
 					SubContent = string.format("Auto loaded config %q", name),
+
+
 					Duration = 7
+
+
 				})
+
+
 			end
+
+
 		end
+
+
 	end
 
+
+
+
+
 	function SaveManager:BuildConfigSection(tab)
+
+
 		assert(self.Library, "Must set SaveManager.Library")
+
+
+
+
 
 		local section = tab:AddSection("Configuration", "settings")
 
+
+
+
+
 		section:AddInput("SaveManager_ConfigName",    { Title = "Config name" })
+
+
 		section:AddDropdown("SaveManager_ConfigList", { Title = "Config list", Values = self:RefreshConfigList(), AllowNull = true })
 
+
+
+
+
 		section:AddButton({
+
+
 			Title = "Create config",
+
+
 			Callback = function()
+
+
 				local name = SaveManager.Options.SaveManager_ConfigName.Value
 
+
+
+
+
 				if name:gsub(" ", "") == "" then 
+
+
 					return self.Library:Notify({
+
+
 						Title = "Interface",
+
+
 						Content = "Config loader",
+
+
 						SubContent = "Invalid config name (empty)",
+
+
 						Duration = 7
+
+
 					})
+
+
 				end
+
+
+
+
 
 				local success, err = self:Save(name)
+
+
 				if not success then
+
+
 					return self.Library:Notify({
+
+
 						Title = "Interface",
+
+
 						Content = "Config loader",
+
+
 						SubContent = "Failed to save config: " .. err,
+
+
 						Duration = 7
+
+
 					})
+
+
 				end
 
+
+
+
+
 				self.Library:Notify({
+
+
 					Title = "Interface",
+
+
 					Content = "Config loader",
+
+
 					SubContent = string.format("Created config %q", name),
+
+
 					Duration = 7
+
+
 				})
+
+
+
+
 
 				SaveManager.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
+
+
 				SaveManager.Options.SaveManager_ConfigList:SetValue(nil)
+
+
 			end
+
+
 		})
 
+
+
+
+
 		section:AddButton({Title = "Load config", Callback = function()
+
+
 			local name = SaveManager.Options.SaveManager_ConfigList.Value
+
+
+
+
 
 			local success, err = self:Load(name)
+
+
 			if not success then
+
+
 				return self.Library:Notify({
+
+
 					Title = "Interface",
+
+
 					Content = "Config loader",
+
+
 					SubContent = "Failed to load config: " .. err,
+
+
 					Duration = 7
+
+
 				})
+
+
 			end
 
+
+
+
+
 			self.Library:Notify({
+
+
 				Title = "Interface",
+
+
 				Content = "Config loader",
+
+
 				SubContent = string.format("Loaded config %q", name),
+
+
 				Duration = 7
+
+
 			})
+
+
 		end})
+
+
+
+
 
 		section:AddButton({Title = "Save config", Callback = function()
+
+
 			local name = SaveManager.Options.SaveManager_ConfigList.Value
+
+
+
+
 
 			local success, err = self:Save(name)
+
+
 			if not success then
+
+
 				return self.Library:Notify({
+
+
 					Title = "Interface",
+
+
 					Content = "Config loader",
+
+
 					SubContent = "Failed to overwrite config: " .. err,
+
+
 					Duration = 7
+
+
 				})
+
+
 			end
 
+
+
+
+
 			self.Library:Notify({
+
+
 				Title = "Interface",
+
+
 				Content = "Config loader",
+
+
 				SubContent = string.format("Overwrote config %q", name),
+
+
 				Duration = 7
+
+
 			})
+
+
 		end})
+
+
+
+
 
 		section:AddButton({Title = "Refresh list", Callback = function()
+
+
 			SaveManager.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
+
+
 			SaveManager.Options.SaveManager_ConfigList:SetValue(nil)
+
+
 		end})
+
+
+
+
 
 		local AutoloadButton
+
+
 		AutoloadButton = section:AddButton({Title = "Set as autoload", Description = "Current autoload config: none", Callback = function()
+
+
 			local name = SaveManager.Options.SaveManager_ConfigList.Value
+
+
 			writefile(self.Folder .. "/autoload.txt", name)
+
+
 			AutoloadButton:SetDesc("Current autoload config: " .. name)
+
+
 			self.Library:Notify({
+
+
 				Title = "Interface",
+
+
 				Content = "Config loader",
+
+
 				SubContent = string.format("Set %q to auto load", name),
+
+
 				Duration = 7
+
+
 			})
+
+
 		end})
 
+
+
+
+
 		if isfile(self.Folder .. "/autoload.txt") then
+
+
 			local name = readfile(self.Folder .. "/autoload.txt")
+
+
 			AutoloadButton:SetDesc("Current autoload config: " .. name)
+
+
 		end
+
+
+
+
 
 		SaveManager:SetIgnoreIndexes({ "SaveManager_ConfigList", "SaveManager_ConfigName" })
+
+
 	end
+
+
+
+
 
 	if not RunService:IsStudio() then
+
+
 		SaveManager:BuildFolderTree()
+
+
 	end
+
+
 end
 
+
+
+
+
 local InterfaceManager = {} do
+
+
 	InterfaceManager.Folder = "FluentSettings"
+
+
 	InterfaceManager.Settings = {
+
+
 		Acrylic = true,
+
+
 		Transparency = true,
+
+
 		MenuKeybind = "M"
+
+
 	}
 
+
+
+
+
 	function InterfaceManager:SetTheme(name)
+
+
 		InterfaceManager.Settings.Theme = name
+
+
 	end
+
+
+
+
 
 	function InterfaceManager:SetFolder(folder)
+
+
 		self.Folder = folder;
+
+
 		self:BuildFolderTree()
+
+
 	end
+
+
+
+
 
 	function InterfaceManager:SetLibrary(library)
+
+
 		self.Library = library
+
+
 	end
+
+
+
+
 
 	function InterfaceManager:BuildFolderTree()
+
+
 		local paths = {}
 
+
+
+
+
 		local parts = self.Folder:split("/")
+
+
 		for idx = 1, #parts do
+
+
 			paths[#paths + 1] = table.concat(parts, "/", 1, idx)
+
+
 		end
+
+
+
+
 
 		table.insert(paths, self.Folder)
+
+
 		table.insert(paths, self.Folder .. "/")
 
+
+
+
+
 		for i = 1, #paths do
+
+
 			local str = paths[i]
+
+
 			if not isfolder(str) then
+
+
 				makefolder(str)
+
+
 			end
+
+
 		end
+
+
 	end
+
+
+
+
 
 	function InterfaceManager:SaveSettings()
+
+
 		writefile(self.Folder .. "/options.json", httpService:JSONEncode(InterfaceManager.Settings))
+
+
 	end
 
+
+
+
+
 	function InterfaceManager:LoadSettings()
+
+
 		local path = self.Folder .. "/options.json"
+
+
 		if isfile(path) then
+
+
 			local data = readfile(path)
+
+
+
+
 
 			if not RunService:IsStudio() then local success, decoded = pcall(httpService.JSONDecode, httpService, data) end
 
+
+
+
+
 			if success then
+
+
 				for i, v in next, decoded do
+
+
 					InterfaceManager.Settings[i] = v
+
+
 				end
+
+
 			end
+
+
 		end
+
+
 	end
+
+
 	function InterfaceManager:BuildInterfaceSection(tab)
+
+
 		assert(self.Library, "Must set InterfaceManager.Library")
+
+
 		local Library = self.Library
+
+
 		local Settings = InterfaceManager.Settings
+
+
+
+
 
 		InterfaceManager:LoadSettings()
 
+
+
+
+
 		local section = tab:AddSection("Interface", "monitor")
+
+
 		local InterfaceTheme = section:AddDropdown("InterfaceTheme", {
+
+
 			Title = "Theme",
+
+
 			Description = "Changes the interface theme.",
+
+
 			Values = Library.Themes,
+
+
 			Default = self.Library.Theme,
+
+
 			Callback = function(Value)
+
+
 				Library:SetTheme(Value)
+
+
 				Settings.Theme = Value
+
+
 				InterfaceManager:SaveSettings()
+
+
 			end
+
+
 		})
+
+
+
+
 
 		InterfaceTheme:SetValue(Settings.Theme)
 
+
+
+
+
 		if Library.UseAcrylic and not Mobile then
+
+
 			section:AddToggle("AcrylicToggle", {
+
+
 				Title = "Acrylic",
+
+
 				Description = "The blurred background requires graphic quality 8+",
+
+
 				Default = Settings.Acrylic,
+
+
 				Callback = function(Value)
+
+
 					Library:ToggleAcrylic(Value)
+
+
 					Settings.Acrylic = Value
+
+
 					InterfaceManager:SaveSettings()
+
+
 				end
+
+
 			})
+
+
 		elseif Mobile then
+
+
 			Settings.Acrylic = false
+
+
 		end
 
+
+
+
+
 		section:AddSlider("WindowTransparency", {
+
+
 			Title = "Window Transparency",
+
+
 			Description = "Adjusts the window transparency.",
+
+
 			Default = 1,
+
+
 			Min = 0,
+
+
 			Max = 3,
+
+
 			Rounding = 1,
+
+
 			Callback = function(Value)
+
+
 				Library:SetWindowTransparency(Value)
+
+
 			end
+
+
 		})
+
+
+
+
+
+
 
 
 		local MenuKeybind = section:AddKeybind("MenuKeybind", { Title = "Minimize Bind", Default = Library.MinimizeKey.Name or Settings.MenuKeybind })
+
+
 		MenuKeybind:OnChanged(function()
+
+
 			Settings.MenuKeybind = MenuKeybind.Value
+
+
 			InterfaceManager:SaveSettings()
+
+
 		end)
+
+
 		Library.MinimizeKeybind = MenuKeybind
+
+
 	end
+
+
 end
 
-function Library:CreateWindow(Config)
+
+
+
+
+Library.CreateWindow = function(self, Config)
+
+
 	assert(Config.Title, "Window - Missing Title")
 
+
+
+
+
 	if Library.Window then
+
+
 		print("You cannot create more than one window.")
+
+
 		return
+
+
 	end
+
+
+
+
 
 	Library.MinimizeKey = Config.MinimizeKey or Enum.KeyCode.LeftControl
+
+
 	Library.UseAcrylic = Config.Acrylic or false
+
+
 	Library.Acrylic = Config.Acrylic or false
+
+
 	Library.Theme = Config.Theme or "Dark"
 
+
+
+
+
 	if Config.Acrylic then
+
+
 		Acrylic.init()
+
+
 	end
+
+
+
+
 
 	local Icon = Config.Icon
+
+
 	if not fischbypass then 
+
+
 		if Library:GetIcon(Icon) then
+
+
 			Icon = Library:GetIcon(Icon)
+
+
 		end
+
+
+
+
 
 		if Icon == "" or Icon == nil then
+
+
 			Icon = nil
+
+
 		end
+
+
 	end
+
+
+
+
 
 	local Window = Components.Window({
+
+
 		Parent = GUI,
+
+
 		Size = Config.Size,
+
+
 		Title = Config.Title,
+
+
 		Icon = Icon,
+
+
+		Image = Config.Image,
+
+
 		SubTitle = Config.SubTitle,
+
+
 		TabWidth = Config.TabWidth,
+
+
 		Search = Config.Search,
+
+
 		UserInfoTitle = Config.UserInfoTitle,
+
+
 		UserInfo = Config.UserInfo,
+
+
 		UserInfoTop = Config.UserInfoTop,
+
+
 		UserInfoSubtitle = Config.UserInfoSubtitle,
+
+
 		UserInfoSubtitleColor = Config.UserInfoSubtitleColor,
+
+
 	})
 
+
+
+
+
 	Library.Window = Window
+
+
 	table.insert(Library.Windows, Window)
+
+
 	InterfaceManager:SetTheme(Config.Theme)
+
+
 	Library:SetTheme(Config.Theme)
 
+
+
+
+
 	return Window
+
+
 end
 
+
+
+
+
 function Library:CreateMinimizer(Config)
+
+
 	Config = Config or {}
+
+
 	if self.Minimizer and self.Minimizer.Parent then
+
+
 		return self.Minimizer
+
+
 	end
+
+
+
+
 
 	local parentGui = Library.GUI or GUI
+
+
 	if parentGui then parentGui.DisplayOrder = 1000 end
+
+
 	local isMobile = Mobile and true or false
 
+
+
+
+
 	local iconAsset = "rbxassetid://10734897102"
+
+
 	if type(Config.Icon) == "string" and Config.Icon ~= "" then
+
+
 		pcall(function()
+
+
 			local resolved = Library:GetIcon(Config.Icon)
+
+
 			if resolved then
+
+
 				iconAsset = resolved
+
+
 			elseif string.match(Config.Icon, "^rbxassetid://%d+$") then
+
+
 				iconAsset = Config.Icon
+
+
 			end
+
+
 		end)
+
+
 	end
+
+
+
+
 
 	local useAcrylic = (Config.Acrylic == true)
 
+
+
+
+
 	local cornerRadius = tonumber(Config.Corner)
+
+
 	local backgroundTransparency = (typeof(Config.Transparency) == "number") and math.clamp(Config.Transparency, 0, 1) or 0
+
+
 	local draggableWhole = (Config.Draggable == true)
 
+
+
+
+
 	local holder
+
+
 	local function createButton(isDesktop)
+
+
 		return New("TextButton", {
+
+
 			Name = "MinimizeButton",
+
+
 			Size = UDim2.new(1, 0, 1, 0),
+
+
 			BorderSizePixel = 0,
+
+
 			BackgroundTransparency = backgroundTransparency or 0,
+
+
 			AutoButtonColor = true,
+
+
 			ThemeTag = {
+
+
 				BackgroundColor3 = "Element",
+
+
 			},
+
+
 		}, {
+
+
 			New("UICorner", { CornerRadius = UDim.new(0, cornerRadius or (isDesktop and 14 or 12)) }),
+
+
 			New("UIStroke", {
+
+
 				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+
+
 				Transparency = isDesktop and 0.6 or 0.7,
+
+
 				Thickness = isDesktop and 2 or 1.5,
+
+
 				ThemeTag = {
+
+
 					Color = "ElementBorder",
+
+
 				},
-			}),
-			New("ImageLabel", {
-				Name = "Icon",
-				Image = iconAsset,
-				Size = UDim2.new(0.8, 0, 0.8, 0),
-				Position = UDim2.new(0.5, 0, 0.5, 0),
-				AnchorPoint = Vector2.new(0.5, 0.5),
-				BackgroundTransparency = 1,
-				ThemeTag = {
-					ImageColor3 = "Text",
-				},
-			}, {
-				New("UIAspectRatioConstraint", { AspectRatio = 1, AspectType = Enum.AspectType.FitWithinMaxSize }),
-				New("UICorner", { CornerRadius = UDim.new(0, 0) })
+
+
 			}),
 
+
+			New("ImageLabel", {
+
+
+				Name = "Icon",
+
+
+				Image = iconAsset,
+
+
+				Size = UDim2.new(0.8, 0, 0.8, 0),
+
+
+				Position = UDim2.new(0.5, 0, 0.5, 0),
+
+
+				AnchorPoint = Vector2.new(0.5, 0.5),
+
+
+				BackgroundTransparency = 1,
+
+
+				ThemeTag = {
+
+
+					ImageColor3 = "Text",
+
+
+				},
+
+
+			}, {
+
+
+				New("UIAspectRatioConstraint", { AspectRatio = 1, AspectType = Enum.AspectType.FitWithinMaxSize }),
+
+
+				New("UICorner", { CornerRadius = UDim.new(0, 0) })
+
+
+			}),
+
+
+
+
+
 		})
+
+
 	end
+
+
+
+
 
 	if isMobile then
+
+
 		holder = New("Frame", {
+
+
 			Name = "FluentMinimizer",
+
+
 			Parent = parentGui,
+
+
 			Size = Config.Size or UDim2.fromOffset(36, 36),
+
+
 			Position = Config.Position or UDim2.new(0.45, 0, 0.025, 0),
+
+
 			BackgroundTransparency = 1,
+
+
 			ZIndex = 999999999,
+
+
 			Visible = (Config.Visible ~= false),
+
+
 		})
+
+
 	else
+
+
 		holder = New("Frame", {
+
+
 			Name = "FluentMinimizer",
+
+
 			Parent = parentGui,
+
+
 			Size = Config.Size or UDim2.fromOffset(36, 36),
+
+
 			Position = Config.Position or UDim2.new(0, 300, 0, 20),
+
+
 			BackgroundTransparency = 1,
+
+
 			ZIndex = 999999999,
+
+
 			Visible = (Config.Visible ~= false),
+
+
 		})
+
+
 	end
+
+
+
+
 
 	if useAcrylic then
+
+
 		local miniAcrylic = Acrylic.AcrylicPaint()
+
+
 		miniAcrylic.Frame.Parent = holder
+
+
 		miniAcrylic.Frame.Size = UDim2.fromScale(1, 1)
+
+
 		pcall(function() miniAcrylic.AddParent(holder) end)
 
+
+
+
+
 		local desiredCorner = UDim.new(0, cornerRadius or 0)
+
+
 		pcall(function()
+
+
 			for _, descendant in ipairs(miniAcrylic.Frame:GetDescendants()) do
+
+
 				if descendant.ClassName == "UICorner" then
+
+
 					descendant.CornerRadius = desiredCorner
+
+
 				elseif descendant.ClassName == "ImageLabel" then
+
+
 					descendant.Size = UDim2.fromScale(1, 1)
+
+
 					descendant.Position = UDim2.new(0.5, 0, 0.5, 0)
+
+
 					descendant.AnchorPoint = Vector2.new(0.5, 0.5)
+
+
 				end
+
+
 			end
+
+
 		end)
+
+
 		self.MinimizerAcrylic = miniAcrylic
+
+
 	end
+
+
+
+
 
 	local btnInstance = createButton(not isMobile)
+
+
 	btnInstance.Parent = holder
+
+
 	btnInstance.ZIndex = (holder.ZIndex or 0) + 1
 
+
+
+
+
 	local button = holder:FindFirstChildOfClass("TextButton")
+
+
 	if button then
+
+
 		local isDragging = false
+
+
 		local dragStart, dragOffset
 
+
+
+
+
 		if draggableWhole then
+
+
 			Creator.AddSignal(button.InputBegan, function(Input)
+
+
 				if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+
+
 					isDragging = true
+
+
 					local pos = Input.Position
+
+
 					dragStart = Vector2.new(pos.X, pos.Y)
+
+
 					dragOffset = holder.Position
+
+
 					local conn
+
+
 					conn = Input.Changed:Connect(function()
+
+
 						if Input.UserInputState == Enum.UserInputState.End then
+
+
 							isDragging = false
+
+
 							dragStart = nil
+
+
 							dragOffset = nil
+
+
 							conn:Disconnect()
+
+
 						end
+
+
 					end)
+
+
 				end
+
+
 			end)
+
+
+
+
 
 			Creator.AddSignal(RunService.Heartbeat, function()
+
+
 				if isDragging and dragStart and dragOffset and holder and holder.Parent then
+
+
 					local mouse = LocalPlayer:GetMouse()
+
+
 					local current = Vector2.new(mouse.X, mouse.Y)
+
+
 					local delta = current - dragStart
+
+
 					local newX = dragOffset.X.Offset + delta.X
+
+
 					local newY = dragOffset.Y.Offset + delta.Y
+
+
 					local viewport = workspace.Camera.ViewportSize
+
+
 					local size = holder.AbsoluteSize
+
+
 					if newX < 0 then newX = 0 end
+
+
 					if newY < 0 then newY = 0 end
+
+
 					if newX > viewport.X - size.X then newX = viewport.X - size.X end
+
+
 					if newY > viewport.Y - size.Y then newY = viewport.Y - size.Y end
+
+
 					holder.Position = UDim2.new(0, newX, 0, newY)
+
+
 				end
+
+
 			end)
+
+
 		end
 
+
+
+
+
 		AddSignal(button.MouseButton1Click, function()
+
+
 			task.wait(0.1)
+
+
 			if not isDragging and Library.Window then
+
+
 				Library.Window:Minimize()
+
+
 			end
+
+
 		end)
+
+
 	end
+
+
+
+
+
+
+
+
 
 
 
 	self.Minimizer = holder
+
+
 	return holder
+
+
 end
+
+
+
+
 
 function Library:SetTheme(Value)
+
+
 	if Library.Window and table.find(Library.Themes, Value) then
+
+
 		Library.Theme = Value
+
+
 		Creator.UpdateTheme()
 
+
+
+
+
 		if Value == "Glass" then
+
+
 			Library:SetWindowTransparency(0.9)
+
+
 		end
+
+
 	end
+
+
 end
+
+
+
+
 
 function Library:Destroy()
+
+
 	if Library.Window then
+
+
 		Library.Unloaded = true
+
+
 		if Library.UseAcrylic then
+
+
 			Library.Window.AcrylicPaint.Model:Destroy()
+
+
 		end
+
+
 		Creator.Disconnect()
+
+
 		Library.GUI:Destroy()
+
+
 	end
+
+
 end
+
+
+
+
 
 function Library:ToggleAcrylic(Value)
+
+
 	if Library.Window then
+
+
 		if Library.UseAcrylic then
+
+
 			Library.Acrylic = Value
+
+
 			if Library.Window.AcrylicPaint and Library.Window.AcrylicPaint.Model then
+
+
 				Library.Window.AcrylicPaint.Model.Transparency = Value and 0.95 or 1
+
+
 			end
+
+
 		end
+
+
 	end
+
+
 end
+
+
+
+
 
 function Library:ToggleTransparency(Value)
+
+
 	if Library.Window then
+
+
 		Library.Window.AcrylicPaint.Frame.Background.BackgroundTransparency = Value and 0.35 or 0
+
+
 	end
+
+
 end
+
+
 function Library:SetWindowTransparency(Value)
+
+
 	if Library.Window and Library.UseAcrylic then
+
+
 		Value = math.clamp(Value, 0, 3)
 
+
+
+
+
 		if Library.Theme == "Glass" then
+
+
 			local glassTransparency = 0.8 + (Value * 0.05)
+
+
 			if Value > 1 then
+
+
 				glassTransparency = 0.85 + ((Value - 1) * 0.04)
+
+
 			end
+
+
 			if Value > 2 then
+
+
 				glassTransparency = 0.93 + ((Value - 2) * 0.04)
+
+
 			end
+
+
 			Library.Window.AcrylicPaint.Model.Transparency = math.min(glassTransparency, 0.99)
 
+
+
+
+
 			local backgroundTransparency = 0.7 + (Value * 0.08)
+
+
 			if Value > 1 then
+
+
 				backgroundTransparency = 0.78 + ((Value - 1) * 0.07)
+
+
 			end
+
+
 			if Value > 2 then
+
+
 				backgroundTransparency = 0.85 + ((Value - 2) * 0.1)
+
+
 			end
+
+
 			Library.Window.AcrylicPaint.Frame.Background.BackgroundTransparency = math.min(backgroundTransparency, 0.99)
+
+
+
+
 
 			Library.NotificationTransparency = Value
 
+
+
+
+
 			for _, notification in pairs(Library.ActiveNotifications or {}) do
+
+
 				if notification and notification.ApplyTransparency then
+
+
 					notification:ApplyTransparency()
+
+
 				end
+
+
 			end
+
+
 		else
+
+
 			Library.Window.AcrylicPaint.Model.Transparency = 0.98
+
+
 			Library.Window.AcrylicPaint.Frame.Background.BackgroundTransparency = Value * 0.3
+
+
 		end
+
+
 	end
+
+
 end
+
+
+
+
 
 function Library:Notify(Config)
+
+
 	return NotificationModule:New(Config)
+
+
 end
+
+
+
+
 
 if getgenv then
+
+
 	getgenv().Fluent = Library
+
+
 else
+
+
 	Fluent = Library
+
+
 end
 
+
+
+
+
 local MinimizeButton = New("TextButton", {
+
+
 	BackgroundColor3 = Color3.fromRGB(25, 25, 30),
+
+
 	Size = UDim2.new(1, 0, 1, 0),
+
+
 	BorderSizePixel = 0,
+
+
 	BackgroundTransparency = 0.05, 
+
+
 }, {
+
+
 	New("UICorner", {
+
+
 		CornerRadius = UDim.new(0, 14),
+
+
 	}),
+
+
 	New("UIGradient", {
+
+
 		Color = ColorSequence.new{
+
+
 			ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 40, 50)),
+
+
 			ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 25))
+
+
 		},
+
+
 		Rotation = 45,
+
+
 	}),
+
+
 	New("UIStroke", {
+
+
 		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+
+
 		Color = Color3.fromRGB(100, 150, 255),
+
+
 		Transparency = 0.6,
+
+
 		Thickness = 2,
+
+
 	}),
+
+
 	New("Frame", {
+
+
 		BackgroundColor3 = Color3.fromRGB(100, 150, 255),
+
+
 		BackgroundTransparency = 0.9,
+
+
 		Size = UDim2.new(1, -6, 1, -6),
+
+
 		Position = UDim2.new(0, 3, 0, 3),
+
+
 		BorderSizePixel = 0,
+
+
 	}, {
+
+
 		New("UICorner", {
+
+
 			CornerRadius = UDim.new(0, 11),
+
+
 		}),
+
+
 	}),
+
+
 	New("Frame", {
+
+
 		BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+
+
 		BackgroundTransparency = 0.94,
+
+
 		Size = UDim2.new(0.7, 0, 0.3, 0),
+
+
 		Position = UDim2.new(0.15, 0, 0.1, 0),
+
+
 		BorderSizePixel = 0,
+
+
 	}, {
+
+
 		New("UICorner", {
+
+
 			CornerRadius = UDim.new(0, 8),
+
+
 		}),
+
+
 	}),
+
+
 	New("ImageLabel", {
+
+
 		Image = "rbxassetid://10734897102",
+
+
 		Size = UDim2.new(0.8, 0, 0.8, 0),
+
+
 		Position = UDim2.new(0.5, 0, 0.5, 0),
+
+
 		AnchorPoint = Vector2.new(0.5, 0.5),
+
+
 		BackgroundTransparency = 1,
+
+
 		ImageColor3 = Color3.fromRGB(255, 255, 255),
+
+
 		ImageTransparency = 0.1,
+
+
 	}, {
+
+
 		New("UIAspectRatioConstraint", {
+
+
 			AspectRatio = 1,
+
+
 			AspectType = Enum.AspectType.FitWithinMaxSize,
+
+
 		})
+
+
 	})
+
+
 })
 
+
+
+
+
 local MobileMinimizeButton = New("TextButton", {
+
+
 	BackgroundColor3 = Color3.fromRGB(25, 25, 30),
+
+
 	Size = UDim2.new(1, 0, 1, 0),
+
+
 	BorderSizePixel = 0,
+
+
 	BackgroundTransparency = 0.05,
+
+
 }, {
+
+
 	New("UICorner", {
+
+
 		CornerRadius = UDim.new(0, 12),
+
+
 	}),
+
+
 	New("UIGradient", {
+
+
 		Color = ColorSequence.new{
+
+
 			ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 40, 50)),
+
+
 			ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 25))
+
+
 		},
+
+
 		Rotation = 45,
+
+
 	}),
+
+
 	New("UIStroke", {
+
+
 		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+
+
 		Color = Color3.fromRGB(100, 150, 255),
+
+
 		Transparency = 0.7,
+
+
 		Thickness = 1.5,
+
+
 	}),
+
+
 	New("Frame", {
+
+
 		BackgroundColor3 = Color3.fromRGB(100, 150, 255),
+
+
 		BackgroundTransparency = 0.92,
+
+
 		Size = UDim2.new(1, -4, 1, -4),
+
+
 		Position = UDim2.new(0, 2, 0, 2),
+
+
 		BorderSizePixel = 0,
+
+
 	}, {
+
+
 		New("UICorner", {
+
+
 			CornerRadius = UDim.new(0, 10),
+
+
 		}),
+
+
 	}),
+
+
 	New("ImageLabel", {
+
+
 		Image = "rbxassetid://10734897102",
+
+
 		Size = UDim2.new(0.8, 0, 0.8, 0),
+
+
 		Position = UDim2.new(0.5, 0, 0.5, 0),
+
+
 		AnchorPoint = Vector2.new(0.5, 0.5),
+
+
 		BackgroundTransparency = 1,
+
+
 		ImageColor3 = Color3.fromRGB(255, 255, 255),
+
+
 		ImageTransparency = 0.1,
+
+
 	}, {
+
+
 		New("UIAspectRatioConstraint", {
+
+
 			AspectRatio = 1,
+
+
 			AspectType = Enum.AspectType.FitWithinMaxSize,
+
+
 		})
+
+
 	})
+
+
 })
+
+
+
+
 
 local Minimizer
 
+
+
+
+
 local isDragging = false
+
+
 local dragStart = nil
+
+
 local dragOffset = nil
 
+
+
+
+
 Creator.AddSignal(MinimizeButton.InputBegan, function(Input)
+
+
 	if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+
+
 		isDragging = true
+
+
 		dragStart = Vector2.new(Input.Position.X, Input.Position.Y)
+
+
 		dragOffset = (Library.Minimizer or Minimizer).Position
 
+
+
+
+
 		local connection
+
+
 		connection = Input.Changed:Connect(function()
+
+
 			if Input.UserInputState == Enum.UserInputState.End then
+
+
 				isDragging = false
+
+
 				dragStart = nil
+
+
 				dragOffset = nil
+
+
 				connection:Disconnect()
+
+
 			end
+
+
 		end)
+
+
 	end
+
+
 end)
+
+
+
+
 
 Creator.AddSignal(MobileMinimizeButton.InputBegan, function(Input)
+
+
 	if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+
+
 		isDragging = true
+
+
 		dragStart = Vector2.new(Input.Position.X, Input.Position.Y)
+
+
 		dragOffset = (Library.Minimizer or Minimizer).Position
+
+
 		local connection
+
+
 		connection = Input.Changed:Connect(function()
+
+
 			if Input.UserInputState == Enum.UserInputState.End then
+
+
 				isDragging = false
+
+
 				dragStart = nil
+
+
 				dragOffset = nil
+
+
 				connection:Disconnect()
+
+
 			end
+
+
 		end)
+
+
 	end
+
+
 end)
+
+
+
+
 
 local debugCount = 0
+
+
 Creator.AddSignal(RunService.Heartbeat, function()
+
+
 	local activeMin = Library.Minimizer or Minimizer
+
+
 	if isDragging and dragStart and dragOffset and activeMin and activeMin.Parent then
+
+
 		debugCount = debugCount + 1
+
+
 		if debugCount % 30 == 1 then
+
+
 		end
+
+
 		local Mouse = game:GetService("Players").LocalPlayer:GetMouse()
+
+
 		local currentMousePos = Vector2.new(Mouse.X, Mouse.Y)
+
+
 		local delta = currentMousePos - dragStart
+
+
 		local newX = dragOffset.X.Offset + delta.X
+
+
 		local newY = dragOffset.Y.Offset + delta.Y
+
+
 		local viewportSize = workspace.Camera.ViewportSize
+
+
 		local minimizerSize = activeMin.AbsoluteSize
 
+
+
+
+
 		if newX < 0 then newX = 0 end
+
+
 		if newY < 0 then newY = 0 end
+
+
 		if newX > viewportSize.X - minimizerSize.X then 
+
+
 			newX = viewportSize.X - minimizerSize.X 
+
+
 		end
+
+
 		if newY > viewportSize.Y - minimizerSize.Y then 
+
+
 			newY = viewportSize.Y - minimizerSize.Y 
+
+
 		end
+
+
 		activeMin.Position = UDim2.new(0, newX, 0, newY)
+
+
 	end
+
+
 end)
+
+
+
+
 
 AddSignal(MinimizeButton.MouseButton1Click, function()
+
+
 	task.wait(0.1)
+
+
 	if not isDragging then
+
+
 		Library.Window:Minimize()
+
+
 	end
+
+
 end)
+
+
+
+
 
 AddSignal(MobileMinimizeButton.MouseButton1Click, function()
+
+
 	task.wait(0.1)
+
+
 	if not isDragging then
+
+
 		Library.Window:Minimize()
+
+
 	end
+
+
 end)
 
-task.wait(0.01)
 
+
+if RunService:IsStudio() then task.wait(0.01) end
 return Library, SaveManager, InterfaceManager, Mobile
