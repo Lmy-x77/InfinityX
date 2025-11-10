@@ -22,7 +22,7 @@ function hook:Hook(info)
         OldInvoke = OldInvoke or hookfunction(Path.InvokeServer, function(self, ...)
             if self == Path then
                 print("[Intercepted RemoteFunction]:", self.Name, ...)
-                return
+                return OldInvoke(self, ...)
             end
             return OldInvoke(self, ...)
         end)
