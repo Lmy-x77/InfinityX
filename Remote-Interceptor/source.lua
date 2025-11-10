@@ -4,7 +4,7 @@ hook.__index = hook
 local OldNamecall
 local OldInvoke
 
-function hook:RemoteInterceptor(info)
+function hook:Hook(info)
     local Path = info.Path
     local Type = info.Type
 
