@@ -1,4 +1,3 @@
-````markdown
 # SafeGuard Module - Roblox Exploit Protection
 
 The **SafeGuard** module is a simple and efficient security system designed for Roblox executors.  
@@ -17,9 +16,9 @@ It protects your scripts from being detected, kicked, or banned by the game, whi
 ## 📦 Installation
 
 1. Copy the following line and paste it into your script:
-   ```lua
-   local SafeGuard = loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Safe-Guard/source.lua'))()
-````
+```lua
+local SafeGuard = loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Safe-Guard/source.lua'))()
+```
 
 2. After loading, initialize SafeGuard with your desired settings using:
 
