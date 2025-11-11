@@ -121,6 +121,3 @@ SafeGuard:Hook({
 **Project:** [InfinityX - SafeGuard Library]
 
 Protect your scripts. Stay undetected.
-
-```
-```
