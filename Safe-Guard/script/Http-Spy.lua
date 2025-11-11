@@ -1,88 +1,69 @@
-hookfunction(print, function(...)
-    return
-end)
-hookfunction(warn, function(...)
-    return
-end)
-hookfunction(error, function(...)
-    return
-end)
-
-local oldwrite
-oldwrite = hookfunction(writefile, function(file, content)
-    if(string.find(string.lower(content), 'https://') or string.find(string.lower(content), '//')) then
-        return
-    end
-
-    return oldwrite(file, content)
-end)
-
-local oldappend
-oldappend = hookfunction(appendfile, function(file, content)
-    if(string.find(string.lower(content), 'https://') or string.find(string.lower(content), '//')) then
-        return
-    end
-
-    return oldappend(file, content)
-end)
-
-game.DescendantAdded:Connect(function(c)
-    if c and c:IsA('TextLabel') or c:IsA('TextButton') or c:IsA('Message') then
-        if string.find(string.lower(c.Text), 'https://') then
-            c:Destroy()
-        end
-    end
-end)
-
-
-getgenv().rconsoletitle = nil
-getgenv().rconsoleprint = nil
-getgenv().rconsolewarn = nil
-getgenv().rconsoleinfo = nil
-getgenv().rconsolerr = nil
-
-getrenv().print = function(...) return end
-getrenv().warn = function(...) return end
-getrenv().error = function(...) return end
-
-getgenv().print = function(...) return end
-getgenv().warn = function(...) return end
-getgenv().error = function(...) return end
-getgenv().clonefunction = function(...) return end
-
-game.CoreGui.ChildAdded:Connect(function(c)
-    if(string.lower(c.Name) == 'devconsolemaster') then
-        task.wait(0.1)
-        c:Destroy()
-    end
-end)
-
-local oldNamecall
-oldNamecall = hookmetamethod(game, '__namecall', newcclosure(function(self, ...)
-    local method = getnamecallmethod()
-    if(string.lower(method) == 'rconsoleprint') then
-        return task.wait(9e9)
-    end
-    if(string.lower(method) == 'rconsoleinfo') then
-        return task.wait(9e9)
-    end
-    if(string.lower(method) == 'rconsolewarn') then
-        return task.wait(9e9)
-    end
-    if(string.lower(method) == 'rconsoleerr') then
-        return task.wait(9e9)
-    end
-    if(string.lower(method) == 'print') then
-        return
-    end
-    if(string.lower(method) == 'warn') then
-        return
-    end
-    if(string.lower(method) == 'error') then
-        return
-    end
-    if(string.lower(method) == 'rendernametag') then
-        return 
-    end
-    return oldNamecall(self, ...)
-end))
+getgenv().rconsoleerr = function() return nil end
+wait()
+getgenv().rconsoleinfo = function() return nil end
+wait()
+getgenv().rconsoleinput = function() return nil end
+wait()
+getgenv().print = function() return nil end
+wait()
+getgenv().warn = function() return nil end
+wait()
+getgenv().error = function() return nil end
+wait()
+getfenv().print = function() return nil end
+wait()
+getfenv().warn = function() return nil end
+wait()
+getfenv().error = function() return nil end
+wait()
+getgenv().rconsolename = function() return nil end
+wait()
+getgenv().rconsoleprint = function() return nil end
+wait()
+getgenv().rconsoletitle = function() return nil end
+wait()
+getgenv().rconsolewarn = function() return nil end
+wait()
+getgenv().saveinstance = function() return nil end
+wait()
+getgenv().appendfile = function() return nil end
+wait()
+getgenv().printconsole = function() return nil end
+wait()
+getgenv().saveinstance = function() return nil end
+wait()
+getgenv().toclipboard = function() return nil end
+wait()
+getgenv().set_clipboard = function() return nil end
+wait()
+getgenv().Clipboard = function() return nil end
+wait()
+getgenv().messagebox = function() return nil end
+wait()
+getgenv().rconsoleinputasync = function() return nil end
+wait()
+getgenv().consoleinput = function() return nil end
+wait()
+getgenv().rconsoledestroy = function() return nil end
+wait()
+getgenv().consoledestroy = function() return nil end
+wait()
+getgenv().rconsolecreate = function() return nil end
+wait()
+getgenv().consolecreate = function() return nil end
+wait()
+getgenv().consolesettitle = function() return nil end
+wait()
+getgenv().rconsolesettitle = function() return nil end
+wait()
+getgenv().consoleprint = function() return nil end
+wait()
+getgenv().consoleclear = function() return nil end
+wait()
+getgenv().getconstant = function() return nil end
+wait()
+getgenv().dofile = function() return nil end
+wait()
+getgenv().rconsoleinfo = function() return nil end
+wait()
+getgenv().setrbxclipboard = function() return nil end
