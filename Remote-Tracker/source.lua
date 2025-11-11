@@ -11,6 +11,7 @@ function hook:Hook(info)
     if not Path or not Type then return end
 
     local function matchArgs(args)
+        if Args.Enabled == nil then return true end
         if not Args.Enabled then return false end
 
         local numbers = Args.Number or {}
