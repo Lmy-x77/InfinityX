@@ -22,18 +22,18 @@ local SafeGuard = loadstring(game:HttpGetAsync('https://raw.githubusercontent.co
 
 2. After loading, initialize SafeGuard with your desired settings using:
 
-   ```lua
-   SafeGuard:Hook({
-     AntiKick = true;
-     AntiBan = true;
-     AntiHttpSpy = true;
+ ```lua
+ SafeGuard:Hook({
+   AntiKick = true;
+   AntiBan = true;
+   AntiHttpSpy = true;
 
-     BlockRemote = {
-       Enabled = false;
-       Name = {''}
-     }
-   })
-   ```
+   BlockRemote = {
+     Enabled = false;
+     Name = {''}
+   }
+ })
+ ```
 
 ---
 
@@ -62,12 +62,12 @@ local SafeGuard = loadstring(game:HttpGetAsync('https://raw.githubusercontent.co
 * **Type:** Table
 * **Default:**
 
-  ```lua
-  BlockRemote = {
-    Enabled = false;
-    Name = {''}
-  }
-  ```
+```lua
+BlockRemote = {
+  Enabled = false;
+  Name = {''}
+}
+```
 * When enabled, blocks the listed RemoteEvents or RemoteFunctions from firing or invoking the server.
 
 **Example:**
