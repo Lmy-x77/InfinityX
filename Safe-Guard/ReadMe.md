@@ -116,8 +116,8 @@ SafeGuard:Hook({
 
 ## 🧩 Credits
 
-**Developed by:** [SPDM Team]
-**Script by:** [Lmy-x77]
+**Developed by:** [Lmy77]
+**Script by:** [Lmy77]
 **Project:** [InfinityX - SafeGuard Library]
 
 Protect your scripts. Stay undetected.
