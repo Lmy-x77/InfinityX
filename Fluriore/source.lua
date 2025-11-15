@@ -1793,7 +1793,7 @@ function FlurioreLib:MakeGui(GuiConfig)
 				UICorner12.Parent = Input
 
 				InputTitle.Font = Enum.Font.GothamBold
-				InputTitle.Text = "TextBox"
+				InputTitle.Text = InputConfig.Title
 				InputTitle.TextColor3 = Color3.fromRGB(230.77499270439148, 230.77499270439148, 230.77499270439148)
 				InputTitle.TextSize = 13
 				InputTitle.TextXAlignment = Enum.TextXAlignment.Left
@@ -1808,7 +1808,7 @@ function FlurioreLib:MakeGui(GuiConfig)
 				InputTitle.Parent = Input
 
 				InputContent.Font = Enum.Font.GothamBold
-				InputContent.Text = "This is a TextBox"
+				InputContent.Text = InputConfig.Content
 				InputContent.TextColor3 = Color3.fromRGB(255, 255, 255)
 				InputContent.TextSize = 12
 				InputContent.TextTransparency = 0.6000000238418579
