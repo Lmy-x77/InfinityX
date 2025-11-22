@@ -56,7 +56,7 @@ end
 task.wait(0.25)
 
 local subtitle = Instance.new("TextLabel", bg)
-subtitle.Text = "Version: 4.2a"
+subtitle.Text = "Universal Version"
 subtitle.Font = Enum.Font.GothamMedium
 subtitle.TextSize = 20
 subtitle.TextColor3 = Color3.fromRGB(170, 170, 170)
