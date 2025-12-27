@@ -3181,7 +3181,7 @@ Tabs.AutoRoll:AddSection("[⚔️] - Weapon Roll")
 Tabs.AutoRoll:AddDropdown("InterfaceTheme", {
   Title = "Select weapon",
   KeepSearch = false,
-  Values = { "Baseball", "Axes", 'Pure Hand', 'Guitar', 'Dual Gun', 'Zombie Claws', 'Sledge Hammer', 'Chainsaw', 'Katana', 'Greatsword', 'Scissors', 'Anchor', 'HandFan', 'Shoes', 'Ghost', 'Spinal Blade'},
+  Values = { "Baseball", "Axes", 'Pure Hand', 'Guitar', 'Dual Gun', 'Zombie Claws', 'Sledge Hammer', 'Chainsaw', 'Katana', 'Greatsword', 'Scissors', 'Anchor', 'HandFan', 'Shoes', 'Ghost', 'Spinal Blade', 'Wizard', 'Christmas Sword', 'Blindfold', 'Krampus Claw'},
   Default = "--",
   Callback = function(Value)
     selectedweapon = Value
@@ -3335,7 +3335,47 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
     end
     while autorolld do task.wait()
       local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28].Header.Text
-      if verify == 'SHOES' or verify == 'GHOST' or verify == 'SPINAL BLADE' then
+      if verify == 'SHOES' or verify == 'GHOST' or verify == 'SPINAL BLADE' or verify == 'WIZARD' then
+        Fluent:Notify({
+          Title = "Notification",
+          Content = "The weapon: " .. verify .. ' has been collected',
+          Duration = 5,
+
+        })
+        return
+      else
+        local Event = game:GetService("ReplicatedStorage").Packets.WeaponSpin
+        Event:InvokeServer(
+          tonumber(selectedslot),
+          nil,
+          true
+        )
+      end
+    end
+  end
+})
+Tabs.AutoRoll:AddToggle("TransparentToggle", {
+  Title = "Auto roll until celestial",
+  Default = false,
+  Callback = function(Value)
+    autorolld = Value
+    if autorolld then
+      local spingui = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28]
+      if spingui.Visible == false then
+        ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.Hud.Left.Row1.Weapon.Shape.Fill)
+        GuiService.GuiNavigationEnabled = false
+        wait(1)
+      end
+      Fluent:Notify({
+        Title = "Notification",
+        Content = "Staring auto roll...",
+        Duration = 3,
+      })
+      wait(1.5)
+    end
+    while autorolld do task.wait()
+      local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28].Header.Text
+      if verify == 'BLINDFOLD' or verify == 'KRAMPUS CLAW' then
         Fluent:Notify({
           Title = "Notification",
           Content = "The weapon: " .. verify .. ' has been collected',
@@ -3358,7 +3398,7 @@ Tabs.AutoRoll:AddSection("[⭐] - Perks Roll")
 Tabs.AutoRoll:AddDropdown("InterfaceTheme", {
   Title = "Select perk",
   KeepSearch = false,
-  Values = { "Berserker", "Healer", "Flame", "Critical", "Undead", "Lasthope", "Andrenaline", "Vampire", "DoubleDmg", "DamageShield" },
+  Values = { "Berserker", "Healer", "Flame", "Critical", "Undead", "Lasthope", "Andrenaline", "Vampire", "DoubleDmg", "DamageShield", "Joker", "Overload" },
   Default = "--",
   Callback = function(Value)
     selectedperk = Value
@@ -3493,11 +3533,51 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
     end
   end
 })
+Tabs.AutoRoll:AddToggle("TransparentToggle", {
+  Title = "Auto roll until divine",
+  Default = false,
+  Callback = function(Value)
+    pautorollm = Value
+    if pautorollm then
+      local perkgui = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin
+      if perkgui.Visible == false then
+        ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.Hud.Left.Row1.Perks.Shape.Fill)
+        GuiService.GuiNavigationEnabled = false
+        wait(1)
+      end
+      Fluent:Notify({
+        Title = "Notification",
+        Content = "Staring auto roll...",
+        Duration = 3,
+      })
+      wait(1.5)
+    end
+    while pautorollm do task.wait()
+      local verifyp = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin.Header.Text
+      if verifyp == 'JOKER' or verifyp == 'OVERLOAD' then
+        Fluent:Notify({
+          Title = "Notification",
+          Content = "The perk: " .. verifyp .. ' has been collected',
+          Duration = 5,
+
+        })
+        return
+      else
+        local Event = game:GetService("ReplicatedStorage").Packets.PerkSpin
+        Event:InvokeServer(
+          tonumber(selectedpslot),
+          nil,
+          true
+        )
+      end
+    end
+  end
+})
 Tabs.AutoRoll:AddSection("[🎲] - Trait Roll")
 Tabs.AutoRoll:AddDropdown("InterfaceTheme", {
   Title = "Select trait",
   KeepSearch = false,
-  Values = { 'Power I', 'Power II', 'Power III', 'Agility I', 'Agility II', 'Agility III', 'Focus I', 'Focus II', 'Focus III', 'Intelligent', 'Fortune', 'Beast', 'Prodigy', 'Critical Chance', 'Critical Dmg'},
+  Values = { 'Power I', 'Power II', 'Power III', 'Agility I', 'Agility II', 'Agility III', 'Focus I', 'Focus II', 'Focus III', 'Intelligent', 'Fortune', 'Beast', 'Prodigy', 'Critical Chance', 'Critical Dmg', 'Midas', 'Yoriichi', 'Christmas Spirit'},
   Default = "--",
   Callback = function(Value)
     selectedtrait = Value
@@ -3606,7 +3686,43 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
     end
     while tautorolls do task.wait()
       local verifyts = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Traits.Content.Main.F1.Trait.Frame.TraitName.Text
-      if verifyts == "Prodigy" or verifyts == "Critical Dmg" then
+      if verifyts == "Prodigy" or verifyts == "Critical Dmg" or verifyts == "Midas" then
+        Fluent:Notify({
+          Title = "Notification",
+          Content = "The trait: " .. verifyts .. ' has been collected',
+          Duration = 5,
+        })
+        return
+      else
+        local Event = game:GetService("ReplicatedStorage").Packets.RerollTrait
+        Event:InvokeServer(
+          tonumber(selectedtslot)
+        )
+      end
+    end
+  end
+})
+Tabs.AutoRoll:AddToggle("TransparentToggle", {
+  Title = "Auto roll until divine",
+  Default = false,
+  Callback = function(Value)
+    tautorolls = Value
+    if tautorolls then
+      local traitgui = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Traits
+      if traitgui.Visible == false then
+        game:GetService("Players").LocalPlayer.PlayerGui.GUI.Traits.Visible = true
+        wait(0.5)
+      end
+      Fluent:Notify({
+        Title = "Notification",
+        Content = "Staring auto roll...",
+        Duration = 3,
+      })
+      wait(1.5)
+    end
+    while tautorolls do task.wait()
+      local verifyts = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Traits.Content.Main.F1.Trait.Frame.TraitName.Text
+      if verifyts == "Yoriichi" or verifyts == "Christmas Spirit" then
         Fluent:Notify({
           Title = "Notification",
           Content = "The trait: " .. verifyts .. ' has been collected',
@@ -3692,14 +3808,11 @@ Tabs.Misc:AddButton({
   Title = "Reedem all codes",
   Callback = function()
     local codes = {
-      "SHAMMER",
-      "NewZombie1",
-      "NewZombie2",
-      "NEWPAYLOAD",
-      "TRYNEWGAMEMODE",
-      "BATTLEPASSRESET",
+      "ALMOSTCHRISTMASEVE",
+      "ALMOSTCHRISTMASEVE2",
+      "ALMOSTCHRISTMASEVE3",
+      "ALMOSTCHRISTMASEVE4",
     }
-    local remote = game:GetService("ReplicatedStorage"):WaitForChild("Packets"):WaitForChild("RedeemCode")
     for _, code in ipairs(codes) do
       remote:InvokeServer(code)
     end
