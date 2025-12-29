@@ -4,7 +4,6 @@ local UserInputService = game:GetService("UserInputService")
 IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS}, UserInputService:GetPlatform())
 if IsOnMobile then
   print("Mobile device")
-  loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/main/Software/Items/button.lua",true))()
 elseif not IsOnMobile then
   print("Computer device")
 end
