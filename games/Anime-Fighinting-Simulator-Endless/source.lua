@@ -28,7 +28,6 @@ print[[
 
 
 -- variables
-local Drawings = {}
 local SelectedSkills = {}
 local Strength = game:GetService("Players").LocalPlayer.Stats["1"]
 local Durability = game:GetService("Players").LocalPlayer.Stats["2"]
@@ -237,6 +236,16 @@ local EspTab = Window:Tab({
   Icon = "eye",
   Locked = false,
 })
+local PlayerTab = Window:Tab({
+  Title = "| Player",
+  Icon = "circle-user-round",
+  Locked = false,
+})
+local ShopTab = Window:Tab({
+  Title = "| Shop",
+  Icon = "shopping-cart",
+  Locked = false,
+})
 local TeleportTab = Window:Tab({
   Title = "| Teleports",
   Icon = "map-pin",
@@ -286,7 +295,6 @@ local Toggle = AutoFarmTab:Toggle({
 
     task.spawn(function()
       while AutoFarm do task.wait()
-        print('a')
         if SelectedStat == 'Strength' and Strength.Value >= 100 and Strength.Value < 10000 then
           Teleport(nil, 2, -6, 71, 134)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
@@ -365,7 +373,7 @@ local Toggle = AutoFarmTab:Toggle({
           Teleport(nil, 2, 2565, 267, 1851)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
         elseif SelectedStat == 'Durability' and Durability.Value > 10000000000000000000000 then
-          Teleport(nil, 2, 2013, 78, -82)
+          Teleport(nil, 2, 1673, 2305, -78)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
 
 
@@ -400,13 +408,13 @@ local Toggle = AutoFarmTab:Toggle({
           Teleport(nil, 2, -411, 1255, 663)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
         elseif SelectedStat == 'Chakra' and Chakra.Value >= 25000000000000000 and Chakra.Value < 150000000000000000 then
-          Teleport(nil, 2, -411, 1255, 663)
+          Teleport(nil, 2, -411, 1255, 663) -- find
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
         elseif SelectedStat == 'Chakra' and Chakra.Value >= 150000000000000000 and Chakra.Value < 25000000000000000000 then
-          Teleport(nil, 2, -411, 1255, 663)
+          Teleport(nil, 2, -732, 2791, 628)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
         elseif SelectedStat == 'Chakra' and Chakra.Value >= 25000000000000000000 and Chakra.Value < 10000000000000000000000 then
-          Teleport(nil, 2, -411, 1255, 663)
+          Teleport(nil, 2, 3242, -441, -233)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
         elseif SelectedStat == 'Chakra' and Chakra.Value >= 10000000000000000000000 then
           Teleport(nil, 2, 341, 237, 1867)
@@ -753,6 +761,112 @@ local Button = EspTab:Button({
 })
 
 
+local Section = PlayerTab:Section({ 
+  Title = "Player Configuration",
+})
+local Slider = PlayerTab:Slider({
+  Title = "WalkSpeed",
+  Desc = "Manage player movement speed settings",
+  Step = 1,
+  Value = {
+    Min = 16,
+    Max = 500,
+    Default = 16,
+  },
+  Callback = function(value)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+  end
+})
+local Slider = PlayerTab:Slider({
+  Title = "JumpPower",
+  Desc = "Manage player movement jump settings",
+  Step = 1,
+  Value = {
+    Min = 50,
+    Max = 500,
+    Default = 50,
+  },
+  Callback = function(value)
+    game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
+  end
+})
+local Toggle = PlayerTab:Toggle({
+  Title = "Noclip",
+  Icon = "check",
+  Type = "Checkbox",
+  Value = false,
+  Callback = function(state)
+    Noclip = state
+    if Noclip then
+      for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+        if v:IsA("BasePart") and v.CanCollide == true then
+          task.spawn(function() while Noclip do task.wait() v.CanCollide = false end end)
+        end
+      end
+    else
+      for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+        if v:IsA("BasePart") and v.CanCollide == false then
+          v.CanCollide = true
+        end
+      end
+    end
+  end
+})
+local Button = PlayerTab:Button({
+  Title = "Respawn player",
+  Callback = function(option)
+    game.Players.LocalPlayer.Character.Humanoid.Health = 0
+  end
+})
+
+
+local Section = ShopTab:Section({ 
+  Title = "Shop Options",
+})
+local Dropdown = ShopTab:Dropdown({
+  Title = "Select chest",
+  Desc = "",
+  Values = {'Christmas', 'Gold', 'Dark', 'Eletric', 'Sayan', 'Burning', 'Easter'},
+  Value = "Christmas",
+  Callback = function(option)
+    SelectedChest = option
+  end
+})
+local Button = ShopTab:Button({
+  Title = "Open selected chest",
+  Locked = false,
+  Callback = function()
+    local args = {
+      "BuyBox",
+      SelectedChest
+    }
+    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+  end
+})
+local Toggle = ShopTab:Toggle({
+  Title = "Auto open selected chest",
+  Icon = "check",
+  Type = "Checkbox",
+  Value = false,
+  Callback = function(state) 
+    AutoChest = state
+
+    if not AutoChest then return end
+
+    task.spawn(function()
+      while AutoChest do
+        local args = {
+          "BuyBox",
+          SelectedChest
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+        task.wait(.5)
+      end
+    end)
+  end
+})
+
+
 local Section = TeleportTab:Section({ 
   Title = "NPC Teleport Options",
 })
@@ -760,7 +874,7 @@ local Dropdown = TeleportTab:Dropdown({
   Title = "Select NPC [ QUEST ]",
   Desc = "",
   Values = GetQuestNpc(),
-  Value = "",
+  Value = "Boom",
   Callback = function(option)
     SelectedQNPC = option
   end
@@ -780,7 +894,7 @@ local Dropdown = TeleportTab:Dropdown({
   Title = "Select NPC [ CHAMPIONS ]",
   Desc = "",
   Values = GetChampionsNpc(),
-  Value = "",
+  Value = "1",
   Callback = function(option)
     SelectedCNPC = option
   end
@@ -790,7 +904,7 @@ local Button = TeleportTab:Button({
   Locked = false,
   Callback = function()
     for _, v in pairs(workspace.Scriptable.NPC.Shops.Champions:GetChildren()) do
-      if v:IsA('Model') and v.Name == SelectedQNPC then
+      if v:IsA('Model') and v.Name == SelectedCNPC then
         Teleport(v, 1, nil,nil,nil)
       end
     end
@@ -800,7 +914,7 @@ local Dropdown = TeleportTab:Dropdown({
   Title = "Select NPC [ SPECIAL ]",
   Desc = "",
   Values = {'Grimoires', 'Kagunes', 'Quirks', 'Stands'},
-  Value = "",
+  Value = "Grimoires",
   AllowNone = true,
   Callback = function(option)
     SelectedSNPC = option
@@ -828,7 +942,7 @@ local TrainingAreaDropdown = TeleportTab:Dropdown({
   Title = "Select area",
   Desc = "",
   Values = GetTrainingAreas(),
-  Value = "",
+  Value = "Tree1",
   AllowNone = true,
   Callback = function(option)
     SelectedArea = option
@@ -866,7 +980,7 @@ local Toggle = TeleportTab:Toggle({
   Icon = "check",
   Type = "Checkbox",
   Value = false,
-  Callback = function(state) 
+  Callback = function(state)
     Spactate = state
 
     task.spawn(function()
