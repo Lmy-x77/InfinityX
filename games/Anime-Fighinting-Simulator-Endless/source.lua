@@ -193,7 +193,7 @@ end
 local Window = WindUI:CreateWindow({
   Title = "InfinityX",
   Author = "Anime Fighinting Simulator",
-  Folder = "wasd",
+  Folder = "InfinityX-WindUi",
   Icon = "rbxassetid://72212320253117",
   NewElements = true,
   Size = UDim2.fromOffset(850, 560),
@@ -240,24 +240,22 @@ Window:CreateTopbarButton(
       Title = "What's new?",
       Content = [[
 <font size="24" color="#00E5FF"><b>✨ NEW UPDATE ✨</b></font>
-        
-<font size="15" color="#FFFFFF">
-━━━━━━━━━━━━━━━━━━━━━━
-</font>
-        
-<font size="20" color="#00FF88"><b>🚀 Gameplay Improvements</b></font>
-        
+
+<font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
+<font size="20" color="#00FF88"><b>🚀 New Features & Improvements</b></font>
+
 <font size="15" color="#E0E0E0">
-• <font color="#00FFCC"><b>Improved Auto Farm Mob</b></font> – faster, smarter and more stable  
-• <font color="#00FFCC"><b>New Farming Method</b></font> – optimized pathing and damage  
-• <font color="#FFD166"><b>M1 Support</b></font> – coming in the next updates  
-• <font color="#00FFCC"><b>Improved Auto Open Chest</b></font> – higher efficiency and detection  
+• <font color="#00FFCC"><b>Improved Auto Mob Farm</b></font> – more efficient and stable mob farming  
+• <font color="#00FFCC"><b>Improved Auto Stats Farm</b></font> – faster and optimized stat progression  
+• <font color="#FFD166"><b>Added Rejoin</b></font> – quickly rejoin the current server  
+• <font color="#FFD166"><b>Added Server Hop</b></font> – automatically switch to another server  
+• <font color="#FFD166"><b>Added Rejoin Smallest Server</b></font> – join servers with fewer players  
+• <font color="#FFD166"><b>Added Server Info</b></font> – shows updated server information  
+• <font color="#7C7CFF"><b>New Tab: Quest</b></font> – easier access to quest-related features  
+• <font color="#7C7CFF"><b>New Tab: Settings</b></font> – manage script options and preferences  
 </font>
-        
-<font size="15" color="#FFFFFF">
-━━━━━━━━━━━━━━━━━━━━━━
-</font>
-      ]],
+<font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
+]],
       Buttons = {
         {
           Title = "Close",
@@ -293,6 +291,11 @@ local ShopTab = Window:Tab({
   Icon = "shopping-cart",
   Locked = false,
 })
+local QuestTab = Window:Tab({
+  Title = "| Quest",
+  Icon = "clipboard-list",
+  Locked = false,
+})
 local TeleportTab = Window:Tab({
   Title = "| Teleports",
   Icon = "map-pin",
@@ -301,6 +304,12 @@ local TeleportTab = Window:Tab({
 local MiscTab = Window:Tab({
   Title = "| Misc",
   Icon = "layers",
+  Locked = false,
+})
+Window:Divider()
+local ConfigTab = Window:Tab({
+  Title = "| Config Usage",
+  Icon = "settings",
   Locked = false,
 })
 AutoFarmTab:Select()
@@ -928,6 +937,71 @@ local Toggle = ShopTab:Toggle({
 })
 
 
+task.spawn(function()
+	local Quests = game:GetService("Players").LocalPlayer.Quests
+	local Paragraphs = {}
+
+	local function UpdateParagraph(quest, Paragraph)
+		Paragraph:SetTitle('<font size="22">📜 Quest Viewer - '..quest.Name..'</font>')
+
+		local text = '<font size="18">'
+		for i, prog in ipairs(quest.Progress:GetChildren()) do
+			text = text
+				..'🔹 <b>Objective '..i..'</b>\n'
+				..'📈 Progress: <font color="#4CAF50">'
+				..GetStats(prog.Value)
+				..'</font> / <font color="#FF9800">'
+				..GetStats(quest.Requirements:GetChildren()[i].Value)
+				..'</font>\n\n'
+		end
+
+		text = text
+			..(quest.Completed.Value
+				and '✅ <font color="#00FF7F"><b>Quest Completed</b></font>'
+				or '⏳ <font color="#FF5555"><b>Quest in Progress</b></font>')
+			..'</font>'
+
+		Paragraph:SetDesc(text)
+	end
+
+	local function CreateParagraph(quest)
+		if Paragraphs[quest] then return end
+
+		local Paragraph = QuestTab:Paragraph({
+			Title = "",
+			Desc = "",
+			Color = "Grey",
+			Locked = false,
+		})
+		QuestTab:Divider()
+
+		Paragraphs[quest] = Paragraph
+
+		task.spawn(function()
+			while quest.Parent and Paragraphs[quest] do
+				UpdateParagraph(quest, Paragraph)
+				task.wait(0.2)
+			end
+		end)
+	end
+
+	for _, quest in ipairs(Quests:GetChildren()) do
+		CreateParagraph(quest)
+	end
+
+	Quests.ChildAdded:Connect(function(quest)
+		CreateParagraph(quest)
+	end)
+
+	Quests.ChildRemoved:Connect(function(quest)
+		if Paragraphs[quest] then
+			Paragraphs[quest]:Destroy()
+			Paragraphs[quest] = nil
+		end
+	end)
+end)
+
+
 local Section = TeleportTab:Section({ 
   Title = "NPC Teleport Options",
 })
@@ -1120,6 +1194,62 @@ local Button = MiscTab:Button({
     end
   end
 })
+local Button = MiscTab:Button({
+  Title = "Rejoin server",
+  Locked = false,
+  Callback = function()
+    game:GetService("TeleportService"):Teleport(
+      game.PlaceId,
+      game:GetService("Players").LocalPlayer
+    )
+  end
+})
+local Button = MiscTab:Button({
+  Title = "Server Hop",
+  Locked = false,
+  Callback = function()
+    for _, v in pairs(game:GetService("HttpService"):JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/".. game.PlaceId .."/servers/Public?sortOrder=Asc&limit=100")).data) do
+      if v.playing < v.maxPlayers and v.id ~= game.JobId then
+        game:GetService("TeleportService"):TeleportToPlaceInstance(
+          game.PlaceId,
+          v.id,
+          game:GetService("Players").LocalPlayer
+        )
+        break
+      end
+    end
+  end
+})
+local Button = MiscTab:Button({
+  Title = "Rejoin smallest server",
+  Locked = false,
+  Callback = function()
+    local HttpService = game:GetService("HttpService")
+    local TeleportService = game:GetService("TeleportService")
+    local Players = game:GetService("Players")
+    local PlaceId = game.PlaceId
+    local JobId = game.JobId
+    local function GetServer()
+      local servers = {}
+      local req = request({
+        Url = string.format("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100", PlaceId)
+      })
+      local data = HttpService:JSONDecode(req.Body)
+      for _, v in pairs(data.data) do
+        if v.playing < v.maxPlayers and v.id ~= JobId then
+          table.insert(servers, v.id)
+        end
+      end
+      if #servers > 0 then
+        return servers[math.random(1, #servers)]
+      end
+    end
+    local serverId = GetServer()
+    if serverId then
+      TeleportService:TeleportToPlaceInstance(PlaceId, serverId, Players.LocalPlayer)
+    end
+  end
+})
 local Toggle = MiscTab:Toggle({
   Title = "Unlock FPS",
   Icon = "check",
@@ -1139,5 +1269,158 @@ local Toggle = MiscTab:Toggle({
     while fps do task.wait(.2)
       UnlockFPS()
     end
+  end
+})
+local Section = MiscTab:Section({ 
+  Title = "Server Information",
+})
+task.spawn(function()
+	local Players = game:GetService("Players")
+	local TeleportService = game:GetService("TeleportService")
+	local LocalPlayer = Players.LocalPlayer
+
+	local Paragraph = MiscTab:Paragraph({
+		Title = '<font size="22">🖥️ Server Information</font>',
+		Desc = "",
+		Color = "Grey",
+		Locked = false,
+	})
+
+	local function GetFriendsInServer()
+		local count = 0
+		for _, plr in ipairs(Players:GetPlayers()) do
+			if plr ~= LocalPlayer and LocalPlayer:IsFriendsWith(plr.UserId) then
+				count += 1
+			end
+		end
+		return count
+	end
+
+	task.spawn(function()
+		while true do
+			local players = Players:GetPlayers()
+			local maxPlayers = Players.MaxPlayers
+			local ping = math.floor(LocalPlayer:GetNetworkPing() * 1000)
+
+			local text =
+				'<font size="18">'
+				..'🆔 <b>Job ID:</b> <font color="#4CAF50">'..game.JobId..'</font>\n\n'
+				..'🌍 <b>Place ID:</b> <font color="#4CAF50">'..game.PlaceId..'</font>\n\n'
+				..'👥 <b>Players:</b> <font color="#4CAF50">'..#players..'</font> / <font color="#FF9800">'..maxPlayers..'</font>\n\n'
+				..'🤝 <b>Friends in Server:</b> <font color="#4CAF50">'..GetFriendsInServer()..'</font>\n\n'
+				..'📡 <b>Ping:</b> <font color="#4CAF50">'..ping..' ms</font>\n\n'
+				..'⏱️ <b>Server Time:</b> <font color="#4CAF50">'..os.date("%X")..'</font>\n\n'
+				..'🧠 <b>Account Age:</b> <font color="#4CAF50">'..LocalPlayer.AccountAge..' days</font>\n\n'
+				..'🛡️ <b>Membership:</b> <font color="#4CAF50">'..tostring(LocalPlayer.MembershipType)..'</font>'
+				..'</font>'
+
+			Paragraph:SetDesc(text)
+			task.wait(1)
+		end
+	end)
+end)
+local Button = MiscTab:Button({
+  Title = "Copy JobId",
+  Locked = false,
+  Callback = function()
+    setclipboard(tostring(game.JobId))
+  end
+})
+local Button = MiscTab:Button({
+  Title = "Copy PlaceId",
+  Locked = false,
+  Callback = function()
+    setclipboard(tostring(game.PlaceId))
+  end
+})
+local Input = MiscTab:Input({
+  Title = "Enter JobId",
+  Value = "",
+  Type = "Input",
+  Placeholder = "fc4e02ec-5f16-4392-9a10-0a54390djkasnbc124",
+  Callback = function(input)
+    SelectedJobId = tostring(input)
+  end
+})
+local Button = MiscTab:Button({
+  Title = "Join Jobid",
+  Locked = false,
+  Callback = function()
+    game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, SelectedJobId)
+  end
+})
+
+
+local ConfigManager = Window.ConfigManager
+local ConfigName = "default"
+local ConfigNameInput = ConfigTab:Input({
+  Title = "Config Name",
+  Icon = "file-cog",
+  Callback = function(value)
+    ConfigName = value
+  end
+})
+ConfigTab:Space()
+local AutoLoadToggle = ConfigTab:Toggle({
+  Title = "Enable Auto Load to Selected Config",
+  Value = false,
+  Callback = function(v)
+    Window.CurrentConfig:SetAutoLoad(v)
+  end
+})
+ConfigTab:Space()
+local AllConfigs = ConfigManager:AllConfigs()
+local DefaultValue = table.find(AllConfigs, ConfigName) and ConfigName or nil
+local AllConfigsDropdown = ConfigTab:Dropdown({
+  Title = "All Configs",
+  Desc = "Select existing configs",
+  Values = AllConfigs,
+  Value = DefaultValue,
+  Callback = function(value)
+    ConfigName = value
+    ConfigNameInput:Set(value)
+    AutoLoadToggle:Set(ConfigManager:GetConfig(ConfigName).AutoLoad or false)
+  end
+})
+ConfigTab:Space()
+ConfigTab:Button({
+  Title = "Save Config",
+  Icon = "",
+  Justify = "Center",
+  Callback = function()
+    Window.CurrentConfig = ConfigManager:Config(ConfigName)
+    if Window.CurrentConfig:Save() then
+        WindUI:Notify({
+            Title = "Config Saved",
+            Desc = "Config '" .. ConfigName .. "' saved",
+            Icon = "check",
+        })
+    end
+    AllConfigsDropdown:Refresh(ConfigManager:AllConfigs())
+  end
+})
+ConfigTab:Space()
+ConfigTab:Button({
+    Title = "Load Config",
+    Icon = "",
+    Justify = "Center",
+    Callback = function()
+      Window.CurrentConfig = ConfigManager:CreateConfig(ConfigName)
+      if Window.CurrentConfig:Load() then
+        WindUI:Notify({
+          Title = "Config Loaded",
+          Desc = "Config '" .. ConfigName .. "' loaded",
+          Icon = "refresh-cw",
+        })
+      end
+    end
+})
+ConfigTab:Space()
+ConfigTab:Button({
+  Title = "Print AutoLoad Configs",
+  Icon = "",
+  Justify = "Center",
+  Callback = function()
+    print(HttpService:JSONDecode(ConfigManager:GetAutoLoadConfigs()))
   end
 })
