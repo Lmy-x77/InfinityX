@@ -28,6 +28,9 @@ print[[
 
 -- variables
 local SelectedSkills = {}
+getgenv().FarmMobSettings = {
+  UseM1 = false
+}
 local Strength = game:GetService("Players").LocalPlayer.Stats["1"]
 local Durability = game:GetService("Players").LocalPlayer.Stats["2"]
 local Chakra = game:GetService("Players").LocalPlayer.Stats["3"]
@@ -92,13 +95,19 @@ function GetTrainingAreas()
   return areas
 end
 function AutoFarmMobs(mob : string)
+  local plr = game.Players.LocalPlayer
+  local char = plr.Character
+  if not char then return end
   for _, v in pairs(workspace.Scriptable.Mobs:GetChildren()) do
-    if v:IsA('Model') and v.Name == mob then
-      game.Players.LocalPlayer.Character:PivotTo(
-        v:GetPivot()
-      )
+    if v:IsA("Model") and v.Name == mob and v.PrimaryPart then
+      local cf = v.PrimaryPart.CFrame
+      local behind = cf * CFrame.new(0, 0, 3.5)
+      char:PivotTo(behind)
     end
   end
+end
+function Alive()
+  print('in dev')
 end
 
 
@@ -222,6 +231,45 @@ Window:Tag({
   Color = Color3.fromRGB(255, 0, 0),
   Radius = 13,
 })
+Window:CreateTopbarButton(
+  "ChangelogButton",
+  "circle-question-mark",
+  function()
+    local Dialog = Window:Dialog({
+      Icon = "circle-question-mark",
+      Title = "What's new?",
+      Content = [[
+<font size="24" color="#00E5FF"><b>✨ NEW UPDATE ✨</b></font>
+        
+<font size="15" color="#FFFFFF">
+━━━━━━━━━━━━━━━━━━━━━━
+</font>
+        
+<font size="20" color="#00FF88"><b>🚀 Gameplay Improvements</b></font>
+        
+<font size="15" color="#E0E0E0">
+• <font color="#00FFCC"><b>Improved Auto Farm Mob</b></font> – faster, smarter and more stable  
+• <font color="#00FFCC"><b>New Farming Method</b></font> – optimized pathing and damage  
+• <font color="#FFD166"><b>M1 Support</b></font> – coming in the next updates  
+• <font color="#00FFCC"><b>Improved Auto Open Chest</b></font> – higher efficiency and detection  
+</font>
+        
+<font size="15" color="#FFFFFF">
+━━━━━━━━━━━━━━━━━━━━━━
+</font>
+      ]],
+      Buttons = {
+        {
+          Title = "Close",
+          Callback = function()
+            print("Closed!")
+          end,
+        },
+      },
+    })
+  end,
+  990
+)
 
 
 -- tabs
@@ -471,11 +519,21 @@ local Dropdown = AutoFarmTab:Dropdown({
   Title = "Select skills",
   Desc = "Select the skills you want to use",
   Values = { "Z","X","C","E","R","T","Y","U","F","G","H","J","K","L","V","B","N","M" },
-  Value = {"Z"},
+  Value = {"Z","X","C"},
   Multi = true,
   AllowNone = true,
   Callback = function(option)
     SelectedSkills = option
+  end
+})
+local Toggle = AutoFarmTab:Toggle({
+  Title = "Use m1",
+  Desc = "Enable this toggle so that Auto Farm uses M1 attacks when farming mobs",
+  Icon = "check",
+  Type = "Checkbox",
+  Value = false,
+  Callback = function(state)
+    getgenv().FarmMobSettings.UseM1 = state
   end
 })
 local Toggle = AutoFarmTab:Toggle({
@@ -488,7 +546,7 @@ local Toggle = AutoFarmTab:Toggle({
     if not AutoFarmMob then return end
 
     task.spawn(function()
-      while AutoFarmMob do task.wait()
+      while AutoFarmMob do
         local MobSelected = nil
         if SelectedMob == "Sarka" then
           MobSelected = '1'
@@ -515,6 +573,10 @@ local Toggle = AutoFarmTab:Toggle({
           end
           task.wait(0.1)
         end
+        if getgenv().FarmMobSettings.UseM1 then
+          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
+        end
+        task.wait()
       end
     end)
   end
