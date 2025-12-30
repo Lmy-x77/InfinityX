@@ -31,6 +31,10 @@ local SelectedSkills = {}
 getgenv().FarmMobSettings = {
   UseM1 = false
 }
+getgenv().AutoSellChampionsSettings = {
+  Enabled = false
+}
+getgenv().ProtectedChampion = false
 local Strength = game:GetService("Players").LocalPlayer.Stats["1"]
 local Durability = game:GetService("Players").LocalPlayer.Stats["2"]
 local Chakra = game:GetService("Players").LocalPlayer.Stats["3"]
@@ -106,8 +110,18 @@ function AutoFarmMobs(mob : string)
     end
   end
 end
-function Alive()
-  print('in dev')
+function GetChampions()
+  local champions = {}
+  for _, v in pairs(game:GetService("Players").LocalPlayer.Champions:GetChildren()) do
+    for _, x in pairs(game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List:GetChildren()) do
+      if x:IsA('Frame') and x.Name == v.Name then
+        table.insert(champions,
+          x.Container.ChampionName.Text
+        )
+      end
+    end
+  end
+  return champions
 end
 
 
@@ -243,16 +257,16 @@ Window:CreateTopbarButton(
 
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
 <font size="20" color="#00FF88"><b>🚀 New Features & Improvements</b></font>
-
 <font size="15" color="#E0E0E0">
-• <font color="#00FFCC"><b>Improved Auto Mob Farm</b></font> – more efficient and stable mob farming  
-• <font color="#00FFCC"><b>Improved Auto Stats Farm</b></font> – faster and optimized stat progression  
-• <font color="#FFD166"><b>Added Rejoin</b></font> – quickly rejoin the current server  
-• <font color="#FFD166"><b>Added Server Hop</b></font> – automatically switch to another server  
-• <font color="#FFD166"><b>Added Rejoin Smallest Server</b></font> – join servers with fewer players  
-• <font color="#FFD166"><b>Added Server Info</b></font> – shows updated server information  
-• <font color="#7C7CFF"><b>New Tab: Quest</b></font> – easier access to quest-related features  
-• <font color="#7C7CFF"><b>New Tab: Settings</b></font> – manage script options and preferences  
+• <font color="#FFD166"><b>Added Auto Summon Champions</b></font> – automatically summons the selected champion  
+• <font color="#FFD166"><b>Added Auto Roll Champions</b></font> – automatically rolls and collects champions  
+• <font color="#FFD166"><b>Added Anti-AFK</b></font> – prevents automatic disconnection due to inactivity  
+• <font color="#00FFCC"><b>Improved Auto Stats Farm</b></font> – better optimization and faster stat gains  
+• <font color="#00FFCC"><b>Improved Quest Viewer</b></font> – clearer and more reliable quest tracking  
+• <font color="#00FFCC"><b>Improved Auto Roll Champions</b></font> – faster and more stable rolling system  
+• <font color="#00FFCC"><b>Fixed Auto Roll Chest</b></font> – corrected issues and improved consistency  
+• <font color="#7C7CFF"><b>Teleport to Quest NPC</b></font> – unlocks a teleport button after quest completion  
+• <font color="#FF6B6B"><b>Removed Account Age Restriction</b></font> – no minimum account age required  
 </font>
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
 ]],
@@ -591,6 +605,55 @@ local Toggle = AutoFarmTab:Toggle({
   end
 })
 local Section = AutoFarmTab:Section({ 
+  Title = "Auto Summon Champion",
+})
+local ChampionsDropdown = AutoFarmTab:Dropdown({
+  Title = "Select champion",
+  Desc = "Select the champion you want to auto summon",
+  Values = GetChampions(),
+  Value = "",
+  Callback = function(option)
+    SelectedAutoSummonChampion = option
+  end
+})
+local Toggle = AutoFarmTab:Toggle({
+  Title = "Auto summon selected champion",
+  Icon = "check",
+  Type = "Checkbox",
+  Value = false,
+  Callback = function(state)
+    AutoSummmonChampion = state
+
+    if not AutoSummmonChampion then return end
+
+    task.spawn(function()
+      while AutoSummmonChampion do task.wait()
+        for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List:GetDescendants()) do
+          if v:IsA('TextLabel') and v.Name == 'ChampionName' and v.Text == SelectedAutoSummonChampion then
+            local champion = v.Parent.Parent.Name
+            for _, x in pairs(game:GetService("Players").LocalPlayer.Champions:GetChildren()) do
+              if x.Name == champion then
+                local args = {
+                  "SummonChamp",
+                  x
+                }
+                game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+              end
+            end
+          end
+        end
+      end
+    end)
+  end
+})
+local Button = AutoFarmTab:Button({
+  Title = "Refresh dropdown",
+  Locked = false,
+  Callback = function()
+    ChampionsDropdown:Refresh(GetChampions())
+  end
+})
+local Section = AutoFarmTab:Section({ 
   Title = "Chikara / Fruit Farming",
 })
 local Toggle = AutoFarmTab:Toggle({
@@ -891,7 +954,7 @@ local Button = PlayerTab:Button({
 
 
 local Section = ShopTab:Section({ 
-  Title = "Shop Options",
+  Title = "Chest Open Options",
 })
 local Dropdown = ShopTab:Dropdown({
   Title = "Select chest",
@@ -935,33 +998,162 @@ local Toggle = ShopTab:Toggle({
     end)
   end
 })
+local Section = ShopTab:Section({ 
+  Title = "Champions Options",
+})
+local Dropdown = ShopTab:Dropdown({
+  Title = "Select gacha",
+  Desc = "Select the gacha you want to roll",
+  Values = {'1 - 5k Chikara', '2 - 15k Chikara'},
+  Value = "",
+  Callback = function(option)
+    SelectedGacha = option
+  end
+})
+local Dropdown = ShopTab:Dropdown({
+  Title = "Select Champions",
+  Desc = "Select the champions you want to get",
+  Values = { "Sunji", "Levee", "Keela", "Sarka", "Pilcol", "Toju", "Canakey", "Loofi", "Asto", "Junwon", "Tojaro", "Juyari", "Narnto", "Boras", "Igicho", "Remgonuk", "Bright Yagami", "Saytamu Serious", "Giovanni", "Booh", "Gen", "Shunro", "Kroll", "Eskano", "Mallyodas", "Saytamu" },
+  Value = {""},
+  Multi = true,
+  AllowNone = true,
+  Callback = function(option)
+    SelectedChampionsToRoll = option
+  end
+})
+ShopTab:Toggle({
+	Title = "Auto sell unlocked champions",
+	Icon = "check",
+	Type = "Checkbox",
+	Value = false,
+	Callback = function(state)
+		AutoSellChampions = state
+		if not state then return end
+
+		task.spawn(function()
+			while AutoSellChampions do task.wait(1)
+				if getgenv().ProtectedChampion then continue end
+
+				for _,v in ipairs(game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List:GetDescendants()) do
+					if v:IsA("TextLabel") and v.Name == "ChampionName" then
+						for _,n in ipairs(SelectedChampionsToRoll) do
+							if v.Text == n then
+								getgenv().ProtectedChampion = true
+								break
+							end
+						end
+					end
+				end
+
+				if not getgenv().ProtectedChampion then
+					for _,c in ipairs(game:GetService("Players").LocalPlayer.Champions:GetChildren()) do
+						if c.Value ~= 1 then
+							game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer("SellChamp", c)
+						end
+					end
+				end
+			end
+		end)
+	end
+})
+ShopTab:Toggle({
+	Title = "Auto roll champions",
+	Icon = "check",
+	Type = "Checkbox",
+	Value = false,
+	Callback = function(state)
+		getgenv().AutoSellChampionsSettings.Enabled = state
+		if not state then return end
+
+		task.spawn(function()
+			local GachaSelected = nil
+			if SelectedGacha == '1 - 5k Chikara' then
+				GachaSelected = '1'
+			elseif SelectedGacha == '2 - 15k Chikara' then
+				GachaSelected = '2'
+			end
+
+			while getgenv().AutoSellChampionsSettings.Enabled do task.wait(1)
+				for _,v in ipairs(game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List:GetDescendants()) do
+					if v:IsA("TextLabel") and v.Name == "ChampionName" then
+						for _,n in ipairs(SelectedChampionsToRoll) do
+							if v.Text == n then
+								getgenv().ProtectedChampion = true
+								WindUI:Notify({
+									Title = "Champion Notification",
+									Content = "You've acquired a selected champion: "..v.Text,
+									Duration = 3,
+									Icon = "bell-ring",
+								})
+								return
+							end
+						end
+					end
+				end
+
+				game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainerChamp", GachaSelected)
+			end
+		end)
+	end
+})
 
 
 task.spawn(function()
-	local Quests = game:GetService("Players").LocalPlayer.Quests
+	local Players = game:GetService("Players")
+	local Quests = Players.LocalPlayer.Quests
+
 	local Paragraphs = {}
+	local Buttons = {}
+
+	local function CleanName(name)
+		return name:match("^[^%d]+"):gsub("%s+$", "")
+	end
+
+	local function FindNPC(questName)
+		local target = CleanName(questName):lower()
+		for _, obj in ipairs(workspace.Scriptable.NPC:GetDescendants()) do
+			if obj:IsA("Model") and obj.Name:lower():find(target, 1, true) then
+				return obj
+			end
+		end
+	end
 
 	local function UpdateParagraph(quest, Paragraph)
+		if not Paragraph then return end
+
 		Paragraph:SetTitle('<font size="22">📜 Quest Viewer - '..quest.Name..'</font>')
 
 		local text = '<font size="18">'
 		for i, prog in ipairs(quest.Progress:GetChildren()) do
-			text = text
-				..'🔹 <b>Objective '..i..'</b>\n'
-				..'📈 Progress: <font color="#4CAF50">'
-				..GetStats(prog.Value)
-				..'</font> / <font color="#FF9800">'
-				..GetStats(quest.Requirements:GetChildren()[i].Value)
-				..'</font>\n\n'
+			local req = quest.Requirements:GetChildren()[i]
+			if req then
+				text ..=
+					'🔹 <b>Objective '..i..'</b>\n'..
+					'📈 Progress: <font color="#4CAF50">'..GetStats(prog.Value)..
+					'</font> / <font color="#FF9800">'..GetStats(req.Value)..
+					'</font>\n\n'
+			end
 		end
 
-		text = text
-			..(quest.Completed.Value
+		text ..=
+			(quest.Completed.Value
 				and '✅ <font color="#00FF7F"><b>Quest Completed</b></font>'
 				or '⏳ <font color="#FF5555"><b>Quest in Progress</b></font>')
 			..'</font>'
 
 		Paragraph:SetDesc(text)
+	end
+
+	local function DestroyQuestUI(quest)
+		if Buttons[quest] then
+			pcall(function() Buttons[quest]:Destroy() end)
+			Buttons[quest] = nil
+		end
+
+		if Paragraphs[quest] then
+			pcall(function() Paragraphs[quest]:Destroy() end)
+			Paragraphs[quest] = nil
+		end
 	end
 
 	local function CreateParagraph(quest)
@@ -973,13 +1165,35 @@ task.spawn(function()
 			Color = "Grey",
 			Locked = false,
 		})
+
+		local TeleportButton = QuestTab:Button({
+			Title = "Teleport to NPC",
+			Desc = "🔒 Complete the quest to unlock",
+			Locked = true,
+			Callback = function()
+				local npc = FindNPC(quest.Name)
+				if npc then
+					Players.LocalPlayer.Character:PivotTo(npc:GetPivot() * CFrame.new(0, 0, -3))
+				end
+			end
+		})
+
 		QuestTab:Divider()
 
 		Paragraphs[quest] = Paragraph
+		Buttons[quest] = TeleportButton
 
 		task.spawn(function()
-			while quest.Parent and Paragraphs[quest] do
+			local unlocked = false
+			while quest.Parent == Quests and Paragraphs[quest] do
 				UpdateParagraph(quest, Paragraph)
+
+				if quest.Completed.Value and not unlocked then
+					unlocked = true
+					TeleportButton:Unlock()
+					TeleportButton:SetDesc("🚀 Click to teleport to the quest NPC")
+				end
+
 				task.wait(0.2)
 			end
 		end)
@@ -989,16 +1203,8 @@ task.spawn(function()
 		CreateParagraph(quest)
 	end
 
-	Quests.ChildAdded:Connect(function(quest)
-		CreateParagraph(quest)
-	end)
-
-	Quests.ChildRemoved:Connect(function(quest)
-		if Paragraphs[quest] then
-			Paragraphs[quest]:Destroy()
-			Paragraphs[quest] = nil
-		end
-	end)
+	Quests.ChildAdded:Connect(CreateParagraph)
+	Quests.ChildRemoved:Connect(DestroyQuestUI)
 end)
 
 
@@ -1254,7 +1460,7 @@ local Toggle = MiscTab:Toggle({
   Title = "Unlock FPS",
   Icon = "check",
   Type = "Checkbox",
-  Value = false,
+  Value = true,
   Callback = function(state)
     fps = state
     function UnlockFPS()
@@ -1269,6 +1475,31 @@ local Toggle = MiscTab:Toggle({
     while fps do task.wait(.2)
       UnlockFPS()
     end
+  end
+})
+local Toggle = MiscTab:Toggle({
+  Title = "Anti Afk",
+  Icon = "check",
+  Type = "Checkbox",
+  Value = true,
+  Callback = function(state)
+    AntiAfk = state
+
+    if not AntiAfk then return end
+
+    task.spawn(function()
+      local vu = game:GetService("VirtualUser")
+      local player = game:GetService("Players").LocalPlayer
+      player.Idled:Connect(function()
+        vu:CaptureController()
+      end)
+      task.spawn(function()
+        while true do
+          task.wait(600)
+          vu:ClickButton2(Vector2.new(-1000, -1000))
+        end
+      end)
+    end)
   end
 })
 local Section = MiscTab:Section({ 
@@ -1310,7 +1541,6 @@ task.spawn(function()
 				..'🤝 <b>Friends in Server:</b> <font color="#4CAF50">'..GetFriendsInServer()..'</font>\n\n'
 				..'📡 <b>Ping:</b> <font color="#4CAF50">'..ping..' ms</font>\n\n'
 				..'⏱️ <b>Server Time:</b> <font color="#4CAF50">'..os.date("%X")..'</font>\n\n'
-				..'🧠 <b>Account Age:</b> <font color="#4CAF50">'..LocalPlayer.AccountAge..' days</font>\n\n'
 				..'🛡️ <b>Membership:</b> <font color="#4CAF50">'..tostring(LocalPlayer.MembershipType)..'</font>'
 				..'</font>'
 
@@ -1351,6 +1581,9 @@ local Button = MiscTab:Button({
 })
 
 
+local Section = ConfigTab:Section({ 
+  Title = "Save Configuration [ BETA ]",
+})
 local ConfigManager = Window.ConfigManager
 local ConfigName = "default"
 local ConfigNameInput = ConfigTab:Input({
@@ -1390,11 +1623,11 @@ ConfigTab:Button({
   Callback = function()
     Window.CurrentConfig = ConfigManager:Config(ConfigName)
     if Window.CurrentConfig:Save() then
-        WindUI:Notify({
-            Title = "Config Saved",
-            Desc = "Config '" .. ConfigName .. "' saved",
-            Icon = "check",
-        })
+      WindUI:Notify({
+        Title = "Config Saved",
+        Desc = "Config '" .. ConfigName .. "' saved",
+        Icon = "check",
+      })
     end
     AllConfigsDropdown:Refresh(ConfigManager:AllConfigs())
   end
