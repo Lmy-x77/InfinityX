@@ -330,7 +330,7 @@ AutoFarmTab:Select()
 
 
 -- source
-local Section = AutoFarmTab:Section({ 
+local Section = AutoFarmTab:Section({
   Title = "Farming Configuration",
 })
 local Paragraph = AutoFarmTab:Paragraph({
@@ -628,16 +628,19 @@ local Toggle = AutoFarmTab:Toggle({
 
     task.spawn(function()
       while AutoSummmonChampion do task.wait()
+        local findChampion = game.Players.LocalPlayer.Character:FindFirstChild('ChampWeld')
         for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List:GetDescendants()) do
           if v:IsA('TextLabel') and v.Name == 'ChampionName' and v.Text == SelectedAutoSummonChampion then
             local champion = v.Parent.Parent.Name
             for _, x in pairs(game:GetService("Players").LocalPlayer.Champions:GetChildren()) do
               if x.Name == champion then
-                local args = {
-                  "SummonChamp",
-                  x
-                }
-                game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+                if not findChampion then
+                  local args = {
+                    "SummonChamp",
+                    x
+                  }
+                  game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+                end
               end
             end
           end
