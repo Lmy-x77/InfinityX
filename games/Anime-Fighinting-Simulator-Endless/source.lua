@@ -35,6 +35,8 @@ getgenv().AutoSellChampionsSettings = {
   Enabled = false
 }
 getgenv().ProtectedChampion = false
+local FruitConnection
+local ChikaraConnection
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
@@ -1589,17 +1591,15 @@ local Toggle = MiscTab:Toggle({
     if not AntiAfk then return end
 
     task.spawn(function()
-      local vu = game:GetService("VirtualUser")
-      local player = game:GetService("Players").LocalPlayer
-      player.Idled:Connect(function()
-        vu:CaptureController()
-      end)
-      task.spawn(function()
-        while true do
-          task.wait(600)
-          vu:ClickButton2(Vector2.new(-1000, -1000))
+      if AntiAfk then
+        for _,v in pairs(getconnections(game:GetService("Players").LocalPlayer.Idled)) do
+          v:Disable()
         end
-      end)
+        game:GetService("RunService").Heartbeat:Connect(function()
+          game:GetService("VirtualUser"):Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+          game:GetService("VirtualUser"):Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+        end)
+      end
     end)
   end
 })
@@ -1711,9 +1711,6 @@ local Input = WebhookTab:Input({
     WEBHOOK_URL = tostring(input)
   end
 })
-local FruitConnection
-local ChikaraConnection
-
 local Toggle = WebhookTab:Toggle({
   Title = "Enable webhook report",
   Icon = "check",
