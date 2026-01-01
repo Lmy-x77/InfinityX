@@ -1564,7 +1564,7 @@ local Toggle = MiscTab:Toggle({
   Title = "Unlock FPS",
   Icon = "check",
   Type = "Checkbox",
-  Value = true,
+  Value = false,
   Callback = function(state)
     fps = state
     function UnlockFPS()
@@ -1585,7 +1585,7 @@ local Toggle = MiscTab:Toggle({
   Title = "Anti Afk",
   Icon = "check",
   Type = "Checkbox",
-  Value = true,
+  Value = false,
   Callback = function(state)
     AntiAfk = state
 
