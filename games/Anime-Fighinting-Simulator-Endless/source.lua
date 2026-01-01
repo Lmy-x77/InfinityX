@@ -35,6 +35,10 @@ getgenv().AutoSellChampionsSettings = {
   Enabled = false
 }
 getgenv().ProtectedChampion = false
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local WEBHOOK_URL = ""
 local Strength = game:GetService("Players").LocalPlayer.Stats["1"]
 local Durability = game:GetService("Players").LocalPlayer.Stats["2"]
 local Chakra = game:GetService("Players").LocalPlayer.Stats["3"]
@@ -122,6 +126,36 @@ function GetChampions()
     end
   end
   return champions
+end
+function GetPlayersOffSafeZone()
+  local players = {}
+  for _, v in ipairs(game.Players:GetPlayers()) do
+    if v ~= game.Players.LocalPlayer then
+      local character = v.Character
+      if character then
+        local pvpFolder = character:FindFirstChild("PVPFolder")
+        if pvpFolder then
+          local safezone = pvpFolder:FindFirstChild("Safezone")
+          if safezone and safezone:IsA("BoolValue") and safezone.Value == false then
+            table.insert(players, v.Name)
+          end
+        end
+      end
+    end
+  end
+  return players
+end
+function SendWebhook(embed)
+  request({
+    Url = WEBHOOK_URL,
+    Method = "POST",
+    Headers = { ["Content-Type"] = "application/json" },
+    Body = HttpService:JSONEncode({
+      username = "InfinityX - Logger",
+      avatar_url = "https://i.imgur.com/4M34hi2.png",
+      embeds = { embed }
+    })
+  })
 end
 
 
@@ -256,17 +290,10 @@ Window:CreateTopbarButton(
 <font size="24" color="#00E5FF"><b>✨ NEW UPDATE ✨</b></font>
 
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
-<font size="20" color="#00FF88"><b>🚀 New Features & Improvements</b></font>
+<font size="20" color="#00FF88"><b>🚀 New Features</b></font>
 <font size="15" color="#E0E0E0">
-• <font color="#FFD166"><b>Added Auto Summon Champions</b></font> – automatically summons the selected champion  
-• <font color="#FFD166"><b>Added Auto Roll Champions</b></font> – automatically rolls and collects champions  
-• <font color="#FFD166"><b>Added Anti-AFK</b></font> – prevents automatic disconnection due to inactivity  
-• <font color="#00FFCC"><b>Improved Auto Stats Farm</b></font> – better optimization and faster stat gains  
-• <font color="#00FFCC"><b>Improved Quest Viewer</b></font> – clearer and more reliable quest tracking  
-• <font color="#00FFCC"><b>Improved Auto Roll Champions</b></font> – faster and more stable rolling system  
-• <font color="#00FFCC"><b>Fixed Auto Roll Chest</b></font> – corrected issues and improved consistency  
-• <font color="#7C7CFF"><b>Teleport to Quest NPC</b></font> – unlocks a teleport button after quest completion  
-• <font color="#FF6B6B"><b>Removed Account Age Restriction</b></font> – no minimum account age required  
+• <font color="#FFD166"><b>Added Auto Farm Player</b></font> – an advanced combat automation system that automatically detects players outside the safe zone, tracks their position, and efficiently eliminates them. Designed with smart target selection, smooth movement handling, and stability to maximize farming performance while minimizing detection and errors. Ideal for fast progression and competitive gameplay.  
+• <font color="#7C7CFF"><b>Added Webhook System</b></font> – a powerful and advanced notification system that sends real-time updates directly to your webhook. Provides detailed information such as important events, rewards, actions, and status updates, ensuring full control and monitoring even when you are away from the game. Built for reliability, clarity, and professional-grade tracking.  
 </font>
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
 ]],
@@ -321,6 +348,11 @@ local MiscTab = Window:Tab({
   Locked = false,
 })
 Window:Divider()
+local WebhookTab = Window:Tab({
+  Title = "| Webhook",
+  Icon = "webhook",
+  Locked = false,
+})
 local ConfigTab = Window:Tab({
   Title = "| Config Usage",
   Icon = "settings",
@@ -526,7 +558,78 @@ local Toggle = AutoFarmTab:Toggle({
     end)
   end
 })
-local Section = AutoFarmTab:Section({ 
+local Section = AutoFarmTab:Section({
+  Title = "Player Farming",
+})
+local PlayersFarmDropdown = AutoFarmTab:Dropdown({
+  Title = "Select player",
+  Desc = "Select the player you want to farm, the script collect all player off the safe zone",
+  Values = GetPlayersOffSafeZone(),
+  Value = "",
+  Callback = function(option)
+    SelectedPlayerToFarm = option
+  end
+})
+local Dropdown = AutoFarmTab:Dropdown({
+  Title = "Select skills",
+  Desc = "Select the skills you want to use to kill selected player",
+  Values = { "Z","X","C","E","R","T","Y","U","F","G","H","J","K","L","V","B","N","M" },
+  Value = {"Z","X","C"},
+  Multi = true,
+  AllowNone = true,
+  Callback = function(option)
+    SelectedSkillsToPF = option
+  end
+})
+local Toggle = AutoFarmTab:Toggle({
+  Title = "Start auto player farm",
+  Icon = "check",
+  Type = "Checkbox",
+  Value = false,
+  Callback = function(state)
+    AutoFarmPlayer = state
+    if not AutoFarmPlayer then return end
+
+    task.spawn(function()
+      while AutoFarmPlayer do task.wait()
+        game.Players.LocalPlayer.Character:PivotTo(game.Players[SelectedPlayerToFarm].Character:GetPivot())
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
+        for _, skill in ipairs(SelectedSkills) do
+          local key = Enum.KeyCode[skill]
+          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("UsePower", skill)
+          if key then
+            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("UseSpecialPower", key)
+          end
+        end
+      end
+    end)
+  end
+})
+local Button = AutoFarmTab:Button({
+  Title = "Viwer player power",
+  Locked = false,
+  Callback = function()
+    local stats1 = game.Players[SelectedPlayerToFarm].Stats['1'].Value
+    local stats2 = game.Players[SelectedPlayerToFarm].Stats['2'].Value
+    local stats3 = game.Players[SelectedPlayerToFarm].Stats['3'].Value
+    local stats4 = game.Players[SelectedPlayerToFarm].Stats['4'].Value
+    local total = stats1 + stats2 + stats3 + stats4
+    WindUI:Notify({
+      Title = "Notification",
+      Content = "The total power of ".. SelectedPlayerToFarm .. ' is: ' ..GetStats(total),
+      Duration = 5,
+      Icon = "bell-ring",
+    })
+  end
+})
+local Button = AutoFarmTab:Button({
+  Title = "Refresh dropdown",
+  Locked = false,
+  Callback = function()
+    PlayersFarmDropdown:Refresh(GetPlayersOffSafeZone())
+  end
+})
+local Section = AutoFarmTab:Section({
   Title = "Mob Farming",
 })
 local Dropdown = AutoFarmTab:Dropdown({
@@ -568,7 +671,7 @@ local Toggle = AutoFarmTab:Toggle({
     AutoFarmMob = state
     if not AutoFarmMob then return end
 
-    task.spawn(function()
+    task.spawn(function() task.wait()
       while AutoFarmMob do
         local MobSelected = nil
         if SelectedMob == "Sarka" then
@@ -590,21 +693,16 @@ local Toggle = AutoFarmTab:Toggle({
         for _, skill in ipairs(SelectedSkills) do
           local key = Enum.KeyCode[skill]
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("UsePower", skill)
-          if key then
-            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("UseSpecialPower", key)
-            task.wait(0.1)
-          end
-          task.wait(0.1)
+          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("UseSpecialPower", key)
         end
         if getgenv().FarmMobSettings.UseM1 then
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
         end
-        task.wait()
       end
     end)
   end
 })
-local Section = AutoFarmTab:Section({ 
+local Section = AutoFarmTab:Section({
   Title = "Auto Summon Champion",
 })
 local ChampionsDropdown = AutoFarmTab:Dropdown({
@@ -1580,6 +1678,140 @@ local Button = MiscTab:Button({
   Locked = false,
   Callback = function()
     game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, SelectedJobId)
+  end
+})
+
+
+local Section = WebhookTab:Section({
+  Title = "Webhook Configuration",
+})
+local Paragraph = WebhookTab:Paragraph({
+  Title = "How to use",
+  Desc = "Copy the URL of your webhook on your Discord server and paste it into the input field, then select the options you want to send there. Remember that this function only notifies your server if something has been generated. If you want it to be collected, make sure you activate automatic collection in the options on the “Auto Farm” tab to avoid any confusion.",
+  Color = "Grey",
+  Locked = false,
+})
+local Dropdown = WebhookTab:Dropdown({
+  Title = "Send a message if",
+  Desc = "Select the method you want to send the message via the webhook",
+  Values = {'A fruit spawned', 'A chikara boxes spawned'},
+  Value = "",
+  AllowNone = true,
+  Callback = function(option)
+    SelectedMethodToNotify = option
+  end
+})
+local Input = WebhookTab:Input({
+  Title = "Webhook url",
+  Desc = "Copy the url of your webhook and add it to this input",
+  Value = "",
+  Type = "Input",
+  Placeholder = "Enter discord webhook",
+  Callback = function(input) 
+    WEBHOOK_URL = tostring(input)
+  end
+})
+local FruitConnection
+local ChikaraConnection
+
+local Toggle = WebhookTab:Toggle({
+  Title = "Enable webhook report",
+  Icon = "check",
+  Type = "Checkbox",
+  Value = false,
+  Callback = function(state)
+    Webhook = state
+
+    if not Webhook then
+      if FruitConnection then FruitConnection:Disconnect() FruitConnection = nil end
+      if ChikaraConnection then ChikaraConnection:Disconnect() ChikaraConnection = nil end
+      return
+    end
+
+    task.spawn(function()
+      if SelectedMethodToNotify == 'A fruit spawned' then
+        if FruitConnection then FruitConnection:Disconnect() end
+
+        local AutoCollectFruit = Fruit
+        SendWebhook({
+          title = "🍍 Auto Collect Fruit Stats",
+          color = AutoCollectFruit and 0x2ECC71 or 0xE74C3C,
+          fields = {
+            { name = "Status", value = tostring(AutoCollectFruit), inline = true },
+            { name = "Player", value = LocalPlayer.Name, inline = true },
+            { name = "UserId", value = tostring(LocalPlayer.UserId), inline = true },
+            { name = "PlaceId", value = tostring(game.PlaceId), inline = true },
+            { name = "JobId", value = game.JobId, inline = false }
+          },
+          footer = { text = "InfinityX • Auto Collect System" },
+          timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+        })
+
+        FruitConnection = workspace.Scriptable.Fruits.ChildAdded:Connect(function(model)
+          if not Webhook then return end
+          if not model:IsA("Model") then return end
+
+          local pos = model:GetPivot().Position
+          SendWebhook({
+            title = "🍎 Fruit Detected",
+            color = 0xF1C40F,
+            fields = {
+              { name = "Fruit Name", value = model.Name, inline = true },
+              { name = "Position (Vector3)", value = tostring(pos), inline = false },
+              { name = "X", value = tostring(math.floor(pos.X)), inline = true },
+              { name = "Y", value = tostring(math.floor(pos.Y)), inline = true },
+              { name = "Z", value = tostring(math.floor(pos.Z)), inline = true },
+              { name = "Server JobId", value = game.JobId, inline = false },
+              { name = "Detected By", value = LocalPlayer.Name, inline = true }
+            },
+            footer = { text = "Wave • Fruit Tracker" },
+            timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+          })
+        end)
+
+      elseif SelectedMethodToNotify == 'A chikara boxes spawned' then
+        if ChikaraConnection then ChikaraConnection:Disconnect() end
+
+        local AutoChikaraBox = ChikaraBox
+        SendWebhook({
+          title = "💎 Auto Collect Chikara Box Stats",
+          color = AutoChikaraBox and 0x9B59B6 or 0xE74C3C,
+          fields = {
+            { name = "Status", value = tostring(AutoChikaraBox), inline = true },
+            { name = "Crystal", value = "Purple Chikara Box", inline = true },
+            { name = "Player", value = LocalPlayer.Name, inline = true },
+            { name = "UserId", value = tostring(LocalPlayer.UserId), inline = true },
+            { name = "PlaceId", value = tostring(game.PlaceId), inline = true },
+            { name = "JobId", value = game.JobId, inline = false }
+          },
+          footer = { text = "Wave • Chikara Box System" },
+          timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+        })
+
+        ChikaraConnection = workspace.Scriptable.ChikaraBoxes.ChildAdded:Connect(function(obj)
+          if not Webhook then return end
+          if not obj:IsA("UnionOperation") then return end
+
+          local pos = obj.Position
+          SendWebhook({
+            title = "🔮 Chikara Box Spawned",
+            color = 0x8E44AD,
+            fields = {
+              { name = "Name", value = obj.Name, inline = true },
+              { name = "Type", value = "Chikara Crystal (Purple)", inline = true },
+              { name = "Position", value = tostring(pos), inline = false },
+              { name = "X", value = tostring(math.floor(pos.X)), inline = true },
+              { name = "Y", value = tostring(math.floor(pos.Y)), inline = true },
+              { name = "Z", value = tostring(math.floor(pos.Z)), inline = true },
+              { name = "Detected By", value = LocalPlayer.Name, inline = true },
+              { name = "Server JobId", value = game.JobId, inline = false }
+            },
+            footer = { text = "InfinityX • Chikara Box Tracker" },
+            timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+          })
+        end)
+      end
+    end)
   end
 })
 
