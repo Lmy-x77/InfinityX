@@ -27,6 +27,7 @@ print[[
 
 
 -- variables
+local SkillKeys = { "Z","X","C","E","R","T","Y","U","F","G","H","J","K","L","V","B","N","M" }
 local SelectedSkills = {}
 getgenv().FarmMobSettings = {
   UseM1 = false
@@ -292,10 +293,13 @@ Window:CreateTopbarButton(
 <font size="24" color="#00E5FF"><b>✨ NEW UPDATE ✨</b></font>
 
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
-<font size="20" color="#00FF88"><b>🚀 New Features</b></font>
+<font size="20" color="#00FF88"><b>🚀 New Features & Improvements</b></font>
 <font size="15" color="#E0E0E0">
-• <font color="#FFD166"><b>Added Auto Farm Player</b></font> – an advanced combat automation system that automatically detects players outside the safe zone, tracks their position, and efficiently eliminates them. Designed with smart target selection, smooth movement handling, and stability to maximize farming performance while minimizing detection and errors. Ideal for fast progression and competitive gameplay.  
-• <font color="#7C7CFF"><b>Added Webhook System</b></font> – a powerful and advanced notification system that sends real-time updates directly to your webhook. Provides detailed information such as important events, rewards, actions, and status updates, ensuring full control and monitoring even when you are away from the game. Built for reliability, clarity, and professional-grade tracking.  
+• <font color="#FFD166"><b>Added Champion Webhook</b></font> – <font size="16">an advanced notification system that instantly alerts you when a selected champion is obtained, ensuring you never miss rare or important pulls.</font>  
+• <font color="#FFD166"><b>Added Teleport Gacha Power</b></font> – <font size="16">automatically teleports the player to the selected Gacha Power location for faster and more efficient access.</font>  
+• <font color="#FFD166"><b>Added Auto Roll Gacha Power</b></font> – <font size="16">automatically rolls the selected Gacha Power with optimized timing and stability.</font>  
+• <font color="#00FFCC"><b>Improved Auto Collect Chikara</b></font> – <font size="16">enhanced collection speed, accuracy, and overall reliability.</font>  
+• <font color="#00FFCC"><b>Fixed Minor Lags</b></font> – <font size="16">performance optimizations to reduce lag and improve overall smoothness.</font>  
 </font>
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
 ]],
@@ -317,6 +321,11 @@ Window:CreateTopbarButton(
 local AutoFarmTab = Window:Tab({
   Title = "| Auto Farm",
   Icon = "swords",
+  Locked = false,
+})
+local SkillTab = Window:Tab({
+  Title = "| Auto Skill",
+  Icon = "zap",
   Locked = false,
 })
 local EspTab = Window:Tab({
@@ -575,7 +584,7 @@ local PlayersFarmDropdown = AutoFarmTab:Dropdown({
 local Dropdown = AutoFarmTab:Dropdown({
   Title = "Select skills",
   Desc = "Select the skills you want to use to kill selected player",
-  Values = { "Z","X","C","E","R","T","Y","U","F","G","H","J","K","L","V","B","N","M" },
+  Values = SkillKeys,
   Value = {"Z","X","C"},
   Multi = true,
   AllowNone = true,
@@ -646,7 +655,7 @@ local Dropdown = AutoFarmTab:Dropdown({
 local Dropdown = AutoFarmTab:Dropdown({
   Title = "Select skills",
   Desc = "Select the skills you want to use",
-  Values = { "Z","X","C","E","R","T","Y","U","F","G","H","J","K","L","V","B","N","M" },
+  Values = SkillKeys,
   Value = {"Z","X","C"},
   Multi = true,
   AllowNone = true,
@@ -803,6 +812,36 @@ local Toggle = AutoFarmTab:Toggle({
     end)
   end
 })
+
+
+local SkillStates = {}
+local Section = SkillTab:Section({
+  Title = "Auto Use Skills Options",
+})
+for _, v in pairs(SkillKeys) do
+  SkillStates[v] = false
+  SkillTab:Toggle({
+    Title = "Auto use " .. v,
+    Icon = "check",
+    Type = "Checkbox",
+    Value = false,
+    Callback = function(state)
+      SkillStates[v] = state
+      if not state then return end
+      task.spawn(function()
+        while SkillStates[v] do
+          task.wait()
+          local key = Enum.KeyCode[v]
+          local rf = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction")
+          rf:InvokeServer("UsePower", v)
+          if key then
+            rf:InvokeServer("UseSpecialPower", key)
+          end
+        end
+      end)
+    end
+  })
+end
 
 
 local Section = EspTab:Section({ 
@@ -1108,7 +1147,7 @@ local Dropdown = ShopTab:Dropdown({
   Title = "Select gacha",
   Desc = "Select the gacha you want to roll",
   Values = {'1 - 5k Chikara', '2 - 15k Chikara'},
-  Value = "",
+  Value = "1 - 5k Chikara",
   Callback = function(option)
     SelectedGacha = option
   end
@@ -1117,7 +1156,7 @@ local Dropdown = ShopTab:Dropdown({
   Title = "Select Champions",
   Desc = "Select the champions you want to get",
   Values = { "Sunji", "Levee", "Keela", "Sarka", "Pilcol", "Toju", "Canakey", "Loofi", "Asto", "Junwon", "Tojaro", "Juyari", "Narnto", "Boras", "Igicho", "Remgonuk", "Bright Yagami", "Saytamu Serious", "Giovanni", "Booh", "Gen", "Shunro", "Kroll", "Eskano", "Mallyodas", "Saytamu" },
-  Value = {""},
+  Value = {"Sunji", "Levee", "Keela"},
   Multi = true,
   AllowNone = true,
   Callback = function(option)
@@ -1196,6 +1235,49 @@ ShopTab:Toggle({
 
 				game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainerChamp", GachaSelected)
 			end
+		end)
+	end
+})
+local Section = ShopTab:Section({ 
+  Title = "Gacha Powers Options",
+})
+local Dropdown = ShopTab:Dropdown({
+  Title = "Select gacha powers",
+  Desc = "Select the gacha power you want to roll",
+  Values = { 'Jutsu Leveling', 'Nen Leveing', 'Soul Leveling', 'Nichiyin Leveling', 'Seiyen Leveling' },
+  Value = "Jutsu Leveling",
+  Callback = function(option)
+    SelectedGachaPower = option
+  end
+})
+ShopTab:Toggle({
+	Title = "Auto roll gacha power",
+	Icon = "check",
+	Type = "Checkbox",
+	Value = false,
+	Callback = function(state)
+		AutoRollGachaPower = state
+		if not AutoRollGachaPower then return end
+
+		task.spawn(function()
+      local remote = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction")
+      if AutoRollGachaPower then
+        while AutoRollGachaPower do task.wait(0.5)
+          if SelectedGachaPower == 'Jutsu Leveling' then
+            remote:InvokeServer('BuyGacha', 'G1')
+          elseif SelectedGachaPower == 'Nen Leveling' then
+            remote:InvokeServer('BuyGacha', 'G2')
+          elseif SelectedGachaPower == 'Soul Leveling' then
+            remote:InvokeServer('BuyGacha', 'G3')
+          elseif SelectedGachaPower == 'Nichiyin Leveling' then
+            remote:InvokeServer('BuyGacha', 'G4')
+          elseif SelectedGachaPower == 'Seiyen Leveling' then
+            remote:InvokeServer('BuyGacha', 'G5')
+          elseif SelectedGachaPower == 'Hero Leveling' then
+            remote:InvokeServer('BuyGacha', 'G6')
+          end
+        end
+      end
 		end)
 	end
 })
@@ -1311,7 +1393,7 @@ task.spawn(function()
 end)
 
 
-local Section = TeleportTab:Section({ 
+local Section = TeleportTab:Section({
   Title = "NPC Teleport Options",
 })
 local Dropdown = TeleportTab:Dropdown({
@@ -1405,6 +1487,36 @@ local Button = TeleportTab:Button({
   Callback = function()
     TrainingAreaDropdown:Refresh(GetTrainingAreas())
   end
+})
+local Section = TeleportTab:Section({ 
+  Title = "Gacha Powers Teleport Options",
+})
+local Dropdown = TeleportTab:Dropdown({
+  Title = "Select gacha powers",
+  Desc = "Select the gacha you want to teleport",
+  Values = { 'Jutsu Leveling', 'Nen Leveing', 'Soul Leveling', 'Nichiyin Leveling', 'Seiyen Leveling' },
+  Value = "Jutsu Leveling",
+  Callback = function(option)
+    SelectedGachaPowerTP = option
+  end
+})
+TeleportTab:Button({
+	Title = "Auto roll champions",
+	Callback = function(state)
+    if SelectedGachaPowerTP == 'Jutsu Leveling' then
+      Teleport(nil, 2, -14, 62, -449)
+    elseif SelectedGachaPowerTP == 'Nen Leveling' then
+      Teleport(nil, 2, -1094, 61, -133)
+    elseif SelectedGachaPowerTP == 'Soul Leveling' then
+      Teleport(nil, 2, 315, -154, -2081)
+    elseif SelectedGachaPowerTP == 'Nichiyin Leveling' then
+      Teleport(nil, 2, -343, 121, -1196)
+    elseif SelectedGachaPowerTP == 'Seiyen Leveling' then
+      Teleport(nil, 2, -2252, 618, 506)
+    elseif SelectedGachaPowerTP == 'Hero Leveling' then
+      Teleport(nil, 2, 1241, 141, -93)
+    end
+	end
 })
 local Section = TeleportTab:Section({ 
   Title = "Player Teleport Options",
@@ -1695,7 +1807,7 @@ local Paragraph = WebhookTab:Paragraph({
 local Dropdown = WebhookTab:Dropdown({
   Title = "Send a message if",
   Desc = "Select the method you want to send the message via the webhook",
-  Values = {'A fruit spawned', 'A chikara boxes spawned'},
+  Values = {'A fruit spawned', 'A chikara boxes spawned', 'A champion collected'},
   Value = "",
   AllowNone = true,
   Callback = function(option)
@@ -1762,7 +1874,7 @@ local Toggle = WebhookTab:Toggle({
               { name = "Server JobId", value = game.JobId, inline = false },
               { name = "Detected By", value = LocalPlayer.Name, inline = true }
             },
-            footer = { text = "Wave • Fruit Tracker" },
+            footer = { text = "InfinityX • Fruit Tracker" },
             timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
           })
         end)
@@ -1782,7 +1894,7 @@ local Toggle = WebhookTab:Toggle({
             { name = "PlaceId", value = tostring(game.PlaceId), inline = true },
             { name = "JobId", value = game.JobId, inline = false }
           },
-          footer = { text = "Wave • Chikara Box System" },
+          footer = { text = "InfinityX • Chikara Box System" },
           timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
         })
 
@@ -1807,6 +1919,46 @@ local Toggle = WebhookTab:Toggle({
             footer = { text = "InfinityX • Chikara Box Tracker" },
             timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
           })
+        end)
+
+      elseif SelectedMethodToNotify == 'A champion collected' then
+        if ChampionConnection then ChampionConnection:Disconnect() end
+        local AutoChampion = getgenv().AutoSellChampionsSettings.Enabled
+        SendWebhook({
+          title = "👑 Auto Roll Champions Stats",
+          color = AutoChampion and 0xF1C40F or 0xE74C3C,
+          fields = {
+            { name = "Status", value = tostring(AutoChampion), inline = true },
+            { name = "System", value = "Champion Roll", inline = true },
+            { name = "Player", value = LocalPlayer.Name, inline = true },
+            { name = "UserId", value = tostring(LocalPlayer.UserId), inline = true },
+            { name = "PlaceId", value = tostring(game.PlaceId), inline = true },
+            { name = "JobId", value = game.JobId, inline = false }
+          },
+          footer = { text = "InfinityX • Champion System" },
+          timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+        })
+
+        ChampionConnection = game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List.DescendantAdded:Connect(function(v)
+            if not Webhook then return end
+            if not v:IsA("TextLabel") or v.Name ~= "ChampionName" then return end
+            for _, n in ipairs(SelectedChampionsToRoll) do
+              if v.Text == n then
+                SendWebhook({
+                  title = "🏆 Champion Collected",
+                  color = 0x2ECC71,
+                  fields = {
+                    { name = "Champion Name", value = v.Text, inline = true },
+                    { name = "Collected By", value = LocalPlayer.Name, inline = true },
+                    { name = "UserId", value = tostring(LocalPlayer.UserId), inline = true },
+                    { name = "Server JobId", value = game.JobId, inline = false }
+                  },
+                  footer = { text = "InfinityX • Champion Roll Tracker" },
+                  timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+                })
+                break
+              end
+            end
         end)
       end
     end)
