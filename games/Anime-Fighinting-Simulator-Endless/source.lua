@@ -293,13 +293,12 @@ Window:CreateTopbarButton(
 <font size="24" color="#00E5FF"><b>✨ NEW UPDATE ✨</b></font>
 
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
-<font size="20" color="#00FF88"><b>🚀 New Features & Improvements</b></font>
+<font size="20" color="#00FF88"><b>🚀 New Features & Changes</b></font>
 <font size="15" color="#E0E0E0">
-• <font color="#FFD166"><b>Added Champion Webhook</b></font> – <font size="16">an advanced notification system that instantly alerts you when a selected champion is obtained, ensuring you never miss rare or important pulls.</font>  
-• <font color="#FFD166"><b>Added Teleport Gacha Power</b></font> – <font size="16">automatically teleports the player to the selected Gacha Power location for faster and more efficient access.</font>  
-• <font color="#FFD166"><b>Added Auto Roll Gacha Power</b></font> – <font size="16">automatically rolls the selected Gacha Power with optimized timing and stability.</font>  
-• <font color="#00FFCC"><b>Improved Auto Collect Chikara</b></font> – <font size="16">enhanced collection speed, accuracy, and overall reliability.</font>  
-• <font color="#00FFCC"><b>Fixed Minor Lags</b></font> – <font size="16">performance optimizations to reduce lag and improve overall smoothness.</font>  
+• <font color="#FFD166"><b>Added New Pain Boss</b></font> – <font size="16">a brand-new boss encounter featuring Pain, bringing new challenges, mechanics, and rewards for players.</font>  
+• <font color="#FFD166"><b>Added New NPC Teleport</b></font> – <font size="16">allows instant teleportation to the newly added NPC for faster interaction and progression.</font>  
+• <font color="#FFD166"><b>Added New Codes</b></font> – <font size="16">support for the latest in-game codes, making it easier to redeem rewards.</font>  
+• <font color="#FF6B6B"><b>Removed Champion Bugs</b></font> – <font size="16">fixed and removed issues related to champions to improve stability and gameplay experience.</font>  
 </font>
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
 ]],
@@ -646,7 +645,7 @@ local Section = AutoFarmTab:Section({
 local Dropdown = AutoFarmTab:Dropdown({
   Title = "Select mob",
   Desc = "Select the mob you want to farm",
-  Values = { "Sarka", "Gen", "Igicho", "Remgonuk", "Booh", "Saytamu", "Riru" },
+  Values = { "Sarka", "Gen", "Igicho", "Remgonuk", "Booh", "Saytamu", "Riru", "Pain" },
   Value = "Sarka",
   Callback = function(option)
     SelectedMob = option
@@ -696,9 +695,11 @@ local Toggle = AutoFarmTab:Toggle({
         elseif SelectedMob == "Booh" then
           MobSelected = '5'
         elseif SelectedMob == "Saytamu" then
-          MobSelected = 6
+          MobSelected = '6'
         elseif SelectedMob == "Riru" then
           MobSelected = '1001'
+        elseif SelectedMob == "Pain" then
+          MobSelected = '1002'
         end
         AutoFarmMobs(MobSelected)
         for _, skill in ipairs(SelectedSkills) do
@@ -753,67 +754,6 @@ local Toggle = AutoFarmTab:Toggle({
               end
             end
           end
-        end
-      end
-    end)
-  end
-})
-local Toggle = AutoFarmTab:Button({
-  Title = "Auto bug stick selected champion",
-  Desc = 'The first thing you have to do is reset and open the champions hub, then run the code. Then open the champions hub again and press "View" and run it.',
-  Callback = function(state)
-    task.spawn(function()
-      local Players = game:GetService("Players")
-      local GuiService = game:GetService("GuiService")
-      local VIM = game:GetService("VirtualInputManager")
-      local lp = Players.LocalPlayer
-      
-      function ClickGui(path: Instance)
-        GuiService.GuiNavigationEnabled = true
-        GuiService.AutoSelectGuiEnabled = true
-        GuiService.SelectedObject = path
-        VIM:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-        VIM:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-      end
-
-      lp.Character.Humanoid.Health = 0
-      task.wait(1)
-
-      local gui = lp.PlayerGui.Main.Frames.Champions.Container
-      local summonBtn = gui.Details.Summon
-      local list = gui.List
-      local details = gui.Details
-      
-      local started = false
-      
-      while true do task.wait()
-          local char = lp.Character
-          local hum = char:FindFirstChildOfClass("Humanoid")
-      
-          if started and hum.Health >= hum.MaxHealth then
-              GuiService.GuiNavigationEnabled = false
-              GuiService.AutoSelectGuiEnabled = false
-              started = false
-              return
-          end
-      
-          started = true
-      
-        if details.Visible == false then
-          for _, v in pairs(list:GetDescendants()) do
-            if v:IsA("TextLabel")
-            and v.Name == "ChampionName"
-            and v.Text == SelectedAutoSummonChampion then
-              local champion = v.Parent.Parent.Name
-              ClickGui(list[champion].Container.View)
-              break
-            end
-          end
-          task.wait(0.15)
-          ClickGui(summonBtn)
-        else
-          task.wait(0.15)
-          ClickGui(summonBtn)
         end
       end
     end)
@@ -1500,7 +1440,7 @@ local Button = TeleportTab:Button({
 local Dropdown = TeleportTab:Dropdown({
   Title = "Select NPC [ SPECIAL ]",
   Desc = "",
-  Values = {'Grimoires', 'Kagunes', 'Quirks', 'Stands'},
+  Values = {'Grimoires', 'Kagunes', 'Quirks', 'Stands', 'Bloodlines'},
   Value = "Grimoires",
   AllowNone = true,
   Callback = function(option)
@@ -1519,6 +1459,8 @@ local Button = TeleportTab:Button({
       Teleport(workspace.Scriptable.NPC.Shops.Special.Quirks["1"], 1, nil,nil,nil)
     elseif SelectedSNPC == 'Stands' then
       Teleport(workspace.Scriptable.NPC.Shops.Special.Stands["1"], 1, nil,nil,nil)
+    elseif SelectedSNPC == 'Stands' then
+      Teleport(workspace.Scriptable.NPC.Shops.Special.Bloodlines["1"], 1, nil,nil,nil)
     end
   end
 })
@@ -1644,6 +1586,9 @@ local Button = MiscTab:Button({
   Locked = false,
   Callback = function()
     local codes = {
+      'MinorBugs',
+      'BadActors',
+      'JanuaryIncident',
       'SecretCode',
       'Krampus',
       '10kLikes',
