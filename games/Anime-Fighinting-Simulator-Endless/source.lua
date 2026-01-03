@@ -758,6 +758,67 @@ local Toggle = AutoFarmTab:Toggle({
     end)
   end
 })
+local Toggle = AutoFarmTab:Button({
+  Title = "Auto bug stick selected champion",
+  Desc = 'The first thing you have to do is reset and open the champions hub, then run the code. Then open the champions hub again and press "View" and run it.',
+  Callback = function(state)
+    task.spawn(function()
+      local Players = game:GetService("Players")
+      local GuiService = game:GetService("GuiService")
+      local VIM = game:GetService("VirtualInputManager")
+      local lp = Players.LocalPlayer
+      
+      function ClickGui(path: Instance)
+        GuiService.GuiNavigationEnabled = true
+        GuiService.AutoSelectGuiEnabled = true
+        GuiService.SelectedObject = path
+        VIM:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+        VIM:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+      end
+
+      lp.Character.Humanoid.Health = 0
+      task.wait(1)
+
+      local gui = lp.PlayerGui.Main.Frames.Champions.Container
+      local summonBtn = gui.Details.Summon
+      local list = gui.List
+      local details = gui.Details
+      
+      local started = false
+      
+      while true do task.wait()
+          local char = lp.Character
+          local hum = char:FindFirstChildOfClass("Humanoid")
+      
+          if started and hum.Health >= hum.MaxHealth then
+              GuiService.GuiNavigationEnabled = false
+              GuiService.AutoSelectGuiEnabled = false
+              started = false
+              return
+          end
+      
+          started = true
+      
+        if details.Visible == false then
+          for _, v in pairs(list:GetDescendants()) do
+            if v:IsA("TextLabel")
+            and v.Name == "ChampionName"
+            and v.Text == SelectedAutoSummonChampion then
+              local champion = v.Parent.Parent.Name
+              ClickGui(list[champion].Container.View)
+              break
+            end
+          end
+          task.wait(0.15)
+          ClickGui(summonBtn)
+        else
+          task.wait(0.15)
+          ClickGui(summonBtn)
+        end
+      end
+    end)
+  end
+})
 local Button = AutoFarmTab:Button({
   Title = "Refresh dropdown",
   Locked = false,
