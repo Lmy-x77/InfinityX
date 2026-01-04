@@ -1344,7 +1344,7 @@ local Section = ShopTab:Section({
 local Dropdown = ShopTab:Dropdown({
   Title = "Select gacha powers",
   Desc = "Select the gacha power you want to roll",
-  Values = { 'Jutsu Leveling', 'Nen Leveing', 'Soul Leveling', 'Nichiyin Leveling', 'Seiyen Leveling' },
+  Values = { 'Jutsu Leveling', 'Nen Leveling', 'Soul Leveling', 'Nichiyin Leveling', 'Seiyen Leveling' },
   Value = "Jutsu Leveling",
   Callback = function(option)
     SelectedGachaPower = option
@@ -1825,14 +1825,14 @@ local Section = TeleportTab:Section({
 local Dropdown = TeleportTab:Dropdown({
   Title = "Select gacha powers",
   Desc = "Select the gacha you want to teleport",
-  Values = { 'Jutsu Leveling', 'Nen Leveing', 'Soul Leveling', 'Nichiyin Leveling', 'Seiyen Leveling' },
+  Values = { 'Jutsu Leveling', 'Nen Leveling', 'Soul Leveling', 'Nichiyin Leveling', 'Seiyen Leveling' },
   Value = "Jutsu Leveling",
   Callback = function(option)
     SelectedGachaPowerTP = option
   end
 })
 TeleportTab:Button({
-	Title = "Auto roll champions",
+	Title = "Teleport selected gacha power",
 	Callback = function(state)
     if SelectedGachaPowerTP == 'Jutsu Leveling' then
       Teleport(nil, 2, -14, 62, -449)
