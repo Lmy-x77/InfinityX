@@ -1,7 +1,4 @@
 -- variables
-
-
-
 local Time = ""
 function startTimer()
     local start = os.clock()
@@ -124,7 +121,7 @@ UI:AddButton("Close Ui", Color3.fromRGB(0, 255, 170), function()
 end)
 
 
-
+-- execute
 startTimer()
 task.spawn(function()
     while true do task.wait()
