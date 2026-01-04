@@ -1271,10 +1271,11 @@ ShopTab:Toggle({
 		if not state then return end
 
 		task.spawn(function()
-			while AutoSellChampions do task.wait(1)
-				if getgenv().ProtectedChampion then continue end
+			while AutoSellChampions do
+				task.wait(1)
+				getgenv().ProtectedChampion = false
 
-				for _,v in ipairs(game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List:GetDescendants()) do
+				for _,v in ipairs(game.Players.LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List:GetDescendants()) do
 					if v:IsA("TextLabel") and v.Name == "ChampionName" then
 						for _,n in ipairs(SelectedChampionsToRoll) do
 							if v.Text == n then
@@ -1283,13 +1284,14 @@ ShopTab:Toggle({
 							end
 						end
 					end
+					if getgenv().ProtectedChampion then break end
 				end
 
-				if not getgenv().ProtectedChampion then
-					for _,c in ipairs(game:GetService("Players").LocalPlayer.Champions:GetChildren()) do
-						if c.Value ~= 1 then
-							game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer("SellChamp", c)
-						end
+				if getgenv().ProtectedChampion then continue end
+
+				for _,c in ipairs(game.Players.LocalPlayer.Champions:GetChildren()) do
+					if c.Value ~= 1 then
+						game.ReplicatedStorage.Remotes.RemoteEvent:FireServer("SellChamp", c)
 					end
 				end
 			end
