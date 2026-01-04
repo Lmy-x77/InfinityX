@@ -35,6 +35,7 @@ elseif getexecutorname then
 end
 if executor == 'Xeno' or executor == 'Solara' then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/notification.lua'))()
+  return
 end
 
 
@@ -2035,20 +2036,9 @@ local Toggle = MiscTab:Toggle({
 	Value = false,
 	Callback = function(state)
 		AntiAfk = state
-		if AntiAfkConn then
-			AntiAfkConn:Disconnect()
-			AntiAfkConn = nil
+    if AntiAfk then
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/hassanxzayn-lua/Anti-afk/main/antiafkbyhassanxzyn"))();
     end
-
-		if not AntiAfk then return end
-
-		for _,v in ipairs(getconnections(game.Players.LocalPlayer.Idled)) do
-			v:Disable()
-		end
-		AntiAfkConn = game:GetService("RunService").Heartbeat:Connect(function()
-			game:GetService("VirtualUser"):CaptureController()
-			game:GetService("VirtualUser"):ClickButton2(Vector2.new())
-		end)
 	end
 })
 local Section = MiscTab:Section({ 
