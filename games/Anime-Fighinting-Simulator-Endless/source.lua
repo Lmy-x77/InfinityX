@@ -2027,28 +2027,29 @@ local Toggle = MiscTab:Toggle({
     end
   end
 })
+local AntiAfkConn
 local Toggle = MiscTab:Toggle({
-  Title = "Anti Afk",
-  Icon = "check",
-  Type = "Checkbox",
-  Value = false,
-  Callback = function(state)
-    AntiAfk = state
+	Title = "Anti Afk",
+	Icon = "check",
+	Type = "Checkbox",
+	Value = false,
+	Callback = function(state)
+		AntiAfk = state
+		if AntiAfkConn then
+			AntiAfkConn:Disconnect()
+			AntiAfkConn = nil
+    end
 
-    if not AntiAfk then return end
+		if not AntiAfk then return end
 
-    task.spawn(function()
-      if AntiAfk then
-        for _,v in pairs(getconnections(game:GetService("Players").LocalPlayer.Idled)) do
-          v:Disable()
-        end
-        game:GetService("RunService").Heartbeat:Connect(function()
-          game:GetService("VirtualUser"):Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-          game:GetService("VirtualUser"):Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-        end)
-      end
-    end)
-  end
+		for _,v in ipairs(getconnections(game.Players.LocalPlayer.Idled)) do
+			v:Disable()
+		end
+		AntiAfkConn = game:GetService("RunService").Heartbeat:Connect(function()
+			game:GetService("VirtualUser"):CaptureController()
+			game:GetService("VirtualUser"):ClickButton2(Vector2.new())
+		end)
+	end
 })
 local Section = MiscTab:Section({ 
   Title = "Server Information",
