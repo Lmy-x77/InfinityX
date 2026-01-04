@@ -778,11 +778,30 @@ local Toggle = AutoFarmTab:Toggle({
     ChikaraBox = state
 
     if not ChikaraBox then return end
+    if not fireclickdetector then
+      WindUI:Notify({
+        Title = "<font size='14'><b>Executor Compatibility Warning</b></font>",
+        Content = [[
+<font size='14' color='#FF6B6B'><b>Unsupported Function Detected</b></font>
+
+<font size='14' color='#E0E0E0'>
+The executor you are currently using does not support the function
+</font>
+<font size='12' color='#FFD166'><b>fireclickdetector()</b></font>
+<font size='11' color='#E0E0E0'>
+This feature requires full ClickDetector interaction support. Please switch to a compatible executor to ensure proper functionality and avoid unexpected behavior.
+</font>
+        ]],
+        Duration = 10,
+        Icon = "bell-ring",
+      })
+      return
+    end
 
     task.spawn(function()
       while ChikaraBox do task.wait()
         for _, v in pairs(workspace.Scriptable.ChikaraBoxes:GetDescendants()) do
-          if v:IsA('Part') and v.Name == 'ClickBox' then
+            if v:IsA('Part') and v.Name == 'ClickBox' then
             fireclickdetector(v.ClickDetector)
             wait(2)
           end
@@ -800,6 +819,25 @@ local Toggle = AutoFarmTab:Toggle({
     Fruit = state
 
     if not Fruit then return end
+    if not fireclickdetector then
+      WindUI:Notify({
+        Title = "<font size='14'><b>Executor Compatibility Warning</b></font>",
+        Content = [[
+<font size='14' color='#FF6B6B'><b>Unsupported Function Detected</b></font>
+
+<font size='14' color='#E0E0E0'>
+The executor you are currently using does not support the function
+</font>
+<font size='12' color='#FFD166'><b>fireclickdetector()</b></font>
+<font size='11' color='#E0E0E0'>
+This feature requires full ClickDetector interaction support. Please switch to a compatible executor to ensure proper functionality and avoid unexpected behavior.
+</font>
+        ]],
+        Duration = 10,
+        Icon = "bell-ring",
+      })
+      return
+    end
 
     task.spawn(function()
       while Fruit do task.wait()
