@@ -26,6 +26,18 @@ print[[
 ]]
 
 
+-- verify
+local executor = "Unknown Executor"
+if identifyexecutor then
+  executor = identifyexecutor()
+elseif getexecutorname then
+  executor = getexecutorname()
+end
+if executor == 'Xeno' or executor == 'Solara' then
+  loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/notification.lua'))()
+end
+
+
 -- variables
 local SkillKeys = { "Z","X","C","E","R","T","Y","U","F","G","H","J","K","L","V","B","N","M" }
 local SelectedSkills = {}
@@ -36,6 +48,43 @@ getgenv().AutoSellChampionsSettings = {
   Enabled = false
 }
 getgenv().ProtectedChampion = false
+getgenv().AutoBuySpecials = {
+  ["Stands"] = {
+    ["The Arm"] = 1,
+    ["Heirophant Lime"] = 2,
+    ["Magician's Crimson"] = 3,
+    ["Purple Smog"] = 4,
+    ["Killer King"] = 5,
+    ["Celestial Diamond"] = 6,
+    ["Time Crusader"] = 7,
+    ["Guardian's Arm"] = 8,
+    ["Crafted in Heaven"] = 9
+  },
+  ["Quirks"] = {
+    ["Belly Laser"] = 1,
+    ["Blue Inferno"] = 2,
+    ["Frostfire Rift"] = 3,
+    ["Bio-Reconstruct"] = 4,
+    ["Unity Drive"] = 5
+  },
+  ["Kagunes"] = {
+    ["Eye Patch"] = 1,
+    ["Jason"] = 2,
+    ["Centipede"] = 3,
+    ["One Eye"] = 4
+  },
+  ["Grimoires"] = {
+    ["Water Grimoire"] = 1,
+    ["Wind Grimoire"] = 2,
+    ["Demon Grimoire"] = 3
+  },
+  ["Bloodlines"] = {
+    ["Copy Eyes"] = 1,
+    ["White Eye"] = 2,
+    ["Itachu's Copy Eyes"] = 3,
+    ['Ripple Eyes'] = 4
+  }
+}
 local FruitConnection
 local ChikaraConnection
 local HttpService = game:GetService("HttpService")
@@ -174,7 +223,7 @@ function ApplyEspToPlayers()
     if v.Name ~= game.Players.LocalPlayer.Name then
       EspLib.ApplyESP(v.Character, {
         Color = Color3.fromRGB(135, 52, 173),
-        Text = v.Character.Name,
+        Text = v.Name,
         ESPName = "PlayersESP",
         HighlightEnabled = true,
       })
@@ -295,10 +344,15 @@ Window:CreateTopbarButton(
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
 <font size="20" color="#00FF88"><b>🚀 New Features & Changes</b></font>
 <font size="15" color="#E0E0E0">
-• <font color="#FFD166"><b>Added New Pain Boss</b></font> – <font size="16">a brand-new boss encounter featuring Pain, bringing new challenges, mechanics, and rewards for players.</font>  
-• <font color="#FFD166"><b>Added New NPC Teleport</b></font> – <font size="16">allows instant teleportation to the newly added NPC for faster interaction and progression.</font>  
-• <font color="#FFD166"><b>Added New Codes</b></font> – <font size="16">support for the latest in-game codes, making it easier to redeem rewards.</font>  
-• <font color="#FF6B6B"><b>Removed Champion Bugs</b></font> – <font size="16">fixed and removed issues related to champions to improve stability and gameplay experience.</font>  
+• <font color="#FFD166"><b>Added Auto Roll Stands</b></font> – <font size="16">Allows the player to scroll stands automatically and stop at the one selected</font>  
+• <font color="#FFD166"><b>Added Auto Roll Quirks</b></font> – <font size="16">Allows the player to scroll quirks automatically and stop at the one selected</font>  
+• <font color="#FFD166"><b>Added Auto Roll Grimoires</b></font> – <font size="16">Allows the player to scroll grimoires automatically and stop at the one selected</font>  
+• <font color="#FFD166"><b>Added Auto Roll Bloodlines</b></font> – <font size="16">Allows the player to scroll bloodlines automatically and stop at the one selected</font>  
+• <font color="#FFD166"><b>Added Auto Roll Kagunes</b></font> – <font size="16">Allows the player to scroll kagunes automatically and stop at the one selected</font>  
+• <font color="#FFD166"><b>Added Executor Support</b></font> – <font size="16">If the executor doesn't support certain hub functions, the script sends you a notification</font>  
+• <font color="#00FFCC"><b>Fixed Esp Players</b></font> – <font size="16">Mobile users can see players even from a distance.</font>  
+• <font color="#00FFCC"><b>Improved All Esps</b></font> – <font size="16">All esp have model and distance checks</font>  
+• <font color="#00FFCC"><b>Fixed Minor Lags</b></font> – <font size="16">performance optimizations to reduce lag and improve overall smoothness.</font>  
 </font>
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
 ]],
@@ -340,6 +394,11 @@ local PlayerTab = Window:Tab({
 local ShopTab = Window:Tab({
   Title = "| Shop",
   Icon = "shopping-cart",
+  Locked = false,
+})
+local SpecialTab = Window:Tab({
+  Title = "| Special",
+  Icon = "sparkles",
   Locked = false,
 })
 local QuestTab = Window:Tab({
@@ -1319,6 +1378,235 @@ ShopTab:Toggle({
       end
 		end)
 	end
+})
+
+
+local DropdownLists = {}
+for category, items in pairs(getgenv().AutoBuySpecials) do
+  DropdownLists[category] = {}
+  for name in pairs(items) do
+    table.insert(DropdownLists[category], name)
+  end
+end
+local Section = SpecialTab:Section({ 
+  Title = "Stands Options",
+})
+SpecialTab:Dropdown({
+  Title = "Select Stands",
+  Desc = "Select the stands you want to get in the auto roll",
+  Values = DropdownLists.Stands,
+  Value = {},
+  Multi = true,
+  AllowNone = true,
+  Callback = function(option)
+    SelectedStands = option
+  end
+})
+local Toggle = SpecialTab:Toggle({
+  Title = "Auto roll stands",
+  Icon = "check",
+  Type = "Checkbox",
+  Value = false,
+  Callback = function(state)
+    AutoStands = state
+    if not AutoStands then return end
+
+    task.spawn(function()
+      while AutoStands do task.wait()
+        local ownedValue = game.Players.LocalPlayer:WaitForChild("Specials"):FindFirstChild('Stands')
+        if not ownedValue then return end
+        for _, name in pairs(SelectedStands) do
+          local id = getgenv().AutoBuySpecials['Stands'][name]
+          if ownedValue.Value == id then
+            WindUI:Notify({
+              Title = "Auto Buy",
+              Content = "Stands already owned: " .. name,
+              Duration = 4,
+              Icon = "bell-ring",
+            })
+            return
+          end
+        end
+        game:GetService('ReplicatedStorage'):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainer", "Stands", 1)
+      end
+    end)
+  end
+})
+local Section = SpecialTab:Section({ 
+  Title = "Quirks Options",
+})
+SpecialTab:Dropdown({
+  Title = "Select Quirks",
+  Desc = "Select the quirks you want to get in the auto roll",
+  Values = DropdownLists.Quirks,
+  Value = {},
+  Multi = true,
+  AllowNone = true,
+  Callback = function(option)
+    SelectedQuirks = option
+  end
+})
+local Toggle = SpecialTab:Toggle({
+  Title = "Auto roll quirks",
+  Icon = "check",
+  Type = "Checkbox",
+  Value = false,
+  Callback = function(state)
+    AutoQuirks = state
+    if not AutoQuirks then return end
+
+    task.spawn(function()
+      while AutoQuirks do task.wait()
+        local ownedValue = game.Players.LocalPlayer:WaitForChild("Specials"):FindFirstChild('Quirks')
+        if not ownedValue then return end
+        for _, name in pairs(SelectedQuirks) do
+          local id = getgenv().AutoBuySpecials['Quirks'][name]
+          if ownedValue.Value == id then
+            WindUI:Notify({
+              Title = "Auto Buy",
+              Content = "Quirks already owned: " .. name,
+              Duration = 4,
+              Icon = "bell-ring",
+            })
+            return
+          end
+        end
+        game:GetService('ReplicatedStorage'):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainer", "Quirks", 1)
+      end
+    end)
+  end
+})
+local Section = SpecialTab:Section({ 
+  Title = "Kagunes Options",
+})
+SpecialTab:Dropdown({
+  Title = "Select Kagunes",
+  Desc = "Select the kagunes you want to get in the auto roll",
+  Values = DropdownLists.Kagunes,
+  Value = {},
+  Multi = true,
+  AllowNone = true,
+  Callback = function(option)
+    SelectedKagunes = option
+  end
+})
+local Toggle = SpecialTab:Toggle({
+  Title = "Auto roll kagunes",
+  Icon = "check",
+  Type = "Checkbox",
+  Value = false,
+  Callback = function(state)
+    AutoKagunes = state
+    if not AutoKagunes then return end
+
+    task.spawn(function()
+      while AutoKagunes do task.wait()
+        local ownedValue = game.Players.LocalPlayer:WaitForChild("Specials"):FindFirstChild('Kagunes')
+        if not ownedValue then return end
+        for _, name in pairs(SelectedKagunes) do
+          local id = getgenv().AutoBuySpecials['Kagunes'][name]
+          if ownedValue.Value == id then
+            WindUI:Notify({
+              Title = "Auto Buy",
+              Content = "Kagunes already owned: " .. name,
+              Duration = 4,
+              Icon = "bell-ring",
+            })
+            return
+          end
+        end
+        game:GetService('ReplicatedStorage'):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainer", "Kagunes", 1)
+      end
+    end)
+  end
+})
+local Section = SpecialTab:Section({ 
+  Title = "Grimoires Options",
+})
+SpecialTab:Dropdown({
+  Title = "Select Grimoires",
+  Desc = "Select the grimoires you want to get in the auto roll",
+  Values = DropdownLists.Grimoires,
+  Value = {},
+  Multi = true,
+  AllowNone = true,
+  Callback = function(option)
+    SelectedGrimoires = option
+  end
+})
+local Toggle = SpecialTab:Toggle({
+  Title = "Auto roll grimoires",
+  Icon = "check",
+  Type = "Checkbox",
+  Value = false,
+  Callback = function(state)
+    AutoGrimoires = state
+    if not AutoGrimoires then return end
+
+    task.spawn(function()
+      while AutoGrimoires do task.wait()
+        local ownedValue = game.Players.LocalPlayer:WaitForChild("Specials"):FindFirstChild('Grimoires')
+        if not ownedValue then return end
+        for _, name in pairs(SelectedGrimoires) do
+          local id = getgenv().AutoBuySpecials['Grimoires'][name]
+          if ownedValue.Value == id then
+            WindUI:Notify({
+              Title = "Auto Buy",
+              Content = "Grimoires already owned: " .. name,
+              Duration = 4,
+              Icon = "bell-ring",
+            })
+            return
+          end
+        end
+        game:GetService('ReplicatedStorage'):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainer", "Grimoires", 1)
+      end
+    end)
+  end
+})
+local Section = SpecialTab:Section({ 
+  Title = "Bloodlines Options",
+})
+SpecialTab:Dropdown({
+  Title = "Select Bloodlines",
+  Desc = "Select the bloodlines you want to get in the auto roll",
+  Values = DropdownLists.Bloodlines,
+  Value = {},
+  Multi = true,
+  AllowNone = true,
+  Callback = function(option)
+    SelectedBloodlines = option
+  end
+})
+local Toggle = SpecialTab:Toggle({
+  Title = "Auto roll bloodlines",
+  Icon = "check",
+  Type = "Checkbox",
+  Value = false,
+  Callback = function(state)
+    AutoBloodlines = state
+    if not AutoBloodlines then return end
+
+    task.spawn(function()
+      while AutoBloodlines do task.wait()
+        local ownedValue = game.Players.LocalPlayer:WaitForChild("Specials"):FindFirstChild('Bloodlines')
+        if not ownedValue then return end
+        for _, name in pairs(SelectedBloodlines) do
+          local id = getgenv().AutoBuySpecials['Bloodlines'][name]
+          if ownedValue.Value == id then
+            WindUI:Notify({
+              Title = "Auto Buy",
+              Content = "Bloodlines already owned: " .. name,
+              Duration = 4,
+              Icon = "bell-ring",
+            })
+            return
+          end
+        end
+        game:GetService('ReplicatedStorage'):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainer", "Bloodlines", 1)
+      end
+    end)
+  end
 })
 
 
