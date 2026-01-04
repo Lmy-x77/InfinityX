@@ -35,7 +35,7 @@ elseif getexecutorname then
 end
 if executor == 'Xeno' or executor == 'Solara' then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/notification.lua'))()
-  return
+  repeat task.wait() until read == true
 end
 
 
@@ -1171,13 +1171,17 @@ local Toggle = PlayerTab:Toggle({
   Value = false,
   Callback = function(state)
     Noclip = state
+    local starter = false
+
     if Noclip then
+      starter = true
       for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
         if v:IsA("BasePart") and v.CanCollide == true then
           task.spawn(function() while Noclip do task.wait() v.CanCollide = false end end)
         end
       end
     else
+      if not starter then return end
       for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
         if v:IsA("BasePart") and v.CanCollide == false then
           v.CanCollide = true
