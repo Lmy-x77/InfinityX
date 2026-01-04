@@ -861,8 +861,8 @@ This feature requires full ClickDetector interaction support. Please switch to a
     task.spawn(function()
       while ChikaraBox do task.wait()
         for _, v in pairs(workspace.Scriptable.ChikaraBoxes:GetDescendants()) do
-            if v:IsA('Part') and v.Name == 'ClickBox' then
-            fireclickdetector(v.ClickDetector)
+            if v:IsA('ClickDetector') then
+            fireclickdetector(v)
             wait(2)
           end
         end
