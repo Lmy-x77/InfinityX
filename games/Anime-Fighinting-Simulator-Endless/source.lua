@@ -497,13 +497,13 @@ local Toggle = AutoFarmTab:Toggle({
         elseif SelectedStat == 'Strength' and Strength.Value >= 250000000000000 and Strength.Value < 75000000000000000 then
           Teleport(nil, 2, 4289, 163, -601)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value >= 75000000000000000 and Strength.Value < 25000000000000000000 then
+        elseif SelectedStat == 'Strength' and Strength.Value >= 75000000000000000 and Strength.Value < 2500000000000000000 then
           Teleport(nil, 2, 798, 231, -1004)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value >= 25000000000000000000 and Strength.Value < 10000000000000000000000 then
+        elseif SelectedStat == 'Strength' and Strength.Value >= 2500000000000000000 and Strength.Value < 1000000000000000000000 then
           Teleport(nil, 2, 3873, 138, 873)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value > 10000000000000000000000 then
+        elseif SelectedStat == 'Strength' and Strength.Value > 1000000000000000000000 then
           Teleport(nil, 2, 3858, 669, -1076)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
 
@@ -538,13 +538,13 @@ local Toggle = AutoFarmTab:Toggle({
         elseif SelectedStat == 'Durability' and Durability.Value >= 250000000000000 and Durability.Value < 75000000000000000 then
           Teleport(nil, 2, 1671, 423, -1293)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value >= 75000000000000000 and Durability.Value < 25000000000000000000 then
+        elseif SelectedStat == 'Durability' and Durability.Value >= 75000000000000000 and Durability.Value < 2500000000000000000 then
           Teleport(nil, 2, 155, 772, -699)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value >= 25000000000000000000 and Durability.Value < 10000000000000000000000 then
+        elseif SelectedStat == 'Durability' and Durability.Value >= 2500000000000000000 and Durability.Value < 1000000000000000000000 then
           Teleport(nil, 2, 2565, 267, 1851)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value > 10000000000000000000000 then
+        elseif SelectedStat == 'Durability' and Durability.Value > 1000000000000000000000 then
           Teleport(nil, 2, 1673, 2305, -78)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
 
@@ -582,13 +582,13 @@ local Toggle = AutoFarmTab:Toggle({
         elseif SelectedStat == 'Chakra' and Chakra.Value >= 25000000000000000 and Chakra.Value < 75000000000000000 then
           Teleport(nil, 2, -411, 1255, 663) -- find
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 75000000000000000 and Chakra.Value < 25000000000000000000 then
+        elseif SelectedStat == 'Chakra' and Chakra.Value >= 75000000000000000 and Chakra.Value < 2500000000000000000 then
           Teleport(nil, 2, -732, 2791, 628)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 25000000000000000000 and Chakra.Value < 10000000000000000000000 then
+        elseif SelectedStat == 'Chakra' and Chakra.Value >= 2500000000000000000 and Chakra.Value < 1000000000000000000000 then
           Teleport(nil, 2, 3242, -441, -233)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 10000000000000000000000 then
+        elseif SelectedStat == 'Chakra' and Chakra.Value >= 1000000000000000000000 then
           Teleport(nil, 2, 341, 237, 1867)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
 
