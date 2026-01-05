@@ -116,8 +116,8 @@ UI:AddLabel("Chikara Stats", "center")
 local CurrentChikara = UI:AddInfo("Your Chikaras: ", game:GetService("Players").LocalPlayer.OtherData.Chikara.Value)
 local ObtainedChikara = UI:AddInfo("Obtained Chikaras: ", 'nil')
 FarmStats = UI:AddInfo("Stats", 'Collecting chikaras...')
-UI:AddButton("Close Ui", Color3.fromRGB(0, 255, 170), function()
-    UI:Destroy()
+UI:AddButton("Rejoin Game", Color3.fromRGB(0, 255, 170), function()
+    game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
 end)
 
 
