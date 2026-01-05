@@ -37,6 +37,22 @@ if executor == 'Xeno' or executor == 'Solara' then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/notification.lua'))()
   repeat task.wait() until read == true
 end
+if getrawmetatable and setreadonly and newcclosure and getnamecallmethod then
+  local mt = getrawmetatable(game)
+  local old = mt.__namecall
+  setreadonly(mt, false)
+  mt.__namecall = newcclosure(function(self, ...)
+    local m = getnamecallmethod()
+    if tostring(m) == "Kick" then
+      return
+    end
+    return old(self, ...)
+  end)
+  setreadonly(mt, true)
+  print('[DEBUG] - Anti-Kick Loaded 🟢')
+else
+  print('[DEBUG] - Anti-Kick Failed 🔴')
+end
 
 
 -- variables
