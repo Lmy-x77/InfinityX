@@ -558,7 +558,7 @@ local Toggle = AutoFarmTab:Toggle({
           Teleport(nil, 2, 155, 772, -699)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
         elseif SelectedStat == 'Durability' and Durability.Value >= 2500000000000000000 and Durability.Value < 1000000000000000000000 then
-          Teleport(nil, 2, 2565, 267, 1851)
+          Teleport(nil, 2, 2568, 92, 1762)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
         elseif SelectedStat == 'Durability' and Durability.Value > 1000000000000000000000 then
           Teleport(nil, 2, 1673, 2305, -78)
@@ -2007,14 +2007,13 @@ local Button = MiscTab:Button({
       'YenCode',
       '100CCU',
       '100Favs',
-      '',
-
     }
     for _, v in pairs(codes) do
       game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer(
         "Code",
         v
-      ) wait(.5)
+      )
+      wait(1)
     end
   end
 })
