@@ -1402,7 +1402,7 @@ ShopTab:Button({
         v
       }
       game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
-      wait()
+      wait(1)
     end
 	end
 })
