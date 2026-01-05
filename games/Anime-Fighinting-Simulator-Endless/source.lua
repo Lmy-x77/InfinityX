@@ -1855,7 +1855,7 @@ local Button = TeleportTab:Button({
       Teleport(workspace.Scriptable.NPC.Shops.Special.Quirks["1"], 1, nil,nil,nil)
     elseif SelectedSNPC == 'Stands' then
       Teleport(workspace.Scriptable.NPC.Shops.Special.Stands["1"], 1, nil,nil,nil)
-    elseif SelectedSNPC == 'Stands' then
+    elseif SelectedSNPC == 'Bloodlines' then
       Teleport(workspace.Scriptable.NPC.Shops.Special.Bloodlines["1"], 1, nil,nil,nil)
     end
   end
