@@ -1377,6 +1377,19 @@ ShopTab:Toggle({
 		end)
 	end
 })
+ShopTab:Button({
+	Title = "Lock all champions",
+	Callback = function()
+    for _, v in pairs(game:GetService("Players").LocalPlayer.Champions:GetChildren()) do
+      local args = {
+        "LockChamp",
+        v
+      }
+      game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+      wait()
+    end
+	end
+})
 local Section = ShopTab:Section({ 
   Title = "Gacha Powers Options",
 })
@@ -2194,6 +2207,16 @@ local Toggle = WebhookTab:Toggle({
   Value = false,
   Callback = function(state)
     Webhook = state
+
+    if Webhook and WEBHOOK_URL == "" then
+      WindUI:Notify({
+        Title = "Webhook Notification",
+        Content = "Please, enter a webhook url first",
+        Duration = 4,
+        Icon = "bell-ring",
+      })
+      return
+    end
 
     if not Webhook then
       if FruitConnection then FruitConnection:Disconnect() FruitConnection = nil end
