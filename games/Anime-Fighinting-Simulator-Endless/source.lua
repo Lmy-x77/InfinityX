@@ -911,6 +911,40 @@ This feature requires full ClickDetector interaction support. Please switch to a
     end)
   end
 })
+local Button = AutoFarmTab:Button({
+  Title = "Afk-Farm Chikara",
+  Locked = false,
+  Callback = function()
+    local Dialog = Window:Dialog({
+      Icon = "circle-question-mark",
+      Title = "InfinityX - Dialog",
+      Content = "<b>Warning</b>\n\nRunning this script will <b>close the hub</b> and <b>start the AFK Farm</b>.\n\nAre you sure you want to continue?",
+      Buttons = {
+        {
+          Title = "Execute",
+          Callback = function()
+            WindUI:Notify({
+              Title = "Notification",
+              Content = "Starting afk farm...",
+              Duration = 2,
+              Icon = "bell-ring",
+            })
+            wait(2)
+            Window:Destroy()
+            wait(1)
+            loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/Afk-Farm.lua'))()
+          end,
+        },
+        {
+          Title = "Close",
+          Callback = function()
+            print("Closed!")
+          end,
+        },
+      },
+    })
+  end
+})
 
 
 local SkillStates = {}
