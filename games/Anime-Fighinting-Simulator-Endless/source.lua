@@ -303,15 +303,26 @@ local ok, result = pcall(function()
     return require("./src/Init")
 end)
 if ok then
-    WindUI = result
+  WindUI = result
 else 
-    WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
+  WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
 end
+WindUI:AddTheme({
+  Name = "InfinityX",
+  Accent = Color3.fromHex("#7D2FA1"),
+  Background = Color3.fromHex("#101010"),
+  Outline = Color3.fromHex("#FFFFFF"),
+  Text = Color3.fromHex("#BFBFBF"),
+  Placeholder = Color3.fromHex("#7a7a7a"),
+  Button = Color3.fromHex("#52525b"),
+  Icon = Color3.fromHex("#9F2ED1"),
+})
 local Window = WindUI:CreateWindow({
   Title = "InfinityX",
   Author = "Anime Fighinting Simulator",
   Folder = "InfinityX/Settings",
   Icon = "rbxassetid://72212320253117",
+  Theme = "InfinityX",
   NewElements = true,
   Size = UDim2.fromOffset(850, 560),
   Transparent = true,
@@ -858,6 +869,7 @@ local Section = AutoFarmTab:Section({
 })
 local Toggle = AutoFarmTab:Toggle({
   Title = "Auto collect chikara box",
+  Desc = "Collect all the fruit that appears",
   Icon = "check",
   Type = "Checkbox",
   Flag = "AutoChikara",
@@ -900,6 +912,7 @@ This feature requires full ClickDetector interaction support. Please switch to a
 })
 local Toggle = AutoFarmTab:Toggle({
   Title = "Auto collect fruit",
+  Desc = "Collect all the chikaras on the island you are on",
   Icon = "check",
   Type = "Checkbox",
   Flag = "AutoFruit",
@@ -942,6 +955,7 @@ This feature requires full ClickDetector interaction support. Please switch to a
 })
 local Button = AutoFarmTab:Button({
   Title = "Afk-Farm Chikara",
+  Desc = "This script teleports you to various places, it's best to run it on a private server",
   Locked = false,
   Callback = function()
     local Dialog = Window:Dialog({
