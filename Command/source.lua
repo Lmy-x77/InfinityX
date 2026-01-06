@@ -343,7 +343,7 @@ function Library:CreateWindow(Properties)
     local Prefix = Utility:GetProperty('Window', 'Prefix', Properties) or Enum.KeyCode.LeftControl
 
     -- // Set Library Properties
-    Library.Prefix = Prefix
+    Library.Prefix = Enum.KeyCode.LeftControl
     Library.Theme = Theme
 
     -- // Custom Theme
