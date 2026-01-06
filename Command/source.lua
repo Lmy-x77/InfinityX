@@ -326,7 +326,7 @@ Library.Themes = {
         SecondaryColor = Color3.fromRGB(50, 50, 50)
     }
 }
-Library.Prefix = Utility:StringToKeyCode(';')
+Library.Prefix = Enum.KeyCode.LeftControl
 Library.Theme = nil
 
 -- // CreateWindow - Name, IntroText, IntroIcon, IntroBlur, IntroBlurIntensity, Theme, Position, Draggable, Prefix
@@ -1008,7 +1008,7 @@ function Library:CreateWindow(Properties)
     -- // Prefix
     UserInputService.InputBegan:Connect(function(Input, GameProcessedEvent)
         if not GameProcessedEvent then
-            if Enum.KeyCode.LeftControl then
+            if Input.KeyCode == Library.Prefix then
                 if Main.Position.Y == UDim.new(1, 37) or Main.Position.Y == UDim.new(1, 36) or Main.Position.Y == UDim.new(0, -72) then
                     UpdateFrameSizes()
                     CommandInput:CaptureFocus()
