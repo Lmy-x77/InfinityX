@@ -1541,12 +1541,13 @@ function Library:CreateWindow(Properties)
     end
 
     function WindowFunctions:AddCommand(Name, Arguments, Description, Callback)
-        Commands[Name:lower()] = {
-            Name = Name:lower(),
-            Arguments = Arguments,
-            Description = Description,
-            Callback = Callback
-        }
+    	Commands[Name] = {
+        	Name = Name,
+        	DisplayName = DisplayName or Name,
+        	Arguments = Arguments,
+        	Description = Description,
+        	Callback = Callback
+    	}
 
         local function Highlight(String, Color)
             return string.format('<font color = "rgb(%d, %d, %d)">%s</font>', Color.r * 255, Color.g * 255, Color.b * 255, String)
