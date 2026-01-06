@@ -278,19 +278,17 @@ function GetZones()
   end
   return zones
 end
-function GetCursedObjects()
-  local objects = {}
-  for _, v in pairs(workspace.Map.CursedSpawns:GetChildren()) do
-    if v:IsA("Part") then
-      table.insert(objects, v.Name)
-    end
-  end
-  return objects
-end
+local CurserdObjects = {
+  'Spirit Board',
+  'SummoningCircle',
+  'Tarot Cards',
+  'BooBooDoll',
+  'Music Box',
+}
 function GetCurrentCursedObject()
-  local cursedfunc = GetCursedObjects()
+  local cursedfunc = CurserdObjects
   for _, v in pairs(workspace:GetDescendants()) do
-    if (v:IsA("Model") or v:IsA('Tool')) and table.find(cursedfunc, v.Name) then
+    if (v:IsA("Model") or v:IsA('Tool') or v:IsA('MeshPart')) and table.find(cursedfunc, v.Name) then
       return v
     end
   end
@@ -301,10 +299,11 @@ function CheckCursedObjects()
     "Music Box",
     "Spirit Board",
     "SummoningCircle",
-    "Tarot Cards"
+    "Tarot Cards",
+    "BooBooDoll",
   }
   for _, v in pairs(workspace:GetDescendants()) do
-    if (v:IsA("Model") or v:IsA("Tool")) and table.find(cursedNames, v.Name) then
+    if (v:IsA("Model") or v:IsA("Tool") or v:IsA('MeshPart')) and table.find(cursedNames, v.Name) then
       return true
     end
   end
@@ -682,7 +681,7 @@ end)
 local ZonesTeleportDropdown = Tabs.Teleport:AddDropdown("", {
   Title = "Select object",
   Description = "Select the cursed object you want to teleport",
-  Values = GetCursedObjects(),
+  Values = CurserdObjects,
   Default = "",
   Callback = function(Value)
     selectedobject = Value
@@ -977,4 +976,9 @@ Tabs.Settings:AddButton({
   		Duration = 5
   	})
   end
+})
+Fluent:Notify({
+  Title = "InfinityX",
+  Content = 'Press "Home" to unlock mouse',
+  Duration = 5
 })
