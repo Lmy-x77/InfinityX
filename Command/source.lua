@@ -381,6 +381,7 @@ function Library:CreateWindow(Properties)
                 Name = 'MainCorner'
             }),
             Utility:Create('TextLabel', {
+				RichText = true,
                 Name = 'IntroText',
                 BackgroundColor3 = Theme.BackgroundColor,
                 BackgroundTransparency = 1,
@@ -619,6 +620,7 @@ function Library:CreateWindow(Properties)
         })
 
         Utility:Create('TextLabel', {
+			RichText = true,
             Name = 'Title',
             Parent = Main,
             BackgroundColor3 = Theme.BackgroundColor,
@@ -736,6 +738,7 @@ function Library:CreateWindow(Properties)
         })
 
         Utility:Create('TextLabel', {
+			RichText = true,
             Name = 'Title',
             Parent = Main,
             BackgroundColor3 = Theme.BackgroundColor,
@@ -818,6 +821,7 @@ function Library:CreateWindow(Properties)
     end
 
     Utility:Create('TextLabel', {
+		RichText = true,
         Name = 'ToolTip',
         Parent = Container,
         BackgroundColor3 = Theme.BackgroundColor,
@@ -1459,6 +1463,7 @@ function Library:CreateWindow(Properties)
                     Thickness = 1
                 }),
                 Utility:Create('TextLabel', {
+					RichText = true,
                     Name = 'NotificationTitle',
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 0, 0, -1),
@@ -1584,6 +1589,7 @@ function Library:CreateWindow(Properties)
                 Name = Name .. 'CommandsHolderCorner'
             }),
             Utility:Create('TextLabel', {
+				RichText = true,
                 Name = Name .. 'Text',
                 BackgroundColor3 = Theme.BackgroundColor,
                 BackgroundTransparency = 1,
