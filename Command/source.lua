@@ -1066,8 +1066,8 @@ function Library:CreateWindow(Properties)
     local function Execute(String)
         local Split = String:split(' ')
         local Arguments = {}
-        local First = Split[1]:lower():gsub(Utility:KeyCodeToString(Library.Prefix), '')
-
+        local First = Split[1]:gsub("<.->", ""):gsub(Utility:KeyCodeToString(Library.Prefix), ""):lower()
+        
         CommandInput.Text = ''
 
         local Command = assert(Commands[First], '[Visual] Command Not Found: ' .. First)
