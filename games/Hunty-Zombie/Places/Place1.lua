@@ -3808,11 +3808,14 @@ Tabs.Misc:AddButton({
   Title = "Reedem all codes",
   Callback = function()
     local codes = {
+      "FLOWUPDATE",
+      "FLOWUPDATE2",
       "ALMOSTCHRISTMASEVE",
       "ALMOSTCHRISTMASEVE2",
       "ALMOSTCHRISTMASEVE3",
-      "ALMOSTCHRISTMASEVE4",
+      "ALMOSTCHRISTMASEVE4"
     }
+    local remote = game:GetService("ReplicatedStorage"):WaitForChild("Packets"):WaitForChild("RedeemCode")
     for _, code in ipairs(codes) do
       remote:InvokeServer(code)
     end
