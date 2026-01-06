@@ -808,10 +808,10 @@ local IsolationMode = Tabs.Shop:AddToggle("AutoMoneyToggle", {
 })
 IsolationMode:OnChanged(function(Value)
   Isolation = Value
-  local Event = workspace.RefreshLocks
-  Event:FireServer(
-    Isolation
-  )
+    local Event = workspace.RefreshLocks
+    Event:FireServer(
+      Isolation
+    )
 end)
 local JoinRequest = Tabs.Shop:AddToggle("AutoMoneyToggle", {
   Title = "Block join request",
@@ -820,9 +820,8 @@ local JoinRequest = Tabs.Shop:AddToggle("AutoMoneyToggle", {
 })
 JoinRequest:OnChanged(function(Value)
   Request = Value
-  local Event = workspace.SettingFunction
-  Event:InvokeServer(
-    "BlockRequests",
+  local Event = workspace.BlockRequestsRemote
+  Event:FireServer(
     Request
   )
 end)
