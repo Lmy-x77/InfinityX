@@ -2255,6 +2255,7 @@ Components.Element = (function()
 		local Options = Options or {}
 
 		Element.TitleLabel = New("TextLabel", {
+			RichText = true,
 			FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Medium, Enum.FontStyle.Normal),
 			Text = Title,
 			TextColor3 = Color3.fromRGB(240, 240, 240),
@@ -2305,6 +2306,7 @@ Components.Element = (function()
 		Element.TitleLabel.Parent = Element.Header
 
 		Element.DescLabel = New("TextLabel", {
+            RichText = true
 			FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
 			Text = Desc,
 			TextColor3 = Color3.fromRGB(200, 200, 200),
@@ -2668,6 +2670,7 @@ Components.Tab = (function()
 				CornerRadius = UDim.new(0, 6),
 			}),
 			New("TextLabel", {
+                RichText = true
 				AnchorPoint = Vector2.new(0, 0.5),
 				Position = not fischbypass and Icon and UDim2.new(0, 30, 0.5, 0) or UDim2.new(0, 12, 0.5, 0),
 				Text = Title,
@@ -2892,6 +2895,7 @@ Components.Tab = (function()
 					},
 				}) or nil,
 				New("TextLabel", {
+                    RichText = true
 					Text = Title,
 					RichText = true,
 					TextColor3 = Color3.fromRGB(255, 255, 255),
@@ -3339,6 +3343,7 @@ Components.Button = (function()
 		local Button = {}
 
 		Button.Title = New("TextLabel", {
+            RichText = true
 			FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
 			TextColor3 = Color3.fromRGB(200, 200, 200),
 			TextSize = 14,
@@ -3467,6 +3472,7 @@ Components.Dialog = (function()
 		})
 
 		NewDialog.Title = New("TextLabel", {
+            RichText = true
 			FontFace = Font.new(
 				"rbxasset://fonts/families/GothamSSm.json",
 				Enum.FontWeight.SemiBold,
@@ -3603,6 +3609,7 @@ Components.Notification = (function()
 		NewNotification.AcrylicPaint = Acrylic.AcrylicPaint()
 
 		NewNotification.Title = New("TextLabel", {
+            RichText = true
 			Position = UDim2.new(0, 14, 0, 17),
 			Text = Config.Title,
 			RichText = true,
@@ -3621,6 +3628,7 @@ Components.Notification = (function()
 		})
 
 		NewNotification.ContentLabel = New("TextLabel", {
+            RichText = true
 			FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
 			Text = Config.Content,
 			TextColor3 = Color3.fromRGB(240, 240, 240),
@@ -3637,6 +3645,7 @@ Components.Notification = (function()
 		})
 
 		NewNotification.SubContentLabel = New("TextLabel", {
+            RichText = true
 			FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
 			Text = Config.SubContent,
 			TextColor3 = Color3.fromRGB(240, 240, 240),
@@ -4722,6 +4731,7 @@ Components.Window = (function()
 			local subtitleText = (Config.UserInfoSubtitle ~= nil) and tostring(Config.UserInfoSubtitle) or ""
 
 			New("TextLabel", {
+				RichText = true,
 				Name = "UserName",
 				BackgroundTransparency = 1,
 				TextXAlignment = Enum.TextXAlignment.Left,
@@ -4736,6 +4746,7 @@ Components.Window = (function()
 			})
 
 			New("TextLabel", {
+				RichText = true,
 				Name = "UserSubtitle",
 				BackgroundTransparency = 1,
 				TextXAlignment = Enum.TextXAlignment.Left,
@@ -5192,6 +5203,7 @@ Components.Window = (function()
 			})
 
 			local Content = New("TextLabel", {
+				RichText = true,
 				FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
 				Text = Config.Content,
 				TextColor3 = Color3.fromRGB(240, 240, 240),
@@ -5435,6 +5447,7 @@ ElementsTable.Dropdown = (function()
 		local container = self.Container
 
 		local DropdownDisplay = New("TextLabel", {
+			RichText = true,
 			FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
 			Text = "",
 			TextColor3 = Color3.fromRGB(240, 240, 240),
@@ -6048,6 +6061,7 @@ ElementsTable.Dropdown = (function()
 				})
 
 				local ButtonLabel = New("TextLabel", {
+					RichText = true,
 					FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
 					Text = Value,
 					TextColor3 = Color3.fromRGB(200, 200, 200),
@@ -6342,6 +6356,7 @@ ElementsTable.Slider = (function()
 		})
 
 		local SliderDisplay = New("TextLabel", {
+			RichText = true,
 			FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json"),
 			Text = "Value",
 			TextSize = 12,
@@ -6666,6 +6681,7 @@ ElementsTable.Keybind = (function()
 		Keybind.Elements = KeybindFrame
 
 		local KeybindDisplayLabel = New("TextLabel", {
+			RichText = true,
 			FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
 			Text = Config.Default,
 			TextColor3 = Color3.fromRGB(240, 240, 240),
@@ -6915,6 +6931,7 @@ ElementsTable.Colorpicker = (function()
 
 			local function CreateInputLabel(Text, Pos)
 				return New("TextLabel", {
+					RichText = true,
 					FontFace = Font.new(
 						"rbxasset://fonts/families/GothamSSm.json",
 						Enum.FontWeight.Medium,
