@@ -343,7 +343,7 @@ function Library:CreateWindow(Properties)
     local Prefix = Utility:GetProperty('Window', 'Prefix', Properties) or Enum.KeyCode.LeftControl
 
     -- // Set Library Properties
-    Library.Prefix = Enum.KeyCode.LeftControl
+    Library.Prefix = Prefix
     Library.Theme = Theme
 
     -- // Custom Theme
@@ -381,7 +381,6 @@ function Library:CreateWindow(Properties)
                 Name = 'MainCorner'
             }),
             Utility:Create('TextLabel', {
-                RichText = true,
                 Name = 'IntroText',
                 BackgroundColor3 = Theme.BackgroundColor,
                 BackgroundTransparency = 1,
@@ -620,7 +619,6 @@ function Library:CreateWindow(Properties)
         })
 
         Utility:Create('TextLabel', {
-            RichText = true,
             Name = 'Title',
             Parent = Main,
             BackgroundColor3 = Theme.BackgroundColor,
@@ -738,7 +736,6 @@ function Library:CreateWindow(Properties)
         })
 
         Utility:Create('TextLabel', {
-            RichText = true,
             Name = 'Title',
             Parent = Main,
             BackgroundColor3 = Theme.BackgroundColor,
@@ -821,7 +818,6 @@ function Library:CreateWindow(Properties)
     end
 
     Utility:Create('TextLabel', {
-        RichText = true,
         Name = 'ToolTip',
         Parent = Container,
         BackgroundColor3 = Theme.BackgroundColor,
@@ -1066,8 +1062,8 @@ function Library:CreateWindow(Properties)
     local function Execute(String)
         local Split = String:split(' ')
         local Arguments = {}
-        local First = Split[1]:gsub("<.->", ""):gsub(Utility:KeyCodeToString(Library.Prefix), ""):lower()
-        
+        local First = Split[1]:lower():gsub(Utility:KeyCodeToString(Library.Prefix), '')
+
         CommandInput.Text = ''
 
         local Command = assert(Commands[First], '[Visual] Command Not Found: ' .. First)
@@ -1463,7 +1459,6 @@ function Library:CreateWindow(Properties)
                     Thickness = 1
                 }),
                 Utility:Create('TextLabel', {
-                    RichText = true,
                     Name = 'NotificationTitle',
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 0, 0, -1),
@@ -1541,13 +1536,12 @@ function Library:CreateWindow(Properties)
     end
 
     function WindowFunctions:AddCommand(Name, Arguments, Description, Callback)
-    	Commands[Name] = {
-        	Name = Name,
-        	DisplayName = DisplayName or Name,
-        	Arguments = Arguments,
-        	Description = Description,
-        	Callback = Callback
-    	}
+        Commands[Name:lower()] = {
+            Name = Name:lower(),
+            Arguments = Arguments,
+            Description = Description,
+            Callback = Callback
+        }
 
         local function Highlight(String, Color)
             return string.format('<font color = "rgb(%d, %d, %d)">%s</font>', Color.r * 255, Color.g * 255, Color.b * 255, String)
@@ -1590,7 +1584,6 @@ function Library:CreateWindow(Properties)
                 Name = Name .. 'CommandsHolderCorner'
             }),
             Utility:Create('TextLabel', {
-                RichText = true,
                 Name = Name .. 'Text',
                 BackgroundColor3 = Theme.BackgroundColor,
                 BackgroundTransparency = 1,
