@@ -75,7 +75,7 @@ local Signals = {"Activated", "MouseButton1Down", "MouseButton2Down", "MouseButt
 
 -- ui library
 local isMobile = game.UserInputService.TouchEnabled
-local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Fluent/source.lua"))()
+local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Fluent/main.lua"))()
 
 local Options = Fluent.Options
 
