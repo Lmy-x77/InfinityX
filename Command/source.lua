@@ -340,10 +340,10 @@ function Library:CreateWindow(Properties)
     local Theme = Utility:GetProperty('Window', 'Theme', Properties) or Library.Themes.dark
     local Position = string.lower(Utility:GetProperty('Window', 'Position', Properties)) or 'top'
     local Draggable = Utility:GetProperty('Window', 'Draggable', Properties) or false
-    local Prefix = Utility:StringToKeyCode(Utility:GetProperty('Window', 'Prefix', Properties)) or Utility:StringToKeyCode(';')
+    local Prefix = Utility:GetProperty('Window', 'Prefix', Properties) or Enum.KeyCode.LeftControl
 
     -- // Set Library Properties
-    Library.Prefix = Prefix
+    Library.Prefix = Enum.KeyCode.LeftControl
     Library.Theme = Theme
 
     -- // Custom Theme
@@ -1008,7 +1008,7 @@ function Library:CreateWindow(Properties)
     -- // Prefix
     UserInputService.InputBegan:Connect(function(Input, GameProcessedEvent)
         if not GameProcessedEvent then
-            if Input.KeyCode.Name == Library.Prefix.Name then
+            if Enum.KeyCode.LeftControl then
                 if Main.Position.Y == UDim.new(1, 37) or Main.Position.Y == UDim.new(1, 36) or Main.Position.Y == UDim.new(0, -72) then
                     UpdateFrameSizes()
                     CommandInput:CaptureFocus()
