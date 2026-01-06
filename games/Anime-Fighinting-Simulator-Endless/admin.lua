@@ -19,7 +19,7 @@ _G.loopresp = _G.loopresp or {}
 -- ui libray
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Command/source.lua"))()
 local Window = Library:CreateWindow({
-  Name = '🚀 <b><font color="rgb(170,85,255)">InfinityX</font></b>',
+  Name = '🚀 <b><font color="rgb(170,85,255)">No Name</font></b>',
   IntroText = '👑 <b><font color="rgb(170,85,255)">InfinityX</font></b>\n<font color="rgb(200,200,200)">Premium Admin Command System</font>',
   IntroIcon = '',
   IntroBlur = true,
