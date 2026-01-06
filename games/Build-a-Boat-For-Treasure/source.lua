@@ -428,7 +428,7 @@ function GetSize()
 end
 
 local Window = Fluent:CreateWindow({
-	Title = '<font color="rgb(175, 120, 255)" size="14"><b>InfinityX</b> <font color="rgb(180,180,180)" size="13"> - <b>v4.2a</b></font></font>',
+	Title = '<font color="rgb(175,120,255)" size="14"><b>InfinityX</b></font> <font color="rgb(180,180,180)" size="13">- <b>v4.2a</b></font>',
   SubTitle = '<font color="rgb(160,160,160)" size="10"><i> -  by lmy77</i></font>',
 	TabWidth = 160,
 	Size = GetSize(),
