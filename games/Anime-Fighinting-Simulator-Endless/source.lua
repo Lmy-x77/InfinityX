@@ -2139,6 +2139,10 @@ local Button = MiscTab:Button({
   Locked = false,
   Callback = function()
     local codes = {
+      'MORECHIKARA',
+      'MOREYEN',
+      'ALMOST100KKLIKES',
+      '75KLIKES',
       'MinorBugs',
       'BadActors',
       'JanuaryIncident',
@@ -2581,19 +2585,19 @@ ConfigTab:Button({
 })
 ConfigTab:Space()
 ConfigTab:Button({
-    Title = "Load Config",
-    Icon = "",
-    Justify = "Center",
-    Callback = function()
-      Window.CurrentConfig = ConfigManager:CreateConfig(ConfigName)
-      if Window.CurrentConfig:Load() then
-        WindUI:Notify({
-          Title = "Config Loaded",
-          Desc = "Config '" .. ConfigName .. "' loaded",
-          Icon = "refresh-cw",
-        })
-      end
+  Title = "Load Config",
+  Icon = "",
+  Justify = "Center",
+  Callback = function()
+    Window.CurrentConfig = ConfigManager:CreateConfig(ConfigName)
+    if Window.CurrentConfig:Load() then
+      WindUI:Notify({
+        Title = "Config Loaded",
+        Desc = "Config '" .. ConfigName .. "' loaded",
+        Icon = "refresh-cw",
+      })
     end
+  end
 })
 ConfigTab:Space()
 ConfigTab:Button({
