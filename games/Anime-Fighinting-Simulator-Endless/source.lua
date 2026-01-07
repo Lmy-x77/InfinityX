@@ -1006,12 +1006,12 @@ local StatMap = {
 local SelectedStatsNumbers = {}
 local SelectedDelay = 0
 local AutoUpgrade = false
-local StrenghtUP =	game:GetService("Players").LocalPlayer.Upgrades["1"].Value
-local DurabilityUP =	game:GetService("Players").LocalPlayer.Upgrades["2"].Value
-local ChakraUP =	game:GetService("Players").LocalPlayer.Upgrades["3"].Value
-local SwordUP =	game:GetService("Players").LocalPlayer.Upgrades["4"].Value
-local AgilityUP =	game:GetService("Players").LocalPlayer.Upgrades["5"].Value
-local SpeedUP =	game:GetService("Players").LocalPlayer.Upgrades["6"].Value
+local StrengthUP =	game:GetService("Players").LocalPlayer.Upgrades["1"]
+local DurabilityUP =	game:GetService("Players").LocalPlayer.Upgrades["2"]
+local ChakraUP =	game:GetService("Players").LocalPlayer.Upgrades["3"]
+local SwordUP =	game:GetService("Players").LocalPlayer.Upgrades["4"]
+local AgilityUP =	game:GetService("Players").LocalPlayer.Upgrades["5"]
+local SpeedUP =	game:GetService("Players").LocalPlayer.Upgrades["6"]
 UpgradeTab:Section({
   Title = "Auto Upgrade Stats",
 })
@@ -1023,7 +1023,7 @@ local AutoUpgradeParagraph = UpgradeTab:Paragraph({
 })
 task.spawn(function()
   while true do task.wait(1)
-    AutoUpgradeParagraph:SetDesc('💪 Strength: '.. GetStats(StrenghtUP)..
+    AutoUpgradeParagraph:SetDesc('💪 Strength: '.. GetStats(StrengthUP)..
       '\n🛡️ Durability: '.. GetStats(DurabilityUP)..
       '\n🔥 Chakra: '.. GetStats(ChakraUP)..
       '\n⚔️ Sword: '.. GetStats(SwordUP)..
