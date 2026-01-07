@@ -404,6 +404,11 @@ local AutoFarmTab = Window:Tab({
   Icon = "swords",
   Locked = false,
 })
+local UpgradeTab = Window:Tab({
+  Title = "| Upgrade",
+  Icon = "chevrons-up",
+  Locked = false,
+})
 local SkillTab = Window:Tab({
   Title = "| Auto Skill",
   Icon = "zap",
@@ -469,7 +474,7 @@ local Paragraph = AutoFarmTab:Paragraph({
   Locked = false,
 })
 task.spawn(function()
-  while true do task.wait()
+  while true do task.wait(1)
     Paragraph:SetDesc('💪 Strength: '.. GetStats(Strength) ..'\n🛡️ Durability: '.. GetStats(Durability) ..'\n🔥 Chakra: '.. GetStats(Chakra) .. '\n⚔️ Sword: '.. GetStats(Sword) .. '\n🪽 Agility: '.. GetStats(Agility) .. '\n🏃‍♀️ Speed: '.. GetStats(Speed))
   end
 end)
@@ -986,6 +991,97 @@ local Button = AutoFarmTab:Button({
         },
       },
     })
+  end
+})
+
+
+local StatMap = {
+  Strength = 1,
+  Durability = 2,
+  Chakra = 3,
+  Sword = 4,
+  Agility = 5,
+  Speed = 6
+}
+local SelectedStatsNumbers = {}
+local SelectedDelay = 0
+local AutoUpgrade = false
+local StrenghtUP =	game:GetService("Players").LocalPlayer.Upgrades["1"].Value
+local DurabilityUP =	game:GetService("Players").LocalPlayer.Upgrades["2"].Value
+local ChakraUP =	game:GetService("Players").LocalPlayer.Upgrades["3"].Value
+local SwordUP =	game:GetService("Players").LocalPlayer.Upgrades["4"].Value
+local AgilityUP =	game:GetService("Players").LocalPlayer.Upgrades["5"].Value
+local SpeedUP =	game:GetService("Players").LocalPlayer.Upgrades["6"].Value
+UpgradeTab:Section({
+  Title = "Auto Upgrade Stats",
+})
+local AutoUpgradeParagraph = UpgradeTab:Paragraph({
+  Title = "Upgrade Viwer",
+  Desc = "",
+  Color = "Grey",
+  Locked = false,
+})
+task.spawn(function()
+  while true do task.wait(1)
+    AutoUpgradeParagraph:SetDesc('💪 Strength: '.. GetStats(StrenghtUP)..
+      '\n🛡️ Durability: '.. GetStats(DurabilityUP)..
+      '\n🔥 Chakra: '.. GetStats(ChakraUP)..
+      '\n⚔️ Sword: '.. GetStats(SwordUP)..
+      '\n🪽 Agility: '..GetStats(AgilityUP)..
+      '\n🏃‍♀️ Speed: '.. GetStats(SpeedUP)
+    )
+  end
+end)
+UpgradeTab:Dropdown({
+  Title = "Select stats",
+  Desc = "",
+  Values = {"Strength", "Durability", "Chakra", "Sword", "Agility", "Speed"},
+  Multi = true,
+  AllowNone = true,
+  Value = {"Strength"},
+  Flag = "AutoUpgradeDropdown",
+  Callback = function(options)
+    table.clear(SelectedStatsNumbers)
+    for _, stat in ipairs(options) do
+      local num = StatMap[stat]
+      if num then
+        table.insert(SelectedStatsNumbers, num)
+      end
+    end
+  end
+})
+UpgradeTab:Slider({
+  Title = "Level up delay",
+  Step = 1,
+  Value = {
+    Min = 0,
+    Max = 60,
+    Default = 0,
+  },
+  Callback = function(value)
+    SelectedDelay = tonumber(value) or 0
+  end
+})
+UpgradeTab:Toggle({
+  Title = "Auto upgrade stats",
+  Icon = "check",
+  Type = "Checkbox",
+  Flag = "AutoUpgradeStats",
+  Value = false,
+  Callback = function(state)
+    AutoUpgrade = state
+    if not AutoUpgrade then return end
+
+    task.spawn(function()
+      local Event = game:GetService("ReplicatedStorage").Remotes.RemoteFunction
+      while AutoUpgrade do
+        for _, statNumber in ipairs(SelectedStatsNumbers) do
+          Event:InvokeServer("Upgrade", statNumber)
+          task.wait(SelectedDelay)
+        end
+        task.wait()
+      end
+    end)
   end
 })
 
