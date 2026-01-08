@@ -1346,6 +1346,110 @@ local Slider = PlayerTab:Slider({
   end
 })
 local Toggle = PlayerTab:Toggle({
+  Title = "FE Invisible",
+  Icon = "check",
+  Type = "Checkbox",
+  Flag = "Noclip",
+  Value = false,
+  Callback = function(state)
+    if _G.EffectUI then
+      _G.EffectUI:Destroy()
+    end
+    if _G.connections then
+      for _, connection in pairs(_G.connections) do
+        connection:Disconnect()
+      end
+      _G.connections = nil
+    end
+
+    local Players = game:GetService("Players")
+    local RunService = game:GetService("RunService")
+    local UserInputService = game:GetService("UserInputService")
+    local TweenService = game:GetService("TweenService")
+
+    local localPlayer = Players.LocalPlayer
+    local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+    local isEffectActive = state
+    local originalParts = {}
+    _G.connections = {}
+
+    local function getCharacterParts(char)
+      local parts = {}
+      for _, part in pairs(char:GetDescendants()) do
+        if part:IsA("BasePart") and part.Transparency == 0 then
+          table.insert(parts, part)
+        end
+      end
+      return parts
+    end
+
+    originalParts = getCharacterParts(character)
+
+    local function setTransparency(isActive)
+      local transparency = isActive and 0.5 or 0
+      for _, part in pairs(originalParts) do
+        if part and part.Parent then
+          part.Transparency = transparency
+        end
+      end
+    end
+    local function resetAll()
+      isEffectActive = false
+      if humanoid and humanoid.Parent then
+        humanoid.CameraOffset = Vector3.new(0, 0, 0)
+      end
+      setTransparency(false)
+    end
+
+    table.insert(_G.connections, RunService.Heartbeat:Connect(function()
+      if isEffectActive and humanoidRootPart and humanoid and humanoid.Health > 0 then
+        local originalCFrame = humanoidRootPart.CFrame
+        local originalCameraOffset = humanoid.CameraOffset
+      
+        local targetCFrame = originalCFrame * CFrame.new(0, 2000000, 0)
+      
+        humanoid.CameraOffset = targetCFrame:ToObjectSpace(CFrame.new(originalCFrame.Position)).Position
+        humanoidRootPart.CFrame = targetCFrame
+      
+        RunService.RenderStepped:Wait()
+      
+        humanoid.CameraOffset = originalCameraOffset
+        humanoidRootPart.CFrame = originalCFrame
+      end
+    end))
+    table.insert(_G.connections, ToggleButton.MouseButton1Click:Connect(function()
+      isEffectActive = not isEffectActive
+      setTransparency(isEffectActive)
+    end))
+
+    local function onCharacterAdded(newCharacter)
+      resetAll()
+    
+      character = newCharacter
+      humanoid = newCharacter:WaitForChild("Humanoid")
+      humanoidRootPart = newCharacter:WaitForChild("HumanoidRootPart")
+
+      originalParts = getCharacterParts(newCharacter)
+
+      local diedConnection
+      diedConnection = humanoid.Died:Connect(function()
+        resetAll()
+        isEffectActive = false
+        diedConnection:Disconnect()
+      end)
+    end
+
+    localPlayer.CharacterAdded:Connect(onCharacterAdded)
+    humanoid.Died:Connect(function()
+      resetAll()
+      isEffectActive = false
+    end)
+  end
+})
+local Toggle = PlayerTab:Toggle({
   Title = "Noclip",
   Icon = "check",
   Type = "Checkbox",
