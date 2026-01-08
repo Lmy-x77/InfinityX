@@ -37,7 +37,7 @@ if executor == 'Xeno' or executor == 'Solara' then
   loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/notification.lua'))()
   repeat task.wait() until read == true
 end
-if getrawmetatable and setreadonly and newcclosure and getnamecallmethod then
+if getrawmetatable and setreadonly and newcclosure and getnamecallmethod and executor ~= 'Bunni' then
   local mt = getrawmetatable(game)
   local old = mt.__namecall
   setreadonly(mt, false)
@@ -2042,6 +2042,27 @@ local Button = TeleportTab:Button({
   end
 })
 local Button = TeleportTab:Button({
+  Title = "Force map loading",
+  Locked = false,
+  Callback = function()
+    Teleport(nil, 2, -7, 140, 4)
+    wait(0.5)
+    Teleport(nil, 2, 1565, 142, -143)
+    wait(0.5)
+    Teleport(nil, 2, 3584, 60, -1202)
+    wait(0.5)
+    Teleport(nil, 2, 3558, 60, 686)
+    wait(0.5)
+    Teleport(nil, 2, 265, 61, 1701)
+    wait(0.5)
+    Teleport(nil, 2, -54, 64, -1308)
+    wait(0.5)
+    Teleport(nil, 2, -1087, 61, 80)
+    wait(0.5)
+    Teleport(nil, 2, -20, 65, -136)
+  end
+})
+local Button = TeleportTab:Button({
   Title = "Refresh dropdown",
   Locked = false,
   Callback = function()
@@ -2146,6 +2167,8 @@ local Button = MiscTab:Button({
   Locked = false,
   Callback = function()
     local codes = {
+      '100KLIKES',
+      'NEWCHIKARACODE',
       'MORECHIKARA',
       'MOREYEN',
       'ALMOST100KKLIKES',
