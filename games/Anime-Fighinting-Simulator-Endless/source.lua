@@ -235,17 +235,22 @@ EspLib.ESPValues.ChikaraBoxesESP = false
 EspLib.ESPValues.FruitESP = false
 EspLib.ESPValues.NPCsESP = false
 EspLib.ESPValues.MobsESP = false
-function ApplyEspToPlayers()
-  for _, v in pairs(game.Players:GetPlayers()) do
-    if v.Name ~= game.Players.LocalPlayer.Name then
-      EspLib.ApplyESP(v.Character, {
-        Color = Color3.fromRGB(135, 52, 173),
-        Text = v.Name,
-        ESPName = "PlayersESP",
-        HighlightEnabled = true,
-      })
-    end
-  end
+local function ApplyEspToPlayer(plr)
+	if plr == game.Players.LocalPlayer then return end
+
+	local function onChar(char)
+		EspLib.ApplyESP(char, {
+			Color = Color3.fromRGB(135, 52, 173),
+			Text = plr.Name,
+			ESPName = "PlayersESP",
+			HighlightEnabled = true,
+		})
+	end
+
+	if plr.Character then
+		onChar(plr.Character)
+	end
+	plr.CharacterAdded:Connect(onChar)
 end
 function ApplyEspToChikara()
   for _, v in pairs(workspace.Scriptable.ChikaraBoxes:GetChildren()) do
@@ -1131,13 +1136,15 @@ local Toggle = EspTab:Toggle({
 
     task.spawn(function()
       if EspLib.ESPValues.PlayersESP then
-        ApplyEspToPlayers()
-      end
-      game.Players.PlayerAdded:Connect(function(player)
-        if EspLib.ESPValues.PlayersESP and player ~= LocalPlayer then
-          ApplyEspToPlayers()
+        for _, p in ipairs(Players:GetPlayers()) do
+          ApplyEspToPlayer(p)
         end
-      end)
+        game.Players.PlayerAdded:Connect(function(player)
+          if EspLib.ESPValues.PlayersESP and player ~= LocalPlayer then
+            ApplyEspToPlayers()
+          end
+        end)
+      end
     end)
   end
 })
