@@ -742,7 +742,7 @@ local Section = AutoFarmTab:Section({
 local Dropdown = AutoFarmTab:Dropdown({
   Title = "Select mob",
   Desc = "Select the mob you want to farm",
-  Values = { "Sarka", "Gen", "Igicho", "Remgonuk", "Booh", "Saytamu", "Riru", "Pain" },
+  Values = { "Sarka", "Gen", "Igicho", "Remgonuk", "Booh", "Saytamu", "Riru", "Paien" },
   Value = "Sarka",
   Flag = "MobDropdown",
   Callback = function(option)
@@ -799,7 +799,7 @@ local Toggle = AutoFarmTab:Toggle({
           MobSelected = '6'
         elseif SelectedMob == "Riru" then
           MobSelected = '1001'
-        elseif SelectedMob == "Pain" then
+        elseif SelectedMob == "Paien" then
           MobSelected = '1002'
         end
         AutoFarmMobs(MobSelected)
@@ -1450,7 +1450,7 @@ local Dropdown = ShopTab:Dropdown({
 local Dropdown = ShopTab:Dropdown({
   Title = "Select Champions",
   Desc = "Select the champions you want to get",
-  Values = { "Sunji", "Levee", "Keela", "Sarka", "Pilcol", "Toju", "Canakey", "Loofi", "Asto", "Junwon", "Tojaro", "Juyari", "Narnto", "Vetega", "Boras", "Igicho", "Remgonuk", "Sasoke", "Itachu", "Bright Yagimi", "Saytamu Serious", "Giovanni", "Booh", "Gen", "Shunro", "Kroll", "Eskano", "Mallyodas", "Saytamu" },
+  Values = { "Sunji", "Levee", "Keela", "Sarka", "Pilcol", "Toju", "Canakey", "Loofi", "Asto", "Junwon", "Tojaro", "Juyari", "Narnto", "Boras", "Igicho", "Remgonuk", "Bright Yagami", "Saytamu Serious", "Giovanni", "Booh", "Gen", "Shunro", "Kroll", "Eskano", "Mallyodas", "Saytamu" },
   Value = {"Sunji", "Levee", "Keela"},
   Flag = "ChampionDropdownB",
   Multi = true,
@@ -2391,7 +2391,7 @@ local Paragraph = WebhookTab:Paragraph({
 local Dropdown = WebhookTab:Dropdown({
   Title = "Send a message if",
   Desc = "Select the method you want to send the message via the webhook",
-  Values = {'A fruit spawned', 'A chikara boxes spawned', 'A champion collected'},
+  Values = {'A fruit spawned', 'A chikara boxes spawned', 'A champion collected', 'A boss drop'},
   Value = "",
   Flag = "WebhookDropdown",
   AllowNone = true,
@@ -2555,6 +2555,43 @@ local Toggle = WebhookTab:Toggle({
                 break
               end
             end
+        end)
+
+      elseif SelectedMethodToNotify == 'A boss drop' then
+        if BossConnection then BossConnection:Disconnect() end
+
+        SendWebhook({
+          title = "💀 Auto Farm Boss Stats",
+          color = AutoFarmMob and 0x2ECC71 or 0xE74C3C,
+          fields = {
+            { name = "Status", value = tostring(AutoFarmMob), inline = true },
+            { name = "System", value = "Boss Drop", inline = true },
+            { name = "Player", value = LocalPlayer.Name, inline = true },
+            { name = "UserId", value = tostring(LocalPlayer.UserId), inline = true },
+            { name = "PlaceId", value = tostring(game.PlaceId), inline = true },
+            { name = "JobId", value = game.JobId, inline = false }
+          },
+          footer = { text = "InfinityX • Boss System" },
+          timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+        })
+
+        BossConnection = game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List.DescendantAdded:Connect(function(v)
+          if not Webhook then return end
+          if not v:IsA("TextLabel") or v.Name ~= "ChampionName" then return end
+          if v.Text == "Riru" or v.Text == "Paien" then
+            SendWebhook({
+              title = "🔥 Boss Drop Collect",
+              color = 0xE67E22,
+              fields = {
+                { name = "Boss", value = v.Text, inline = true },
+                { name = "Collected By", value = LocalPlayer.Name, inline = true },
+                { name = "UserId", value = tostring(LocalPlayer.UserId), inline = true },
+                { name = "Server JobId", value = game.JobId, inline = false }
+              },
+              footer = { text = "InfinityX • Boss Drop Tracker" },
+              timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+            })
+          end
         end)
       end
     end)
