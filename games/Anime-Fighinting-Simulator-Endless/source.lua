@@ -1957,7 +1957,7 @@ end)
 local Section = TeleportTab:Section({
   Title = "NPC Teleport Options",
 })
-local Dropdown = TeleportTab:Dropdown({
+local NPCQuestDropdown = TeleportTab:Dropdown({
   Title = "Select NPC [ QUEST ]",
   Desc = "",
   Values = GetQuestNpc(),
@@ -1978,7 +1978,7 @@ local Button = TeleportTab:Button({
     end
   end
 })
-local Dropdown = TeleportTab:Dropdown({
+local NPCChampionDropdown = TeleportTab:Dropdown({
   Title = "Select NPC [ CHAMPIONS ]",
   Desc = "",
   Values = GetChampionsNpc(),
@@ -2025,6 +2025,14 @@ local Button = TeleportTab:Button({
     elseif SelectedSNPC == 'Bloodlines' then
       Teleport(workspace.Scriptable.NPC.Shops.Special.Bloodlines["1"], 1, nil,nil,nil)
     end
+  end
+})
+local Button = TeleportTab:Button({
+  Title = "Refresh all dropdowns",
+  Locked = false,
+  Callback = function()
+    NPCQuestDropdown:Refresh(GetQuestNpc())
+    NPCChampionDropdown:Refresh(GetChampionsNpc())
   end
 })
 local Section = TeleportTab:Section({ 
