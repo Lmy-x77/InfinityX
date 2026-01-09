@@ -2174,6 +2174,7 @@ local Button = MiscTab:Button({
   Locked = false,
   Callback = function()
     local codes = {
+      'UPDATETHISWEEKEND',
       '100KLIKES',
       'NEWCHIKARACODE',
       'MORECHIKARA',
