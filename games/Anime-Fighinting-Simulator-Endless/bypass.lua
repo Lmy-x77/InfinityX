@@ -2,6 +2,8 @@ local GameData = game:GetService("ReplicatedStorage").Modules.GameData
 local success, source = pcall(require, GameData)
 if not success then return end
 
+game:GetService("ReplicatedFirst"):FindFirstChild('Start'):Destroy()
+
 for _, f in pairs(source) do
     if type(f) == "function" then
         for _, c in pairs(debug.getconstants(f)) do
