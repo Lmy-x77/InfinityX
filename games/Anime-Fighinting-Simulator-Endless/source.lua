@@ -239,21 +239,25 @@ EspLib.ESPValues.FruitESP = false
 EspLib.ESPValues.NPCsESP = false
 EspLib.ESPValues.MobsESP = false
 local function ApplyEspToPlayer(plr)
-	if plr == game.Players.LocalPlayer then return end
+  if plr == LocalPlayer then return end
 
-	local function onChar(char)
-		EspLib.ApplyESP(char, {
-			Color = Color3.fromRGB(135, 52, 173),
-			Text = plr.Name,
-			ESPName = "PlayersESP",
-			HighlightEnabled = true,
-		})
-	end
+  local function onChar(char)
+    if not EspLib.ESPValues.PlayersESP then return end
+    if not char then return end
 
-	if plr.Character then
-		onChar(plr.Character)
-	end
-	plr.CharacterAdded:Connect(onChar)
+    EspLib.ApplyESP(char, {
+      Color = Color3.fromRGB(135, 52, 173),
+      Text = plr.Name,
+      ESPName = "PlayersESP",
+      HighlightEnabled = true,
+    })
+  end
+
+  if plr.Character then
+    onChar(plr.Character)
+  end
+
+  plr.CharacterAdded:Connect(onChar)
 end
 function ApplyEspToChikara()
   for _, v in pairs(workspace.Scriptable.ChikaraBoxes:GetChildren()) do
@@ -281,7 +285,7 @@ function ApplyEspToFruit()
 end
 function ApplyEspToNPCs()
   for _, v in pairs(workspace.Scriptable.NPC:GetDescendants()) do
-    if v:IsA('Model') then
+    if v:IsA("Model") and v.Name ~= "Model" and v.Name ~= "NPCModel" then
       EspLib.ApplyESP(v, {
         Color = Color3.fromRGB(52, 135, 173),
         Text = v.Name,
@@ -1128,7 +1132,8 @@ end
 local Section = EspTab:Section({ 
   Title = "Esp Options",
 })
-local Toggle = EspTab:Toggle({
+local playerAddedConn
+EspTab:Toggle({
   Title = "Esp players",
   Icon = "check",
   Type = "Checkbox",
@@ -1137,18 +1142,22 @@ local Toggle = EspTab:Toggle({
   Callback = function(state)
     EspLib.ESPValues.PlayersESP = state
 
-    task.spawn(function()
-      if EspLib.ESPValues.PlayersESP then
-        for _, p in ipairs(Players:GetPlayers()) do
+    if state then
+      for _, p in ipairs(Players:GetPlayers()) do
+        ApplyEspToPlayer(p)
+      end
+
+      if not playerAddedConn then
+        playerAddedConn = Players.PlayerAdded:Connect(function(p)
           ApplyEspToPlayer(p)
-        end
-        game.Players.PlayerAdded:Connect(function(player)
-          if EspLib.ESPValues.PlayersESP and player ~= LocalPlayer then
-            ApplyEspToPlayers()
-          end
         end)
       end
-    end)
+    else
+      if playerAddedConn then
+        playerAddedConn:Disconnect()
+        playerAddedConn = nil
+      end
+    end
   end
 })
 local Toggle = EspTab:Toggle({
