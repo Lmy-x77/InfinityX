@@ -50,6 +50,9 @@ if getrawmetatable and setreadonly and newcclosure and getnamecallmethod and exe
   end)
   setreadonly(mt, true)
   print('[DEBUG] - Anti-Kick Loaded 🟢')
+  wait(1)
+  loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/bypass.lua'))()
+  print('[DEBUG] - Crash Bypass Loaded 🟢')
 else
   print('[DEBUG] - Anti-Kick Failed 🔴')
 end
