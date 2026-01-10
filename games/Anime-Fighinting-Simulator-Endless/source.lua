@@ -885,51 +885,8 @@ local Section = AutoFarmTab:Section({
   Title = "Chikara / Fruit Farming",
 })
 local Toggle = AutoFarmTab:Toggle({
-  Title = "Auto collect chikara box",
-  Desc = "Collect all the fruit that appears",
-  Icon = "check",
-  Type = "Checkbox",
-  Flag = "AutoChikara",
-  Value = false,
-  Callback = function(state)
-    ChikaraBox = state
-
-    if not ChikaraBox then return end
-    if not fireclickdetector then
-      WindUI:Notify({
-        Title = "<font size='14'><b>Executor Compatibility Warning</b></font>",
-        Content = [[
-<font size='14' color='#FF6B6B'><b>Unsupported Function Detected</b></font>
-
-<font size='14' color='#E0E0E0'>
-The executor you are currently using does not support the function
-</font>
-<font size='12' color='#FFD166'><b>fireclickdetector()</b></font>
-<font size='11' color='#E0E0E0'>
-This feature requires full ClickDetector interaction support. Please switch to a compatible executor to ensure proper functionality and avoid unexpected behavior.
-</font>
-        ]],
-        Duration = 10,
-        Icon = "bell-ring",
-      })
-      return
-    end
-
-    task.spawn(function()
-      while ChikaraBox do task.wait()
-        for _, v in pairs(workspace.Scriptable.ChikaraBoxes:GetDescendants()) do
-            if v:IsA('ClickDetector') then
-            fireclickdetector(v)
-            wait(2)
-          end
-        end
-      end
-    end)
-  end
-})
-local Toggle = AutoFarmTab:Toggle({
   Title = "Auto collect fruit",
-  Desc = "Collect all the chikaras on the island you are on",
+  Desc = "Collect all the fruit that appears",
   Icon = "check",
   Type = "Checkbox",
   Flag = "AutoFruit",
@@ -962,6 +919,49 @@ This feature requires full ClickDetector interaction support. Please switch to a
       while Fruit do task.wait()
         for _, v in pairs(workspace.Scriptable.Fruits:GetDescendants()) do
           if v:IsA('ClickDetector') and v.Name == 'ClickDetector' then
+            fireclickdetector(v)
+            wait(2)
+          end
+        end
+      end
+    end)
+  end
+})
+local Toggle = AutoFarmTab:Toggle({
+  Title = "Auto collect chikara box",
+  Desc = "Collect all the chikaras on the island you are on",
+  Icon = "check",
+  Type = "Checkbox",
+  Flag = "AutoChikara",
+  Value = false,
+  Callback = function(state)
+    ChikaraBox = state
+
+    if not ChikaraBox then return end
+    if not fireclickdetector then
+      WindUI:Notify({
+        Title = "<font size='14'><b>Executor Compatibility Warning</b></font>",
+        Content = [[
+<font size='14' color='#FF6B6B'><b>Unsupported Function Detected</b></font>
+
+<font size='14' color='#E0E0E0'>
+The executor you are currently using does not support the function
+</font>
+<font size='12' color='#FFD166'><b>fireclickdetector()</b></font>
+<font size='11' color='#E0E0E0'>
+This feature requires full ClickDetector interaction support. Please switch to a compatible executor to ensure proper functionality and avoid unexpected behavior.
+</font>
+        ]],
+        Duration = 10,
+        Icon = "bell-ring",
+      })
+      return
+    end
+
+    task.spawn(function()
+      while ChikaraBox do task.wait()
+        for _, v in pairs(workspace.Scriptable.ChikaraBoxes:GetDescendants()) do
+            if v:IsA('ClickDetector') then
             fireclickdetector(v)
             wait(2)
           end
