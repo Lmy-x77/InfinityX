@@ -1,125 +1,144 @@
-local GameData = game:GetService("ReplicatedStorage").Modules.GameData
-local success, source = pcall(require, GameData)
-if not success then return end
 
-local rf = game:GetService("ReplicatedFirst")
-local start = rf:FindFirstChild("Start")
-if start then start:Destroy() end
+local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-for _, f in pairs(getgc(true)) do
-    if type(f) == "function" then
-        local ok, consts = pcall(debug.getconstants, f)
-        if ok then
-            for _, c in pairs(consts) do
-                if type(c) == "string" and c:lower() == "script detected" then
-                    hookfunction(f, function() return end)
-                end
-            end
+local LocalPlayer = Players.LocalPlayer
+local hooked = setmetatable({}, { __mode = "k" }) -- weak keys to avoid leaks
+
+local function safeHook(fn, replacement)
+    if hooked[fn] then return end
+    hooked[fn] = true
+    hookfunction(fn, replacement or function(...) return nil end)
+end
+
+local function scanGC(callback, includeTables)
+    for _, v in ipairs(getgc(includeTables)) do
+        if type(v) == "function" then
+            callback(v)
         end
     end
 end
 
-for _, f in pairs(getgc(true)) do
-    if type(f) == "function" then
-        local ok, consts = pcall(debug.getconstants, f)
-        if ok then
-            for _, c in pairs(consts) do
-                if type(c) == "string" and c:lower() == "🤡 do not exploit anymore rip bozo 🤡" then
-                    hookfunction(f, function() return end)
-                end
-            end
-        end
-    end
-end
+local function hookByConstant(target)
+    scanGC(function(fn)
+        local ok, consts = pcall(debug.getconstants, fn)
+        if not ok or not consts then return end
 
-for _, f in pairs(source) do
-    if type(f) == "function" then
-        for _, c in pairs(debug.getconstants(f)) do
-            if type(c) == "string" and c:lower() == "kick" then
-                hookfunction(f, function() return end)
+        for _, c in ipairs(consts) do
+            if c == target then
+                safeHook(fn)
                 break
             end
         end
+    end)
+end
+
+do
+    local GameData = ReplicatedStorage:FindFirstChild("Modules")
+        and ReplicatedStorage.Modules:FindFirstChild("GameData")
+
+    if GameData then
+        pcall(require, GameData)
     end
 end
 
-task.spawn(function()
-    local RF = game:GetService("ReplicatedFirst")
-    local start, ls2
-
-    repeat
-        start = RF:FindFirstChild("Start")
-        task.wait(1)
-    until start
-
-    repeat
-        ls2 = start:FindFirstChild("LocalScript2")
-        task.wait(1)
-    until ls2
-
-    for i = 1, 5 do task.wait(3)
-        for _, v in pairs(getgc(false)) do
-            if type(v) == "function" then
-                local info = debug.getinfo(v)
-                if info and info.name == "reportDetectionAndCrash" then
-                    hookfunction(v, function() return end)
-                    return
-                end
-            end
-        end
+do
+    local start = ReplicatedFirst:FindFirstChild("Start")
+    if start then
+        start:Destroy()
     end
-end)
+end
 
-task.spawn(function()
-    while true do task.wait(1)
-        local gui = game.Players.LocalPlayer.PlayerGui:FindFirstChild("ImpactFrame")
-        if gui then
-            local ls = gui:FindFirstChildWhichIsA("LocalScript")
-            if ls then
-                for _, f in pairs(getsenv(ls)) do
-                    if type(f) == "function" then
-                        hookfunction(f, function() return end)
-                        break
+hookByConstant("script detected")
+hookByConstant("🤡 do not exploit anymore rip bozo 🤡")
+
+do
+    local GameData = ReplicatedStorage:FindFirstChild("Modules")
+        and ReplicatedStorage.Modules:FindFirstChild("GameData")
+
+    if GameData then
+        local ok, source = pcall(require, GameData)
+        if ok and type(source) == "table" then
+            for _, fn in pairs(source) do
+                if type(fn) == "function" then
+                    local ok2, consts = pcall(debug.getconstants, fn)
+                    if ok2 then
+                        for _, c in ipairs(consts) do
+                            if c == "kick" then
+                                safeHook(fn)
+                                break
+                            end
+                        end
                     end
                 end
             end
-            for _, s in pairs(gui:GetDescendants()) do
-                if s:IsA("Sound") then
-                    s:Destroy()
-                end
-            end
-            gui:Destroy()
         end
+    end
+end
+
+local function waitForLS2()
+    local start = ReplicatedFirst:WaitForChild("Start", math.huge)
+    return start:WaitForChild("LocalScript2", math.huge)
+end
+
+task.spawn(function()
+    for _ = 1, 5 do
+        task.wait(3)
+        scanGC(function(fn)
+            local info = debug.getinfo(fn)
+            if info and info.name == "reportDetectionAndCrash" then
+                safeHook(fn)
+            end
+        end)
     end
 end)
 
+do
+    local pg = LocalPlayer:WaitForChild("PlayerGui")
+
+    local function handleImpact(gui)
+        local ls = gui:FindFirstChildWhichIsA("LocalScript")
+        if ls then
+            for _, fn in pairs(getsenv(ls)) do
+                if type(fn) == "function" then
+                    safeHook(fn)
+                end
+            end
+        end
+
+        for _, d in ipairs(gui:GetDescendants()) do
+            if d:IsA("Sound") then
+                d:Destroy()
+            end
+        end
+
+        gui:Destroy()
+    end
+
+    pg.ChildAdded:Connect(function(child)
+        if child.Name == "ImpactFrame" then
+            handleImpact(child)
+        end
+    end)
+end
+
 task.spawn(function()
-    local RF = game:GetService("ReplicatedFirst")
-    local start, ls2
+    local ls2 = waitForLS2()
 
-    repeat
-        start = RF:FindFirstChild("Start")
-        task.wait(1)
-    until start
-
-    repeat
-        ls2 = start:FindFirstChild("LocalScript2")
-        task.wait(1)
-    until ls2
-
-    for _, f in pairs(getsenv(ls2)) do
-        if type(f) == "function" then
-            hookfunction(f, function() return end)
+    for _, fn in pairs(getsenv(ls2)) do
+        if type(fn) == "function" then
+            safeHook(fn)
         end
     end
 
-    local module = ls2:FindFirstChild("ModuleScript")
+    local module = ls2:FindFirstChildOfClass("ModuleScript")
     if module then
         local ok, mod = pcall(require, module)
-        if ok then
-            for _, f in pairs(mod) do
-                if type(f) == "function" then
-                    hookfunction(f, function() return end)
+        if ok and type(mod) == "table" then
+            for _, fn in pairs(mod) do
+                if type(fn) == "function" then
+                    safeHook(fn)
                 end
             end
         end
