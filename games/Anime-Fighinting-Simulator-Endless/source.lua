@@ -34,7 +34,7 @@ elseif getexecutorname then
   executor = getexecutorname()
 end
 if executor == 'Xeno' or executor == 'Solara' then
-  loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/notification.lua'))()
+  loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/modules/notification.lua'))()
   repeat task.wait() until read == true
 end
 if getrawmetatable and setreadonly and newcclosure and getnamecallmethod and executor ~= 'Bunni' then
@@ -992,7 +992,7 @@ local Button = AutoFarmTab:Button({
             wait(2)
             Window:Destroy()
             wait(1)
-            loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/Afk-Farm.lua'))()
+            loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/modules/Afk-Farm.lua'))()
           end,
         },
         {
