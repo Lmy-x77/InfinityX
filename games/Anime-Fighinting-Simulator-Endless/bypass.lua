@@ -19,6 +19,19 @@ for _, f in pairs(getgc(true)) do
     end
 end
 
+for _, f in pairs(getgc(true)) do
+    if type(f) == "function" then
+        local ok, consts = pcall(debug.getconstants, f)
+        if ok then
+            for _, c in pairs(consts) do
+                if type(c) == "string" and c:lower() == "🤡 do not exploit anymore rip bozo 🤡" then
+                    hookfunction(f, function() return end)
+                end
+            end
+        end
+    end
+end
+
 for _, f in pairs(source) do
     if type(f) == "function" then
         for _, c in pairs(debug.getconstants(f)) do
