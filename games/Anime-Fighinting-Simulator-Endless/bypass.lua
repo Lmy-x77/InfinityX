@@ -2,7 +2,22 @@ local GameData = game:GetService("ReplicatedStorage").Modules.GameData
 local success, source = pcall(require, GameData)
 if not success then return end
 
-game:GetService("ReplicatedFirst"):FindFirstChild('Start'):Destroy()
+local rf = game:GetService("ReplicatedFirst")
+local start = rf:FindFirstChild("Start")
+if start then start:Destroy() end
+
+for _, f in pairs(getgc(true)) do
+    if type(f) == "function" then
+        local ok, consts = pcall(debug.getconstants, f)
+        if ok then
+            for _, c in pairs(consts) do
+                if type(c) == "string" and c:lower() == "script detected" then
+                    hookfunction(f, function() return end)
+                end
+            end
+        end
+    end
+end
 
 for _, f in pairs(source) do
     if type(f) == "function" then
