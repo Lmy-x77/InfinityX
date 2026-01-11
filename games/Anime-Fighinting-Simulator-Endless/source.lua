@@ -1007,94 +1007,90 @@ local Button = AutoFarmTab:Button({
 })
 
 
+local Players = game:GetService("Players")
+local RS = game:GetService("ReplicatedStorage")
+local LP = Players.LocalPlayer
+local Event = RS.Remotes.RemoteFunction
 local StatMap = {
-  Strength = 1,
-  Durability = 2,
-  Chakra = 3,
-  Sword = 4,
-  Agility = 5,
-  Speed = 6
+	Strength = 1,
+	Durability = 2,
+	Chakra = 3,
+	Sword = 4,
+	Agility = 5,
+	Speed = 6
+}
+local Upgrades = LP:WaitForChild("Upgrades")
+local UpgradeRefs = {
+	[1] = Upgrades["1"],
+	[2] = Upgrades["2"],
+	[3] = Upgrades["3"],
+	[4] = Upgrades["4"],
+	[5] = Upgrades["5"],
+	[6] = Upgrades["6"],
 }
 local SelectedStatsNumbers = {}
 local SelectedDelay = 0
 local AutoUpgrade = false
-local StrengthUP =	game:GetService("Players").LocalPlayer.Upgrades["1"]
-local DurabilityUP =	game:GetService("Players").LocalPlayer.Upgrades["2"]
-local ChakraUP =	game:GetService("Players").LocalPlayer.Upgrades["3"]
-local SwordUP =	game:GetService("Players").LocalPlayer.Upgrades["4"]
-local AgilityUP =	game:GetService("Players").LocalPlayer.Upgrades["5"]
-local SpeedUP =	game:GetService("Players").LocalPlayer.Upgrades["6"]
-UpgradeTab:Section({
-  Title = "Auto Upgrade Stats",
-})
-local AutoUpgradeParagraph = UpgradeTab:Paragraph({
-  Title = "Upgrade Viwer",
-  Desc = "",
-  Color = "Grey",
-  Locked = false,
-})
+local AutoUpgradeParagraph = UpgradeTab:Paragraph({ Title = "Upgrade Viwer", Desc = "", Color = "Grey", Locked = false, })
 task.spawn(function()
-  while true do task.wait(1)
-    AutoUpgradeParagraph:SetDesc('💪 Strength: '.. GetStats(StrengthUP)..
-      '\n🛡️ Durability: '.. GetStats(DurabilityUP)..
-      '\n🔥 Chakra: '.. GetStats(ChakraUP)..
-      '\n⚔️ Sword: '.. GetStats(SwordUP)..
-      '\n🪽 Agility: '..GetStats(AgilityUP)..
-      '\n🏃‍♀️ Speed: '.. GetStats(SpeedUP)
-    )
-  end
+	while true do
+		task.wait(2)
+		AutoUpgradeParagraph:SetDesc(
+			'💪 Strength: '..GetStats(UpgradeRefs[1])..
+			'\n🛡️ Durability: '..GetStats(UpgradeRefs[2])..
+			'\n🔥 Chakra: '..GetStats(UpgradeRefs[3])..
+			'\n⚔️ Sword: '..GetStats(UpgradeRefs[4])..
+			'\n🪽 Agility: '..GetStats(UpgradeRefs[5])..
+			'\n🏃‍♀️ Speed: '..GetStats(UpgradeRefs[6])
+		)
+	end
 end)
 UpgradeTab:Dropdown({
-  Title = "Select stats",
-  Desc = "",
-  Values = {"Strength", "Durability", "Chakra", "Sword", "Agility", "Speed"},
-  Multi = true,
-  AllowNone = true,
-  Value = {"Strength"},
-  Flag = "AutoUpgradeDropdown",
-  Callback = function(options)
-    table.clear(SelectedStatsNumbers)
-    for _, stat in ipairs(options) do
-      local num = StatMap[stat]
-      if num then
-        table.insert(SelectedStatsNumbers, num)
-      end
-    end
-  end
+	Title = "Select stats",
+	Values = {"Strength","Durability","Chakra","Sword","Agility","Speed"},
+	Multi = true,
+	AllowNone = true,
+  Flag = "StatsUpgradeDropdown",
+	Callback = function(options)
+		table.clear(SelectedStatsNumbers)
+		for _, stat in ipairs(options) do
+			local id = StatMap[stat]
+			if id then
+				SelectedStatsNumbers[#SelectedStatsNumbers+1] = id
+			end
+		end
+	end
 })
 UpgradeTab:Slider({
-  Title = "Level up delay",
-  Step = 1,
-  Value = {
-    Min = 0,
-    Max = 60,
-    Default = 0,
-  },
-  Callback = function(value)
-    SelectedDelay = tonumber(value) or 0
-  end
+	Title = "Level up delay",
+	Step = 1,
+	Value = {Min = 0, Max = 60, Default = 0},
+  Flag = "LevelUpDelay",
+	Callback = function(v)
+		SelectedDelay = tonumber(v) or 0
+	end
 })
 UpgradeTab:Toggle({
-  Title = "Auto upgrade stats",
-  Icon = "check",
+	Title = "Auto upgrade stats",
   Type = "Checkbox",
-  Flag = "AutoUpgradeStats",
-  Value = false,
-  Callback = function(state)
-    AutoUpgrade = state
-    if not AutoUpgrade then return end
+  Flag = "AutoUpgradeStatsToggle",
+	Value = false,
+	Callback = function(state)
+		AutoUpgrade = state
+		if not state then return end
 
-    task.spawn(function()
-      local Event = game:GetService("ReplicatedStorage").Remotes.RemoteFunction
-      while AutoUpgrade do
-        for _, statNumber in ipairs(SelectedStatsNumbers) do
-          Event:InvokeServer("Upgrade", statNumber)
-          task.wait(SelectedDelay)
-        end
-        task.wait()
-      end
-    end)
-  end
+		task.spawn(function()
+			while AutoUpgrade do
+				for i = 1, #SelectedStatsNumbers do
+					Event:InvokeServer("Upgrade", SelectedStatsNumbers[i])
+					if SelectedDelay > 0 then
+						task.wait(SelectedDelay)
+					end
+				end
+				task.wait(0.2)
+			end
+		end)
+	end
 })
 
 
