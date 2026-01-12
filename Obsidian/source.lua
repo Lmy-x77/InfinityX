@@ -6063,14 +6063,12 @@ function Library:CreateWindow(WindowInfo)
         })
 
         SearchBox = New("TextBox", {
-            BackgroundTransparency = 1,
-            PlaceholderText = "Search...",
-            AnchorPoint = Vector2.new(1, 0),
-            Position = UDim2.new(1, -8, 0, 0),
-            Size = UDim2.new(1, -12, 1, 0),
-            TextSize = 14,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Visible = false,
+            BackgroundColor3 = "MainColor",
+            PlaceholderText = "Search",
+            Size = WindowInfo.SearchbarSize,
+            Position = UDim2.new(0, 360, 0, 0)
+            TextScaled = true,
+            Visible = not (WindowInfo.DisableSearch or false),
             Parent = RightWrapper,
         })
         New("UIPadding", {
