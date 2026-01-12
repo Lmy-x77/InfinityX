@@ -1070,9 +1070,10 @@ local function New(ClassName: string, Properties: { [string]: any })
 
     FillInstance(Properties, inst)
 
-    if Properties.Parent then
-        local parentZ = Properties.Parent.ZIndex or 1
-        inst.ZIndex = Properties.ZIndex or parentZ
+    if Properties.Parent and Properties.Parent:IsA("GuiObject") then
+        inst.ZIndex = Properties.ZIndex or Properties.Parent.ZIndex
+    else
+        inst.ZIndex = Properties.ZIndex or 1
     end
 
     return inst
@@ -5918,7 +5919,7 @@ function Library:CreateWindow(WindowInfo)
             ImageTransparency = 0.45,
             ScaleType = Enum.ScaleType.Slice,
             SliceCenter = Rect.new(10, 10, 118, 118),
-            ZIndex = (MainFrame.ZIndex or 1) - 1,
+            ZIndex = MainFrame.ZIndex - 1,
             Parent = MainFrame,
         })
         New("UICorner", {
