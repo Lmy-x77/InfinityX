@@ -4401,14 +4401,13 @@ do
                 BackgroundTransparency = 1,
                 PlaceholderText = "Search...",
                 AnchorPoint = Vector2.new(1, 0),
-                Position = UDim2.new(1, -8, 0, 0),
+                Position = UDim2.new(0, 360, 0, 0),
                 Size = UDim2.new(1, -12, 1, 0),
                 TextSize = 14,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Visible = false,
                 Parent = Display,
             })
-            
             New("UIPadding", {
                 PaddingLeft = UDim.new(0, 8),
                 Parent = SearchBox,
@@ -6015,14 +6014,6 @@ function Library:CreateWindow(WindowInfo)
             Parent = TopBar,
         })
 
-        New("UIListLayout", {
-            FillDirection = Enum.FillDirection.Horizontal,
-            HorizontalAlignment = Enum.HorizontalAlignment.Left,
-            VerticalAlignment = Enum.VerticalAlignment.Center,
-            Padding = UDim.new(0, 8),
-            Parent = RightWrapper,
-        })
-
         CurrentTabInfo = New("Frame", {
             Size = UDim2.fromScale(WindowInfo.DisableSearch and 1 or 0.5, 1),
             Visible = false,
@@ -6073,12 +6064,19 @@ function Library:CreateWindow(WindowInfo)
         })
 
         SearchBox = New("TextBox", {
-            BackgroundColor3 = "MainColor",
-            PlaceholderText = "Search",
-            Size = WindowInfo.SearchbarSize,
-            TextScaled = true,
-            Visible = not (WindowInfo.DisableSearch or false),
-            Parent = RightWrapper,
+            BackgroundTransparency = 1,
+            PlaceholderText = "Search...",
+            AnchorPoint = Vector2.new(1, 0),
+            Position = UDim2.new(1, -8, 0, 0),
+            Size = UDim2.new(1, -12, 1, 0),
+            TextSize = 14,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Visible = false,
+            Parent = Display,
+        })
+        New("UIPadding", {
+            PaddingLeft = UDim.new(0, 8),
+            Parent = SearchBox,
         })
         New("UIFlexItem", {
             FlexMode = Enum.UIFlexMode.Shrink,
