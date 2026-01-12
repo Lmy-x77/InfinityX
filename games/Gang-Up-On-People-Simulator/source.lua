@@ -84,13 +84,22 @@ local function GetPlayersName()
   end
   return plrs
 end
-local scriptVersion = "4.2a"
+local LibrarySettings = {
+  Title = '<font color="rgb(110, 48, 160)" size="' .. (isMobile and '14' or '24') .. '"><b>'.. (isMobile and ' InfinityX' or 'InfintyX') ..'</b></font>',
+  Footer = {
+    GameName = '<font color="rgb(180,180,255)"><i>Gang up on people simulator</i></font> · ',
+    Version = '<font color="rgb(160,160,160)">Version 4.2a</font> · ',
+    DiscordLink = '<font color="rgb(100,200,255)">Join us: discord.gg/emKJgWMHAr</font>'
+  }
+}
 
 
 
 -- ui library
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Obsidian/source.lua"))()
 function getDpiScale()
     if IsOnMobile then
         return Library:SetDPIScale(75)
@@ -98,35 +107,36 @@ function getDpiScale()
         Library:SetDPIScale(100)
     end
 end
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 local Options = Library.Options
 local Toggles = Library.Toggles
 
 Library.ForceCheckbox = true
 
 local Window = Library:CreateWindow({
-  Title = "InfinityX",
-  Footer = "Gang Up On People Simulator · ".. scriptVersion .. " · discord.gg/emKJgWMHAr",
-  Icon = 126527122577864,
-  NotifySide = "Right",
-  ShowCustomCursor = false,
-  Center = true,
-  MobileButtonsSide = "Left",
-  Resizable = false,
-  Size = UDim2.fromOffset(650, 410),
-  ToggleKeybind = Enum.KeyCode.K
+    Title = LibrarySettings.Title,
+    Footer = LibrarySettings.Footer.GameName .. LibrarySettings.Footer.Version .. LibrarySettings.Footer.DiscordLink,
+    Icon = 126527122577864,
+    NotifySide = "Right",
+    ShowCustomCursor = false,
+    Center = true,
+    MobileButtonsSide = "Left",
+    Resizable = false,
+    Size = UDim2.fromOffset(600, 500),
+    ToggleKeybind = Enum.KeyCode.K,
+    SidebarCompacted = true,
+    DisableSearch = false,
+    SearchbarSize = UDim2.fromOffset(130, 32),
 })
 
 
 
 -- tabs
 local Tabs = {
-  Farm = Window:AddTab("Farming", "banknote"),
-  LPlayer = Window:AddTab("Character", "user"),
-  Money = Window:AddTab("Money", "banknote"),
-  Shop = Window:AddTab("Shop", "shopping-cart"),
-  Settings = Window:AddTab("Config.", "settings"),
+  Farm = Window:AddTab("Farming", "banknote", "Automatic farming options"),
+  LPlayer = Window:AddTab("Character", "user", "Player options"),
+  Money = Window:AddTab("Money", "banknote", "View your money"),
+  Shop = Window:AddTab("Shop", "shopping-cart", "Buy items in script"),
+  Settings = Window:AddTab("Config.", "settings", "Ui library settings"),
 }
 
 
@@ -135,7 +145,7 @@ local Tabs = {
 local MoneyGroupBox = Tabs.Farm:AddLeftGroupbox("Money Farm", "hand-coins")
 local PlayerGroupBox = Tabs.Farm:AddRightGroupbox("Player Farm", "users")
 local MiscGroupBox = Tabs.Farm:AddLeftGroupbox("Misc", "layers")
-MoneyGroupBox:AddToggle("MyToggle", {
+MoneyGroupBox:AddToggle("CollectAllMoney", {
 	Text = "Collect all money",
 	Tooltip = "Active to collect all money in the map",
 	DisabledTooltip = "I am disabled!",
@@ -164,7 +174,7 @@ MoneyGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-MoneyGroupBox:AddToggle("MyToggle", {
+MoneyGroupBox:AddToggle("CollectAllMoneyPlusDeposit", {
 	Text = "Collect money + deposit",
 	Tooltip = "Active to collect all and deposit money in the map",
 	DisabledTooltip = "I am disabled!",
@@ -195,7 +205,7 @@ MoneyGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-MoneyGroupBox:AddToggle("MyToggle", {
+MoneyGroupBox:AddToggle("EspMoney", {
 	Text = "Esp money",
 	Tooltip = "Active to view all money in the map",
 	DisabledTooltip = "I am disabled!",
@@ -273,7 +283,7 @@ MoneyGroupBox:AddToggle("MyToggle", {
       end
     end)
 	end,
-}):AddColorPicker("ColorPicker1", {
+}):AddColorPicker("MoneyColor", {
   Default = Color3.fromRGB(0, 255, 0),
   Title = "Esp money color",
   Transparency = 0,
@@ -301,7 +311,7 @@ PlayerGroupBox:AddDropdown("PlayersDropdown", {
 	Disabled = false,
 	Visible = true,
 })
-PlayerGroupBox:AddDropdown("MyDropdown", {
+PlayerGroupBox:AddDropdown("ModeDropdown", {
 	Values = { 'Slap', 'Kick', 'Stomp' },
 	Default = '...',
 	Multi = false,
@@ -343,7 +353,7 @@ PlayerGroupBox:AddButton({
 	Visible = true,
 	Risky = false,
 })
-PlayerGroupBox:AddToggle("MyToggle", {
+PlayerGroupBox:AddToggle("PlayerFarm", {
 	Text = "Start player farm",
 	Tooltip = "Active to farm players",
 	DisabledTooltip = "I am disabled!",
@@ -371,7 +381,7 @@ PlayerGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-MiscGroupBox:AddToggle("MyToggle", {
+MiscGroupBox:AddToggle("SlapFarm", {
 	Text = "Slap farm",
 	Tooltip = "Active to slap farm",
 	DisabledTooltip = "I am disabled!",
@@ -410,7 +420,7 @@ local BypassGroupBox = Tabs.LPlayer:AddRightGroupbox("Bypass", "shield-off")
 local SafeZoneGroupBox = Tabs.LPlayer:AddLeftGroupbox("Safe Zone", "shield")
 local FunGroupBox = Tabs.LPlayer:AddRightGroupbox("Fun", "star")
 if not IsOnMobile then
-  CharacterGroupBox:AddSlider("MySlider", {
+  CharacterGroupBox:AddSlider("WalkSpeedSlider", {
     Text = "WalkSpeed",
     Default = 16,
     Min = 16,
@@ -428,7 +438,7 @@ if not IsOnMobile then
     Disabled = false,
     Visible = true,
   })
-  CharacterGroupBox:AddSlider("MySlider", {
+  CharacterGroupBox:AddSlider("JumpPowerSlider", {
     Text = "JumpPower",
     Default = 50,
     Min = 50,
@@ -447,7 +457,7 @@ if not IsOnMobile then
     Visible = true,
   })
 elseif IsOnMobile then
-  CharacterGroupBox:AddInput("MyTextbox", {
+  CharacterGroupBox:AddInput("WalkSpeedBox", {
       Default = "",
       Numeric = true,
       Finished = false,
@@ -460,7 +470,7 @@ elseif IsOnMobile then
         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
       end,
   })
-  CharacterGroupBox:AddInput("MyTextbox", {
+  CharacterGroupBox:AddInput("JumpPowerBox", {
       Default = "",
       Numeric = true,
       Finished = false,
@@ -509,10 +519,10 @@ CharacterGroupBox:AddButton("Rejoin server", function()
 
   local serverId = GetServer()
   if serverId then
-      TeleportService:TeleportToPlaceInstance(PlaceId, serverId, Players.LocalPlayer)
+    TeleportService:TeleportToPlaceInstance(PlaceId, serverId, Players.LocalPlayer)
   end
 end)
-CharacterGroupBox:AddToggle("AntiFlyToggle", {
+CharacterGroupBox:AddToggle("FlyToggle", {
 	Text = "Fly",
 	Tooltip = "Active to fly",
 	DisabledTooltip = "I am disabled!",
@@ -587,7 +597,7 @@ BypassGroupBox:AddToggle("AntiFlyToggle", {
     end
 	end,
 })
-BypassGroupBox:AddToggle("MyToggle", {
+BypassGroupBox:AddToggle("AntiRagDoll", {
 	Text = "Anti ragdoll",
 	Tooltip = "Active to bypass ragdoll",
 	DisabledTooltip = "I am disabled!",
@@ -637,7 +647,7 @@ BypassGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-BypassGroupBox:AddToggle("MyToggle", {
+BypassGroupBox:AddToggle("AntiDead", {
 	Text = "Anti dead",
 	Tooltip = "If the game tries to kill you on suspicion of an exploit, this function blocks it",
 	DisabledTooltip = "I am disabled!",
@@ -679,7 +689,7 @@ BypassGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-BypassGroupBox:AddToggle("MyToggle", {
+BypassGroupBox:AddToggle("NoFallDamage", {
 	Text = "No fall damage",
 	Tooltip = "Active to bypass fall damage",
 	DisabledTooltip = "I am disabled!",
@@ -722,7 +732,7 @@ BypassGroupBox:AddToggle("MyToggle", {
 	end,
 })
 if not IsOnMobile then
-  SafeZoneGroupBox:AddSlider("MySlider", {
+  SafeZoneGroupBox:AddSlider("HealthSlider", {
     Text = "Enter Health",
     Default = 0,
     Min = 0,
@@ -735,7 +745,7 @@ if not IsOnMobile then
     end,
   })
 elseif IsOnMobile then
-  SafeZoneGroupBox:AddInput("MyTextbox", {
+  SafeZoneGroupBox:AddInput("HealthBox", {
     Default = "0",
     Numeric = true,
     Finished = false,
@@ -749,7 +759,7 @@ elseif IsOnMobile then
     end,
   })
 end
-SafeZoneGroupBox:AddToggle("MyToggle", {
+SafeZoneGroupBox:AddToggle("SafeZone", {
 	Text = "Auto safe zone",
 	Tooltip = "Active to teleport you to the safe zone",
 	DisabledTooltip = "I am disabled!",
@@ -768,7 +778,7 @@ SafeZoneGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-FunGroupBox:AddToggle("MyToggle", {
+FunGroupBox:AddToggle("LagServer", {
 	Text = "Lag server [+1000 cash]",
 	Tooltip = "This code only works on certain servers",
 	DisabledTooltip = "I am disabled!",
@@ -810,7 +820,7 @@ FunGroupBox:AddToggle("MyToggle", {
       end
 	end,
 })
-FunGroupBox:AddToggle("MyToggle", {
+FunGroupBox:AddToggle("SpamAllAttacks", {
 	Text = "Spam all attacks",
 	Tooltip = "Active to spam all attacks",
 	DisabledTooltip = "I am disabled!",
@@ -833,7 +843,7 @@ FunGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-FunGroupBox:AddToggle("MyToggle", {
+FunGroupBox:AddToggle("BigHitbox", {
 	Text = "Big hitbox",
 	Tooltip = "Active to view all players big hitbox",
 	DisabledTooltip = "I am disabled!",
@@ -925,7 +935,7 @@ task.spawn(function()
       HandInfo:SetText("You Have: ".. game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild('CashEffect'):WaitForChild('CashDisplay').Text)
     end
 end)
-DepositGroupBox:AddToggle("MyToggle", {
+DepositGroupBox:AddToggle("AutoDeposit", {
 	Text = "Auto deposit",
 	Tooltip = "Active to deposit all money in your bank",
 	DisabledTooltip = "I am disabled!",
@@ -995,7 +1005,7 @@ ShopGroupBox:AddButton("Gravity Hammer", function()
   }
   game:GetService("ReplicatedStorage").RemoteEvent.PurchaseRequest:FireServer(ohString1, ohInstance2, ohTable3)
 end)
-AutoShopGroupBox:AddToggle("MyToggle", {
+AutoShopGroupBox:AddToggle("AutoShotgun", {
 	Text = "Shotgun",
 	Tooltip = "Active to collect shotgun automatically",
 	DisabledTooltip = "I am disabled!",
@@ -1020,7 +1030,7 @@ AutoShopGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-AutoShopGroupBox:AddToggle("MyToggle", {
+AutoShopGroupBox:AddToggle("AutoRevolver", {
 	Text = "Revolver",
 	Tooltip = "Active to collect revolver automatically",
 	DisabledTooltip = "I am disabled!",
@@ -1103,6 +1113,16 @@ CreditsGroupBox:AddButton("Discord server", function()
         Time = 4,
     })
 end)
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+ThemeManager:SetFolder("Obsidian")
+SaveManager:SetFolder("Obsidian/Shark-Bite")
+SaveManager:SetSubFolder("Shark-Bite")
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
+SaveManager:LoadAutoloadConfig()
 
 
 
