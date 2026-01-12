@@ -6072,7 +6072,7 @@ function Library:CreateWindow(WindowInfo)
             TextSize = 14,
             TextXAlignment = Enum.TextXAlignment.Left,
             Visible = false,
-            Parent = Display,
+            Parent = RightWrapper,
         })
         New("UIPadding", {
             PaddingLeft = UDim.new(0, 8),
