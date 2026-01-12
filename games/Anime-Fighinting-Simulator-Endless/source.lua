@@ -1,5 +1,4 @@
 game.Players.LocalPlayer:Kick('The script is not safe to run at this time. Please wait until we bypass it. For more information, join the Discord server.')
-return
 
 
 
