@@ -6104,8 +6104,8 @@ function Library:CreateWindow(WindowInfo)
                 ImageRectOffset = SearchIcon.ImageRectOffset,
                 ImageRectSize = SearchIcon.ImageRectSize,
                 ImageTransparency = 0.5,
-                Size = UDim2.new(1, -106, 1, -16),
-                Position = UDim2.new(1, -49, 0.5, 0),
+                Size = UDim2.new(1, -49, 0.5, 0),
+                Position = UDim2.new(1, -106, 1, -23),
                 SizeConstraint = Enum.SizeConstraint.RelativeYY,
                 Parent = SearchBox,
             })
