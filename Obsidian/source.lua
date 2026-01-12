@@ -1,3 +1,4 @@
+
 local cloneref = (cloneref or clonereference or function(instance: any)
     return instance
 end)
@@ -6067,7 +6068,8 @@ function Library:CreateWindow(WindowInfo)
             PlaceholderText = "Search",
             Size = WindowInfo.SearchbarSize,
             Position = UDim2.new(0, 360, 0, 0),
-            TextScaled = true,
+            TextScaled = false,
+            TextSize = 14,
             Visible = not (WindowInfo.DisableSearch or false),
             Parent = RightWrapper,
         })
@@ -6103,7 +6105,8 @@ function Library:CreateWindow(WindowInfo)
                 ImageRectOffset = SearchIcon.ImageRectOffset,
                 ImageRectSize = SearchIcon.ImageRectSize,
                 ImageTransparency = 0.5,
-                Size = UDim2.fromScale(1, 1),
+                Size = UDim2.new(1, -106, 1, -16),
+                Position = UDim2.new(1, -49, 0.5, 0)
                 SizeConstraint = Enum.SizeConstraint.RelativeYY,
                 Parent = SearchBox,
             })
