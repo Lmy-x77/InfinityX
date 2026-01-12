@@ -1070,14 +1070,15 @@ local function New(ClassName: string, Properties: { [string]: any })
 
     FillInstance(Properties, inst)
 
-    if Properties.Parent and Properties.Parent:IsA("GuiObject") then
-        inst.ZIndex = Properties.ZIndex or Properties.Parent.ZIndex
-    else
-        inst.ZIndex = Properties.ZIndex or 1
+    if Properties.ZIndex then
+        inst.ZIndex = Properties.ZIndex
+    elseif Properties.Parent and Properties.Parent:IsA("GuiObject") then
+        inst.ZIndex = Properties.Parent.ZIndex
     end
 
     return inst
 end
+
 
 --// Main Instances \\-
 local function SafeParentUI(Instance: Instance, Parent: Instance | () -> Instance)
@@ -5919,8 +5920,8 @@ function Library:CreateWindow(WindowInfo)
             ImageTransparency = 0.45,
             ScaleType = Enum.ScaleType.Slice,
             SliceCenter = Rect.new(10, 10, 118, 118),
-            ZIndex = MainFrame.ZIndex - 1,
             Parent = MainFrame,
+            ZIndex = MainFrame.ZIndex - 1,
         })
         New("UICorner", {
             CornerRadius = UDim.new(0, WindowInfo.CornerRadius),
