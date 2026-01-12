@@ -5909,17 +5909,18 @@ function Library:CreateWindow(WindowInfo)
             Visible = false,
             Parent = ScreenGui,
         })
-        local shadow = Instance.new("ImageLabel")
-        shadow.Size = UDim2.new(1, 10, 1, 20)
-        shadow.Position = UDim2.new(0, -5, 0, -10)
-        shadow.BackgroundTransparency = 1
-        shadow.Image = "rbxassetid://1316045217"
-        shadow.ImageColor3 = Color3.fromRGB(170, 0, 255)
-        shadow.ImageTransparency = 0.45
-        shadow.ScaleType = Enum.ScaleType.Slice
-        shadow.SliceCenter = Rect.new(10, 10, 118, 118)
-        shadow.ZIndex = MainFrame.ZIndex - 1
-        shadow.Parent = MainFrame
+        New('ImageLabel', {
+            Size = UDim2.new(1, 10, 1, 20)
+            Position = UDim2.new(0, -5, 0, -10)
+            BackgroundTransparency = 1
+            Image = "rbxassetid://1316045217"
+            ImageColor3 = Color3.fromRGB(170, 0, 255)
+            ImageTransparency = 0.45
+            ScaleType = Enum.ScaleType.Slice
+            SliceCenter = Rect.new(10, 10, 118, 118)
+            ZIndex = MainFrame.ZIndex - 1
+            Parent = MainFrame
+        })
         New("UICorner", {
             CornerRadius = UDim.new(0, WindowInfo.CornerRadius),
             Parent = MainFrame,
