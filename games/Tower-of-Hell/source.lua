@@ -57,41 +57,44 @@ local LibrarySettings = {
 
 -- ui library
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
-function getDpiScale()
-  if IsOnMobile then
-    return Library:SetDPIScale(75)
-  elseif not IsOnMobile then
-    Library:SetDPIScale(100)
-  end
-end
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Obsidian/source.lua"))()
+function getDpiScale()
+    if IsOnMobile then
+        return Library:SetDPIScale(75)
+    elseif not IsOnMobile then
+        Library:SetDPIScale(100)
+    end
+end
 local Options = Library.Options
 local Toggles = Library.Toggles
 
 Library.ForceCheckbox = true
 
 local Window = Library:CreateWindow({
-  Title = LibrarySettings.Title,
-  Footer = LibrarySettings.Footer.GameName .. LibrarySettings.Footer.Version .. LibrarySettings.Footer.DiscordLink,
-  Icon = 126527122577864,
-  NotifySide = "Right",
-  ShowCustomCursor = false,
-  Center = true,
-  MobileButtonsSide = "Left",
-  Resizable = false,
-  Size = UDim2.fromOffset(650, 410),
-  ToggleKeybind = Enum.KeyCode.K
+    Title = LibrarySettings.Title,
+    Footer = LibrarySettings.Footer.GameName .. LibrarySettings.Footer.Version .. LibrarySettings.Footer.DiscordLink,
+    Icon = 126527122577864,
+    NotifySide = "Right",
+    ShowCustomCursor = false,
+    Center = true,
+    MobileButtonsSide = "Left",
+    Resizable = false,
+    Size = UDim2.fromOffset(600, 500),
+    ToggleKeybind = Enum.KeyCode.K,
+    SidebarCompacted = true,
+    DisableSearch = false,
+    SearchbarSize = UDim2.fromOffset(130, 32),
 })
 
 
 
 -- tabs
 local Tabs = {
-  Main = Window:AddTab("Main", "layers"),
-  Shop = Window:AddTab("Shop", "shopping-cart"),
-  Settings = Window:AddTab("Config.", "settings"),
+  Main = Window:AddTab("Main", "layers", "Main script options"),
+  Shop = Window:AddTab("Shop", "shopping-cart", "Buy items in the game"),
+  Settings = Window:AddTab("Config.", "settings", "Ui library settings"),
 }
 
 
@@ -143,7 +146,7 @@ TowerGroupBox:AddLabel({
   Text = "The finish tower is working, but be careful, after several tests even taking time to get kicked or banned the code is still not 100% secure, so use with moderation.\n\n(I recommend using it on a private server, but still be careful when using it)",
   DoesWrap = true
 })
-CharacterGroupBox:AddToggle("MyToggle", {
+CharacterGroupBox:AddToggle("GodMode", {
 	Text = "God mode",
 	Tooltip = "Active to dont die in kill parts",
 	DisabledTooltip = "I am disabled!",
@@ -160,7 +163,7 @@ CharacterGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-CharacterGroupBox:AddToggle("MyToggle", {
+CharacterGroupBox:AddToggle("AntiAfk", {
 	Text = "Anti afk",
 	Tooltip = "Active for dont have kiked at 20 minutes idled",
 	DisabledTooltip = "I am disabled!",
@@ -184,7 +187,7 @@ CharacterGroupBox:AddToggle("MyToggle", {
 })
 CharacterGroupBox:AddDivider()
 if not IsOnMobile then
-  CharacterGroupBox:AddSlider("MySlider", {
+  CharacterGroupBox:AddSlider("WalkSpeedSlider", {
     Text = "WalkSpeed",
     Default = 16,
     Min = 16,
@@ -202,7 +205,7 @@ if not IsOnMobile then
     Disabled = false,
     Visible = true,
   })
-  CharacterGroupBox:AddSlider("MySlider", {
+  CharacterGroupBox:AddSlider("JumpPowerSlied", {
     Text = "JumpPower",
     Default = 50,
     Min = 50,
@@ -221,7 +224,7 @@ if not IsOnMobile then
     Visible = true,
   })
 elseif IsOnMobile then
-  CharacterGroupBox:AddInput("MyTextbox", {
+  CharacterGroupBox:AddInput("WalkSpeedBox", {
     Default = "",
     Numeric = true,
     Finished = false,
@@ -234,7 +237,7 @@ elseif IsOnMobile then
       game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
     end,
   })
-  CharacterGroupBox:AddInput("MyTextbox", {
+  CharacterGroupBox:AddInput("JumpPowerBox", {
     Default = "",
     Numeric = true,
     Finished = false,
@@ -248,7 +251,7 @@ elseif IsOnMobile then
     end,
   })
 end
-CharacterGroupBox:AddInput("MyTextbox", {
+CharacterGroupBox:AddInput("ExtraJumps", {
   Default = "0",
   Numeric = true,
   Finished = false,
@@ -265,7 +268,7 @@ CharacterGroupBox:AddInput("MyTextbox", {
     end
   end,
 })
-ToolGroupBox:AddDropdown("", {
+ToolGroupBox:AddDropdown("ToolsDropdown", {
 	Values = GetTools(),
 	Default = '...',
 	Multi = false,
@@ -304,7 +307,7 @@ end)
 local GearsGroupBox = Tabs.Shop:AddLeftGroupbox("Gears", "hammer")
 local MutatorGroupBox = Tabs.Shop:AddLeftGroupbox("Mutator", "atom")
 local StatusGroupBox = Tabs.Shop:AddRightGroupbox("Status", "chart-line")
-GearsGroupBox:AddDropdown("", {
+GearsGroupBox:AddDropdown("PowerDropdown", {
 	Values = {'speed', 'gravity', 'fusion', 'trowel', 'hook', 'hourglass'},
 	Default = '...',
 	Multi = false,
@@ -325,7 +328,7 @@ GearsGroupBox:AddDropdown("", {
 GearsGroupBox:AddButton("Buy selected gear", function()
 	GetItem('gear', selectedGear, 'regular')
 end)
-MutatorGroupBox:AddDropdown("", {
+MutatorGroupBox:AddDropdown("MutatorDropdowj", {
 	Values = {'invincibility', 'speed', 'gravity', 'fog', 'negative', 'lengthen', 'time', 'invisibility', 'double jump', 'bunny', 'checkpoints', 'double coins'},
 	Default = '...',
 	Multi = false,
@@ -433,6 +436,16 @@ CreditsGroupBox:AddButton("Discord server", function()
     Time = 4,
   })
 end)
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+ThemeManager:SetFolder("Obsidian")
+SaveManager:SetFolder("Obsidian/Tower-of-Hell")
+SaveManager:SetSubFolder("Tower-of-Hell")
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
+SaveManager:LoadAutoloadConfig()
 
 
 
