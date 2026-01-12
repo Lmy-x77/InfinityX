@@ -1,4 +1,3 @@
-
 local cloneref = (cloneref or clonereference or function(instance: any)
     return instance
 end)
@@ -6101,7 +6100,7 @@ function Library:CreateWindow(WindowInfo)
         if SearchIcon then
             New("ImageLabel", {
                 Image = SearchIcon.Url,
-                ImageColor3 = "FontColor",
+                ImageColor3 = Color3.fromRGB(255, 255, 255),
                 ImageRectOffset = SearchIcon.ImageRectOffset,
                 ImageRectSize = SearchIcon.ImageRectSize,
                 ImageTransparency = 0.5,
