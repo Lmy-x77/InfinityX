@@ -98,7 +98,9 @@ local LibrarySettings = {
 
 -- ui library
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Obsidian/source.lua"))()
 function getDpiScale()
     if IsOnMobile then
         return Library:SetDPIScale(75)
@@ -106,8 +108,6 @@ function getDpiScale()
         Library:SetDPIScale(100)
     end
 end
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 local Options = Library.Options
 local Toggles = Library.Toggles
 
@@ -122,17 +122,20 @@ local Window = Library:CreateWindow({
     Center = true,
     MobileButtonsSide = "Left",
     Resizable = false,
-    Size = UDim2.fromOffset(650, 410),
-    ToggleKeybind = Enum.KeyCode.K
+    Size = UDim2.fromOffset(600, 500),
+    ToggleKeybind = Enum.KeyCode.K,
+    SidebarCompacted = true,
+    DisableSearch = false,
+    SearchbarSize = UDim2.fromOffset(130, 32),
 })
 
 
 
 -- tabs
 local Tabs = {
-  Main = Window:AddTab("Main", "layers"),
-  Visual = Window:AddTab("Visual", "eye"),
-  Settings = Window:AddTab("Config.", "settings"),
+  Main = Window:AddTab("Main", "layers", "Main features of script"),
+  Visual = Window:AddTab("Visual", "eye", "Visual options"),
+  Settings = Window:AddTab("Config.", "settings", "Ui library settings"),
 }
 
 
@@ -142,7 +145,7 @@ local SurvivalGroupBox = Tabs.Main:AddLeftGroupbox("Survival", "heart-pulse")
 local MiscGroupBox = Tabs.Main:AddLeftGroupbox("Misc", "wrench")
 local SharkGroupBox = Tabs.Main:AddRightGroupbox("Shark", "waves")
 local CharacterGroupBox = Tabs.Main:AddRightGroupbox("Character", "user")
-SurvivalGroupBox:AddToggle("MyToggle", {
+SurvivalGroupBox:AddToggle("EspShark", {
 	Text = "Esp shark",
 	Tooltip = "Active to esp the shark",
 	DisabledTooltip = "I am disabled!",
@@ -229,7 +232,7 @@ SurvivalGroupBox:AddToggle("MyToggle", {
         EspSettings.SharkColor = Value
     end,
 })
-SurvivalGroupBox:AddToggle("MyToggle", {
+SurvivalGroupBox:AddToggle("AutoTPShark", {
 	Text = "Auto teleport to shark",
 	Tooltip = "Active to teleport to all sharks automatically",
 	DisabledTooltip = "I am disabled!",
@@ -264,7 +267,7 @@ SurvivalGroupBox:AddToggle("MyToggle", {
         end
 	end,
 })
-SurvivalGroupBox:AddToggle("MyToggle", {
+SurvivalGroupBox:AddToggle("AutoLobby", {
 	Text = "Auto lobby",
 	Tooltip = "When the match starts and you're innocent, it automatically teleports you to the lobby",
 	DisabledTooltip = "I am disabled!",
@@ -294,7 +297,7 @@ SurvivalGroupBox:AddToggle("MyToggle", {
         end
 	end,
 })
-SurvivalGroupBox:AddToggle("MyToggle", {
+SurvivalGroupBox:AddToggle("AutoChest", {
 	Text = "Auto chest",
 	Tooltip = "Active to automatically collect the chest",
 	DisabledTooltip = "I am disabled!",
@@ -329,7 +332,7 @@ SurvivalGroupBox:AddToggle("MyToggle", {
 	end,
 })
 SurvivalGroupBox:AddButton({
-	Text = "Inifnite ammo",
+	Text = "Infinite ammo",
 	Func = function()
         local success = pcall(function()
             for _, tool in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
@@ -538,7 +541,7 @@ MiscGroupBox:AddButton({
 	Visible = true,
 	Risky = false,
 })
-SharkGroupBox:AddToggle("MyToggle", {
+SharkGroupBox:AddToggle("EspSurvivals", {
 	Text = "Esp survivals",
 	Tooltip = "Active to esp the survivals",
 	DisabledTooltip = "I am disabled!",
@@ -569,7 +572,7 @@ SharkGroupBox:AddToggle("MyToggle", {
             end
         end
 	end,
-}):AddColorPicker("ColorPicker1", {
+}):AddColorPicker("PlayersColor", {
     Default = Color3.fromRGB(61, 240, 61),
     Title = "Esp player color",
     Transparency = 0,
@@ -578,7 +581,7 @@ SharkGroupBox:AddToggle("MyToggle", {
         EspSettings.SurvivalColor = Value
     end,
 })
-SharkGroupBox:AddToggle("MyToggle", {
+SharkGroupBox:AddToggle("EspBoats", {
 	Text = "Esp boats",
 	Tooltip = "Active to esp the boats",
 	DisabledTooltip = "I am disabled!",
@@ -656,7 +659,7 @@ SharkGroupBox:AddToggle("MyToggle", {
             end
         end)
 	end,
-}):AddColorPicker("ColorPicker1", {
+}):AddColorPicker("BoatsColor", {
     Default = Color3.fromRGB(255, 62, 62),
     Title = "Esp boat color",
     Transparency = 0,
@@ -690,7 +693,7 @@ SharkGroupBox:AddButton({
 	Risky = false,
 })
 if not IsOnMobile then
-    CharacterGroupBox:AddSlider("MySlider", {
+    CharacterGroupBox:AddSlider("WalkSpeedSlider", {
     	Text = "WalkSpeed",
     	Default = 16,
     	Min = 16,
@@ -708,7 +711,7 @@ if not IsOnMobile then
     	Disabled = false,
     	Visible = true,
     })
-    CharacterGroupBox:AddSlider("MySlider", {
+    CharacterGroupBox:AddSlider("JumpPowerSlider", {
     	Text = "JumpPower",
     	Default = 50,
     	Min = 50,
@@ -727,7 +730,7 @@ if not IsOnMobile then
     	Visible = true,
     })
 elseif IsOnMobile then
-    CharacterGroupBox:AddInput("MyTextbox", {
+    CharacterGroupBox:AddInput("WalkSpeedBox", {
         Default = "",
         Numeric = true,
         Finished = false,
@@ -740,7 +743,7 @@ elseif IsOnMobile then
             game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
         end,
     })
-    CharacterGroupBox:AddInput("MyTextbox", {
+    CharacterGroupBox:AddInput("JumpPowerBox", {
         Default = "",
         Numeric = true,
         Finished = false,
@@ -834,6 +837,33 @@ CharacterGroupBox:AddButton({
 	Risky = false,
 })
 CharacterGroupBox:AddButton({
+	Text = "Remove client kick",
+	Func = function()
+        for _, f in pairs(getgc(true)) do
+            if type(f) == "function" then
+                local ok, consts = pcall(debug.getconstants, f)
+                if ok then
+                    for _, c in pairs(consts) do
+                        if type(c) == "string" and c:lower() == "kick" then
+                            hookfunction(f, function()
+                                return nil
+                            end)
+                        end
+                    end
+                end
+            end
+        end
+	end,
+	DoubleClick = false,
+
+	Tooltip = "Click to remove client kick",
+	DisabledTooltip = "I am disabled!",
+
+	Disabled = false,
+	Visible = true,
+	Risky = false,
+})
+CharacterGroupBox:AddButton({
 	Text = "Force day",
 	Func = function()
         Library:Notify({
@@ -859,7 +889,7 @@ CharacterGroupBox:AddButton({
 
 local InfiniteTeethGroupBox = Tabs.Visual:AddLeftGroupbox("Infinite Teeth", 'waves')
 Library.ForceCheckbox = false
-InfiniteTeethGroupBox:AddToggle("MyToggle", {
+InfiniteTeethGroupBox:AddToggle("StartINFT", {
 	Text = "Start",
 	Tooltip = "Active to start a inf teeth visual",
 	DisabledTooltip = "I am disabled!",
@@ -916,7 +946,7 @@ InfiniteTeethGroupBox:AddButton("Stop", function()
     visualTeeth.Stoped = false
 end)
 InfiniteTeethGroupBox:AddDivider()
-InfiniteTeethGroupBox:AddInput("MyTextbox", {
+InfiniteTeethGroupBox:AddInput("TheetValue", {
     Default = "1000",
     Numeric = true,
     Finished = false,
@@ -929,7 +959,7 @@ InfiniteTeethGroupBox:AddInput("MyTextbox", {
         visualTeeth.Teeth = Value
     end,
 })
-InfiniteTeethGroupBox:AddInput("MyTextbox", {
+InfiniteTeethGroupBox:AddInput("TheetTime", {
     Default = "0.0001",
     Numeric = true,
     Finished = false,
@@ -943,7 +973,7 @@ InfiniteTeethGroupBox:AddInput("MyTextbox", {
     end,
 })
 Library.ForceCheckbox = true
-InfiniteTeethGroupBox:AddToggle("TeethToggle", {
+InfiniteTeethGroupBox:AddToggle("UseTheethAnimation", {
 	Text = "Use teeth animation",
 	Tooltip = "",
 	DisabledTooltip = "I am disabled!",
@@ -957,7 +987,7 @@ InfiniteTeethGroupBox:AddToggle("TeethToggle", {
         visualTeeth.TeethAnimation = Value
 	end,
 })
-Toggles.TeethToggle:SetValue(true)
+Toggles.UseTheethAnimation:SetValue(true)
 
 
 local UiSettingsGroubBox = Tabs.Settings:AddLeftGroupbox("Ui Settings", "brush")
@@ -1016,6 +1046,16 @@ CreditsGroupBox:AddButton("Discord server", function()
         Time = 4,
     })
 end)
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+ThemeManager:SetFolder("Obsidian")
+SaveManager:SetFolder("Obsidian/Shark-Bite")
+SaveManager:SetSubFolder("Shark-Bite")
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
+SaveManager:LoadAutoloadConfig()
 
 
 
