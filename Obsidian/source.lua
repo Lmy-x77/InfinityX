@@ -5920,7 +5920,7 @@ function Library:CreateWindow(WindowInfo)
             ScaleType = Enum.ScaleType.Slice,
             SliceCenter = Rect.new(10, 10, 118, 118),
             Parent = MainFrame,
-            ZIndex = MainFrame.ZIndex - 1,
+            ZIndex = -1,
         })
         New("UICorner", {
             CornerRadius = UDim.new(0, WindowInfo.CornerRadius),
