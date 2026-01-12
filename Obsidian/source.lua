@@ -1061,22 +1061,21 @@ local function FillInstance(Table: { [string]: any }, Instance: GuiObject)
     end
 end
 
-local function New(ClassName: string, Properties: { [string]: any })
-    local inst = Instance.new(ClassName)
+local function New(ClassName: string, Properties: { [string]: any }): any
+    local Instance = Instance.new(ClassName)
 
-    if Templates and Templates[ClassName] then
-        FillInstance(Templates[ClassName], inst)
+    if Templates[ClassName] then
+        FillInstance(Templates[ClassName], Instance)
+    end
+    FillInstance(Properties, Instance)
+
+    if Properties["Parent"] and not Properties["ZIndex"] then
+        pcall(function()
+            Instance.ZIndex = Properties.Parent.ZIndex
+        end)
     end
 
-    FillInstance(Properties, inst)
-
-    if Properties.ZIndex then
-        inst.ZIndex = Properties.ZIndex
-    elseif Properties.Parent and Properties.Parent:IsA("GuiObject") then
-        inst.ZIndex = Properties.Parent.ZIndex
-    end
-
-    return inst
+    return Instance
 end
 
 
