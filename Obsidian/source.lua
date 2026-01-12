@@ -1061,21 +1061,21 @@ local function FillInstance(Table: { [string]: any }, Instance: GuiObject)
     end
 end
 
-local function New(ClassName: string, Properties: { [string]: any }): any
-    local Instance = Instance.new(ClassName)
+local function New(ClassName: string, Properties: { [string]: any })
+    local inst = Instance.new(ClassName)
 
-    if Templates[ClassName] then
-        FillInstance(Templates[ClassName], Instance)
-    end
-    FillInstance(Properties, Instance)
-
-    if Properties["Parent"] and not Properties["ZIndex"] then
-        pcall(function()
-            Instance.ZIndex = Properties.Parent.ZIndex
-        end)
+    if Templates and Templates[ClassName] then
+        FillInstance(Templates[ClassName], inst)
     end
 
-    return Instance
+    FillInstance(Properties, inst)
+
+    if Properties.Parent then
+        local parentZ = Properties.Parent.ZIndex or 1
+        inst.ZIndex = Properties.ZIndex or parentZ
+    end
+
+    return inst
 end
 
 --// Main Instances \\-
@@ -5909,7 +5909,7 @@ function Library:CreateWindow(WindowInfo)
             Visible = false,
             Parent = ScreenGui,
         })
-        New('ImageLabel', {
+        New("ImageLabel", {
             Size = UDim2.new(1, 10, 1, 20),
             Position = UDim2.new(0, -5, 0, -10),
             BackgroundTransparency = 1,
@@ -5918,7 +5918,7 @@ function Library:CreateWindow(WindowInfo)
             ImageTransparency = 0.45,
             ScaleType = Enum.ScaleType.Slice,
             SliceCenter = Rect.new(10, 10, 118, 118),
-            ZIndex = MainFrame.ZIndex - 1,
+            ZIndex = (MainFrame.ZIndex or 1) - 1,
             Parent = MainFrame,
         })
         New("UICorner", {
