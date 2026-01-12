@@ -7493,7 +7493,7 @@ shadow.ImageColor3 = Color3.fromRGB(170, 0, 255)
 shadow.ImageTransparency = 0.45
 shadow.ScaleType = Enum.ScaleType.Slice
 shadow.SliceCenter = Rect.new(10, 10, 118, 118)
-shadow.ZIndex = main.ZIndex - 1
+shadow.ZIndex = MainFrame.ZIndex - 1
 shadow.Parent = MainFrame
 
 Library:GiveSignal(Players.PlayerAdded:Connect(OnPlayerChange))
