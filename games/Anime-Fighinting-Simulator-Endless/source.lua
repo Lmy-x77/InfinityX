@@ -1,9 +1,3 @@
-game.Players.LocalPlayer:Kick('The script is not safe to run at this time. Please wait until we bypass it. For more information, join the Discord server.')
-task.wait(9e9)
-
-
-
-
 ---@diagnostic disable: undefined-global
 -- detect service
 local UserInputService = game:GetService("UserInputService")
@@ -33,35 +27,13 @@ print[[
 
 
 -- verify
-local executor = "Unknown Executor"
-if identifyexecutor then
-  executor = identifyexecutor()
-elseif getexecutorname then
-  executor = getexecutorname()
-end
-if executor == 'Xeno' or executor == 'Solara' then
-  loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/modules/notification.lua'))()
-  repeat task.wait() until read == true
-end
-if getrawmetatable and setreadonly and newcclosure and getnamecallmethod and executor ~= 'Bunni' then
-  local mt = getrawmetatable(game)
-  local old = mt.__namecall
-  setreadonly(mt, false)
-  mt.__namecall = newcclosure(function(self, ...)
-    local m = getnamecallmethod()
-    if tostring(m) == "Kick" then
-      return
-    end
-    return old(self, ...)
-  end)
-  setreadonly(mt, true)
-  print('[DEBUG] - Anti-Kick Loaded 🟢')
-  wait(1)
-  loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/bypass.lua'))()
-  print('[DEBUG] - Crash Bypass Loaded 🟢')
-else
-  print('[DEBUG] - Anti-Kick Failed 🔴')
-end
+pcall(function()
+  loadstring(game:HttpGet(
+    'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/bypass.lua'
+  ))()
+  print('[DEBUG] - Bypass loaded! 🟢')
+  print('Thanks @26jc, 090 and @MeowMad Ali')
+end)
 
 
 -- variables
@@ -91,7 +63,8 @@ getgenv().AutoBuySpecials = {
     ["Blue Inferno"] = 2,
     ["Frostfire Rift"] = 3,
     ["Bio-Reconstruct"] = 4,
-    ["Unity Drive"] = 5
+    ["Unity Drive"] = 5,
+    ["Hell Flame"] = 6
   },
   ["Kagunes"] = {
     ["Eye Patch"] = 1,
@@ -102,7 +75,8 @@ getgenv().AutoBuySpecials = {
   ["Grimoires"] = {
     ["Water Grimoire"] = 1,
     ["Wind Grimoire"] = 2,
-    ["Demon Grimoire"] = 3
+    ["Demon Grimoire"] = 3,
+    ["Tree Grimoire"] = 4
   },
   ["Bloodlines"] = {
     ["Copy Eyes"] = 1,
@@ -111,6 +85,8 @@ getgenv().AutoBuySpecials = {
     ['Ripple Eyes'] = 4
   }
 }
+local FruitConn
+local Applied = {}
 local FruitConnection
 local ChikaraConnection
 local HttpService = game:GetService("HttpService")
@@ -277,15 +253,21 @@ function ApplyEspToChikara()
     end
   end
 end
-function ApplyEspToFruit()
-  for _, v in pairs(workspace.Scriptable.Fruits:GetChildren()) do
-    if v:IsA('Model') then
-      EspLib.ApplyESP(v, {
-        Color = Color3.fromRGB(173, 52, 52),
-        Text = v.Name,
-        ESPName = "FruitESP",
-        HighlightEnabled = true,
-      })
+local function ApplyFruit(fruit)
+  if Applied[fruit] then return end
+  Applied[fruit] = true
+
+  EspLib.ApplyESP(fruit, {
+    Color = Color3.fromRGB(173, 52, 52),
+    Text = fruit.Name,
+    ESPName = "FruitESP",
+    HighlightEnabled = true,
+  })
+end
+local function ApplyEspToFruit()
+  for _, v in ipairs(workspace.Scriptable.Fruits:GetChildren()) do
+    if v:IsA("Model") then
+      ApplyFruit(v)
     end
   end
 end
@@ -390,15 +372,14 @@ Window:CreateTopbarButton(
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
 <font size="20" color="#00FF88"><b>🚀 New Features & Changes</b></font>
 <font size="15" color="#E0E0E0">
-• <font color="#FFD166"><b>Added Auto Roll Stands</b></font> – <font size="16">Allows the player to scroll stands automatically and stop at the one selected</font>  
-• <font color="#FFD166"><b>Added Auto Roll Quirks</b></font> – <font size="16">Allows the player to scroll quirks automatically and stop at the one selected</font>  
-• <font color="#FFD166"><b>Added Auto Roll Grimoires</b></font> – <font size="16">Allows the player to scroll grimoires automatically and stop at the one selected</font>  
-• <font color="#FFD166"><b>Added Auto Roll Bloodlines</b></font> – <font size="16">Allows the player to scroll bloodlines automatically and stop at the one selected</font>  
-• <font color="#FFD166"><b>Added Auto Roll Kagunes</b></font> – <font size="16">Allows the player to scroll kagunes automatically and stop at the one selected</font>  
-• <font color="#FFD166"><b>Added Executor Support</b></font> – <font size="16">If the executor doesn't support certain hub functions, the script sends you a notification</font>  
-• <font color="#00FFCC"><b>Fixed Esp Players</b></font> – <font size="16">Mobile users can see players even from a distance.</font>  
-• <font color="#00FFCC"><b>Improved All Esps</b></font> – <font size="16">All esp have model and distance checks</font>  
-• <font color="#00FFCC"><b>Fixed Minor Lags</b></font> – <font size="16">performance optimizations to reduce lag and improve overall smoothness.</font>  
+• <font color="#FFD166"><b>Added New Quirks</b></font> – <font size="16">newly released in-game quirks have been fully added and integrated into the system.</font>  
+• <font color="#FFD166"><b>Added New Grimoires</b></font> – <font size="16">new grimoires introduced in the game are now supported and available.</font>  
+• <font color="#FFD166"><b>Added New Anti-Cheater Bypass</b></font> – <font size="16">an advanced and optimized bypass designed to improve stability, reduce detections, and ensure smoother execution against updated anti-cheat systems.</font>  
+• <font color="#FFD166"><b>Added New Codes</b></font> – <font size="16">support for the latest game codes, allowing quick and easy reward redemption.</font>  
+• <font color="#00FFCC"><b>Fixed Script Crash</b></font> – <font size="16">resolved critical issues that could cause unexpected script crashes.</font>  
+• <font color="#00FFCC"><b>Fixed ESP Fruit</b></font> – <font size="16">corrected detection and rendering issues related to fruit ESP.</font>  
+• <font color="#00FFCC"><b>Improved All ESP</b></font> – <font size="16">overall enhancements to accuracy, performance, and reliability.</font>  
+• <font color="#00FFCC"><b>Improved ESP Library</b></font> – <font size="16">refactored core ESP systems for better optimization and stability.</font>  
 </font>
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
 ]],
@@ -1183,25 +1164,32 @@ local Toggle = EspTab:Toggle({
     end)
   end
 })
-local Toggle = EspTab:Toggle({
+EspTab:Toggle({
   Title = "Esp all fruits",
   Icon = "check",
   Type = "Checkbox",
   Flag = "EspFruit",
   Value = false,
   Callback = function(state)
-    EspLib.ESPValues.FruitESP= state
+    EspLib.ESPValues.FruitESP = state
 
-    task.spawn(function()
-      if EspLib.ESPValues.FruitESP then
-        ApplyEspToFruit()
+    if state then
+      ApplyEspToFruit()
+
+      if not FruitConn then
+        FruitConn = workspace.Scriptable.Fruits.ChildAdded:Connect(function(fruit)
+          if EspLib.ESPValues.FruitESP and fruit:IsA("Model") then
+            ApplyFruit(fruit)
+          end
+        end)
       end
-      workspace.Scriptable.Fruits.ChildAdded:Connect(function(fruit)
-        if EspLib.ESPValues.FruitESP and fruit:IsA('Model') then
-          ApplyEspToFruit()
-        end
-      end)
-    end)
+    else
+      if FruitConn then
+        FruitConn:Disconnect()
+        FruitConn = nil
+      end
+      table.clear(Applied)
+    end
   end
 })
 local Toggle = EspTab:Toggle({
@@ -1471,7 +1459,7 @@ local Dropdown = ShopTab:Dropdown({
 local Dropdown = ShopTab:Dropdown({
   Title = "Select Champions",
   Desc = "Select the champions you want to get",
-  Values = { "Sunji", "Levee", "Keela", "Sarka", "Pilcol", "Toju", "Canakey", "Loofi", "Asto", "Junwon", "Tojaro", "Juyari", "Narnto", "Vetega", "Boras", "Igicho", "Remgonuk", "Sasoke ", "Itachu", "Bright Yagimi", "Saytamu Serious", "Giovanni", "Booh", "Gen", "Shunro", "Kroll", "Eskano", "Mallyodas", "Saytamu" },
+  Values = { "Sunji", "Levee", "Keela", "Sarka", "Pilcol", "Toju", "Canakey", "Loofi", "Asto", "Junwon", "Tojaro", "Juyari", "Narnto", "Vetega", "Genas", "Boras", "Igicho", "Remgonuk", "Sasoke ", "Itachu", "Goju", "Bright Yagimi", "Saytamu Serious", "Giovanni", "Booh", "Gen", "Shunro", "Kroll", "Eskano", "Mallyodas", "Gokro", "Saytamu" },
   Value = {"Sunji", "Levee", "Keela"},
   Flag = "ChampionDropdownB",
   Multi = true,
@@ -2196,6 +2184,15 @@ local Button = MiscTab:Button({
   Locked = false,
   Callback = function()
     local codes = {
+      'BUGSPATCH4',
+      'BUGSPATCH3',
+      'BUGSPATCH2',
+      'BUGSPATCH1',
+      '50KFAVORITES',
+      '125KLIKES',
+      '25MVisits',
+      'KURAMANEXTWEEK',
+      '150KLIKES',
       'UPDATETHISWEEKEND',
       '100KLIKES',
       'NEWCHIKARACODE',
