@@ -1,5 +1,7 @@
-if not run_on_actor and not identifyexecutor() == 'Bunni' then
-  pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer, "Your exploit: " .. identifyexecutor() .. ' dont support actor funtions')
+if (not run_on_actor) or identifyexecutor() == "Bunni" then
+  pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
+    "Your exploit: " .. identifyexecutor() .. " dont support actor functions"
+  )
 end
 
 local Source = [=[
