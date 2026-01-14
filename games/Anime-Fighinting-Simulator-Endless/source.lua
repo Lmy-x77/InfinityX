@@ -39,12 +39,9 @@ end)
 -- variables
 local SkillKeys = { "Z","X","C","E","R","T","Y","U","F","G","H","J","K","L","V","B","N","M" }
 local SelectedSkills = {}
-getgenv().FarmMobSettings = {
-  UseM1 = false
-}
-getgenv().AutoSellChampionsSettings = {
-  Enabled = false
-}
+getgenv().AfkFarmSettings = { Desync = true }
+getgenv().FarmMobSettings = { UseM1 = false }
+getgenv().AutoSellChampionsSettings = { Enabled = false }
 getgenv().ProtectedChampion = false
 getgenv().AutoBuySpecials = {
   ["Stands"] = {
@@ -198,6 +195,9 @@ function GetPlayersOffSafeZone()
     end
   end
   return players
+end
+local KeyPress = function(v)
+  return game:GetService("VirtualInputManager"):SendKeyEvent(true, v, false, game)
 end
 function SendWebhook(embed)
   request({
@@ -536,8 +536,11 @@ local Toggle = AutoFarmTab:Toggle({
         elseif SelectedStat == 'Strength' and Strength.Value >= 2500000000000000000 and Strength.Value < 1000000000000000000000 then
           Teleport(nil, 2, 3873, 138, 873)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value > 1000000000000000000000 then
+        elseif SelectedStat == 'Strength' and Strength.Value >= 1000000000000000000000 and Strength.Value < 10000000000000000000000 then
           Teleport(nil, 2, 3858, 669, -1076)
+          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
+        elseif SelectedStat == 'Strength' and Strength.Value >= 1000000000000000000000 then
+          Teleport(nil, 2, 2385, 246, -624)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
 
 
@@ -577,8 +580,11 @@ local Toggle = AutoFarmTab:Toggle({
         elseif SelectedStat == 'Durability' and Durability.Value >= 2500000000000000000 and Durability.Value < 1000000000000000000000 then
           Teleport(nil, 2, 2568, 92, 1762)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value > 1000000000000000000000 then
+        elseif SelectedStat == 'Durability' and Durability.Value >= 1000000000000000000000 and Durability.Value < 10000000000000000000000 then
           Teleport(nil, 2, 1673, 2305, -78)
+          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
+        elseif SelectedStat == 'Durability' and Durability.Value >= 10000000000000000000000 then
+          Teleport(nil, 2, 3529, 258, 1451)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
 
 
@@ -621,8 +627,11 @@ local Toggle = AutoFarmTab:Toggle({
         elseif SelectedStat == 'Chakra' and Chakra.Value >= 2500000000000000000 and Chakra.Value < 1000000000000000000000 then
           Teleport(nil, 2, 3242, -441, -233)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 1000000000000000000000 then
+        elseif SelectedStat == 'Chakra' and Chakra.Value >= 1000000000000000000000 and Chakra.Value < 10000000000000000000000 then
           Teleport(nil, 2, 341, 237, 1867)
+          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
+        elseif SelectedStat == 'Chakra' and Chakra.Value >= 10000000000000000000000 then
+          Teleport(nil, 2, -1072, 608, 1506)
           game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
 
 
@@ -964,8 +973,8 @@ local Button = AutoFarmTab:Button({
   Callback = function()
     local Dialog = Window:Dialog({
       Icon = "circle-question-mark",
-      Title = "InfinityX - Dialog",
-      Content = "<b>Warning</b>\n\nRunning this script will <b>close the hub</b> and <b>start the AFK Farm</b>.\n\nAre you sure you want to continue?",
+      Title = "InfinityX",
+      Content = "<b>Warning</b>\n\nRunning this script will <b>close the hub</b> and <b>start the AFK Farm</b>.\n\nThis script uses a <b>Desync system</b>.\n\n<b>Some executors may not be able to run this script.</b>\n\nAre you sure you want to continue?",
       Buttons = {
         {
           Title = "Execute",
@@ -975,10 +984,15 @@ local Button = AutoFarmTab:Button({
               Content = "Starting afk farm...",
               Duration = 2,
               Icon = "bell-ring",
-            })
-            wait(2)
-            Window:Destroy()
-            wait(1)
+            }); wait(2)
+            Window:Destroy(); wait(1)
+
+            if getgenv().AfkFarmSettings.Desync then
+              Teleport(nil, 2, 14, 105, -13) wait(.5)
+              setfflag("NextGenReplicatorEnabledWrite4", "false"); wait(1)
+              setfflag("NextGenReplicatorEnabledWrite4", "true"); wait(1)
+            end
+
             loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/modules/Afk-Farm.lua'))()
           end,
         },
@@ -990,6 +1004,17 @@ local Button = AutoFarmTab:Button({
         },
       },
     })
+  end
+})
+local Toggle = AutoFarmTab:Toggle({
+  Title = "Use Desync",
+  Desc = "Use desync in afk farm chikara",
+  Icon = "check",
+  Type = "Checkbox",
+  Flag = "AutoChikara",
+  Value = true,
+  Callback = function(state)
+    getgenv().AfkFarmSettings.Desync = state
   end
 })
 
@@ -2176,7 +2201,7 @@ local Button = TeleportTab:Button({
 })
 
 
-local Section = MiscTab:Section({ 
+local Section = MiscTab:Section({
   Title = "Misc Options",
 })
 local Button = MiscTab:Button({
