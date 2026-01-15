@@ -27,13 +27,18 @@ print[[
 
 
 -- verify
-pcall(function()
-  loadstring(game:HttpGet(
-    'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/bypass.lua'
-  ))()
-  print('[DEBUG] - Bypass loaded! 🟢')
-  print('Thanks @26jc, 090 and @MeowMad Ali')
-end)
+if not BYPASS_LOADED then
+  pcall(function()
+    loadstring(game:HttpGet(
+      'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/bypass.lua'
+    ))()
+    print('[DEBUG] - Bypass loaded! 🟢')
+    print('Thanks @26jc, 090 and @MeowMad Ali')
+  end)
+else
+  print('[DEBUG] - Bypass already loaded')
+end
+pcall(function() getgenv().BYPASS_LOADED = true end)
 
 
 -- variables
