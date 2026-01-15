@@ -56,18 +56,6 @@ local function AntiRagdoll()
   end)
   hookfunction(v2, function() end)
 end
-local function FireTool(ToolName)
-  for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
-      if v.Name == ToolName then
-          v.Parent = game.Players.LocalPlayer.Character
-      end
-   end
-  for i,v in pairs (game.Players.LocalPlayer.Character:GetChildren()) do
-      if v.Name == ToolName then
-          v:Activate()
-      end
-  end
-end
 local function EquipTool(ToolName)
   for i, v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
       if v:IsA('Tool') and v.Name == ToolName then
@@ -84,49 +72,32 @@ local function GetPlayersName()
   end
   return plrs
 end
-local LibrarySettings = {
-  Title = '<font color="rgb(110, 48, 160)" size="' .. (isMobile and '14' or '24') .. '"><b>'.. (isMobile and ' InfinityX' or 'InfintyX') ..'</b></font>',
-  Footer = {
-    GameName = '<font color="rgb(180,180,255)"><i>Gang up on people simulator</i></font> · ',
-    Version = '<font color="rgb(160,160,160)">Version 4.2a</font> · ',
-    DiscordLink = '<font color="rgb(100,200,255)">Join us: discord.gg/emKJgWMHAr</font>'
-  }
-}
 
 
 
 -- ui library
-local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Obsidian/source.lua"))()
-function getDpiScale()
-    if IsOnMobile then
-        return Library:SetDPIScale(75)
-    elseif not IsOnMobile then
-        Library:SetDPIScale(100)
-    end
-end
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/SaveManager.lua"))()
 local Options = Library.Options
 local Toggles = Library.Toggles
 
 Library.ForceCheckbox = true
 
 local Window = Library:CreateWindow({
-    Title = LibrarySettings.Title,
-    Footer = LibrarySettings.Footer.GameName .. LibrarySettings.Footer.Version .. LibrarySettings.Footer.DiscordLink,
-    Icon = 126527122577864,
-    NotifySide = "Right",
-    ShowCustomCursor = false,
-    Center = true,
-    MobileButtonsSide = "Left",
-    Resizable = false,
-    Size = UDim2.fromOffset(600, 500),
-    ToggleKeybind = Enum.KeyCode.K,
-    SidebarCompacted = true,
-    DisableSearch = false,
-    SearchbarSize = UDim2.fromOffset(130, 32),
+  Title = '',
+  Footer = '<font color="rgb(120,80,200)">Gang Up On People Simulator</font>',
+  Icon = 126527122577864,
+  Size = UDim2.fromOffset(580, 500),
+  Position = UDim2.fromOffset(100, 100),
+  Center = true,
+  AutoShow = true,
+  Resizable = true,
+  ShowCustomCursor = false,
+  ToggleKeybind = Enum.KeyCode.RightControl,
+  NotifySide = "Right",
 })
+Window:SetSidebarWidth(54)
 
 
 
@@ -1118,8 +1089,8 @@ SaveManager:SetLibrary(Library)
 SaveManager:IgnoreThemeSettings()
 SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
 ThemeManager:SetFolder("Obsidian")
-SaveManager:SetFolder("Obsidian/Shark-Bite")
-SaveManager:SetSubFolder("Shark-Bite")
+SaveManager:SetFolder("Obsidian/GUOPS")
+SaveManager:SetSubFolder("GUOPS")
 SaveManager:BuildConfigSection(Tabs.Settings)
 ThemeManager:ApplyToTab(Tabs.Settings)
 SaveManager:LoadAutoloadConfig()
@@ -1127,7 +1098,6 @@ SaveManager:LoadAutoloadConfig()
 
 
 -- extra functions
-getDpiScale()
 game.Players.PlayerAdded:Connect(function()
   Options.PlayersDropdown:SetValues(GetPlayersName())
 end)
