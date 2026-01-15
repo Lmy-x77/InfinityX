@@ -44,49 +44,32 @@ function GetItem(kind, item, method)
   local Event = game:GetService("ReplicatedStorage").Remotes.Economy.buyShopItem
   return Event:InvokeServer({kind = kind, item = item, method = method})
 end
-local LibrarySettings = {
-  Title = '<font color="rgb(110, 48, 160)" size="' .. (isMobile and '14' or '24') .. '"><b>'.. (isMobile and ' InfinityX' or 'InfintyX') ..'</b></font>',
-  Footer = {
-    GameName = '<font color="rgb(180,180,255)"><i>Tower Of Hell</i></font> · ',
-    Version = '<font color="rgb(160,160,160)">Version 4.2a</font> · ',
-    DiscordLink = '<font color="rgb(100,200,255)">Join us: discord.gg/emKJgWMHAr</font>'
-  }
-}
 
 
 
 -- ui library
-local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Obsidian/source.lua"))()
-function getDpiScale()
-    if IsOnMobile then
-        return Library:SetDPIScale(75)
-    elseif not IsOnMobile then
-        Library:SetDPIScale(100)
-    end
-end
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/SaveManager.lua"))()
 local Options = Library.Options
 local Toggles = Library.Toggles
 
 Library.ForceCheckbox = true
 
 local Window = Library:CreateWindow({
-    Title = LibrarySettings.Title,
-    Footer = LibrarySettings.Footer.GameName .. LibrarySettings.Footer.Version .. LibrarySettings.Footer.DiscordLink,
-    Icon = 126527122577864,
-    NotifySide = "Right",
-    ShowCustomCursor = false,
-    Center = true,
-    MobileButtonsSide = "Left",
-    Resizable = false,
-    Size = UDim2.fromOffset(600, 500),
-    ToggleKeybind = Enum.KeyCode.K,
-    SidebarCompacted = true,
-    DisableSearch = false,
-    SearchbarSize = UDim2.fromOffset(130, 32),
+  Title = '',
+  Footer = '<font color="rgb(120,80,200)">Tower of Hell</font>',
+  Icon = 126527122577864,
+  Size = UDim2.fromOffset(580, 500),
+  Position = UDim2.fromOffset(100, 100),
+  Center = true,
+  AutoShow = true,
+  Resizable = true,
+  ShowCustomCursor = false,
+  ToggleKeybind = Enum.KeyCode.RightControl,
+  NotifySide = "Right",
 })
+Window:SetSidebarWidth(54)
 
 
 
@@ -142,7 +125,7 @@ TowerGroupBox:AddButton("Finish tower + rejoin", function()
   end
 end)
 TowerGroupBox:AddDivider()
-TowerGroupBox:AddLabel({
+TowerGroupBox:AddParagraph({
   Text = "The finish tower is working, but be careful, after several tests even taking time to get kicked or banned the code is still not 100% secure, so use with moderation.\n\n(I recommend using it on a private server, but still be careful when using it)",
   DoesWrap = true
 })
@@ -450,7 +433,6 @@ SaveManager:LoadAutoloadConfig()
 
 
 -- extra functions
-getDpiScale()
 Library:Notify({
     Title = "InfinityX",
     Description = "Welcome ".. game.Players.LocalPlayer.Name .."",
