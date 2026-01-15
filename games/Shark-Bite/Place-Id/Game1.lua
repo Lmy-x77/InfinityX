@@ -97,37 +97,28 @@ local LibrarySettings = {
 
 
 -- ui library
-local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Obsidian/source.lua"))()
-function getDpiScale()
-    if IsOnMobile then
-        return Library:SetDPIScale(75)
-    elseif not IsOnMobile then
-        Library:SetDPIScale(100)
-    end
-end
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/SaveManager.lua"))()
 local Options = Library.Options
 local Toggles = Library.Toggles
 
 Library.ForceCheckbox = true
 
 local Window = Library:CreateWindow({
-    Title = LibrarySettings.Title,
-    Footer = LibrarySettings.Footer.GameName .. LibrarySettings.Footer.Version .. LibrarySettings.Footer.DiscordLink,
-    Icon = 126527122577864,
-    NotifySide = "Right",
-    ShowCustomCursor = false,
-    Center = true,
-    MobileButtonsSide = "Left",
-    Resizable = false,
-    Size = UDim2.fromOffset(600, 500),
-    ToggleKeybind = Enum.KeyCode.K,
-    SidebarCompacted = true,
-    DisableSearch = false,
-    SearchbarSize = UDim2.fromOffset(130, 32),
+  Title = '',
+  Footer = '<font color="rgb(120,80,200)">Shark Bite (Classic)</font>',
+  Icon = 126527122577864,
+  Size = UDim2.fromOffset(580, 500),
+  Position = UDim2.fromOffset(100, 100),
+  Center = true,
+  AutoShow = true,
+  Resizable = true,
+  ShowCustomCursor = false,
+  ToggleKeybind = Enum.KeyCode.RightControl,
+  NotifySide = "Right",
 })
+Window:SetSidebarWidth(54)
 
 
 
@@ -1060,7 +1051,6 @@ SaveManager:LoadAutoloadConfig()
 
 
 -- extra functions
-getDpiScale()
 Library:Notify({
     Title = "InfinityX",
     Description = "Welcome ".. game.Players.LocalPlayer.Name .."",
