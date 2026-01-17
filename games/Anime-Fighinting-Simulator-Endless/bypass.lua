@@ -1,4 +1,4 @@
-if (not run_on_actor) or identifyexecutor() == "Bunni" then
+if (not run_on_actor or not getrawmetatable or not setreadonly or not rawset) or identifyexecutor() == "Bunni" then
   pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
     "Your exploit: " .. identifyexecutor() .. " dont support actor functions"
   )
