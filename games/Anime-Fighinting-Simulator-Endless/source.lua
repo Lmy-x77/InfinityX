@@ -1,9 +1,3 @@
-pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
-	"Script being updated"
-)
-task.wait(9e9)
-
-
 ---@diagnostic disable: undefined-global
 -- detect service
 local UserInputService = game:GetService("UserInputService")
@@ -207,8 +201,174 @@ function GetPlayersOffSafeZone()
   end
   return players
 end
-local KeyPress = function(v)
-  return game:GetService("VirtualInputManager"):SendKeyEvent(true, v, false, game)
+local Players = game:GetService("Players")
+local RS = game:GetService("ReplicatedStorage")
+local LP = Players.LocalPlayer
+local Remote = RS.Remotes.RemoteEvent
+local Char = LP.Character or LP.CharacterAdded:Wait()
+local HRP = Char:WaitForChild("HumanoidRootPart")
+local Stats = {
+	[1] = LP.Stats["1"],
+	[2] = LP.Stats["2"],
+	[3] = LP.Stats["3"],
+	[4] = LP.Stats["4"],
+	[5] = LP.Stats["5"],
+	[6] = LP.Stats["6"],
+}
+local Areas = {
+	[1] = {
+		{100,1e4,{nil,2,-6,71,134}},
+		{1e4,1e5,{nil,1343,195,-141}},
+		{1e5,1e6,{nil,2,-1257,65,486}},
+		{1e6,1e7,{nil,2,-917,85,179}},
+		{1e7,1e8,{nil,2,-2245,617,533}},
+		{1e8,1e9,{nil,2,-42,65,-1248}},
+		{1e9,1e11,{nil,2,721,149,925}},
+		{1e11,5e12,{nil,2,1842,139,96}},
+		{5e12,2.5e14,{nil,2,621,662,413}},
+		{2.5e14,7.5e16,{nil,2,4289,163,-601}},
+		{7.5e16,2.5e18,{nil,2,798,231,-1004}},
+		{2.5e18,1e21,{nil,2,3873,138,873}},
+		{1e21,1e22,{nil,2,3858,669,-1076}},
+		{1e22,math.huge,{nil,2,2385,246,-624}},
+	},
+	[2] = {
+		{100,1e4,{nil,2,67,69,878}},
+		{1e4,1e5,{nil,2,-1655,63,-520}},
+		{1e5,1e6,{nil,2,-93,101,2029}},
+		{1e6,1e7,{nil,2,-628,179,720}},
+		{1e7,1e8,{nil,2,-1108,211,-962}},
+		{1e8,1e9,{nil,2,-333,72,-1650}},
+		{1e9,1e11,{nil,2,2508,1543,-380}},
+		{1e11,5e12,{nil,2,-2802,-228,355}},
+		{5e12,2.5e14,{nil,2,2187,517,581}},
+		{2.5e14,7.5e16,{nil,2,1671,423,-1293}},
+		{7.5e16,2.5e18,{nil,2,155,772,-699}},
+		{2.5e18,1e21,{nil,2,2568,92,1762}},
+		{1e21,1e22,{nil,2,1673,2305,-78}},
+		{1e22,math.huge,{nil,2,3529,258,1451}},
+	},
+	[3] = {
+		{100,1e4,{nil,2,4,64,-124}},
+		{1e4,1e5,{nil,2,1424,146,-581}},
+		{1e5,1e6,{nil,2,914,140,794}},
+		{1e6,1e7,{nil,2,1551,387,685}},
+		{1e7,1e8,{nil,2,346,-149,-1844}},
+		{1e8,1e9,{nil,2,1022,249,-618}},
+		{1e9,1e11,{nil,2,3054,110,1105}},
+		{1e11,5e12,{nil,2,1710,577,1743}},
+		{5e12,2.5e14,{nil,2,-16,61,-475}},
+		{2.5e14,7.5e16,{nil,2,-411,1255,663}},
+		{7.5e16,2.5e18,{nil,2,-732,2791,628}},
+		{2.5e18,1e21,{nil,2,3242,-441,-233}},
+		{1e21,1e22,{nil,2,341,237,1867}},
+		{1e22,math.huge,{nil,2,-1072,608,1506}},
+	},
+	[5] = {
+		{100,1e4,{nil,2,37,69,459}},
+		{1e4,1e5,{nil,2,-424,122,-81}},
+		{1e5,5e6,{nil,2,3479,60,143}},
+		{5e6,math.huge,{nil,2,4111,69,879}},
+	},
+	[6] = {
+		{100,1e4,{nil,2,-102,62,-496}},
+		{1e4,1e5,{nil,2,-424,122,-81}},
+		{1e5,5e6,{nil,2,3479,60,143}},
+		{5e6,math.huge,{nil,2,4111,69,879}},
+	},
+}
+local function TeleportBest(id)
+	if id == 4 then return end
+
+	local statValue = Stats[id].Value
+	local list = Areas[id]
+	if not list then return end
+
+	for _, area in ipairs(list) do
+		local min, max, tp = area[1], area[2], area[3]
+		if statValue >= min and statValue < max then
+			Teleport(unpack(tp))
+			return
+		end
+	end
+end
+local function GetBoomQuest()
+	for _,q in ipairs(LP.Quests:GetChildren()) do
+		if q.Name:find("Boom") then
+			return q
+		end
+	end
+end
+local BoomNPC = workspace.Scriptable.NPC.Quest:FindFirstChild("Boom")
+local function TurnInBoom()
+  if BoomNPC then
+	  HRP:PivotTo(BoomNPC:GetPivot())
+	  local click
+	  repeat
+	  	click = BoomNPC:FindFirstChild("ClickBox", true)
+	  	task.wait(0.1)
+	  until click and click:FindFirstChildOfClass("ClickDetector")
+	  fireclickdetector(click:FindFirstChildOfClass("ClickDetector"))
+  else
+    Teleport(nil, 2, -36, 80, 3)
+	  local click
+	  repeat
+	  	click = BoomNPC:FindFirstChild("ClickBox", true)
+	  	task.wait(0.1)
+	  until click and click:FindFirstChildOfClass("ClickDetector")
+	  fireclickdetector(click:FindFirstChildOfClass("ClickDetector"))
+  end
+end
+local ReindeerNPC = workspace.Scriptable.NPC.Quest:FindFirstChild("Reindeer")
+local function TurnInReindeer()
+	if ReindeerNPC then
+		HRP:PivotTo(ReindeerNPC:GetPivot())
+		local click
+		repeat
+			click = ReindeerNPC:FindFirstChild("ClickBox", true)
+			task.wait(0.1)
+		until click and click:FindFirstChildOfClass("ClickDetector")
+		fireclickdetector(click:FindFirstChildOfClass("ClickDetector"))
+  else
+    Teleport(nil, 2, -33, 105, 37)
+	  local click
+	  repeat
+	  	click = ReindeerNPC:FindFirstChild("ClickBox", true)
+	  	task.wait(0.1)
+	  until click and click:FindFirstChildOfClass("ClickDetector")
+	  fireclickdetector(click:FindFirstChildOfClass("ClickDetector"))
+	end
+end
+local function GetReindeerQuest()
+	for _, q in ipairs(LP.Quests:GetChildren()) do
+		if q:FindFirstChild("QuestType") and q.Name:find("Reindeer") then
+			return q
+		end
+	end
+end
+local function GetWeakerPlayersOffSafeZone()
+	local list = {}
+	local myPower = LP.OtherData.TotalPower.Value
+	for _, v in ipairs(Players:GetPlayers()) do
+		if v ~= LP and v:FindFirstChild("OtherData") then
+			if v.OtherData.TotalPower.Value < myPower then
+				local char = v.Character
+				if char then
+					local pvp = char:FindFirstChild("PVPFolder")
+					if pvp and pvp:FindFirstChild("Safezone") and pvp.Safezone.Value == false then
+						table.insert(list, v)
+					end
+				end
+			end
+		end
+	end
+	return list
+end
+local function KillPlayer(plr)
+	if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character.Humanoid.Health ~= 0 then
+		HRP:PivotTo(plr.Character.HumanoidRootPart:GetPivot())
+		Remote:FireServer("Train", 1)
+	end
 end
 function SendWebhook(embed)
   request({
@@ -311,11 +471,11 @@ end
 -- ui library
 local WindUI
 local ok, result = pcall(function()
-    return require("./src/Init")
+  return require("./src/Init")
 end)
 if ok then
   WindUI = result
-else 
+else
   WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
 end
 WindUI:AddTheme({
@@ -335,9 +495,10 @@ local Window = WindUI:CreateWindow({
   Icon = "rbxassetid://72212320253117",
   Theme = "InfinityX",
   NewElements = true,
-  Size = UDim2.fromOffset(850, 560),
-  Transparent = true,
+  Size = UDim2.fromOffset(680, 580),
+  Transparent = false,
   HideSearchBar = true,
+  SideBarWidth = 180,
 })
 Window:EditOpenButton({
   Title = ".gg/emKJgWMHAr",
@@ -352,24 +513,6 @@ Window:EditOpenButton({
   Enabled = true,
   Draggable = true,
 })
-Window:Tag({
-  Title = "BETA 4.2a",
-  Icon = "history",
-  Color = Color3.fromRGB(204, 0, 204),
-  Radius = 13,
-})
-Window:Tag({
-  Title = "discord.gg/emKJgWMHAr",
-  Icon = "link",
-  Color = Color3.fromRGB(255, 255, 255),
-  Radius = 13,
-})
-Window:Tag({
-  Title = "by lmy77",
-  Icon = "circle-user-round",
-  Color = Color3.fromRGB(255, 0, 0),
-  Radius = 13,
-})
 Window:CreateTopbarButton(
   "ChangelogButton",
   "circle-question-mark",
@@ -383,14 +526,14 @@ Window:CreateTopbarButton(
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
 <font size="20" color="#00FF88"><b>🚀 New Features & Changes</b></font>
 <font size="15" color="#E0E0E0">
-• <font color="#FFD166"><b>Added New Quirks</b></font> – <font size="16">newly released in-game quirks have been fully added and integrated into the system.</font>  
-• <font color="#FFD166"><b>Added New Grimoires</b></font> – <font size="16">new grimoires introduced in the game are now supported and available.</font>  
-• <font color="#FFD166"><b>Added New Anti-Cheater Bypass</b></font> – <font size="16">an advanced and optimized bypass designed to improve stability, reduce detections, and ensure smoother execution against updated anti-cheat systems.</font>  
-• <font color="#FFD166"><b>Added New Codes</b></font> – <font size="16">support for the latest game codes, allowing quick and easy reward redemption.</font>  
-• <font color="#00FFCC"><b>Fixed Script Crash</b></font> – <font size="16">resolved critical issues that could cause unexpected script crashes.</font>  
-• <font color="#00FFCC"><b>Fixed ESP Fruit</b></font> – <font size="16">corrected detection and rendering issues related to fruit ESP.</font>  
-• <font color="#00FFCC"><b>Improved All ESP</b></font> – <font size="16">overall enhancements to accuracy, performance, and reliability.</font>  
-• <font color="#00FFCC"><b>Improved ESP Library</b></font> – <font size="16">refactored core ESP systems for better optimization and stability.</font>  
+• <font color="#FFD166"><b>Added Auto Quests</b></font> – <font size="16">automatic completion for Boom and Reindeer quests.</font>
+• <font color="#FFD166"><b>Added UI Customization</b></font> – <font size="16">new customization options and cleaner interface.</font>
+• <font color="#FFD166"><b>Added Anti-AFK System</b></font> – <font size="16">prevents AFK kicks with improved bypass.</font>
+• <font color="#FFD166"><b>Added Auto Buy Next Class</b></font> – <font size="16">automatically purchases the next class.</font>
+• <font color="#00FFCC"><b>Improved Farming & Teleports</b></font> – <font size="16">better area selection, faster and more stable teleports.</font>
+• <font color="#00FFCC"><b>Improved Auto Upgrade & Config</b></font> – <font size="16">smoother upgrades and improved config tab.</font>
+• <font color="#00FFCC"><b>Improved Verification Bypass</b></font> – <font size="16">higher stability and success rate.</font>
+• <font color="#FF6B6B"><b>UI Cleanup</b></font> – <font size="16">removed unnecessary UI tags and layout clutter.</font>
 </font>
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
 ]],
@@ -480,7 +623,6 @@ local Section = AutoFarmTab:Section({
 local Paragraph = AutoFarmTab:Paragraph({
   Title = "Stats Viwer",
   Desc = "",
-  Color = "Grey",
   Locked = false,
 })
 task.spawn(function()
@@ -506,177 +648,45 @@ local Toggle = AutoFarmTab:Toggle({
   Value = false,
   Callback = function(state)
     AutoFarm = state
-
     if not AutoFarm then return end
+
+    local Remote = game:GetService("ReplicatedStorage").Remotes.RemoteEvent
+    local StatMap = {
+      Strength = 1,
+      Durability = 2,
+      Chakra = 3,
+      Sword = 4,
+      Agility = 5,
+      Speed = 6,
+    }
+    local Stats = {
+      [1] = Strength,
+      [2] = Durability,
+      [3] = Chakra,
+      [4] = Sword,
+      [5] = Agility,
+      [6] = Speed,
+    }
+    local function TeleportBestByStat(statId)
+      if statId == 4 then return end
+      local value = Stats[statId].Value
+      local list = Areas[statId]
+      if not list then return end
+      for _,area in ipairs(list) do
+        local min, max, tp = area[1], area[2], area[3]
+        if value >= min and value < max then
+          Teleport(unpack(tp))
+          return
+        end
+      end
+    end
 
     task.spawn(function()
       while AutoFarm do task.wait()
-        if SelectedStat == 'Strength' and Strength.Value >= 100 and Strength.Value < 10000 then
-          Teleport(nil, 2, -6, 71, 134)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value >= 10000 and Strength.Value < 100000 then
-          Teleport(1343, 195, -141)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value >= 100000 and Strength.Value < 1000000 then
-          Teleport(nil, 2, -1257, 65, 486)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value >= 1000000 and Strength.Value < 10000000 then
-          Teleport(nil, 2, -917, 85, 179)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value >= 10000000 and Strength.Value < 100000000 then
-          Teleport(nil, 2, -2245, 617, 533)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value >= 100000000 and Strength.Value < 1000000000 then
-          Teleport(nil, 2, -42, 65, -1248)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value >= 1000000000 and Strength.Value < 100000000000 then
-          Teleport(nil, 2,721, 149, 925)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value >= 100000000000 and Strength.Value < 5000000000000 then
-          Teleport(nil, 2, 1842, 139, 96)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value >= 5000000000000 and Strength.Value < 250000000000000 then
-          Teleport(nil, 2, 621, 662, 413)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value >= 250000000000000 and Strength.Value < 75000000000000000 then
-          Teleport(nil, 2, 4289, 163, -601)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value >= 75000000000000000 and Strength.Value < 2500000000000000000 then
-          Teleport(nil, 2, 798, 231, -1004)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value >= 2500000000000000000 and Strength.Value < 1000000000000000000000 then
-          Teleport(nil, 2, 3873, 138, 873)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value >= 1000000000000000000000 and Strength.Value < 10000000000000000000000 then
-          Teleport(nil, 2, 3858, 669, -1076)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-        elseif SelectedStat == 'Strength' and Strength.Value >= 1000000000000000000000 then
-          Teleport(nil, 2, 2385, 246, -624)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
-
-
-        elseif SelectedStat == 'Durability' and Durability.Value >= 100 and Durability.Value < 10000 then
-          Teleport(nil, 2, 67, 69, 878)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value >= 10000 and Durability.Value < 100000 then
-          Teleport(nil, 2, -1655, 63, -520)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value >= 100000 and Durability.Value < 1000000 then
-          Teleport(nil, 2, -93, 101, 2029)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value >= 1000000 and Durability.Value < 10000000 then
-          Teleport(nil, 2, -628, 179, 720)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value >= 10000000 and Durability.Value < 100000000 then
-          Teleport(nil, 2, -1108, 211, -962)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value >= 100000000 and Durability.Value < 1000000000 then
-          Teleport(nil, 2, -333, 72, -1650)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value >= 1000000000 and Durability.Value < 100000000000 then
-          Teleport(nil, 2, 2508, 1543, -380)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value >= 100000000000 and Durability.Value < 5000000000000 then
-          Teleport(nil, 2, -2802, -228, 355)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value >= 5000000000000 and Durability.Value < 250000000000000 then
-          Teleport(nil, 2, 2187, 517, 581)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value >= 250000000000000 and Durability.Value < 75000000000000000 then
-          Teleport(nil, 2, 1671, 423, -1293)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value >= 75000000000000000 and Durability.Value < 2500000000000000000 then
-          Teleport(nil, 2, 155, 772, -699)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value >= 2500000000000000000 and Durability.Value < 1000000000000000000000 then
-          Teleport(nil, 2, 2568, 92, 1762)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value >= 1000000000000000000000 and Durability.Value < 10000000000000000000000 then
-          Teleport(nil, 2, 1673, 2305, -78)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-        elseif SelectedStat == 'Durability' and Durability.Value >= 10000000000000000000000 then
-          Teleport(nil, 2, 3529, 258, 1451)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 2)
-
-
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 100 and Chakra.Value < 10000 then
-          Teleport(nil, 2, 4, 64, -124)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 10000 and Chakra.Value < 100000 then
-          Teleport(nil, 2, 1424, 146, -581)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 100000 and Chakra.Value < 1000000 then
-          Teleport(nil, 2, 914, 140, 794)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 1000000 and Chakra.Value < 10000000 then
-          Teleport(nil, 2, 1551, 387, 685)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 10000000 and Chakra.Value < 100000000 then
-          Teleport(nil, 2, 346, -149, -1844)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 100000000 and Chakra.Value < 1000000000 then
-          Teleport(nil, 2, 1022, 249, -618)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 1000000000 and Chakra.Value < 100000000000 then
-          Teleport(nil, 2, 3054, 110, 1105)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 100000000000 and Chakra.Value < 5000000000000 then
-          Teleport(nil, 2, 1710, 577, 1743)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 5000000000000 and Chakra.Value < 250000000000000 then
-          Teleport(nil, 2, -16, 61, -475)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 250000000000000 and Chakra.Value < 25000000000000000 then
-          Teleport(nil, 2, -411, 1255, 663)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 25000000000000000 and Chakra.Value < 75000000000000000 then
-          Teleport(nil, 2, -411, 1255, 663) -- find
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 75000000000000000 and Chakra.Value < 2500000000000000000 then
-          Teleport(nil, 2, -732, 2791, 628)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 2500000000000000000 and Chakra.Value < 1000000000000000000000 then
-          Teleport(nil, 2, 3242, -441, -233)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 1000000000000000000000 and Chakra.Value < 10000000000000000000000 then
-          Teleport(nil, 2, 341, 237, 1867)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-        elseif SelectedStat == 'Chakra' and Chakra.Value >= 10000000000000000000000 then
-          Teleport(nil, 2, -1072, 608, 1506)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 3)
-
-
-        elseif SelectedStat == 'Agility' and Agility.Value >= 100 and Agility.Value < 10000 then
-          Teleport(nil, 2, 37, 69, 459)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 5)
-        elseif SelectedStat == 'Agility' and Agility.Value >= 10000 and Agility.Value < 100000 then
-          Teleport(nil, 2, -424, 122, -81)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 5)
-        elseif SelectedStat == 'Agility' and Agility.Value >= 100000 and Agility.Value < 5000000 then
-          Teleport(nil, 2, 3479, 60, 143)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 5)
-        elseif SelectedStat == 'Agility' and Agility.Value >= 5000000 then
-          Teleport(nil, 2, 4111, 69, 879)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 5)
-
-
-        elseif SelectedStat == 'Speed' and Speed.Value >= 100 and Speed.Value < 10000 then
-          Teleport(nil, 2, -102, 62, -496)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 6)
-        elseif SelectedStat == 'Speed' and Speed.Value >= 10000 and Speed.Value < 100000 then
-          Teleport(nil, 2, -424, 122, -81)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 6)
-        elseif SelectedStat == 'Speed' and Speed.Value >= 100000 and Speed.Value < 5000000 then
-          Teleport(nil, 2, 3479, 60, 143)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 6)
-        elseif SelectedStat == 'Speed' and Speed.Value >= 5000000 then
-          Teleport(nil, 2, 4111, 69, 879)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 6)
-
-
-        elseif SelectedStat == 'Sword' then
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 4)
-        end
+        local statId = StatMap[SelectedStat]
+        if not statId then continue end
+        TeleportBestByStat(statId)
+        Remote:FireServer("Train", statId)
       end
     end)
   end
@@ -888,6 +898,129 @@ local Button = AutoFarmTab:Button({
     ChampionsDropdown:Refresh(GetChampions())
   end
 })
+local Section = AutoFarmTab:Section({
+  Title = "Auto Npcs Quest",
+})
+AutoFarmTab:Toggle({
+	Title = "Auto boom quest",
+  Desc = "Automatically completes Boom quests.",
+	Icon = "check",
+	Type = "Checkbox",
+  Flag = "AutoBoomQuestToggle",
+	Value = false,
+	Callback = function(state)
+		AutoBoom = state
+		task.spawn(function()
+			while AutoBoom do
+				local Q = GetBoomQuest()
+				if Q then
+					if Q.Completed.Value then
+						TurnInBoom()
+						task.wait(1)
+					else
+            for id = 1,6 do
+              local prog = Q.Progress:FindFirstChild(tostring(id))
+              local req = Q.Requirements:FindFirstChild(tostring(id))
+              local stat = Stats[id]
+              if prog and req then
+                if prog.Value >= req.Value then
+                  continue
+                end
+                local need
+                if prog.Value == 0 then
+                  need = req.Value
+                else
+                  need = req.Value - prog.Value
+                end
+                local target = stat.Value + need
+                while AutoBoom do
+                  if not Q.Requirements:FindFirstChild(tostring(id)) then
+                    break
+                  end
+                  if stat.Value >= target then
+                    break
+                  end
+                  TeleportBest(id)
+                  Remote:FireServer("Train", id)
+                  task.wait()
+                end
+                break
+              end
+            end
+					end
+        else
+          TurnInBoom()
+          task.wait(1)
+				end
+				task.wait()
+			end
+		end)
+	end
+})
+AutoFarmTab:Toggle({
+	Title = "Auto reindeer quest",
+	Desc = "Automatically completes Reindeer quests.",
+	Icon = "check",
+	Type = "Checkbox",
+	Flag = "AutoReindeerQuestToggle",
+	Value = false,
+	Locked = false,
+	Callback = function(state)
+		AutoReindeer = state
+		task.spawn(function()
+			while AutoReindeer do
+				local Q = GetReindeerQuest()
+				if Q then
+					if Q.Completed.Value then
+						TurnInReindeer()
+						task.wait(1)
+					else
+						local qType = Q.QuestType.Value
+						if qType == "KillPlayer" then
+							for _, plr in ipairs(GetWeakerPlayersOffSafeZone()) do
+								if not AutoReindeer or Q.Completed.Value then break end
+								KillPlayer(plr)
+								task.wait()
+							end
+						elseif qType == "GainIncrement" then
+							for id = 1,6 do
+								local prog = Q.Progress:FindFirstChild(tostring(id))
+								local req = Q.Requirements:FindFirstChild(tostring(id))
+								if prog and req then
+									while AutoReindeer and prog.Value < req.Value do
+										TeleportBest(id)
+										Remote:FireServer("Train", id)
+										task.wait()
+									end
+								end
+								if Q.Completed.Value then break end
+							end
+						else
+							for id = 1,6 do
+								local prog = Q.Progress:FindFirstChild(tostring(id))
+								local req = Q.Requirements:FindFirstChild(tostring(id))
+								local stat = Stats[id]
+								if prog and req and prog.Value < req.Value then
+									local target = stat.Value + (req.Value - prog.Value)
+									while AutoReindeer and stat.Value < target do
+										TeleportBest(id)
+										Remote:FireServer("Train", id)
+										task.wait()
+									end
+									break
+								end
+							end
+						end
+					end
+				else
+					TurnInReindeer()
+					task.wait(1)
+				end
+				task.wait()
+			end
+		end)
+	end
+})
 local Section = AutoFarmTab:Section({ 
   Title = "Chikara / Fruit Farming",
 })
@@ -928,6 +1061,7 @@ This feature requires full ClickDetector interaction support. Please switch to a
           if v:IsA('ClickDetector') and v.Name == 'ClickDetector' then
             fireclickdetector(v)
             wait(2)
+            break
           end
         end
       end
@@ -971,6 +1105,7 @@ This feature requires full ClickDetector interaction support. Please switch to a
             if v:IsA('ClickDetector') then
             fireclickdetector(v)
             wait(2)
+            break
           end
         end
       end
@@ -1052,9 +1187,12 @@ local UpgradeRefs = {
 	[6] = Upgrades["6"],
 }
 local SelectedStatsNumbers = {}
-local SelectedDelay = 0
+local SelectedDelay = 2
 local AutoUpgrade = false
-local AutoUpgradeParagraph = UpgradeTab:Paragraph({ Title = "Upgrade Viwer", Desc = "", Color = "Grey", Locked = false, })
+local Section = UpgradeTab:Section({
+  Title = "Upgrade Configuration",
+})
+local AutoUpgradeParagraph = UpgradeTab:Paragraph({ Title = "Upgrade Viwer", Desc = "", Locked = false, })
 task.spawn(function()
 	while true do
 		task.wait(2)
@@ -1087,10 +1225,10 @@ UpgradeTab:Dropdown({
 UpgradeTab:Slider({
 	Title = "Level up delay",
 	Step = 1,
-	Value = {Min = 0, Max = 60, Default = 0},
+	Value = {Min = 2, Max = 60, Default = 2},
   Flag = "LevelUpDelay",
 	Callback = function(v)
-		SelectedDelay = tonumber(v) or 0
+		SelectedDelay = tonumber(v) or 2
 	end
 })
 UpgradeTab:Toggle({
@@ -1641,6 +1779,39 @@ ShopTab:Toggle({
 		end)
 	end
 })
+local Section = ShopTab:Section({ 
+  Title = "Class Shop",
+})
+local ClassParagraph = ShopTab:Paragraph({
+  Title = "Class Viwer",
+  Desc = "nil",
+  Locked = false,
+})
+task.spawn(function()
+  while true do task.wait(2)
+    ClassParagraph:SetDesc('Current Class: ' .. game.Players.LocalPlayer.Character.HumanoidRootPart.Overhead.Class.Text)
+  end
+end)
+ShopTab:Toggle({
+	Title = "Auto buy next class",
+	Icon = "check",
+	Type = "Checkbox",
+  Flag = "AutoRollGP",
+	Value = false,
+	Callback = function(state)
+		Class = state
+		if not Class then return end
+
+		task.spawn(function()
+      while Class do task.wait(2)
+        local Event = game:GetService("ReplicatedStorage").Remotes.RemoteFunction
+        Event:InvokeServer(
+          "Class"
+        )
+      end
+		end)
+	end
+})
 
 
 local DropdownLists = {}
@@ -1996,8 +2167,8 @@ local Section = TeleportTab:Section({
   Title = "NPC Teleport Options",
 })
 local NPCQuestDropdown = TeleportTab:Dropdown({
-  Title = "Select NPC [ QUEST ]",
-  Desc = "",
+  Title = "Quest NPC",
+  Desc = "Select an NPC related to quests",
   Values = GetQuestNpc(),
   Value = "Boom",
   Flag = "NpcQuestTD",
@@ -2005,20 +2176,20 @@ local NPCQuestDropdown = TeleportTab:Dropdown({
     SelectedQNPC = option
   end
 })
-local Button = TeleportTab:Button({
-  Title = "Teleport selected NPC [ QUEST ]",
+TeleportTab:Button({
+  Title = "Teleport to Quest NPC",
   Locked = false,
   Callback = function()
     for _, v in pairs(workspace.Scriptable.NPC.Quest:GetChildren()) do
-      if v:IsA('Model') and v.Name == SelectedQNPC then
-        Teleport(v, 1, nil,nil,nil)
+      if v:IsA("Model") and v.Name == SelectedQNPC then
+        Teleport(v, 1, nil, nil, nil)
       end
     end
   end
 })
 local NPCChampionDropdown = TeleportTab:Dropdown({
-  Title = "Select NPC [ CHAMPIONS ]",
-  Desc = "",
+  Title = "Champion NPC",
+  Desc = "Select an NPC from the champions area",
   Values = GetChampionsNpc(),
   Value = "1",
   Flag = "NpcChampionTD",
@@ -2026,21 +2197,21 @@ local NPCChampionDropdown = TeleportTab:Dropdown({
     SelectedCNPC = option
   end
 })
-local Button = TeleportTab:Button({
-  Title = "Teleport selected NPC [ CHAMPIONS ]",
+TeleportTab:Button({
+  Title = "Teleport to Champion NPC",
   Locked = false,
   Callback = function()
     for _, v in pairs(workspace.Scriptable.NPC.Shops.Champions:GetChildren()) do
-      if v:IsA('Model') and v.Name == SelectedCNPC then
-        Teleport(v, 1, nil,nil,nil)
+      if v:IsA("Model") and v.Name == SelectedCNPC then
+        Teleport(v, 1, nil, nil, nil)
       end
     end
   end
 })
 local Dropdown = TeleportTab:Dropdown({
-  Title = "Select NPC [ SPECIAL ]",
-  Desc = "",
-  Values = {'Grimoires', 'Kagunes', 'Quirks', 'Stands', 'Bloodlines'},
+  Title = "Special NPC",
+  Desc = "Select a special shop NPC",
+  Values = { "Grimoires", "Kagunes", "Quirks", "Stands", "Bloodlines" },
   Value = "Grimoires",
   Flag = "NpcSpecialTD",
   AllowNone = true,
@@ -2048,20 +2219,20 @@ local Dropdown = TeleportTab:Dropdown({
     SelectedSNPC = option
   end
 })
-local Button = TeleportTab:Button({
-  Title = "Teleport selected NPC [ SPECIAL ]",
+TeleportTab:Button({
+  Title = "Teleport to Special NPC",
   Locked = false,
   Callback = function()
-    if SelectedSNPC == 'Grimoires' then
-      Teleport(workspace.Scriptable.NPC.Shops.Special.Grimoires["1"], 1, nil,nil,nil)
-    elseif SelectedSNPC == 'Kagunes' then
-      Teleport(workspace.Scriptable.NPC.Shops.Special.Kagunes["1"], 1, nil,nil,nil)
-    elseif SelectedSNPC == 'Quirks' then
-      Teleport(workspace.Scriptable.NPC.Shops.Special.Quirks["1"], 1, nil,nil,nil)
-    elseif SelectedSNPC == 'Stands' then
-      Teleport(workspace.Scriptable.NPC.Shops.Special.Stands["1"], 1, nil,nil,nil)
-    elseif SelectedSNPC == 'Bloodlines' then
-      Teleport(workspace.Scriptable.NPC.Shops.Special.Bloodlines["1"], 1, nil,nil,nil)
+    if SelectedSNPC == "Grimoires" then
+      Teleport(workspace.Scriptable.NPC.Shops.Special.Grimoires["1"], 1, nil, nil, nil)
+    elseif SelectedSNPC == "Kagunes" then
+      Teleport(workspace.Scriptable.NPC.Shops.Special.Kagunes["1"], 1, nil, nil, nil)
+    elseif SelectedSNPC == "Quirks" then
+      Teleport(workspace.Scriptable.NPC.Shops.Special.Quirks["1"], 1, nil, nil, nil)
+    elseif SelectedSNPC == "Stands" then
+      Teleport(workspace.Scriptable.NPC.Shops.Special.Stands["1"], 1, nil, nil, nil)
+    elseif SelectedSNPC == "Bloodlines" then
+      Teleport(workspace.Scriptable.NPC.Shops.Special.Bloodlines["1"], 1, nil, nil, nil)
     end
   end
 })
@@ -2359,6 +2530,46 @@ local Toggle = MiscTab:Toggle({
 	Callback = function(state)
 		AntiAfk = state
     if AntiAfk then
+      local Players = game:GetService("Players")
+      local VirtualUser = game:GetService("VirtualUser")
+      local player = Players.LocalPlayer
+      player.Idled:Connect(function()
+          VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+          task.wait(1)
+          VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+      end)
+      if hookmetamethod then
+        pcall(function()
+          local mt = getrawmetatable(game)
+          local oldNamecall = mt.__namecall
+          local oldIndex = mt.__index
+          setreadonly(mt, false)
+          mt.__namecall = newcclosure(function(self, ...)
+            local method = getnamecallmethod()
+            if self == LocalPlayer and (method == "Kick" or method == "kick") then
+              return
+            end
+            return oldNamecall(self, ...)
+          end)
+          mt.__index = newcclosure(function(self, key)
+            if self == LocalPlayer and (key == "Kick" or key == "kick") then
+              return
+            end
+            return oldIndex(self, key)
+          end)
+          setreadonly(mt, true)
+
+          local old
+          old = hookmetamethod(game, "__namecall", function(self, ...)
+            local args = {...}
+            local method = getnamecallmethod()
+            if method == "FireServer" and self.Name == "RemoteEvent" and args[1] == "AntiAfk" then
+              return
+            end
+            return old(self, ...)
+          end)
+        end)
+      end
       loadstring(game:HttpGet("https://raw.githubusercontent.com/hassanxzayn-lua/Anti-afk/main/antiafkbyhassanxzyn"))();
     end
 	end
@@ -2374,7 +2585,6 @@ task.spawn(function()
 	local Paragraph = MiscTab:Paragraph({
 		Title = '<font size="22">🖥️ Server Information</font>',
 		Desc = "",
-		Color = "Grey",
 		Locked = false,
 	})
 
@@ -2448,7 +2658,6 @@ local Section = WebhookTab:Section({
 local Paragraph = WebhookTab:Paragraph({
   Title = "How to use",
   Desc = "Copy the URL of your webhook on your Discord server and paste it into the input field, then select the options you want to send there. Remember that this function only notifies your server if something has been generated. If you want it to be collected, make sure you activate automatic collection in the options on the “Auto Farm” tab to avoid any confusion.",
-  Color = "Grey",
   Locked = false,
 })
 local Dropdown = WebhookTab:Dropdown({
@@ -2662,7 +2871,7 @@ local Toggle = WebhookTab:Toggle({
 })
 
 
-local Section = ConfigTab:Section({ 
+local Section = ConfigTab:Section({
   Title = "Save Configuration",
 })
 local ConfigManager = Window.ConfigManager
@@ -2679,13 +2888,20 @@ local AutoLoadToggle = ConfigTab:Toggle({
   Title = "Enable Auto Load to Selected Config",
   Value = false,
   Callback = function(v)
-    Window.CurrentConfig:SetAutoLoad(v)
+    local cfg = ConfigManager:GetConfig(ConfigName)
+    if cfg then
+      cfg:SetAutoLoad(v)
+    end
   end
 })
 ConfigTab:Space()
+local function RefreshConfigs()
+  local all = ConfigManager:AllConfigs()
+  AllConfigsDropdown:Refresh(all)
+end
 local AllConfigs = ConfigManager:AllConfigs()
 local DefaultValue = table.find(AllConfigs, ConfigName) and ConfigName or nil
-local AllConfigsDropdown = ConfigTab:Dropdown({
+AllConfigsDropdown = ConfigTab:Dropdown({
   Title = "All Configs",
   Desc = "Select existing configs",
   Values = AllConfigs,
@@ -2693,17 +2909,19 @@ local AllConfigsDropdown = ConfigTab:Dropdown({
   Callback = function(value)
     ConfigName = value
     ConfigNameInput:Set(value)
-    AutoLoadToggle:Set(ConfigManager:GetConfig(ConfigName).AutoLoad or false)
+
+    local cfg = ConfigManager:GetConfig(value)
+    AutoLoadToggle:Set(cfg and cfg.AutoLoad or false)
   end
 })
 ConfigTab:Space()
 ConfigTab:Button({
   Title = "Load Config",
-  Icon = "",
   Justify = "Center",
   Callback = function()
-    Window.CurrentConfig = ConfigManager:CreateConfig(ConfigName)
-    if Window.CurrentConfig:Load() then
+    local cfg = ConfigManager:CreateConfig(ConfigName)
+    if cfg:Load() then
+      Window.CurrentConfig = cfg
       WindUI:Notify({
         Title = "Config Loaded",
         Desc = "Config '" .. ConfigName .. "' loaded",
@@ -2715,26 +2933,41 @@ ConfigTab:Button({
 ConfigTab:Space()
 ConfigTab:Button({
   Title = "Save Config",
-  Icon = "",
   Justify = "Center",
   Callback = function()
-    Window.CurrentConfig = ConfigManager:Config(ConfigName)
-    if Window.CurrentConfig:Save() then
+    local cfg = ConfigManager:Config(ConfigName)
+    if cfg:Save() then
       WindUI:Notify({
         Title = "Config Saved",
         Desc = "Config '" .. ConfigName .. "' saved",
         Icon = "check",
       })
     end
-    AllConfigsDropdown:Refresh(ConfigManager:AllConfigs())
+    RefreshConfigs()
   end
 })
 ConfigTab:Space()
 ConfigTab:Button({
   Title = "Print AutoLoad Configs",
-  Icon = "",
   Justify = "Center",
   Callback = function()
     print(HttpService:JSONDecode(ConfigManager:GetAutoLoadConfigs()))
   end
+})
+ConfigTab:Section({
+  Title = "Join our Discord server!",
+  TextSize = 20,
+})
+ConfigTab:Paragraph({
+  Title = "infinityx script development",
+  Desc = "The server of the creator of InfinityX and anothers Projects.\nBy lmy77",
+  Buttons = {
+    {
+      Title = "Copy link",
+      Icon = "link",
+      Callback = function()
+        setclipboard("https://discord.gg/emKJgWMHAr")
+      end
+    }
+  }
 })
