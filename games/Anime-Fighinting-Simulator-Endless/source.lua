@@ -1,3 +1,9 @@
+pcall(function()
+  game.Players.LocalPlayer:Kick('')
+  task.wait(9e9)
+end)
+
+
 ---@diagnostic disable: undefined-global
 -- detect service
 local UserInputService = game:GetService("UserInputService")
