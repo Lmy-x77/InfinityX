@@ -1,5 +1,7 @@
 pcall(function()
-  game.Players.LocalPlayer:Kick('Script being updated')
+  pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
+    "Script being updated"
+  )
   task.wait(9e9)
 end)
 
