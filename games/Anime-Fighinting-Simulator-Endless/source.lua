@@ -1,9 +1,7 @@
-pcall(function()
-  pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
-    "Script being updated"
-  )
-  task.wait(9e9)
-end)
+pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
+	"Script being updated"
+)
+task.wait(9e9)
 
 
 ---@diagnostic disable: undefined-global
