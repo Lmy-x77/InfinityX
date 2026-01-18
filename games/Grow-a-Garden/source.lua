@@ -327,7 +327,7 @@ Library.ForceCheckbox = true
 
 local Window = Library:CreateWindow({
   Title = '',
-  Footer = '<font color="rgb(120,80,200)">Shark Bite (Classic)</font>',
+  Footer = '<font color="rgb(120,80,200)">Grow a Garden</font>',
   Icon = 126527122577864,
   Size = UDim2.fromOffset(580, 500),
   Position = UDim2.fromOffset(100, 100),
@@ -1375,8 +1375,8 @@ SaveManager:SetLibrary(Library)
 SaveManager:IgnoreThemeSettings()
 SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
 ThemeManager:SetFolder("Obsidian")
-SaveManager:SetFolder("Obsidian/Shark-Bite")
-SaveManager:SetSubFolder("Shark-Bite")
+SaveManager:SetFolder("Obsidian/Grow-a-Garden")
+SaveManager:SetSubFolder("Grow-a-Garden")
 SaveManager:BuildConfigSection(Tabs.Settings)
 ThemeManager:ApplyToTab(Tabs.Settings)
 SaveManager:LoadAutoloadConfig()
