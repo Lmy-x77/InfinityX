@@ -317,46 +317,40 @@ scriptVersion = "4.2a"
 
 
 -- ui library
-local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
-function getDpiScale()
-    if IsOnMobile then
-        return Library:SetDPIScale(75)
-    elseif not IsOnMobile then
-        Library:SetDPIScale(100)
-    end
-end
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/SaveManager.lua"))()
 local Options = Library.Options
 local Toggles = Library.Toggles
 
 Library.ForceCheckbox = true
 
 local Window = Library:CreateWindow({
-  Title = "InfinityX",
-  Footer = "Grow a Garden · ".. scriptVersion .. " · discord.gg/emKJgWMHAr",
+  Title = '',
+  Footer = '<font color="rgb(120,80,200)">Shark Bite (Classic)</font>',
   Icon = 126527122577864,
-  NotifySide = "Right",
-  ShowCustomCursor = false,
+  Size = UDim2.fromOffset(580, 500),
+  Position = UDim2.fromOffset(100, 100),
   Center = true,
-  MobileButtonsSide = "Left",
-  Resizable = false,
-  Size = UDim2.fromOffset(650, 410),
-  ToggleKeybind = Enum.KeyCode.K
+  AutoShow = true,
+  Resizable = true,
+  ShowCustomCursor = false,
+  ToggleKeybind = Enum.KeyCode.RightControl,
+  NotifySide = "Right",
 })
+Window:SetSidebarWidth(54)
 
 
 
 -- tabs
 local Tabs = {
-  Farm = Window:AddTab("Farming", "banknote"),
-  Shop = Window:AddTab("Shop", "shopping-cart"),
-  Event = Window:AddTab("Event", "star"),
-  Pets = Window:AddTab("Pets", "dog"),
-  LPlayer = Window:AddTab("Character", "user"),
-  Misc = Window:AddTab("Misc", "layers"),
-  Settings = Window:AddTab("Config.", "settings"),
+  Farm = Window:AddTab("Farming", "banknote", "Automated options to improve your day."),
+  Shop = Window:AddTab("Shop", "shopping-cart", "Buy anything you want."),
+  Event = Window:AddTab("Event", "star", "Automated options for events"),
+  Pets = Window:AddTab("Pets", "dog", "Configure your pets however you like."),
+  LPlayer = Window:AddTab("Character", "user", "Options that will be executed on you"),
+  Misc = Window:AddTab("Misc", "layers", "Additional extra options"),
+  Settings = Window:AddTab("Config.", "settings", "Ui Settings"),
 }
 
 
@@ -365,7 +359,7 @@ local Tabs = {
 local FruitGroupBox = Tabs.Farm:AddLeftGroupbox("Fruit", "grape")
 local MutationGroupBox = Tabs.Farm:AddRightGroupbox("Mutations", "dna")
 local TeleportGroupBox = Tabs.Farm:AddLeftGroupbox("Teleport", "locate")
-FruitGroupBox:AddToggle("MyToggle", {
+FruitGroupBox:AddToggle("AutoPlant", {
 	Text = "Auto plant",
 	Tooltip = "Active to plant all seeds in your inventory",
 	DisabledTooltip = "I am disabled!",
@@ -402,7 +396,7 @@ FruitGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-FruitGroupBox:AddToggle("MyToggle", {
+FruitGroupBox:AddToggle("AutoCollect", {
 	Text = "Auto collect",
 	Tooltip = "Active to collect all plants in your garden",
 	DisabledTooltip = "I am disabled!",
@@ -453,7 +447,7 @@ FruitGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-FruitGroupBox:AddToggle("MyToggle", {
+FruitGroupBox:AddToggle("AutoSellInventory", {
 	Text = "Auto sell inventory",
 	Tooltip = "Active to sell all plants in your inventory",
 	DisabledTooltip = "I am disabled!",
@@ -482,7 +476,7 @@ FruitGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-FruitGroupBox:AddToggle("MyToggle", {
+FruitGroupBox:AddToggle("AutoSellInHand", {
 	Text = "Auto sell in hand",
 	Tooltip = "Active to sell all plants in your hand",
 	DisabledTooltip = "I am disabled!",
@@ -531,7 +525,7 @@ FruitGroupBox:AddButton({
 	Risky = false,
 })
 FruitGroupBox:AddDivider()
-FruitGroupBox:AddToggle("MyToggle", {
+FruitGroupBox:AddToggle("ShowBiggestFruit", {
 	Text = "Show biggest fruit",
 	Tooltip = "Active to show all your biggest fruit",
 	DisabledTooltip = "I am disabled!",
@@ -709,7 +703,7 @@ local SeedGroupBox = Tabs.Shop:AddLeftGroupbox("Seeds", "sprout")
 local GearGroupBox = Tabs.Shop:AddRightGroupbox("Gears", "hammer")
 local UiGroupBox = Tabs.Shop:AddLeftGroupbox("Ui", "panel-top")
 local ButtonsGroupBox = Tabs.Shop:AddRightGroupbox("Buttons", "box")
-SeedGroupBox:AddDropdown("", {
+SeedGroupBox:AddDropdown("SeddsDropdown", {
 	Values = GetSeed(),
 	Default = '...',
 	Multi = true,
@@ -728,7 +722,7 @@ SeedGroupBox:AddDropdown("", {
 	Disabled = false,
 	Visible = true,
 })
-SeedGroupBox:AddToggle("MyToggle", {
+SeedGroupBox:AddToggle("AutoBuySedd", {
 	Text = "Auto buy seed",
 	Tooltip = "Active to buy all selected seeds",
 	DisabledTooltip = "I am disabled!",
@@ -775,7 +769,7 @@ SeedGroupBox:AddButton({
 	Visible = true,
 	Risky = false,
 })
-GearGroupBox:AddDropdown("", {
+GearGroupBox:AddDropdown("GearsDropdown", {
 	Values = GetGears(),
 	Default = '...',
 	Multi = true,
@@ -794,7 +788,7 @@ GearGroupBox:AddDropdown("", {
 	Disabled = false,
 	Visible = true,
 })
-GearGroupBox:AddToggle("MyToggle", {
+GearGroupBox:AddToggle("AutoBuyGear", {
 	Text = "Auto buy gear",
 	Tooltip = "Active to buy all selected seeds",
 	DisabledTooltip = "I am disabled!",
@@ -940,7 +934,7 @@ local DinoGroupBox = Tabs.Event:AddLeftGroupbox("Event in soon")
 
 local FeedGroupBox = Tabs.Pets:AddLeftGroupbox("Feed", "beef")
 local EggGroupBox = Tabs.Pets:AddRightGroupbox("Eggs", "egg")
-FeedGroupBox:AddDropdown("", {
+FeedGroupBox:AddDropdown("PlantsDropdown", {
 	Values = AllCropsNames,
 	Default = '...',
 	Multi = true,
@@ -1042,7 +1036,7 @@ local TradeGroupBox = Tabs.LPlayer:AddRightGroupbox("Trade", "refresh-cw")
 local TeleportBGroupBox = Tabs.LPlayer:AddLeftGroupbox("Teleport", "locate")
 local StatusGroupBox = Tabs.LPlayer:AddRightGroupbox("Status", "chart-line")
 if not IsOnMobile then
-  CharacterGroupBox:AddSlider("MySlider", {
+  CharacterGroupBox:AddSlider("WalkSpeedSlider", {
     Text = "WalkSpeed",
     Default = 16,
     Min = 16,
@@ -1060,7 +1054,7 @@ if not IsOnMobile then
     Disabled = false,
     Visible = true,
   })
-  CharacterGroupBox:AddSlider("MySlider", {
+  CharacterGroupBox:AddSlider("JumpPowerSlider", {
     Text = "JumpPower",
     Default = 50,
     Min = 50,
@@ -1079,7 +1073,7 @@ if not IsOnMobile then
     Visible = true,
   })
 elseif IsOnMobile then
-  CharacterGroupBox:AddInput("MyTextbox", {
+  CharacterGroupBox:AddInput("WalkSpeedBox", {
       Default = "",
       Numeric = true,
       Finished = false,
@@ -1092,7 +1086,7 @@ elseif IsOnMobile then
           game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
       end,
   })
-  CharacterGroupBox:AddInput("MyTextbox", {
+  CharacterGroupBox:AddInput("JumpPowerBox", {
       Default = "",
       Numeric = true,
       Finished = false,
@@ -1173,7 +1167,7 @@ TradeGroupBox:AddToggle("IgnoreFavToggle", {
   end
 })
 Toggles.IgnoreFavToggle:SetValue(true)
-TradeGroupBox:AddToggle("", {
+TradeGroupBox:AddToggle("AutoTrade", {
   Text = "Auto send trade",
   Tooltip = 'Active to send trade to selected player',
   Default = false,
@@ -1236,7 +1230,7 @@ end)
 
 local SeedPackGroupBox = Tabs.Misc:AddLeftGroupbox("Seed Pack", "sprout")
 local OptionsGroupBox = Tabs.Misc:AddRightGroupbox("Other Options", "menu")
-SeedPackGroupBox:AddDropdown("", {
+SeedPackGroupBox:AddDropdown("SeedsDropdown", {
 	Values = seedPackNames,
 	Default = '...',
 	Multi = false,
@@ -1256,7 +1250,7 @@ SeedPackGroupBox:AddDropdown("", {
 	Disabled = false,
 	Visible = true,
 })
-SeedPackGroupBox:AddToggle("", {
+SeedPackGroupBox:AddToggle("AutoSeed", {
   Text = "Auto open seed pack",
   Tooltip = 'Activate to open all seed packets automatically',
   Default = false,
@@ -1376,11 +1370,20 @@ CreditsGroupBox:AddButton("Discord server", function()
         Time = 4,
     })
 end)
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+ThemeManager:SetFolder("Obsidian")
+SaveManager:SetFolder("Obsidian/Shark-Bite")
+SaveManager:SetSubFolder("Shark-Bite")
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
+SaveManager:LoadAutoloadConfig()
 
 
 
 -- extra functions
-getDpiScale()
 game.Players.PlayerAdded:Connect(function()
   Options.PlayersDropdown:SetValues(GetPlayersName())
 end)
