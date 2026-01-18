@@ -1,52 +1,63 @@
--- variables
-local isMobile = game.UserInputService.TouchEnabled
-local LibrarySettings = {
-  Title = '<font color="rgb(110, 48, 160)" size="' .. (isMobile and '14' or '24') .. '"><b>'.. (isMobile and ' InfinityX' or 'InfintyX') ..'</b></font>',
-  Footer = {
-    GameName = '<font color="rgb(180,180,255)"><i>Anime Mania [ Lobby ]</i></font> · ',
-    Version = '<font color="rgb(160,160,160)">Version 4.2a</font> · ',
-    DiscordLink = '<font color="rgb(100,200,255)">Join us: discord.gg/emKJgWMHAr</font>'
-  }
-}
+-- detect service
+local TextService = game:GetService("TextService")
+local UserInputService = game:GetService("UserInputService")
+IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS}, UserInputService:GetPlatform())
+if IsOnMobile then
+    print("Mobile device")
+elseif not IsOnMobile then
+    print("Computer device")
+end
 
+
+
+-- start
+print[[                                                                     
+
+ /$$$$$$            /$$$$$$  /$$           /$$   /$$               /$$   /$$
+|_  $$_/           /$$__  $$|__/          |__/  | $$              | $$  / $$
+| $$   /$$$$$$$ | $$  \__/ /$$ /$$$$$$$  /$$ /$$$$$$   /$$   /$$|  $$/ $$/
+| $$  | $$__  $$| $$$$    | $$| $$__  $$| $$|_  $$_/  | $$  | $$ \  $$$$/ 
+| $$  | $$  \ $$| $$_/    | $$| $$  \ $$| $$  | $$    | $$  | $$  >$$  $$ 
+| $$  | $$  | $$| $$      | $$| $$  | $$| $$  | $$ /$$| $$  | $$ /$$/\  $$
+/$$$$$$| $$  | $$| $$      | $$| $$  | $$| $$  |  $$$$/|  $$$$$$$| $$  \ $$
+|______/|__/  |__/|__/      |__/|__/  |__/|__/   \___/   \____  $$|__/  |__/
+                                                       /$$  | $$          
+                                                      |  $$$$$$/          
+                                                       \______/           
+]]
+loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Mania/Bypass.lua'))()
 
 
 -- ui library
-local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
-function getDpiScale()
-  if IsOnMobile then
-    return Library:SetDPIScale(75)
-  elseif not IsOnMobile then
-    Library:SetDPIScale(100)
-  end
-end
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/SaveManager.lua"))()
 local Options = Library.Options
 local Toggles = Library.Toggles
 
 Library.ForceCheckbox = true
 
 local Window = Library:CreateWindow({
-  Title = LibrarySettings.Title,
-  Footer = LibrarySettings.Footer.GameName .. LibrarySettings.Footer.Version .. LibrarySettings.Footer.DiscordLink,
+  Title = '',
+  Footer = '<font color="rgb(120,80,200)">Anime Mania (Lobby)</font>',
   Icon = 126527122577864,
-  NotifySide = "Right",
-  ShowCustomCursor = false,
+  Size = UDim2.fromOffset(580, 500),
+  Position = UDim2.fromOffset(100, 100),
   Center = true,
-  MobileButtonsSide = "Left",
-  Resizable = false,
-  Size = UDim2.fromOffset(650, 410),
-  ToggleKeybind = Enum.KeyCode.K
+  AutoShow = true,
+  Resizable = true,
+  ShowCustomCursor = false,
+  ToggleKeybind = Enum.KeyCode.RightControl,
+  NotifySide = "Right",
 })
+Window:SetSidebarWidth(54)
 
 
 
 -- tabs
 local Tabs = {
-  Main = Window:AddTab("Main", "layers"),
-  Settings = Window:AddTab("Config.", "settings"),
+  Main = Window:AddTab("Main", "layers", "Main features script"),
+  Settings = Window:AddTab("Config.", "settings", "Ui settings"),
 }
 
 
@@ -56,7 +67,7 @@ local RollGroupBox = Tabs.Main:AddLeftGroupbox("Rolls", "refresh-cw")
 local TeleportGroupBox = Tabs.Main:AddRightGroupbox("Teleport", "locate")
 local SlotGroupBox = Tabs.Main:AddLeftGroupbox("Slot", "inbox")
 local MiscGroupBox = Tabs.Main:AddRightGroupbox("Misc", "layers")
-RollGroupBox:AddDropdown("PlayersDropdown", {
+RollGroupBox:AddDropdown("MethodDropdown", {
 	Values = {'Token', 'Gems', 'Coins'},
 	Default = '...',
 	Multi = false,
@@ -74,7 +85,7 @@ RollGroupBox:AddDropdown("PlayersDropdown", {
 	Disabled = false,
 	Visible = true,
 })
-RollGroupBox:AddDropdown("PlayersDropdown", {
+RollGroupBox:AddDropdown("AmountDropdown", {
 	Values = {'1', '10'},
 	Default = '...',
 	Multi = false,
@@ -136,7 +147,7 @@ RollGroupBox:AddButton({
 	Visible = true,
 	Risky = false,
 })
-RollGroupBox:AddToggle("MyToggle", {
+RollGroupBox:AddToggle("AutoRoll", {
 	Text = "Auto roll",
 	Tooltip = "Active to auto roll selected method and amount",
 	DisabledTooltip = "I am disabled!",
@@ -198,7 +209,7 @@ task.spawn(function()
     end
   end
 end)
-SlotGroupBox:AddInput("MyTextbox", {
+SlotGroupBox:AddInput("SlotsBox", {
   Default = "0",
   Numeric = true,
   Finished = false,
@@ -294,17 +305,26 @@ end)
 CreditsGroupBox:AddLabel("Script made by Lmy77")
 CreditsGroupBox:AddButton("Discord server", function()
 	setclipboard("https://discord.gg/emKJgWMHAr")
-  Library:Notify({
-    Title = "InfinityX",
-    Description = "Discord server copied to clipboard",
-    Time = 4,
-  })
+    Library:Notify({
+        Title = "InfinityX",
+        Description = "Discord server copied to clipboard",
+        Time = 4,
+    })
 end)
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+ThemeManager:SetFolder("Obsidian")
+SaveManager:SetFolder("Obsidian/Anime-Manie-Lobby")
+SaveManager:SetSubFolder("Anime-Manie-Lobby")
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
+SaveManager:LoadAutoloadConfig()
 
 
 
 -- extra functions
-getDpiScale()
 Library:Notify({
     Title = "InfinityX",
     Description = "Welcome ".. game.Players.LocalPlayer.Name .."",
