@@ -27,6 +27,13 @@ print[[
 
 
 -- verify
+local scriptClosed = false
+if scriptClosed then
+  pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
+    "The script is being updated. For more information, join the Discord server."
+  )
+  task.wait(9e9)
+end
 if not BYPASS_LOADED then
   pcall(function()
     loadstring(game:HttpGet(
