@@ -244,54 +244,47 @@ scriptVersion = '4.2a'
 
 
 -- ui library
-local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
-
-function getDpiScale()
-    if IsOnMobile then
-        return Library:SetDPIScale(75)
-    elseif not IsOnMobile then
-        Library:SetDPIScale(100)
-    end
-end
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/SaveManager.lua"))()
 local Options = Library.Options
 local Toggles = Library.Toggles
 
 Library.ForceCheckbox = true
 
 local Window = Library:CreateWindow({
-  Title = "InfinityX",
-  Footer = "Dig · ".. scriptVersion .. " · discord.gg/emKJgWMHAr",
+  Title = '',
+  Footer = '<font color="rgb(120,80,200)">Shark Bite (Classic)</font>',
   Icon = 126527122577864,
-  NotifySide = "Right",
-  ShowCustomCursor = false,
+  Size = UDim2.fromOffset(580, 500),
+  Position = UDim2.fromOffset(100, 100),
   Center = true,
-  MobileButtonsSide = "Left",
-  Resizable = false,
-  Size = UDim2.fromOffset(650, 410),
-  ToggleKeybind = Enum.KeyCode.K
+  AutoShow = true,
+  Resizable = true,
+  ShowCustomCursor = false,
+  ToggleKeybind = Enum.KeyCode.RightControl,
+  NotifySide = "Right",
 })
+Window:SetSidebarWidth(54)
 
 
 
 -- tabs
 local Tabs = {
-  Farm = Window:AddTab("Farming", "banknote"),
-  Transport = Window:AddTab("Transport", "locate"),
-  Misc = Window:AddTab("Misc", "layers"),
-  Settings = Window:AddTab("Config.", "settings"),
+  Farm = Window:AddTab("Farming", "banknote", "Configure it the way you want to dig."),
+  Transport = Window:AddTab("Transport", "locate", "Teleport to wherever you want."),
+  Misc = Window:AddTab("Misc", "layers", "Additional extra options"),
+  Settings = Window:AddTab("Config.", "settings", "UI Settings"),
 }
 
 
 
 -- source
 local DigGroupBox = Tabs.Farm:AddLeftGroupbox("Dig", "shovel")
-local DigSettingsGroupBox = Tabs.Farm:AddRightGroupbox("Dig Settings", "settings")
+local DigSettingsGroupBox = Tabs.Farm:AddRightGroupbox("Dig Settings", "settings", "")
 local AppraiserGroupBox = Tabs.Farm:AddLeftGroupbox("Appraiser", 'dices')
-local TeleportGroupBox = Tabs.Farm:AddLeftGroupbox("Teleport", "locate")
-DigGroupBox:AddDropdown("", {
+local TeleportGroupBox = Tabs.Farm:AddRightGroupbox("Teleport", "locate")
+DigGroupBox:AddDropdown("DigModeDropdown", {
 	Values = {'Legit', 'Normal', 'Instant'},
 	Default = '...',
 	Multi = false,
@@ -309,7 +302,7 @@ DigGroupBox:AddDropdown("", {
 	Disabled = false,
 	Visible = true,
 })
-DigGroupBox:AddToggle("", {
+DigGroupBox:AddToggle("AutoDig", {
   Text = "Auto dig",
   Tooltip = 'Activate to dig automatically',
   Default = false,
@@ -387,7 +380,7 @@ DigGroupBox:AddToggle("", {
     end
   end
 })
-DigGroupBox:AddToggle("", {
+DigGroupBox:AddToggle("AutoWalk", {
   Text = "Auto walk",
   Tooltip = 'Activate to walk in a random direction',
   Default = false,
@@ -406,7 +399,7 @@ DigGroupBox:AddToggle("", {
     end
   end
 })
-DigGroupBox:AddToggle("", {
+DigGroupBox:AddToggle("AutoSell", {
   Text = "Auto sell",
   Tooltip = 'Activate to sell all yours items automatically',
   Default = false,
@@ -443,7 +436,7 @@ DigGroupBox:AddToggle("", {
     end
   end
 })
-DigSettingsGroupBox:AddInput("MyTextbox", {
+DigSettingsGroupBox:AddInput("InstantDelay", {
   Default = "0.5",
   Numeric = true,
   Finished = false,
@@ -456,7 +449,7 @@ DigSettingsGroupBox:AddInput("MyTextbox", {
     DigFarmSettings.InstantDelay = tonumber(Value) or 0.5
   end,
 })
-DigSettingsGroupBox:AddInput("MyTextbox", {
+DigSettingsGroupBox:AddInput("NormalDelay", {
   Default = "2",
   Numeric = true,
   Finished = false,
@@ -469,7 +462,7 @@ DigSettingsGroupBox:AddInput("MyTextbox", {
     DigFarmSettings.NormalDelay = tonumber(Value) or 2
   end,
 })
-DigSettingsGroupBox:AddInput("MyTextbox", {
+DigSettingsGroupBox:AddInput("LegitDelay", {
   Default = "1",
   Numeric = true,
   Finished = false,
@@ -482,7 +475,7 @@ DigSettingsGroupBox:AddInput("MyTextbox", {
     DigFarmSettings.LegitDelay = tonumber(Value) or 1
   end,
 })
-DigSettingsGroupBox:AddToggle("NotifyItemsToggle", {
+DigSettingsGroupBox:AddToggle("NotifyNewItem", {
   Text = "Notifies new item",
   Tooltip = 'Shows the new items added to your inventory',
   Default = false,
@@ -499,7 +492,7 @@ DigSettingsGroupBox:AddToggle("NotifyItemsToggle", {
     end)
   end
 })
-DigSettingsGroupBox:AddToggle("EnableUiToggle", {
+DigSettingsGroupBox:AddToggle("AutoShowHud", {
   Text = "Auto show hud",
   Tooltip = 'Activate to show hud even when disabled',
   Default = false,
@@ -510,7 +503,7 @@ DigSettingsGroupBox:AddToggle("EnableUiToggle", {
     end
   end
 })
-AppraiserGroupBox:AddDropdown("", {
+AppraiserGroupBox:AddDropdown("ItemsDropdown", {
 	Values = GetAllTools(),
 	Default = '...',
 	Multi = false,
@@ -528,7 +521,7 @@ AppraiserGroupBox:AddDropdown("", {
 	Disabled = false,
 	Visible = true,
 })
-AppraiserGroupBox:AddToggle("EnableUiToggle", {
+AppraiserGroupBox:AddToggle("AutoAppraiser", {
   Text = "Auto appraiser",
   Tooltip = 'Activate to appraiser selected item automatically',
   Default = false,
@@ -581,7 +574,7 @@ AppraiserGroupBox:AddButton({
 	Risky = false,
 })
 AppraiserGroupBox:AddDivider()
-AppraiserGroupBox:AddInput("MyTextbox", {
+AppraiserGroupBox:AddInput("AppraiserSpeed", {
   Default = "",
   Numeric = true,
   Finished = false,
@@ -630,7 +623,7 @@ local PurchasablesGroupBox = Tabs.Transport:AddLeftGroupbox("Purchasables", "sto
 local NPCsGroupBox = Tabs.Transport:AddRightGroupbox("NPCs", "users")
 local EnchantmentGroupBox = Tabs.Transport:AddLeftGroupbox("Enchantment", "sparkles")
 local DeliveryGroupBox = Tabs.Transport:AddRightGroupbox("Delivery", "pizza")
-BossesGroupBox:AddDropdown("", {
+BossesGroupBox:AddDropdown("BossesDropdown", {
 	Values = GetBosses(),
 	Default = '...',
 	Multi = true,
@@ -648,7 +641,7 @@ BossesGroupBox:AddDropdown("", {
 	Disabled = false,
 	Visible = true,
 })
-BossesGroupBox:AddToggle("EnableUiToggle", {
+BossesGroupBox:AddToggle("AutoTpBosses", {
   Text = "Auto teleport boss",
   Tooltip = 'Activate to teleport to selected boss',
   Default = false,
@@ -667,7 +660,7 @@ BossesGroupBox:AddToggle("EnableUiToggle", {
     end
   end
 })
-BossesGroupBox:AddToggle("EnableUiToggle", {
+BossesGroupBox:AddToggle("AutoAttackBoss", {
   Text = "Auto hit boss",
   Tooltip = 'Activate to teleport to selected boss',
   Default = false,
@@ -713,7 +706,7 @@ BossesGroupBox:AddButton({
 	Visible = true,
 	Risky = false,
 })
-AreasGroupBox:AddDropdown("", {
+AreasGroupBox:AddDropdown("AreasDropdown", {
 	Values = {'Alona Jungle', 'Azure Hallow', 'Boss Area (Molten Monstrosity)', 'Cinder Approach', 'Cinder Cavern', 'Cinder Shores', 'Combat Guild', 'Copper Mesa', 'Fernhill Forest', 'Fox Town', 'Glacial Cavern', 'Jail Cells', 'Monks Workshop', 'Mount Charcoal', 'Mount Cinder', 'Npc (Sydney)', 'Penguins Pizza', 'Phoenix Tribe', 'Rooftop Woodlands', 'Saltys Saloon', 'Solstice Shrine', 'Sovering Chasm', 'Spiders Keep', 'The Interlude', 'Tom Bakery', 'Verdant Vale', 'Volcano'},
 	Default = '...',
 	Multi = false,
@@ -799,7 +792,7 @@ AreasGroupBox:AddButton({
 	Visible = true,
 	Risky = false,
 })
-PurchasablesGroupBox:AddDropdown("PurchasebleDropdown", {
+PurchasablesGroupBox:AddDropdown("PruchasableDropdown", {
 	Values = GetPurchasable(),
 	Default = '...',
 	Multi = false,
@@ -835,7 +828,7 @@ PurchasablesGroupBox:AddButton({
 	Visible = true,
 	Risky = false,
 })
-NPCsGroupBox:AddDropdown("", {
+NPCsGroupBox:AddDropdown("NpcsDropdown", {
 	Values = GetNPCs(),
 	Default = '...',
 	Multi = false,
@@ -885,7 +878,7 @@ EnchantmentGroupBox:AddButton({
 	Visible = true,
 	Risky = false,
 })
-DeliveryGroupBox:AddToggle("EnableUiToggle", {
+DeliveryGroupBox:AddToggle("AutoEventToggle", {
   Text = "Auto event",
   Tooltip = 'Activate to complete event automatically',
   Default = false,
@@ -946,7 +939,7 @@ CodesGroupBox:AddButton({
 	Risky = false,
 })
 if not IsOnMobile then
-  CharacterGroupBox:AddSlider("MySlider", {
+  CharacterGroupBox:AddSlider("WalksSpeedSlider", {
     Text = "WalkSpeed",
     Default = 16,
     Min = 16,
@@ -964,7 +957,7 @@ if not IsOnMobile then
     Disabled = false,
     Visible = true,
   })
-  CharacterGroupBox:AddSlider("MySlider", {
+  CharacterGroupBox:AddSlider("JumpPowerSlider", {
     Text = "JumpPower",
     Default = 50,
     Min = 50,
@@ -983,7 +976,7 @@ if not IsOnMobile then
     Visible = true,
   })
 elseif IsOnMobile then
-  CharacterGroupBox:AddInput("MyTextbox", {
+  CharacterGroupBox:AddInput("WalkSpeedBox", {
       Default = "",
       Numeric = true,
       Finished = false,
@@ -996,7 +989,7 @@ elseif IsOnMobile then
           game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
       end,
   })
-  CharacterGroupBox:AddInput("MyTextbox", {
+  CharacterGroupBox:AddInput("JumpPowerBox", {
       Default = "",
       Numeric = true,
       Finished = false,
@@ -1061,7 +1054,7 @@ CharacterGroupBox:AddButton("Rejoin smallest server", function()
     TeleportService:TeleportToPlaceInstance(PlaceId, serverId, Players.LocalPlayer)
   end
 end)
-CharacterGroupBox:AddToggle("EnableUiToggle", {
+CharacterGroupBox:AddToggle("AntiAfk", {
   Text = "Anti afk",
   Tooltip = 'Activate to teleport to selected boss',
   Default = false,
@@ -1077,7 +1070,7 @@ CharacterGroupBox:AddToggle("EnableUiToggle", {
     end
   end
 })
-VehicleGroupBox:AddDropdown("", {
+VehicleGroupBox:AddDropdown("CarsDropdown", {
 	Values = GetCars(),
 	Default = '...',
 	Multi = false,
@@ -1206,11 +1199,20 @@ CreditsGroupBox:AddButton("Discord server", function()
         Time = 4,
     })
 end)
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+ThemeManager:SetFolder("Obsidian")
+SaveManager:SetFolder("Obsidian/DIG")
+SaveManager:SetSubFolder("DIG")
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
+SaveManager:LoadAutoloadConfig()
 
 
 
 -- extra functions
-getDpiScale()
 workspace.World.Interactive.Purchaseable.ChildAdded:Connect(function()
   Options.PurchasebleDropdown:SetValues(GetPurchasable())
 end)
