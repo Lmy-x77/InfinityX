@@ -1,3 +1,34 @@
+-- detect service
+local TextService = game:GetService("TextService")
+local UserInputService = game:GetService("UserInputService")
+IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS}, UserInputService:GetPlatform())
+if IsOnMobile then
+    print("Mobile device")
+elseif not IsOnMobile then
+    print("Computer device")
+end
+
+
+
+-- start
+print[[                                                                     
+
+ /$$$$$$            /$$$$$$  /$$           /$$   /$$               /$$   /$$
+|_  $$_/           /$$__  $$|__/          |__/  | $$              | $$  / $$
+| $$   /$$$$$$$ | $$  \__/ /$$ /$$$$$$$  /$$ /$$$$$$   /$$   /$$|  $$/ $$/
+| $$  | $$__  $$| $$$$    | $$| $$__  $$| $$|_  $$_/  | $$  | $$ \  $$$$/ 
+| $$  | $$  \ $$| $$_/    | $$| $$  \ $$| $$  | $$    | $$  | $$  >$$  $$ 
+| $$  | $$  | $$| $$      | $$| $$  | $$| $$  | $$ /$$| $$  | $$ /$$/\  $$
+/$$$$$$| $$  | $$| $$      | $$| $$  | $$| $$  |  $$$$/|  $$$$$$$| $$  \ $$
+|______/|__/  |__/|__/      |__/|__/  |__/|__/   \___/   \____  $$|__/  |__/
+                                                       /$$  | $$          
+                                                      |  $$$$$$/          
+                                                       \______/           
+]]
+loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Mania/Bypass.lua'))()
+
+
+
 -- variables
 local FarmSettings = {
   Method = 'Above',
@@ -21,53 +52,39 @@ function GetCharName()
   end
   return charNames
 end
-local LibrarySettings = {
-  Title = '<font color="rgb(110, 48, 160)" size="' .. (isMobile and '14' or '24') .. '"><b>'.. (isMobile and ' InfinityX' or 'InfintyX') ..'</b></font>',
-  Footer = {
-    GameName = '<font color="rgb(180,180,255)"><i>Anime Mania [ Arena ]</i></font> · ',
-    Version = '<font color="rgb(160,160,160)">Version 4.2a</font> · ',
-    DiscordLink = '<font color="rgb(100,200,255)">Join us: discord.gg/emKJgWMHAr</font>'
-  }
-}
 
 
 
 -- ui library
-local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
-function getDpiScale()
-  if IsOnMobile then
-    return Library:SetDPIScale(75)
-  elseif not IsOnMobile then
-    Library:SetDPIScale(100)
-  end
-end
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/Library.lua"))()
+local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nanana291/Kong/main/SaveManager.lua"))()
 local Options = Library.Options
 local Toggles = Library.Toggles
 
 Library.ForceCheckbox = true
 
 local Window = Library:CreateWindow({
-  Title = LibrarySettings.Title,
-  Footer = LibrarySettings.Footer.GameName .. LibrarySettings.Footer.Version .. LibrarySettings.Footer.DiscordLink,
+  Title = '',
+  Footer = '<font color="rgb(120,80,200)">Anime Mania (Arena)</font>',
   Icon = 126527122577864,
-  NotifySide = "Right",
-  ShowCustomCursor = false,
+  Size = UDim2.fromOffset(580, 500),
+  Position = UDim2.fromOffset(100, 100),
   Center = true,
-  MobileButtonsSide = "Left",
-  Resizable = false,
-  Size = UDim2.fromOffset(650, 410),
-  ToggleKeybind = Enum.KeyCode.K
+  AutoShow = true,
+  Resizable = true,
+  ShowCustomCursor = false,
+  ToggleKeybind = Enum.KeyCode.RightControl,
+  NotifySide = "Right",
 })
+Window:SetSidebarWidth(54)
 
 
 
 -- tabs
 local Tabs = {
-  Farm = Window:AddTab("Farm", "banknote"),
-  Settings = Window:AddTab("Config.", "settings"),
+  Farm = Window:AddTab("Farm", "banknote", "Automatic options"),
+  Settings = Window:AddTab("Config.", "settings", "Ui Settings"),
 }
 
 
@@ -78,7 +95,7 @@ local SkillsGroupBox = Tabs.Farm:AddRightGroupbox("Skills", "atom")
 local CharacterSelectionGroupBox = Tabs.Farm:AddLeftGroupbox("Select Character", "users")
 local MiscGroupBox = Tabs.Farm:AddRightGroupbox("Misc", "layers")
 local FarmSettingsGroupBox = Tabs.Farm:AddRightGroupbox("Farm Settings", "settings")
-WaveGroupBox:AddToggle("MyToggle", {
+WaveGroupBox:AddToggle("TpMobs", {
 	Text = "Teleport to all mobs",
 	Tooltip = "Active to teleport character to all mobs",
 	DisabledTooltip = "I am disabled!",
@@ -113,7 +130,7 @@ WaveGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-WaveGroupBox:AddToggle("MyToggle", {
+WaveGroupBox:AddToggle("SkillsToggle", {
 	Text = "Use all skills",
 	Tooltip = "Active to use all skills",
 	DisabledTooltip = "I am disabled!",
@@ -133,7 +150,7 @@ WaveGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-WaveGroupBox:AddToggle("MyToggle", {
+WaveGroupBox:AddToggle("TeamAssist", {
 	Text = "Auto team assist",
 	Tooltip = "Active to use team assist",
 	DisabledTooltip = "I am disabled!",
@@ -151,7 +168,7 @@ WaveGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-WaveGroupBox:AddToggle("MyToggle", {
+WaveGroupBox:AddToggle("M1", {
 	Text = "Auto m1",
 	Tooltip = "Active to use m1",
 	DisabledTooltip = "I am disabled!",
@@ -168,7 +185,7 @@ WaveGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-WaveGroupBox:AddToggle("MyToggle", {
+WaveGroupBox:AddToggle("Gd", {
 	Text = "God mode",
 	Tooltip = "Active to dont die",
 	DisabledTooltip = "I am disabled!",
@@ -181,32 +198,32 @@ WaveGroupBox:AddToggle("MyToggle", {
 	Callback = function(Value)
     gd = Value
 
-    local RunService = game:GetService('RunService')
-    local ReplicatedStorage = game:GetService('ReplicatedStorage')
+    local RunService = game:GetService("RunService")
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-    local success, clCheck = pcall(function()
-        return ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("clCheck")
+    local clCheck
+    pcall(function()
+      clCheck = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("clCheck")
     end)
-    if not success or not clCheck then
-        return
-    end
 
-    RunService.RenderStepped:Connect(function()
-        if gd then
-          local successInvoke, errorMessage = pcall(function()
-              clCheck:InvokeServer('Dash')
-          end)
+    if not clCheck then return end
 
-          if not successInvoke then
-            warn("Error: ".. errorMessage)
-          end
-        end
-    end)
+    local last = 0
+    local cooldown = 0.15
+
+    RunService.Heartbeat:Connect(function()
+      if not gd then return end
+      if os.clock() - last < cooldown then return end
+      last = os.clock()
+      pcall(function()
+        clCheck:InvokeServer("Dash")
+      end)
+    end)    
 	end,
 })
 local skills = {1, 2, 3, 4}
 for _, v in pairs(skills) do
-  SkillsGroupBox:AddToggle("MyToggle", {
+  SkillsGroupBox:AddToggle("AutoUse " .. v, {
     Text = "Auto use ".. v .. " skill",
     Tooltip = "Active to use ".. v .. " skill automatically",
     DisabledTooltip = "I am disabled!",
@@ -224,7 +241,7 @@ for _, v in pairs(skills) do
     end,
   })
 end
-CharacterSelectionGroupBox:AddDropdown("PlayersDropdown", {
+CharacterSelectionGroupBox:AddDropdown("CharactersNameDropdown", {
 	Values = GetCharName(),
 	Default = '...',
 	Multi = false,
@@ -242,7 +259,7 @@ CharacterSelectionGroupBox:AddDropdown("PlayersDropdown", {
 	Disabled = false,
 	Visible = true,
 })
-CharacterSelectionGroupBox:AddToggle("MyToggle", {
+CharacterSelectionGroupBox:AddToggle("AutoSelect", {
 	Text = "Auto select",
 	Tooltip = "Active to select a selected character in dropdown",
 	DisabledTooltip = "I am disabled!",
@@ -302,7 +319,7 @@ CharacterSelectionGroupBox:AddToggle("MyToggle", {
     end)
 	end,
 })
-CharacterSelectionGroupBox:AddToggle("MyToggle", {
+CharacterSelectionGroupBox:AddToggle("AutoReplay", {
 	Text = "Auto replay",
 	Tooltip = "Active to replay mode automatically",
 	DisabledTooltip = "I am disabled!",
@@ -365,7 +382,7 @@ CharacterSelectionGroupBox:AddToggle("MyToggle", {
     end)
 	end,
 })
-CharacterSelectionGroupBox:AddToggle("MyToggle", {
+CharacterSelectionGroupBox:AddToggle("AutoNext", {
 	Text = "Auto next",
 	Tooltip = "Active to replay mode automatically",
 	DisabledTooltip = "I am disabled!",
@@ -428,7 +445,7 @@ CharacterSelectionGroupBox:AddToggle("MyToggle", {
     end)
 	end,
 })
-MiscGroupBox:AddToggle("MyToggle", {
+MiscGroupBox:AddToggle("AutoNextWave", {
 	Text = "Auto next wave [Dungeon]",
 	Tooltip = "Teleport you to wave point",
 	DisabledTooltip = "I am disabled!",
@@ -451,7 +468,7 @@ MiscGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-MiscGroupBox:AddToggle("MyToggle", {
+MiscGroupBox:AddToggle("AntiAfk", {
 	Text = "Anti afk",
 	Tooltip = "Active for dont have kiked at 20 minutes idled",
 	DisabledTooltip = "I am disabled!",
@@ -473,7 +490,7 @@ MiscGroupBox:AddToggle("MyToggle", {
     end
 	end,
 })
-FarmSettingsGroupBox:AddDropdown("MyDropdown", {
+FarmSettingsGroupBox:AddDropdown("FarmMethod", {
 	Values = { 'Above', 'Behind' },
 	Default = 'Above',
 	Multi = false,
@@ -491,7 +508,7 @@ FarmSettingsGroupBox:AddDropdown("MyDropdown", {
 	Disabled = false,
 	Visible = true,
 })
-FarmSettingsGroupBox:AddInput("MyTextbox", {
+FarmSettingsGroupBox:AddInput("DistanceBox", {
   Default = "5.5",
   Numeric = true,
   Finished = false,
@@ -556,12 +573,22 @@ end)
 CreditsGroupBox:AddLabel("Script made by Lmy77")
 CreditsGroupBox:AddButton("Discord server", function()
 	setclipboard("https://discord.gg/emKJgWMHAr")
-  Library:Notify({
-    Title = "InfinityX",
-    Description = "Discord server copied to clipboard",
-    Time = 4,
-  })
+    Library:Notify({
+        Title = "InfinityX",
+        Description = "Discord server copied to clipboard",
+        Time = 4,
+    })
 end)
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+ThemeManager:SetFolder("Obsidian")
+SaveManager:SetFolder("Obsidian/Anime-Manie-Arena")
+SaveManager:SetSubFolder("Anime-Manie-Arena")
+SaveManager:BuildConfigSection(Tabs.Settings)
+ThemeManager:ApplyToTab(Tabs.Settings)
+SaveManager:LoadAutoloadConfig()
 
 
 
