@@ -254,7 +254,7 @@ Library.ForceCheckbox = true
 
 local Window = Library:CreateWindow({
   Title = '',
-  Footer = '<font color="rgb(120,80,200)">Shark Bite (Classic)</font>',
+  Footer = '<font color="rgb(120,80,200)">DIG</font>',
   Icon = 126527122577864,
   Size = UDim2.fromOffset(580, 500),
   Position = UDim2.fromOffset(100, 100),
