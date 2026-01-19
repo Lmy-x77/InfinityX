@@ -1,6 +1,12 @@
 local PlaceId = { Lobby = 893973440, Event = 107279422643029 }
 if game.PlaceId ~= PlaceId.Event then return end
 
+game:GetService("StarterGui"):SetCore("SendNotification", {
+	Title = "InfinityX",
+	Text = "AutoEvent Loaded, waiting for end cutscene",
+	Duration = 5
+})
+
 local BeginGui = game.Players.LocalPlayer.PlayerGui.GateUIFolder.BeginGui
 repeat task.wait() until BeginGui.Enabled == true
 
