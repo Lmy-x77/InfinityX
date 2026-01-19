@@ -329,7 +329,7 @@ end
 local ReindeerNPC = workspace.Scriptable.NPC.Quest:FindFirstChild("Reindeer")
 local function TurnInReindeer()
 	if ReindeerNPC then
-		HRP:PivotTo(ReindeerNPC:GetPivot())
+		Teleport(nil, 2, -33, 105, 37)
 		local click
 		repeat
 			click = ReindeerNPC:FindFirstChild("ClickBox", true)
@@ -375,6 +375,89 @@ local function KillPlayer(plr)
 	if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character.Humanoid.Health ~= 0 then
 		HRP:PivotTo(plr.Character.HumanoidRootPart:GetPivot())
 		Remote:FireServer("Train", 1)
+	end
+end
+local SwordMasterNPC = workspace.Scriptable.NPC.Quest:FindFirstChild("Sword Master")
+local function TurnInSwordMaster()
+	if SwordMasterNPC then
+		HRP:PivotTo(SwordMasterNPC:GetPivot())
+		local click
+		repeat
+			click = SwordMasterNPC:FindFirstChild("ClickBox", true)
+			task.wait(0.1)
+		until click and click:FindFirstChildOfClass("ClickDetector")
+		fireclickdetector(click:FindFirstChildOfClass("ClickDetector"))
+  else
+		Teleport(nil, 2, 326, 70, -1993)
+		local click
+		repeat
+			click = SwordMasterNPC:FindFirstChild("ClickBox", true)
+			task.wait(0.1)
+		until click and click:FindFirstChildOfClass("ClickDetector")
+		fireclickdetector(click:FindFirstChildOfClass("ClickDetector"))
+	end
+end
+local function EquipBestSword()
+  local Sword = game:GetService("Players").LocalPlayer.OtherData.Sword.Value
+  local Event = game:GetService("ReplicatedStorage").Remotes.RemoteFunction
+  Event:InvokeServer(
+    "SwordEquip",
+    Sword
+  )
+end
+local function GetSwordMasterQuest()
+	for _, q in ipairs(LP.Quests:GetChildren()) do
+		if q:FindFirstChild("QuestType") and q.Name:find("Sword") then
+			return q
+		end
+	end
+end
+local function GetKitiroQuest()
+	for _, q in ipairs(LP.Quests:GetChildren()) do
+		if q:FindFirstChild("QuestType") and q.Name:find("Kitiro") then
+			return q
+		end
+	end
+end
+local MAX_DISTANCE = 60
+local currentNPC
+local function GetNPC1Alive()
+	for _, v in ipairs(workspace:GetDescendants()) do
+		if v:IsA("Model") and v.Name == "1" and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("PVPFolder") and v.PVPFolder:FindFirstChild("NewHealth") and v.PVPFolder.NewHealth.Value > 0 then
+			return v
+		end
+	end
+end
+local function KillNPC1()
+	if not currentNPC
+		or not currentNPC.Parent
+		or currentNPC.PVPFolder.NewHealth.Value <= 0 then
+		currentNPC = GetNPC1Alive()
+		if currentNPC then
+			HRP:PivotTo(currentNPC.HumanoidRootPart:GetPivot())
+		end
+	end
+
+	if not currentNPC then return end
+
+	local dist = (HRP.Position - currentNPC.HumanoidRootPart.Position).Magnitude
+	if dist <= MAX_DISTANCE then
+		Remote:FireServer("Train", 1)
+	else
+		HRP:PivotTo(currentNPC.HumanoidRootPart:GetPivot())
+	end
+end
+local function TurnInKitiro()
+	if KitiroNpc then
+		HRP:PivotTo(KitiroNpc:GetPivot())
+		local click
+		repeat
+			click = KitiroNpc:FindFirstChild("ClickBox", true)
+			task.wait(0.1)
+		until click and click:FindFirstChildOfClass("ClickDetector")
+		fireclickdetector(click:FindFirstChildOfClass("ClickDetector"))
+	else
+		Teleport(nil, 2, 326, 70, -1993)
 	end
 end
 function SendWebhook(embed)
@@ -690,6 +773,17 @@ local Toggle = AutoFarmTab:Toggle({
 
     task.spawn(function()
       while AutoFarm do task.wait()
+        local char = game.Players.LocalPlayer.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+
+        if not hum or hum.Health <= 0 then
+          task.wait(6)
+          repeat task.wait()
+            char = game.Players.LocalPlayer.Character
+            hum = char and char:FindFirstChildOfClass("Humanoid")
+          until hum and hum.Health > 0 or not AutoFarm
+        end
+
         local statId = StatMap[SelectedStat]
         if not statId then continue end
         TeleportBestByStat(statId)
@@ -1021,6 +1115,111 @@ AutoFarmTab:Toggle({
 					end
 				else
 					TurnInReindeer()
+					task.wait(1)
+				end
+				task.wait()
+			end
+		end)
+	end
+})
+AutoFarmTab:Toggle({
+  Title = "Auto kitiro quest",
+  Desc = "Automatically completes Kitiro quests.",
+  Icon = "check",
+  Type = "Checkbox",
+  Flag = "AutoKitiroQuestToggle",
+  Value = false,
+  Locked = false,
+  Callback = function(state)
+    AutoKitiro = state
+    if not AutoKitiro then teleported = false return end
+    task.spawn(function()
+      while AutoKitiro do
+        local Q = GetKitiroQuest()
+        if Q then
+          if Q.Completed.Value then
+            TurnInKitiro()
+            task.wait(1)
+          else
+            local qType = Q.QuestType.Value
+            if qType == "GainIncrement" then
+              for id = 1,6 do
+                local prog = Q.Progress:FindFirstChild(tostring(id))
+                local req = Q.Requirements:FindFirstChild(tostring(id))
+                if prog and req then
+                  while AutoKitiro and prog.Value < req.Value do
+                    TeleportBest(id)
+                    Remote:FireServer("Train", id)
+                    task.wait()
+                  end
+                end
+                if Q.Completed.Value then break end
+              end
+            elseif qType == "KillNPC" then
+              while AutoKitiro and not Q.Completed.Value do
+                KillNPC1()
+                task.wait()
+              end
+            else
+              for id = 1,6 do
+                local prog = Q.Progress:FindFirstChild(tostring(id))
+                local req = Q.Requirements:FindFirstChild(tostring(id))
+                local stat = Stats[id]
+                if prog and req and stat and prog.Value < req.Value then
+                  local target = stat.Value + (req.Value - prog.Value)
+                  while AutoKitiro and stat.Value < target do
+                    TeleportBest(id)
+                    Remote:FireServer("Train", id)
+                    task.wait()
+                  end
+                  break
+                end
+              end
+            end
+          end
+        else
+          TurnInKitiro()
+          task.wait(1)
+        end
+        task.wait()
+      end
+    end)
+  end
+})
+AutoFarmTab:Toggle({
+	Title = "Auto sword master quest",
+	Desc = "Automatically completes Sword Master quests.",
+	Icon = "check",
+	Type = "Checkbox",
+	Flag = "AutoSwordMasterQuestToggle",
+	Value = false,
+	Locked = false,
+	Callback = function(state)
+		AutoSwordMaster = state
+    if not AutoSwordMaster then return end
+		task.spawn(function()
+			while AutoSwordMaster do
+				local Q = GetSwordMasterQuest()
+				if Q then
+					if Q.Completed.Value then
+						TurnInSwordMaster()
+						task.wait(1)
+					else
+						local prog = Q.Progress:FindFirstChild("4")
+						local req = Q.Requirements:FindFirstChild("4")
+						local stat = Stats[4]
+						if prog and req and stat then
+							local target = stat.Value + (req.Value - prog.Value)
+							while AutoSwordMaster and stat.Value < target do
+								TeleportBest(4)
+								EquipBestSword()
+                Remote:FireServer("Train", 4)
+								task.wait()
+							end
+						end
+					end
+				else
+					TurnInSwordMaster()
 					task.wait(1)
 				end
 				task.wait()
@@ -2578,6 +2777,21 @@ local Toggle = MiscTab:Toggle({
         end)
       end
       loadstring(game:HttpGet("https://raw.githubusercontent.com/hassanxzayn-lua/Anti-afk/main/antiafkbyhassanxzyn"))();
+    end
+	end
+})
+local Toggle = MiscTab:Toggle({
+	Title = "Mobile Auto Clicker",
+	Icon = "check",
+	Type = "Checkbox",
+  Flag = "AntiAFK",
+	Value = false,
+	Callback = function(state)
+    AutoClicker = state
+    if not AutoClicker then return end
+    
+    if AutoClicker then
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/rrixh/uwuware/main/Kustom/autoklicker-mobile_lulaslollipop",true))();
     end
 	end
 })
