@@ -302,7 +302,10 @@ function GetSize()
         return UDim2.fromOffset(730, 560)
     end
 end
-
+local Lighting = game:GetService("Lighting")
+local Atmosphere = Lighting:FindFirstChildOfClass("Atmosphere")
+local OldFogStart, OldFogEnd
+local OldDensity, OldHaze, OldGlare
 scriptVersion = '4.2a'
 
 
@@ -790,33 +793,32 @@ sections.GameSection5:Toggle({
 	Name = "No Fog",
 	Default = false,
 	Callback = function(bool)
-		local Lighting = game:GetService("Lighting")
-		local Atmosphere = Lighting:FindFirstChildOfClass("Atmosphere")
-
-		if Atmosphere then
-			Atmosphere.__OldDensity = Atmosphere.__OldDensity or Atmosphere.Density
-			Atmosphere.__OldHaze = Atmosphere.__OldHaze or Atmosphere.Haze
-			Atmosphere.__OldGlare = Atmosphere.__OldGlare or Atmosphere.Glare
-		end
-
-		Lighting.__OldFogStart = Lighting.__OldFogStart or Lighting.FogStart
-		Lighting.__OldFogEnd = Lighting.__OldFogEnd or Lighting.FogEnd
-
 		if bool then
+			OldFogStart = Lighting.FogStart
+			OldFogEnd = Lighting.FogEnd
+
 			Lighting.FogStart = 0
 			Lighting.FogEnd = 1e9
+
 			if Atmosphere then
+				OldDensity = Atmosphere.Density
+				OldHaze = Atmosphere.Haze
+				OldGlare = Atmosphere.Glare
+
 				Atmosphere.Density = 0
 				Atmosphere.Haze = 0
 				Atmosphere.Glare = 0
 			end
 		else
-			Lighting.FogStart = Lighting.__OldFogStart
-			Lighting.FogEnd = Lighting.__OldFogEnd
-			if Atmosphere then
-				Atmosphere.Density = Atmosphere.__OldDensity
-				Atmosphere.Haze = Atmosphere.__OldHaze
-				Atmosphere.Glare = Atmosphere.__OldGlare
+			if OldFogStart and OldFogEnd then
+				Lighting.FogStart = OldFogStart
+				Lighting.FogEnd = OldFogEnd
+			end
+
+			if Atmosphere and OldDensity then
+				Atmosphere.Density = OldDensity
+				Atmosphere.Haze = OldHaze
+				Atmosphere.Glare = OldGlare
 			end
 		end
 	end,
