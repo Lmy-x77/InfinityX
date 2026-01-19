@@ -299,9 +299,10 @@ function GetSize()
     if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.MouseEnabled then
         return UDim2.fromOffset(600, 350)
     else
-        return UDim2.fromOffset(830, 525)
+        return UDim2.fromOffset(730, 560)
     end
 end
+
 scriptVersion = '4.2a'
 
 
@@ -367,6 +368,7 @@ local sections = {
     GameSection3 = tabs.Game:Section({ Side = "Left" }),
     GameSection4 = tabs.Game:Section({ Side = "Right" }),
     GameSection5 = tabs.Game:Section({ Side = "Right" }),
+    GameSection6 = tabs.Game:Section({ Side = "Left" }),
     LPlayerSection1 = tabs.LPayer:Section({ Side = "Left" }),
     LPlayerSection2 = tabs.LPayer:Section({ Side = "Right" }),
     LPlayerSection3 = tabs.LPayer:Section({ Side = "Left" }),
@@ -394,6 +396,9 @@ sections.GameSection4:Header({
 })
 sections.GameSection5:Header({
 	Name = "[📶] Misc"
+})
+sections.GameSection6:Header({
+	Name = "[🌸] Event"
 })
 sections.GameSection1:Toggle({
 	Name = "Auto hack",
@@ -757,6 +762,127 @@ sections.GameSection5:Toggle({
         end
 	end,
 }, "Toggle")
+sections.GameSection5:Toggle({
+	Name = "Xray",
+	Default = false,
+	Callback = function(bool)
+		local Players = game:GetService("Players")
+
+		for _, v in pairs(workspace:GetDescendants()) do
+			if v:IsA("BasePart") then
+				local isCharacter = false
+
+				for _, plr in pairs(Players:GetPlayers()) do
+					if plr.Character and v:IsDescendantOf(plr.Character) then
+						isCharacter = true
+						break
+					end
+				end
+
+				if not isCharacter then
+					v.LocalTransparencyModifier = bool and 0.8 or 0
+				end
+			end
+		end
+	end,
+}, "Toggle")
+sections.GameSection5:Toggle({
+	Name = "No Fog",
+	Default = false,
+	Callback = function(bool)
+		local Lighting = game:GetService("Lighting")
+		local Atmosphere = Lighting:FindFirstChildOfClass("Atmosphere")
+
+		if Atmosphere then
+			Atmosphere.__OldDensity = Atmosphere.__OldDensity or Atmosphere.Density
+			Atmosphere.__OldHaze = Atmosphere.__OldHaze or Atmosphere.Haze
+			Atmosphere.__OldGlare = Atmosphere.__OldGlare or Atmosphere.Glare
+		end
+
+		Lighting.__OldFogStart = Lighting.__OldFogStart or Lighting.FogStart
+		Lighting.__OldFogEnd = Lighting.__OldFogEnd or Lighting.FogEnd
+
+		if bool then
+			Lighting.FogStart = 0
+			Lighting.FogEnd = 1e9
+			if Atmosphere then
+				Atmosphere.Density = 0
+				Atmosphere.Haze = 0
+				Atmosphere.Glare = 0
+			end
+		else
+			Lighting.FogStart = Lighting.__OldFogStart
+			Lighting.FogEnd = Lighting.__OldFogEnd
+			if Atmosphere then
+				Atmosphere.Density = Atmosphere.__OldDensity
+				Atmosphere.Haze = Atmosphere.__OldHaze
+				Atmosphere.Glare = Atmosphere.__OldGlare
+			end
+		end
+	end,
+}, "Toggle")
+sections.GameSection6:Toggle({
+	Name = "Auto event",
+	Default = false,
+	Callback = function(bool)
+		AutoEvent = bool
+		if not AutoEvent then return end
+
+		local PlaceId = { Lobby = 893973440, Event = 107279422643029 }
+		local EventMap = "Shopping Center by D4niel_Foxy"
+
+		local ReplicatedStorage = game:GetService("ReplicatedStorage")
+		local CurrentMapValue = ReplicatedStorage:WaitForChild("CurrentMap")
+
+		while AutoEvent do task.wait(1)
+			if game.PlaceId == PlaceId.Lobby then
+				if tostring(CurrentMapValue.Value) == EventMap then
+					local Map = workspace:FindFirstChild(EventMap)
+					if Map then
+						local Heels = Map:FindFirstChild("Heels")
+						if Heels then
+							local ClickPart = Heels:FindFirstChild("ClickPart")
+							if ClickPart then
+								local Click = ClickPart:FindFirstChild("ClickDetector")
+								if Click then
+									fireclickdetector(Click)
+								end
+							end
+						end
+
+						task.wait(1)
+
+						local Mirror = Map:FindFirstChild("MirrorModel")
+						if Mirror then
+							for _, v in pairs(Mirror:GetDescendants()) do
+								if v:IsA("ClickDetector") then
+									fireclickdetector(v)
+								end
+							end
+
+							task.wait(1)
+
+                            pcall(queue_on_teleport, [[
+                                wait(4) loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Flee-The-Facility/AutoEvent.lua"))()
+                            ]])
+
+                            task.wait(1)
+
+							for _, v in pairs(Mirror:GetDescendants()) do
+								if v:IsA("TouchTransmitter") then
+									firetouchinterest(v.Parent, game.Players.LocalPlayer.Character.HumanoidRootPart, 0)
+									firetouchinterest(v.Parent, game.Players.LocalPlayer.Character.HumanoidRootPart, 1)
+								end
+							end
+                            task.wait(2)
+						end
+					end
+				end
+			end
+		end
+	end,
+}, "Toggle")
+
 
 
 sections.LPlayerSection1:Header({
