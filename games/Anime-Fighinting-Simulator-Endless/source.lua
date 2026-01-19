@@ -1477,8 +1477,7 @@ for _, v in pairs(SkillKeys) do
       SkillStates[v] = state
       if not state then return end
       task.spawn(function()
-        while SkillStates[v] do
-          task.wait()
+        while SkillStates[v] do task.wait(2)
           local key = Enum.KeyCode[v]
           local rf = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction")
           rf:InvokeServer("UsePower", v)
