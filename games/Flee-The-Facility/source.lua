@@ -10,9 +10,10 @@ wait(2.5)
 
 -- detect service
 local UserInputService = game:GetService("UserInputService")
-if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled and not UserInputService.MouseEnabled then
+IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS}, UserInputService:GetPlatform())
+if IsOnMobile then
 	print("Mobile device")
-elseif not UserInputService.TouchEnabled and UserInputService.KeyboardEnabled and UserInputService.MouseEnabled then
+elseif not IsOnMobile then
 	print("Computer device")
 end
 
@@ -270,7 +271,11 @@ local function updateComputerESP()
     end
 end
 local KeyPress = function(v)
-    return game:GetService("VirtualInputManager"):SendKeyEvent(true, v, false, game)
+    if IsOnMobile then
+        return game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):FireServer("Input", "Action", true)
+    elseif not IsOnMobile then
+        return game:GetService("VirtualInputManager"):SendKeyEvent(true, v, false, game)
+    end
 end
 function getAction()
     if game:GetService("Players").LocalPlayer.TempPlayerStatsModule.ActionProgress.Value == 0 then
@@ -363,7 +368,7 @@ local tabs = {
 	Game = tabGroups.TabGroup1:Tab({ Name = "| Game", Image = "rbxassetid://10723424505" }),
     LPayer = tabGroups.TabGroup1:Tab({ Name = "| Local Player", Image = "rbxassetid://10747373176" }),
     Esp = tabGroups.TabGroup1:Tab({ Name = "| Esp", Image = "rbxassetid://10747375132" }),
-    EspSettings = tabGroups.TabGroup1:Tab({ Name = "| Esp Settings", Image = "rbxassetid://10734950309" }),
+    EspSettings = tabGroups.TabGroup1:Tab({ Name = "| Settings", Image = "rbxassetid://10734950309" }),
 }
 local sections = {
 	GameSection1 = tabs.Game:Section({ Side = "Left" }),
@@ -378,7 +383,7 @@ local sections = {
     LPlayerSection4 = tabs.LPayer:Section({ Side = "Right" }),
     EspSection1 = tabs.Esp:Section({ Side = "Left" }),
     EspSection2 = tabs.Esp:Section({ Side = "Right" }),
-    EspSeettingsSection1 = tabs.EspSettings:Section({ Side = "Left" }),
+    EspSeettingsSection1 = tabs.EspSettings:Section({ Side = "Right" }),
 }
 tabs.Game:Select()
 
@@ -426,7 +431,7 @@ sections.GameSection1:Toggle({
             end
         end
 	end,
-}, "Toggle")
+}, "AutoHack")
 sections.GameSection1:Button({
 	Name = "Teleport to exit door",
 	Callback = function()
@@ -471,7 +476,7 @@ sections.GameSection1:Button({
                             if x.ActionSign.Value == 20 and v.Screen.Color ~= Color3.fromRGB(40, 127, 71) then
                                 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = x.CFrame
                                 wait(.5)
-                                game:GetService('VirtualInputManager'):SendKeyEvent(true, 'E', false, game) wait(.1) game:GetService('VirtualInputManager'):SendKeyEvent(false, 'E', false, game)
+                                KeyPress("E")
                                 wait(.5)
                                 task.spawn(function()
                                     wait(1)
@@ -694,7 +699,7 @@ sections.GameSection5:Toggle({
             _G.Unfly()
         end
 	end,
-}, "Toggle")
+}, "Fly")
 sections.GameSection5:Toggle({
 	Name = "Noclip",
 	Default = false,
@@ -735,7 +740,7 @@ sections.GameSection5:Toggle({
             _G.Clip()
         end
 	end,
-}, "Toggle")
+}, "Noclip")
 sections.GameSection5:Toggle({
 	Name = "Infinite Jump",
 	Default = false,
@@ -764,7 +769,7 @@ sections.GameSection5:Toggle({
             _G.DisableInfiniteJump()
         end
 	end,
-}, "Toggle")
+}, "InfJump")
 sections.GameSection5:Toggle({
 	Name = "Xray",
 	Default = false,
@@ -788,7 +793,7 @@ sections.GameSection5:Toggle({
 			end
 		end
 	end,
-}, "Toggle")
+}, "Xray")
 sections.GameSection5:Toggle({
 	Name = "No Fog",
 	Default = false,
@@ -822,7 +827,7 @@ sections.GameSection5:Toggle({
 			end
 		end
 	end,
-}, "Toggle")
+}, "NoFog")
 sections.GameSection6:Toggle({
 	Name = "Auto event",
 	Default = false,
@@ -883,7 +888,7 @@ sections.GameSection6:Toggle({
 			end
 		end
 	end,
-}, "Toggle")
+}, "EventToggle")
 
 
 
@@ -934,7 +939,7 @@ sections.LPlayerSection1:Toggle({
             end
         end
 	end,
-}, "Toggle")
+}, "AntiRagdoll")
 sections.LPlayerSection1:Toggle({
 	Name = "No slow",
 	Default = false,
@@ -955,7 +960,7 @@ sections.LPlayerSection1:Toggle({
             end
         end
 	end,
-}, "Toggle")
+}, "NoSlow")
 sections.LPlayerSection1:Toggle({
 	Name = "Self-protection",
 	Default = false,
@@ -1006,7 +1011,7 @@ sections.LPlayerSection1:Toggle({
 			end
 		end)
 	end,
-}, "Toggle")
+}, "SelfProtection")
 sections.LPlayerSection2:Toggle({
 	Name = "Knock aura",
 	Default = false,
@@ -1042,7 +1047,7 @@ sections.LPlayerSection2:Toggle({
             end
         end
 	end,
-}, "Toggle")
+}, "KnockAura")
 sections.LPlayerSection2:Toggle({
 	Name = "Active crawling",
 	Default = false,
@@ -1058,7 +1063,7 @@ sections.LPlayerSection2:Toggle({
             game:GetService("Players").LocalPlayer.TempPlayerStatsModule.DisableCrawl.Value = false
         end
 	end,
-}, "Toggle")
+}, "EnableCrawling")
 sections.LPlayerSection2:Toggle({
 	Name = "No hammer cooldown",
 	Default = false,
@@ -1073,7 +1078,7 @@ sections.LPlayerSection2:Toggle({
             end
         end
 	end,
-}, "Toggle")
+}, "NoHammerCD")
 sections.LPlayerSection2:Button({
 	Name = "Capture a random player",
 	Callback = function()
@@ -1133,7 +1138,7 @@ local walkspeedInput = sections.LPlayerSection3:Input({
 	Callback = function(input)
 		WalkSpeedValue = input
 	end,
-}, "TargetInput")
+}, "WalkSpeed")
 local jumppowerInput = sections.LPlayerSection3:Input({
 	Name = "JumpPower",
 	Placeholder = "value",
@@ -1141,7 +1146,7 @@ local jumppowerInput = sections.LPlayerSection3:Input({
 	Callback = function(input)
 		JumpPowerValue = input
 	end,
-}, "TargetInput")
+}, "JumpPower")
 sections.LPlayerSection3:Divider()
 sections.LPlayerSection3:Button({
 	Name = "Set values",
@@ -1414,7 +1419,7 @@ sections.LPlayerSection4:Toggle({
             end
         end)
 	end,
-}, "Toggle")
+}, "AfkFarm")
 sections.LPlayerSection4:Divider()
 local walkspeedInput = sections.LPlayerSection4:Input({
 	Name = "Set distance",
@@ -1423,7 +1428,7 @@ local walkspeedInput = sections.LPlayerSection4:Input({
 	Callback = function(input)
 		afkFarmSettings.Distance = input
 	end,
-}, "TargetInput")
+}, "DistanceAfk")
 local walkspeedInput = sections.LPlayerSection4:Input({
 	Name = "Set distance to beast",
 	Placeholder = "30",
@@ -1431,7 +1436,7 @@ local walkspeedInput = sections.LPlayerSection4:Input({
 	Callback = function(input)
 		afkFarmSettings.DistaneToBeast = input
 	end,
-}, "TargetInput")
+}, "BeastDistanceAfk")
 
 
 sections.EspSection1:Header({
@@ -1460,7 +1465,7 @@ sections.EspSection1:Toggle({
             end)
         end
 	end,
-}, "Toggle")
+}, "EspPlayers")
 sections.EspSection1:Divider()
 local StyleDropdown = sections.EspSection1:Dropdown({
 	Name = "Box style",
@@ -1477,28 +1482,28 @@ local StyleDropdown = sections.EspSection1:Dropdown({
             getgenv().EspSettings.Box3D = false
         end
 	end,
-}, "Dropdown")
+}, "BoxStyle")
 sections.EspSection1:Toggle({
 	Name = "Names",
 	Default = true,
 	Callback = function(bool)
         getgenv().EspSettings.Name = bool
 	end,
-}, "Toggle")
+}, "Names")
 sections.EspSection1:Toggle({
 	Name = "Tracers",
 	Default = true,
 	Callback = function(bool)
         getgenv().EspSettings.Tracers = bool
 	end,
-}, "Toggle")
+}, "Tracers")
 sections.EspSection1:Toggle({
 	Name = "Studs",
 	Default = true,
 	Callback = function(bool)
         getgenv().EspSettings.Studs = bool
 	end,
-}, "Toggle")
+}, "Studs")
 sections.EspSection2:Toggle({
 	Name = "Esp computers",
 	Default = false,
@@ -1531,7 +1536,7 @@ sections.EspSection2:Toggle({
             end
         end
 	end,
-}, "Toggle")
+}, "EspComputers")
 
 
 sections.EspSeettingsSection1:Header({
@@ -1544,7 +1549,7 @@ local playerPicker = sections.EspSeettingsSection1:Colorpicker({
 	Callback = function(color, alpha)
         getgenv().EspSettings.InnocentColor = color
 	end,
-}, "ESPColorToggle")
+}, "InnocentColor")
 local beastPicker = sections.EspSeettingsSection1:Colorpicker({
 	Name = "Set the beast colour",
 	Default = Color3.fromRGB(255, 0, 0),
@@ -1552,7 +1557,7 @@ local beastPicker = sections.EspSeettingsSection1:Colorpicker({
 	Callback = function(color, alpha)
         getgenv().EspSettings.BeastColor = color
 	end,
-}, "ESPColorToggle")
+}, "BeastColor")
 sections.EspSeettingsSection1:Button({
 	Name = "Reset colors",
 	Callback = function()
@@ -1562,6 +1567,9 @@ sections.EspSeettingsSection1:Button({
         beastPicker:SetColor(Color3.fromRGB(255, 0, 0))
 	end,
 })
+MacLib:SetFolder("Maclib")
+tabs.EspSettings:InsertConfigSection("Left")
+MacLib:LoadAutoLoadConfig()
 
 
 
