@@ -6,7 +6,7 @@ wait(.8)
 -- variables
 local currentPlaceId = game.PlaceId
 local supportedGames = {
-    [{893973440}] = 'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Flee-The-Facility/source.lua',
+    [{893973440, 1738581510, 125624013879756, 132745842491660}] = 'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Flee-The-Facility/source.lua',
     [{10260193230}] = 'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Meme-Sea/source.lua',
     [{1962086868, 3582763398, 2127551566, 94971861814985}] = 'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Tower-of-Hell/source.lua',
     [{6284881984, 6314042276}] = 'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Mania/source.lua',
