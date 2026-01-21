@@ -1,8 +1,6 @@
--- CONFIG MANAGER (VERSÃO LIMPA + AUTOLOAD 100% FUNCIONAL)
-
 local cloneref = cloneref or function(i) return i end
-local RunService = cloneref(game:GetService("RunService"))
 local HttpService = cloneref(game:GetService("HttpService"))
+local RunService = cloneref(game:GetService("RunService"))
 
 local ConfigManager = {}
 ConfigManager.__index = ConfigManager
@@ -68,6 +66,10 @@ function ConfigManager:AllConfigs()
 		if n then table.insert(t, n) end
 	end
 	return t
+end
+
+function ConfigManager:Get(name)
+	return self.Configs[name] or self:Create(name)
 end
 
 function ConfigManager:Create(name)
@@ -139,8 +141,8 @@ function ConfigManager:Create(name)
 	end
 
 	if isfile(cfg.Path) then
-		local d = HttpService:JSONDecode(readfile(cfg.Path))
-		if d.__autoload then
+		local data = HttpService:JSONDecode(readfile(cfg.Path))
+		if data.__autoload then
 			cfg:Load()
 		end
 	end
@@ -148,10 +150,6 @@ function ConfigManager:Create(name)
 	self.Configs[name] = cfg
 	self.Window:SetCurrentConfig(cfg)
 	return cfg
-end
-
-function ConfigManager:Get(name)
-	return self.Configs[name] or self:Create(name)
 end
 
 function ConfigManager:GetAutoLoads()
