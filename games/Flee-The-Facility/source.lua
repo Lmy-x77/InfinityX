@@ -100,7 +100,9 @@ getgenv().EspSettings = {
     Studs = true,
     Box3D = true,
     BeastColor = Color3.fromRGB(255, 0, 0),
-    InnocentColor = Color3.fromRGB(70, 243, 84)
+    InnocentColor = Color3.fromRGB(70, 243, 84),
+    Drawing = true,
+    Highlight = false
 }
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -271,10 +273,15 @@ local function updateComputerESP()
     end
 end
 local KeyPress = function(v)
-    if IsOnMobile then
+    if IsOnMobile and v == "E" then
         return game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):FireServer("Input", "Action", true)
-    elseif not IsOnMobile then
-        return game:GetService("VirtualInputManager"):SendKeyEvent(true, v, false, game)
+    elseif not IsOnMobile and v == "E" then
+        return game:GetService("ReplicatedStorage"):WaitForChild("RemoteEvent"):FireServer("Input", "Action", true)
+    elseif not IsOnMobile and v ~= "E" then
+        local VirtualInput = game:GetService("VirtualInputManager")
+        VirtualInput:SendKeyEvent(true, v, false, game)
+        wait(0.1)
+        VirtualInput:SendKeyEvent(false, v, false, game)
     end
 end
 function getAction()
@@ -360,6 +367,68 @@ local globalSettings = {
 
 
 
+-- esp librayr
+local EspLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Esp%20v2/source.lua", true))()
+EspLib.ESPValues.PlayersESP = false
+EspLib.ESPValues.ClosetsESP = false
+local function ApplyEspToPlayer(plr)
+	if plr == LocalPlayer then return end
+
+	local function onChar(char)
+		if not EspLib.ESPValues.PlayersESP then return end
+		if not char then return end
+
+		local isBeast = char:FindFirstChild("BeastPowers") ~= nil
+		local color = isBeast and getgenv().EspSettings.BeastColor or getgenv().EspSettings.InnocentColor
+
+		EspLib.ApplyESP(char, {
+			Color = color,
+			Text = plr.Name,
+			ESPName = "PlayersESP",
+			HighlightEnabled = true,
+		})
+	end
+
+	if plr.Character then
+		onChar(plr.Character)
+	end
+	plr.CharacterAdded:Connect(onChar)
+end
+local function RefreshESP()
+	if ESPEnabled then
+		if getgenv().EspSettings.Drawing then
+			deleteESP()
+			for _, player in pairs(Players:GetPlayers()) do
+				if player ~= LocalPlayer then
+					createESP(player)
+				end
+			end
+		elseif getgenv().EspSettings.Highlight then
+			EspLib.ESPValues.PlayersESP = true
+			for _, p in ipairs(Players:GetPlayers()) do
+				ApplyEspToPlayer(p)
+			end
+		end
+	end
+end
+local function ApplyEspToClosets()
+	local map = workspace:FindFirstChild(tostring(game.ReplicatedStorage.CurrentMap.Value))
+	if not map then return end
+
+	for i, v in ipairs(map:GetChildren()) do
+		if v:IsA("Model") and (v.Name == "Locker" or v.Name:find("Closet")) then
+			EspLib.ApplyESP(v, {
+				Color = Color3.fromRGB(0, 170, 255),
+				Text = "Closet",
+				ESPName = "ClosetsESP",
+				HighlightEnabled = true,
+			})
+		end
+	end
+end
+
+
+
 -- tabs
 local tabGroups = {
 	TabGroup1 = Window:TabGroup()
@@ -383,7 +452,9 @@ local sections = {
     LPlayerSection4 = tabs.LPayer:Section({ Side = "Right" }),
     EspSection1 = tabs.Esp:Section({ Side = "Left" }),
     EspSection2 = tabs.Esp:Section({ Side = "Right" }),
+    EspSection3 = tabs.Esp:Section({ Side = "Right" }),
     EspSeettingsSection1 = tabs.EspSettings:Section({ Side = "Right" }),
+    EspSeettingsSection2 = tabs.EspSettings:Section({ Side = "Right" }),
 }
 tabs.Game:Select()
 
@@ -1012,6 +1083,47 @@ sections.LPlayerSection1:Toggle({
 		end)
 	end,
 }, "SelfProtection")
+sections.LPlayerSection1:Toggle({
+	Name = "Anti seer",
+	Default = false,
+	Callback = function(bool)
+        seer = bool
+        if not seer then return end
+
+        local plr = game.Players.LocalPlayer
+        local char = plr.Character or plr.CharacterAdded:Wait()
+        local hrp = char:WaitForChild("HumanoidRootPart")
+
+        local map = workspace:FindFirstChild(tostring(game.ReplicatedStorage.CurrentMap.Value))
+        local DetectFrame = plr.PlayerGui.ScreenGui.WarningFrame
+
+        local oldCFrame = nil
+        local inLocker = false
+
+        while seer do task.wait()
+            if DetectFrame.Visible and not inLocker then
+                oldCFrame = hrp.CFrame
+                inLocker = true
+
+                for _, v in pairs(map:GetChildren()) do
+                    if v:IsA("Model") and (v.Name == "Locker" or v.Name:find('Closet')) then
+                        local cf = v:GetBoundingBox()
+                        hrp.CFrame = cf
+                        break
+                    end
+                end
+            end
+
+            if inLocker and not DetectFrame.Visible then
+                task.wait(0.5)
+                if oldCFrame then
+                    hrp.CFrame = oldCFrame
+                end
+                inLocker = false
+            end
+        end
+	end,
+}, "AntiSeer")
 sections.LPlayerSection2:Toggle({
 	Name = "Knock aura",
 	Default = false,
@@ -1099,11 +1211,11 @@ sections.LPlayerSection2:Button({
             if (v.Name ~= game.Players.LocalPlayer.Name) then
                 if (v.TempPlayerStatsModule.Captured.Value == false) then
                     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Character.HumanoidRootPart.CFrame
-                    wait(.2)
+                    wait(.5)
                     local ohString1 = "HammerHit"
                     local ohInstance2 = v.Character["Left Arm"]
                     game.Players.LocalPlayer.Character.Hammer.HammerEvent:FireServer(ohString1, ohInstance2)
-                    wait(.3)
+                    wait(.5)
                     local ohString1 = "HammerTieUp"
                     local ohInstance2 = v.Character.Torso
                     local ohVector33 = Vector3.new(v.Character.HumanoidRootPart.Position)
@@ -1116,6 +1228,10 @@ sections.LPlayerSection2:Button({
                                     if z.Value == 30 then
                                         local pivotCFrame = x:GetPivot()
                                         game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = pivotCFrame
+                                        wait(.5)
+                                        KeyPress('E')
+                                        wait(.5)
+                                        KeyPress('E')
                                         wait(.5)
                                         KeyPress('E')
                                         wait(.2)
@@ -1401,6 +1517,10 @@ sections.LPlayerSection4:Toggle({
                                                     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = pivotCFrame
                                                     wait(.2)
                                                     KeyPressAfk('E')
+                                                    wait(.2)
+                                                    KeyPressAfk('E')
+                                                    wait(.2)
+                                                    KeyPressAfk('E')
                                                     if v.TempPlayerStatsModule.Captured.Value == false then
                                                         wait(.2)
                                                     elseif v.TempPlayerStatsModule.Captured.Value == true then
@@ -1421,22 +1541,29 @@ sections.LPlayerSection4:Toggle({
 	end,
 }, "AfkFarm")
 sections.LPlayerSection4:Divider()
-local walkspeedInput = sections.LPlayerSection4:Input({
+local DistanceAfkInput = sections.LPlayerSection4:Input({
 	Name = "Set distance",
 	Placeholder = "30",
 	AcceptedCharacters = "Numeric",
 	Callback = function(input)
-		afkFarmSettings.Distance = input
+		afkFarmSettings.Distance = tonumber(input)
 	end,
 }, "DistanceAfk")
-local walkspeedInput = sections.LPlayerSection4:Input({
+local BeastDistanceAfkInput = sections.LPlayerSection4:Input({
 	Name = "Set distance to beast",
 	Placeholder = "30",
 	AcceptedCharacters = "Numeric",
 	Callback = function(input)
-		afkFarmSettings.DistaneToBeast = input
+		afkFarmSettings.DistaneToBeast = tonumber(input)
 	end,
 }, "BeastDistanceAfk")
+sections.LPlayerSection4:Button({
+	Name = "Reset values",
+	Callback = function()
+        DistanceAfkInput:UpdateText('30')
+        BeastDistanceAfkInput:UpdateText('30')
+	end,
+})
 
 
 sections.EspSection1:Header({
@@ -1445,14 +1572,17 @@ sections.EspSection1:Header({
 sections.EspSection2:Header({
     Name = "[💻] Esp Computers"
 })
+sections.EspSection3:Header({
+    Name = "[📦] Esp Closets"
+})
 sections.EspSection1:Toggle({
 	Name = "Esp players",
 	Default = false,
 	Callback = function(bool)
         ESPEnabled = bool
-        if not ESPEnabled then
+        if not ESPEnabled and getgenv().EspSettings.Drawing then
             deleteESP()
-        else
+        elseif ESPEnabled and getgenv().EspSettings.Drawing then
             for _, player in pairs(Players:GetPlayers()) do
                 if player ~= LocalPlayer then
                     createESP(player)
@@ -1463,6 +1593,26 @@ sections.EspSection1:Toggle({
                     createESP(player)
                 end
             end)
+        end
+
+        if ESPEnabled and getgenv().EspSettings.Highlight then
+            EspLib.ESPValues.PlayersESP = true
+            if ESPEnabled then
+                for _, p in ipairs(Players:GetPlayers()) do
+                    ApplyEspToPlayer(p)
+                end
+                if not playerAddedConn then
+                    playerAddedConn = Players.PlayerAdded:Connect(function(p)
+                        ApplyEspToPlayer(p)
+                    end)
+                end
+            end
+        elseif not ESPEnabled and getgenv().EspSettings.Highlight then
+            EspLib.ESPValues.PlayersESP = false
+            if playerAddedConn then
+                playerAddedConn:Disconnect()
+                playerAddedConn = nil
+            end
         end
 	end,
 }, "EspPlayers")
@@ -1537,10 +1687,24 @@ sections.EspSection2:Toggle({
         end
 	end,
 }, "EspComputers")
+sections.EspSection3:Toggle({
+	Name = "Esp Closets",
+	Default = false,
+	Callback = function(bool)
+        EspLib.ESPValues.ClosetsESP = bool
+
+		while EspLib.ESPValues.ClosetsESP do task.wait()
+			ApplyEspToClosets()
+		end
+	end,
+}, "EspClosets")
 
 
 sections.EspSeettingsSection1:Header({
 	Name = "[🖌️] Esp Colors"
+})
+sections.EspSeettingsSection2:Header({
+	Name = "[👀] Esp Type"
 })
 local playerPicker = sections.EspSeettingsSection1:Colorpicker({
 	Name = "Set the player's colour",
@@ -1567,6 +1731,28 @@ sections.EspSeettingsSection1:Button({
         beastPicker:SetColor(Color3.fromRGB(255, 0, 0))
 	end,
 })
+local EspTypeDropdown = sections.EspSeettingsSection2:Dropdown({
+	Name = "Select esp type",
+	Search = false,
+	Multi = false,
+	Required = false,
+	Options = {'Drawing', 'Highlight'},
+	Default = 'Drawing',
+	Callback = function(option)
+		EspType = option
+
+		if option == "Drawing" then
+			getgenv().EspSettings.Drawing = true
+			getgenv().EspSettings.Highlight = false
+			EspLib.ESPValues.PlayersESP = false
+		else
+			getgenv().EspSettings.Drawing = false
+			getgenv().EspSettings.Highlight = true
+		end
+
+		RefreshESP()
+	end,
+}, "EspType")
 MacLib:SetFolder("Maclib")
 tabs.EspSettings:InsertConfigSection("Left")
 MacLib:LoadAutoLoadConfig()
