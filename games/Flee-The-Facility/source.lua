@@ -1575,45 +1575,57 @@ sections.EspSection2:Header({
 sections.EspSection3:Header({
     Name = "[📦] Esp Closets"
 })
+local drawingAddedConn = nil
+local playerAddedConn = nil
 sections.EspSection1:Toggle({
 	Name = "Esp players",
 	Default = false,
 	Callback = function(bool)
-        ESPEnabled = bool
-        if not ESPEnabled and getgenv().EspSettings.Drawing then
-            deleteESP()
-        elseif ESPEnabled and getgenv().EspSettings.Drawing then
-            for _, player in pairs(Players:GetPlayers()) do
-                if player ~= LocalPlayer then
-                    createESP(player)
-                end
-            end
-            Players.PlayerAdded:Connect(function(player)
-                if ESPEnabled and player ~= LocalPlayer then
-                    createESP(player)
-                end
-            end)
-        end
+		ESPEnabled = bool
+		if not ESPEnabled then
+			if drawingAddedConn then
+				drawingAddedConn:Disconnect()
+				drawingAddedConn = nil
+			end
+			if playerAddedConn then
+				playerAddedConn:Disconnect()
+				playerAddedConn = nil
+			end
 
-        if ESPEnabled and getgenv().EspSettings.Highlight then
-            EspLib.ESPValues.PlayersESP = true
-            if ESPEnabled then
-                for _, p in ipairs(Players:GetPlayers()) do
-                    ApplyEspToPlayer(p)
-                end
-                if not playerAddedConn then
-                    playerAddedConn = Players.PlayerAdded:Connect(function(p)
-                        ApplyEspToPlayer(p)
-                    end)
-                end
-            end
-        elseif not ESPEnabled and getgenv().EspSettings.Highlight then
-            EspLib.ESPValues.PlayersESP = false
-            if playerAddedConn then
-                playerAddedConn:Disconnect()
-                playerAddedConn = nil
-            end
-        end
+			deleteESP()
+			EspLib.ESPValues.PlayersESP = false
+			return
+		end
+
+		if getgenv().EspSettings.Drawing then
+			deleteESP()
+
+			for _, player in pairs(Players:GetPlayers()) do
+				if player ~= LocalPlayer then
+					createESP(player)
+				end
+			end
+
+			drawingAddedConn = Players.PlayerAdded:Connect(function(player)
+				if ESPEnabled and getgenv().EspSettings.Drawing then
+					createESP(player)
+				end
+			end)
+		end
+
+		if getgenv().EspSettings.Highlight then
+			EspLib.ESPValues.PlayersESP = true
+
+			for _, p in ipairs(Players:GetPlayers()) do
+				ApplyEspToPlayer(p)
+			end
+
+			playerAddedConn = Players.PlayerAdded:Connect(function(p)
+				if ESPEnabled and getgenv().EspSettings.Highlight then
+					ApplyEspToPlayer(p)
+				end
+			end)
+		end
 	end,
 }, "EspPlayers")
 sections.EspSection1:Divider()
@@ -1741,10 +1753,21 @@ local EspTypeDropdown = sections.EspSeettingsSection2:Dropdown({
 	Callback = function(option)
 		EspType = option
 
+		deleteESP()
+		EspLib.ESPValues.PlayersESP = false
+
+		if drawingAddedConn then
+			drawingAddedConn:Disconnect()
+			drawingAddedConn = nil
+		end
+		if playerAddedConn then
+			playerAddedConn:Disconnect()
+			playerAddedConn = nil
+		end
+
 		if option == "Drawing" then
 			getgenv().EspSettings.Drawing = true
 			getgenv().EspSettings.Highlight = false
-			EspLib.ESPValues.PlayersESP = false
 		else
 			getgenv().EspSettings.Drawing = false
 			getgenv().EspSettings.Highlight = true
