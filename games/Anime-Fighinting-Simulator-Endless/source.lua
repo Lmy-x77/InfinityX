@@ -51,6 +51,7 @@ pcall(function() getgenv().BYPASS_LOADED = true end)
 -- variables
 local SkillKeys = { "Z","X","C","E","R","T","Y","U","F","G","H","J","K","L","V","B","N","M" }
 local SelectedSkills = {}
+getgenv().StatsFarm = { Delay = false }
 getgenv().AfkFarmSettings = { Desync = true }
 getgenv().FarmMobSettings = { UseM1 = false }
 getgenv().AutoSellChampionsSettings = { Enabled = false }
@@ -225,7 +226,7 @@ local Stats = {
 local Areas = {
 	[1] = {
 		{100,1e4,{nil,2,-6,71,134}},
-		{1e4,1e5,{nil,2, 1343,195,-141}},
+		{1e4,1e5,{nil,2,1343,195,-141}},
 		{1e5,1e6,{nil,2,-1257,65,486}},
 		{1e6,1e7,{nil,2,-917,85,179}},
 		{1e7,1e8,{nil,2,-2245,617,533}},
@@ -570,12 +571,14 @@ else
 end
 WindUI:AddTheme({
   Name = "InfinityX",
-  Accent = Color3.fromHex("#7D2FA1"),
-  Background = Color3.fromHex("#101010"),
-  Outline = Color3.fromHex("#FFFFFF"),
-  Text = Color3.fromHex("#BFBFBF"),
-  Placeholder = Color3.fromHex("#7a7a7a"),
-  Button = Color3.fromHex("#52525b"),
+
+  Accent = Color3.fromHex("#b91c1c"),
+  Dialog = Color3.fromHex("#450a0a"),
+  Outline = Color3.fromHex("#fca5a5"),
+  Text = Color3.fromHex("#fef2f2"),
+  Placeholder = Color3.fromHex("#6f757b"),
+  Background = Color3.fromHex("#0c0404"),
+  Button = Color3.fromHex("9F2ED1"),
   Icon = Color3.fromHex("#9F2ED1"),
 })
 local Window = WindUI:CreateWindow({
@@ -732,6 +735,7 @@ local Dropdown = AutoFarmTab:Dropdown({
 })
 local Toggle = AutoFarmTab:Toggle({
   Title = "Start auto farm",
+  Desc = "Activate to farm in the best area the stats you selected.",
   Icon = "check",
   Type = "Checkbox",
   Flag = "StatFarm",
@@ -776,7 +780,7 @@ local Toggle = AutoFarmTab:Toggle({
         local char = game.Players.LocalPlayer.Character
         local hum = char and char:FindFirstChildOfClass("Humanoid")
 
-        if not hum or hum.Health <= 0 then
+        if not hum or hum.Health <= 0 and getgenv().StatsFarm.Delay then
           task.wait(6)
           repeat task.wait()
             char = game.Players.LocalPlayer.Character
@@ -790,6 +794,17 @@ local Toggle = AutoFarmTab:Toggle({
         Remote:FireServer("Train", statId)
       end
     end)
+  end
+})
+local Toggle = AutoFarmTab:Toggle({
+  Title = "Delay on dead",
+  Desc = "Every time a player dies with auto-farm stats enabled, it takes a while before they can teleport back to the selected training zone.",
+  Icon = "check",
+  Type = "Checkbox",
+  Flag = "StatFarm",
+  Value = false,
+  Callback = function(state)
+    getgenv().StatsFarm.Delay = state
   end
 })
 local Section = AutoFarmTab:Section({
@@ -2322,7 +2337,6 @@ task.spawn(function()
 		local Paragraph = QuestTab:Paragraph({
 			Title = "",
 			Desc = "",
-			Color = "Grey",
 			Locked = false,
 		})
 
@@ -2596,6 +2610,8 @@ local Button = MiscTab:Button({
   Locked = false,
   Callback = function()
     local codes = {
+      'WednesdayYenCode',
+      'WednesdayBoostsCode',
       'BUGSPATCH4',
       'BUGSPATCH3',
       'BUGSPATCH2',
