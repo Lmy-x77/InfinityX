@@ -394,6 +394,12 @@ local function ApplyEspToPlayer(plr)
 	end
 	plr.CharacterAdded:Connect(onChar)
 end
+local function RefreshPlayerESP(plr)
+	if not ESPEnabled or not getgenv().EspSettings.Highlight then return end
+	if not plr.Character then return end
+
+	ApplyEspToPlayer(plr)
+end
 local function RefreshESP()
 	if ESPEnabled then
 		if getgenv().EspSettings.Drawing then
@@ -1582,6 +1588,7 @@ sections.EspSection1:Toggle({
 	Default = false,
 	Callback = function(bool)
 		ESPEnabled = bool
+
 		if not ESPEnabled then
 			if drawingAddedConn then
 				drawingAddedConn:Disconnect()
@@ -1597,34 +1604,44 @@ sections.EspSection1:Toggle({
 			return
 		end
 
-		if getgenv().EspSettings.Drawing then
-			deleteESP()
-
-			for _, player in pairs(Players:GetPlayers()) do
-				if player ~= LocalPlayer then
-					createESP(player)
-				end
-			end
-
-			drawingAddedConn = Players.PlayerAdded:Connect(function(player)
-				if ESPEnabled and getgenv().EspSettings.Drawing then
-					createESP(player)
-				end
-			end)
-		end
-
 		if getgenv().EspSettings.Highlight then
 			EspLib.ESPValues.PlayersESP = true
 
-			for _, p in ipairs(Players:GetPlayers()) do
-				ApplyEspToPlayer(p)
+			for _, plr in ipairs(Players:GetPlayers()) do
+				if plr ~= LocalPlayer then
+					ApplyEspToPlayer(plr)
+				end
 			end
 
-			playerAddedConn = Players.PlayerAdded:Connect(function(p)
-				if ESPEnabled and getgenv().EspSettings.Highlight then
-					ApplyEspToPlayer(p)
+			playerAddedConn = Players.PlayerAdded:Connect(function(plr)
+				if plr ~= LocalPlayer and ESPEnabled and getgenv().EspSettings.Highlight then
+					ApplyEspToPlayer(plr)
 				end
 			end)
+
+			for _, plr in ipairs(Players:GetPlayers()) do
+				if plr ~= LocalPlayer then
+					local function hookChar(char)
+						char.ChildAdded:Connect(function(x)
+							if x.Name == "BeastPowers" then
+								ApplyEspToPlayer(plr)
+							end
+						end)
+
+						char.ChildRemoved:Connect(function(x)
+							if x.Name == "BeastPowers" then
+								ApplyEspToPlayer(plr)
+							end
+						end)
+					end
+
+					if plr.Character then
+						hookChar(plr.Character)
+					end
+
+					plr.CharacterAdded:Connect(hookChar)
+				end
+			end
 		end
 	end,
 }, "EspPlayers")
