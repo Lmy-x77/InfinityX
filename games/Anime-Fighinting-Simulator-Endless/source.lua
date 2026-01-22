@@ -378,6 +378,12 @@ local function KillPlayer(plr)
 		Remote:FireServer("Train", 1)
 	end
 end
+local function KillPlayerSword(plr)
+	if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character.Humanoid.Health ~= 0 then
+		HRP:PivotTo(plr.Character.HumanoidRootPart:GetPivot())
+		Remote:FireServer("Train", 4)
+	end
+end
 local SwordMasterNPC = workspace.Scriptable.NPC.Quest:FindFirstChild("Sword Master")
 local function TurnInSwordMaster()
 	if SwordMasterNPC then
@@ -1096,6 +1102,12 @@ AutoFarmTab:Toggle({
 							for _, plr in ipairs(GetWeakerPlayersOffSafeZone()) do
 								if not AutoReindeer or Q.Completed.Value then break end
 								KillPlayer(plr)
+								task.wait()
+							end
+						elseif qType == "KillPlayerSword" then
+							for _, plr in ipairs(GetWeakerPlayersOffSafeZone()) do
+								if not AutoReindeer or Q.Completed.Value then break end
+								KillPlayerSword(plr)
 								task.wait()
 							end
 						elseif qType == "GainIncrement" then
