@@ -962,7 +962,10 @@ sections.GameSection6:Toggle({
 						end
 					end
 				end
-			end
+            elseif game.PlaceId == PlaceId.Event then
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Flee-The-Facility/AutoEvent.lua"))()
+                return
+            end
 		end
 	end,
 }, "EventToggle")
