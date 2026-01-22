@@ -278,10 +278,26 @@ local function notify(text)
 end
 
 local CheckKey = makeButton("Check Key", UDim2.new(0.05, 0, 0, 150))
-CheckKey.MouseButton1Click:Connect(function()
-    local Key = textbox.Text
+local ScriptID = "82d9add8-633f-4041-be19-f3ac76b91f17"
 
-    if Key == "" or #Key < 10 then
+local function ValidateKey(key)
+    local ok, api = pcall(function()
+        return loadstring(game:HttpGet("https://api.luashield.com/getluaapi"))()
+    end)
+    if not ok or not api then return false end
+
+    local valid = false
+    local success = pcall(function()
+        valid = api.validateKey(key, ScriptID)
+    end)
+
+    return success and valid
+end
+
+local CheckKey = makeButton("Check Key", UDim2.new(0.05, 0, 0, 150))
+CheckKey.MouseButton1Click:Connect(function()
+    local key = textbox.Text
+    if key == "" then
         CheckKey.Text = "Invalid key"
         task.wait(1)
         CheckKey.Text = "Check Key"
@@ -290,51 +306,21 @@ CheckKey.MouseButton1Click:Connect(function()
 
     CheckKey.Text = "Checking..."
 
-    local success, api = pcall(function()
-        return loadstring(game:HttpGet("https://api.luashield.com/getluaapi"))()
-    end)
-
-    if not success or not api then
-        CheckKey.Text = "API error"
-        task.wait(1)
-        CheckKey.Text = "Check Key"
-        return
-    end
-
-    local isValid = false
-    local ok, err = pcall(function()
-        isValid = api.validateKey(Key, ScriptID)
-    end)
-
-    if not ok or not isValid then
+    if not ValidateKey(key) then
         CheckKey.Text = "Invalid key"
         task.wait(1.2)
         CheckKey.Text = "Check Key"
         return
     end
 
+    writefile("InfinityX/Key-System/key.lua", key)
+    getgenv().InfinityX_Key = key
     CheckKey.Text = "Key valid!"
-
-    writefile("InfinityX/Key-System/key.lua", Key)
-
-    task.wait(0.8)
-
-    for _, v in ipairs(gui:GetDescendants()) do
-        if v:IsA("GuiObject") then
-            TweenService:Create(v, TweenInfo.new(0.3), {
-                BackgroundTransparency = 1,
-                TextTransparency = 1,
-                ImageTransparency = 1
-            }):Play()
-        end
-    end
-
-    UIStroke:Destroy()
-    CLoseKeySystem()
-    task.wait(0.4)
-    gui:Destroy()
+    task.wait(0.6)
 
     correctKey = true
+    CLoseKeySystem()
+    gui:Destroy()
 end)
 
 local GetKey = makeButton("Get Key", UDim2.new(0.525, 0, 0, 150))
