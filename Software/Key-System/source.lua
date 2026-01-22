@@ -279,44 +279,39 @@ end
 
 local CheckKey = makeButton("Check Key", UDim2.new(0.05, 0, 0, 150))
 CheckKey.MouseButton1Click:Connect(function()
-	CheckKey.Text = "Checking..."
-	writefile('InfinityX/Key-System/key.lua', textbox.Text)
-	wait(1)
-	if readfile('InfinityX/Key-System/key.lua') == key then
-        CheckKey.Text = 'Key is valid!'
-		wait(1.2)
-		for _, v in ipairs(gui:GetDescendants()) do
-			if v:IsA("GuiObject") and not v:IsA('Frame') and not v:IsA('ImageLabel') then
-				TweenService:Create(v, TweenInfo.new(0.3), {
-					BackgroundTransparency = 1,
-					TextTransparency = 1
-				}):Play()
-			end
-		end
-		for _, v in ipairs(gui:GetDescendants()) do
-			if v:IsA('Frame') then
-				TweenService:Create(v, TweenInfo.new(0.3), {
-					BackgroundTransparency = 1,
-				}):Play()
-			end
-		end
-		for _, v in ipairs(gui:GetDescendants()) do
-			if v:IsA('ImageLabel') then
-				TweenService:Create(v, TweenInfo.new(0.3), {
-					ImageTransparency = 1,
-				}):Play()
-			end
-		end
-        UIStroke:Destroy()
-		CLoseKeySystem()
-		wait(0.5)
-		gui:Destroy()
-		correctKey = true
-	else
-        CheckKey.Text = 'Invalid key!'
-		wait(1)
-		CheckKey.Text = "Check Key"
-	end
+    local userKey = textbox.Text
+
+    if userKey == "" or #userKey < 5 then
+        CheckKey.Text = "Invalid format"
+        task.wait(1)
+        CheckKey.Text = "Check Key"
+        return
+    end
+
+    CheckKey.Text = "Saving key..."
+    writefile("InfinityX/Key-System/key.lua", userKey)
+
+    task.wait(0.6)
+
+    CheckKey.Text = "Key saved!"
+    task.wait(0.8)
+
+    for _, v in ipairs(gui:GetDescendants()) do
+        if v:IsA("GuiObject") then
+            TweenService:Create(v, TweenInfo.new(0.3), {
+                BackgroundTransparency = 1,
+                TextTransparency = 1,
+                ImageTransparency = 1
+            }):Play()
+        end
+    end
+
+    UIStroke:Destroy()
+    CLoseKeySystem()
+    task.wait(0.4)
+    gui:Destroy()
+
+    correctKey = true
 end)
 
 local GetKey = makeButton("Get Key", UDim2.new(0.525, 0, 0, 150))
