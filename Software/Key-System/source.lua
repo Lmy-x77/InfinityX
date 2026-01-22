@@ -279,21 +279,44 @@ end
 
 local CheckKey = makeButton("Check Key", UDim2.new(0.05, 0, 0, 150))
 CheckKey.MouseButton1Click:Connect(function()
-    local userKey = textbox.Text
+    local Key = textbox.Text
 
-    if userKey == "" or #userKey < 5 then
-        CheckKey.Text = "Invalid format"
+    if Key == "" or #Key < 10 then
+        CheckKey.Text = "Invalid key"
         task.wait(1)
         CheckKey.Text = "Check Key"
         return
     end
 
-    CheckKey.Text = "Saving key..."
-    writefile("InfinityX/Key-System/key.lua", userKey)
+    CheckKey.Text = "Checking..."
 
-    task.wait(0.6)
+    local success, api = pcall(function()
+        return loadstring(game:HttpGet("https://api.luashield.com/getluaapi"))()
+    end)
 
-    CheckKey.Text = "Key saved!"
+    if not success or not api then
+        CheckKey.Text = "API error"
+        task.wait(1)
+        CheckKey.Text = "Check Key"
+        return
+    end
+
+    local isValid = false
+    local ok, err = pcall(function()
+        isValid = api.validateKey(Key, ScriptID)
+    end)
+
+    if not ok or not isValid then
+        CheckKey.Text = "Invalid key"
+        task.wait(1.2)
+        CheckKey.Text = "Check Key"
+        return
+    end
+
+    CheckKey.Text = "Key valid!"
+
+    writefile("InfinityX/Key-System/key.lua", Key)
+
     task.wait(0.8)
 
     for _, v in ipairs(gui:GetDescendants()) do
