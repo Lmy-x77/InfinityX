@@ -94,6 +94,14 @@ local function MHFYJL_fake_script() -- Main.hideUi
 	local script = Instance.new('LocalScript', Main)
 
         local button = script.Parent
+        function GetGui()
+            for _, v in pairs(game:GetService("CoreGui"):GetDescendants()) do
+                if v:IsA('Frame') and v.Name == 'Base' then
+                    return v
+                end
+            end
+        end
+        if GetGui() then GetGui().Visible = not GetGui().Visible end
         local function toggleVisibility()
 			local VirtualInputManager = game:GetService("VirtualInputManager")
             if game.PlaceId == 537413528 then
