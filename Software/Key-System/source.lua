@@ -281,10 +281,11 @@ local CheckKey = makeButton("Check Key", UDim2.new(0.05, 0, 0, 150))
 local ScriptID = "82d9add8-633f-4041-be19-f3ac76b91f17"
 
 local function ValidateKey(key)
-    local ok, api = pcall(function()
-        return loadstring(game:HttpGet("https://api.luashield.com/getluaapi"))()
-    end)
-    if not ok or not api then return false end
+    local api = loadstring(game:HttpGetAsync("https://api.luashield.com/getluaapi"))()
+    if not api then
+        Notify({Title="InfinityX",Description="API error",Duration=2})
+        return false
+    end
 
     local valid = false
     local success = pcall(function()
