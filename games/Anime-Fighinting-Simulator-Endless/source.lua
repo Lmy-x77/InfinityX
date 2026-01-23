@@ -27,7 +27,7 @@ print[[
 
 
 -- verify
-local scriptClosed = false
+local scriptClosed = true
 if scriptClosed then
   pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
     "The script is being updated. For more information, join the Discord server."
