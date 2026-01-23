@@ -329,6 +329,49 @@ local function cacheModels(map, keyword)
 	end
 	return t
 end
+local RunService = game:GetService("RunService")
+local function getMap()
+	return workspace:FindFirstChild(tostring(RS.CurrentMap.Value))
+end
+local Fired = {}
+local Cached = {
+	Doors = {},
+	Computers = {},
+	Pods = {},
+	Map = nil
+}
+local function rebuildCache()
+	local map = getMap()
+	if map == Cached.Map then return end
+	Cached.Map = map
+
+	Cached.Doors = cacheModels(map, "door")
+	Cached.Computers = cacheModels(map, "computer")
+	Cached.Pods = cacheModels(map, "freeze")
+end
+task.spawn(function()
+	while true do
+		rebuildCache()
+		task.wait(1)
+	end
+end)
+local function autoInteract(toggleFlag, listGetter)
+	local hrp = getHRP()
+	local distSq = AutoInteractSettings.Distance ^ 2
+
+	while toggleFlag() do
+		task.wait(0.15)
+		if not ActionBox.Visible then continue end
+
+		for _, obj in ipairs(listGetter()) do
+			local pos = obj:GetPivot().Position
+			if (hrp.Position - pos).Magnitude ^ 2 <= distSq then
+				Remote:FireServer(AutoInteractSettings.Mode, "Action", true)
+				break
+			end
+		end
+	end
+end
 local Lighting = game:GetService("Lighting")
 local Atmosphere = Lighting:FindFirstChildOfClass("Atmosphere")
 local OldFogStart, OldFogEnd
@@ -386,6 +429,7 @@ local globalSettings = {
 local EspLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Esp%20v2/source.lua", true))()
 EspLib.ESPValues.PlayersESP = false
 EspLib.ESPValues.ClosetsESP = false
+EspLib.ESPValues.FreezePodESP = false
 local function ApplyEspToPlayer(plr)
 	if plr == LocalPlayer then return end
 
@@ -453,7 +497,7 @@ local function ApplyEspToClosets()
                 for _, x in ipairs(v:GetDescendants()) do
                     if x:IsA("Decal") and x.Name == "Decal" then
                         EspLib.ApplyESP(x.Parent.Parent.Parent, {
-                            Color = Color3.fromRGB(0, 170, 255),
+                            Color = Color3.fromRGB(131, 74, 41),
                             Text = "Closet",
                             ESPName = "ClosetsESP",
                             HighlightEnabled = true,
@@ -464,6 +508,56 @@ local function ApplyEspToClosets()
             end
         end
     end
+end
+local CachedFreezePods = {}
+local LastMap
+local function CacheFreezePods()
+	local map = workspace:FindFirstChild(tostring(game.ReplicatedStorage.CurrentMap.Value))
+	if not map or map == LastMap then return end
+	LastMap = map
+
+	table.clear(CachedFreezePods)
+
+	for _, v in ipairs(map:GetDescendants()) do
+		if v:IsA("Model") and v.Name:find("Freeze") and not v.Name:find("Prefab") then
+			table.insert(CachedFreezePods, v)
+		end
+	end
+end
+local function ApplyEspToFreezePods()
+	for _, pod in ipairs(CachedFreezePods) do
+		EspLib.ApplyESP(pod, {
+			Color = Color3.fromRGB(0,170,255),
+			Text = "FreezePod",
+			ESPName = "FreezePodESP",
+			HighlightEnabled = true
+		})
+	end
+end
+local CachedExitDoors = {}
+local LastMap
+local function CacheExitDoors()
+	local map = workspace:FindFirstChild(tostring(game.ReplicatedStorage.CurrentMap.Value))
+	if not map or map == LastMap then return end
+	LastMap = map
+
+	table.clear(CachedExitDoors)
+
+	for _, v in ipairs(map:GetDescendants()) do
+		if v:IsA("Model") and v.Name:lower():find("exit") then
+			table.insert(CachedExitDoors, v)
+		end
+	end
+end
+local function ApplyEspToExitDoors()
+	for _, door in ipairs(CachedExitDoors) do
+		EspLib.ApplyESP(door, {
+			Color = Color3.fromRGB(255, 85, 0),
+			Text = "ExitDoor",
+			ESPName = "ExitDoorESP",
+			HighlightEnabled = true
+		})
+	end
 end
 
 
@@ -492,8 +586,10 @@ local sections = {
     EspSection1 = tabs.Esp:Section({ Side = "Left" }),
     EspSection2 = tabs.Esp:Section({ Side = "Right" }),
     EspSection3 = tabs.Esp:Section({ Side = "Right" }),
+    EspSection4 = tabs.Esp:Section({ Side = "Right" }),
+    EspSection5 = tabs.Esp:Section({ Side = "Right" }),
+    EspSection6 = tabs.Esp:Section({ Side = "Left" }),
     EspSeettingsSection1 = tabs.EspSettings:Section({ Side = "Right" }),
-    EspSeettingsSection2 = tabs.EspSettings:Section({ Side = "Right" }),
     AutoInteractSerction1 = tabs.EspSettings:Section({ Side = "Right" }),
     AutoInteractSerction2 = tabs.EspSettings:Section({ Side = "Left" }),
 }
@@ -1168,6 +1264,45 @@ sections.LPlayerSection1:Toggle({
         end
 	end,
 }, "AntiSeer")
+sections.LPlayerSection1:Toggle({
+	Name = "Auto escape",
+	Default = false,
+	Callback = function(bool)
+        AutoEscape = bool
+        if not AutoEscape then return end
+
+        local ComputersLeft = game:GetService("ReplicatedStorage").ComputersLeft
+        local function HRP() return game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") end
+        local function teleportToExit()
+            for _, v in pairs(workspace:GetDescendants()) do
+                if v:IsA("Model") and v.Name == "ExitDoor" then
+                    for _, x in pairs(v:GetChildren()) do
+                        if x:IsA("Part") and x.Name == "ExitDoorTrigger" then
+                            exitTrigger = x
+                        elseif x:IsA("Part") and x.Name == "ExitArea" then
+                            exitArea = x
+                        end
+                    end
+                end
+            end
+
+            if HRP() and exitTrigger then
+                HRP().CFrame = exitTrigger.CFrame
+                wait(0.5)
+                KeyPress("E")
+            end
+        end
+        ComputersLeft:GetPropertyChangedSignal("Value"):Connect(function()
+            if AutoEscape then
+                if not game.Players.LocalPlayer.TempPlayerStatsModule.IsBeast.Value then
+                    if ComputersLeft.Value == 0 and not game:GetService("Players").LocalPlayer.TempPlayerStatsModule.Escaped.Value then
+                        teleportToExit()
+                    end
+                end
+            end
+        end)
+	end,
+}, "AutoEscape")
 sections.LPlayerSection2:Toggle({
 	Name = "Knock aura",
 	Default = false,
@@ -1196,7 +1331,7 @@ sections.LPlayerSection2:Toggle({
                             local ohString1 = "HammerHit"
                             local ohInstance2 = x
                             game.Players.LocalPlayer.Character.Hammer.HammerEvent:FireServer(ohString1, ohInstance2)
-                            wait(.1)
+                            break
                         end
                     end
                 end
@@ -1235,6 +1370,35 @@ sections.LPlayerSection2:Toggle({
         end
 	end,
 }, "NoHammerCD")
+sections.LPlayerSection2:Toggle({
+	Name = "Auto Tie",
+	Default = false,
+	Callback = function(bool)
+		AutoTie = bool
+		if not AutoTie then return end
+
+		while AutoTie do
+			task.wait()
+			for _, v in pairs(game.Players:GetPlayers()) do
+				if v ~= game.Players.LocalPlayer and v.Character and v:FindFirstChild("TempPlayerStatsModule") then
+					local rag = v.TempPlayerStatsModule:FindFirstChild("Ragdoll")
+					if rag and rag.Value == true then
+						if not Fired[v] then
+							Fired[v] = true
+							game.Players.LocalPlayer.Character.Hammer.HammerEvent:FireServer(
+								"HammerTieUp",
+								v.Character:FindFirstChild("Torso") or v.Character:FindFirstChild("UpperTorso"),
+								v.Character.HumanoidRootPart.Position
+							)
+						end
+					elseif rag and rag.Value == false then
+						Fired[v] = nil
+					end
+				end
+			end
+		end
+	end,
+}, "AutoTie")
 sections.LPlayerSection2:Button({
 	Name = "Capture a random player",
 	Callback = function()
@@ -1619,6 +1783,15 @@ sections.EspSection2:Header({
 sections.EspSection3:Header({
     Name = "[📦] Esp Closets"
 })
+sections.EspSection4:Header({
+    Name = "[🧊] Esp Freeze Pod"
+})
+sections.EspSection5:Header({
+    Name = "[🚪] Esp Exit Door"
+})
+sections.EspSection6:Header({
+	Name = "[👀] Esp Type"
+})
 local drawingAddedConn = nil
 local playerAddedConn = nil
 sections.EspSection1:Toggle({
@@ -1776,18 +1949,85 @@ sections.EspSection3:Toggle({
 	Callback = function(bool)
         EspLib.ESPValues.ClosetsESP = bool
 
-		while EspLib.ESPValues.ClosetsESP do task.wait()
+		while EspLib.ESPValues.ClosetsESP do
 			ApplyEspToClosets()
+            task.wait(1)
 		end
 	end,
 }, "EspClosets")
+sections.EspSection4:Toggle({
+	Name = "Esp Freeze Pod",
+	Default = false,
+	Callback = function(v)
+		EspLib.ESPValues.FreezePodESP = v
+		if not v then return end
+
+		CacheFreezePods()
+		ApplyEspToFreezePods()
+
+		task.spawn(function()
+			while EspLib.ESPValues.FreezePodESP do
+				CacheFreezePods()
+				task.wait(1)
+			end
+		end)
+	end,
+}, "EspCapsule")
+sections.EspSection5:Toggle({
+	Name = "Esp Exit Door",
+	Default = false,
+	Callback = function(v)
+		EspLib.ESPValues.ExitDoorESP = v
+		if not v then return end
+
+		CacheExitDoors()
+		ApplyEspToExitDoors()
+
+		task.spawn(function()
+			while EspLib.ESPValues.ExitDoorESP do
+				CacheExitDoors()
+				task.wait(1)
+			end
+		end)
+	end,
+}, "EspExitDoor")
+sections.EspSection6:Dropdown({
+	Name = "Select esp type",
+	Search = false,
+	Multi = false,
+	Required = false,
+	Options = {'Drawing', 'Highlight'},
+	Default = 'Drawing',
+	Callback = function(option)
+		EspType = option
+
+		deleteESP()
+		EspLib.ESPValues.PlayersESP = false
+
+		if drawingAddedConn then
+			drawingAddedConn:Disconnect()
+			drawingAddedConn = nil
+		end
+		if playerAddedConn then
+			playerAddedConn:Disconnect()
+			playerAddedConn = nil
+		end
+
+		if option == "Drawing" then
+			getgenv().EspSettings.Drawing = true
+			getgenv().EspSettings.Highlight = false
+		else
+			getgenv().EspSettings.Drawing = false
+			getgenv().EspSettings.Highlight = true
+		end
+
+		RefreshESP()
+	end,
+}, "EspType")
 
 
 sections.EspSeettingsSection1:Header({
 	Name = "[🖌️] Esp Colors"
-})
-sections.EspSeettingsSection2:Header({
-	Name = "[👀] Esp Type"
 })
 sections.AutoInteractSerction1:Header({
 	Name = "[👆] Auto Interact"
@@ -1823,111 +2063,36 @@ sections.EspSeettingsSection1:Button({
         beastPicker:SetColor(Color3.fromRGB(255, 0, 0))
 	end,
 })
-local EspTypeDropdown = sections.EspSeettingsSection2:Dropdown({
-	Name = "Select esp type",
-	Search = false,
-	Multi = false,
-	Required = false,
-	Options = {'Drawing', 'Highlight'},
-	Default = 'Drawing',
-	Callback = function(option)
-		EspType = option
-
-		deleteESP()
-		EspLib.ESPValues.PlayersESP = false
-
-		if drawingAddedConn then
-			drawingAddedConn:Disconnect()
-			drawingAddedConn = nil
-		end
-		if playerAddedConn then
-			playerAddedConn:Disconnect()
-			playerAddedConn = nil
-		end
-
-		if option == "Drawing" then
-			getgenv().EspSettings.Drawing = true
-			getgenv().EspSettings.Highlight = false
-		else
-			getgenv().EspSettings.Drawing = false
-			getgenv().EspSettings.Highlight = true
-		end
-
-		RefreshESP()
-	end,
-}, "EspType")
 sections.AutoInteractSerction1:Toggle({
 	Name = "Auto interact doors",
 	Default = false,
-	Callback = function(bool)
-		InteractDoor = bool
-		if not bool then return end
-
-		local hrp = getHRP()
-		local map = workspace:FindFirstChild(tostring(RS.CurrentMap.Value))
-		local Distance = AutoInteractSettings.Distance
-		local Doors = cacheModels(map, "door")
-
-		while InteractDoor do task.wait()
-			if not ActionBox.Visible then continue end
-
-			for _, door in pairs(Doors) do
-				if (hrp.Position - door:GetPivot().Position).Magnitude <= Distance then
-					Remote:FireServer(AutoInteractSettings.Mode, "Action", true)
-					break
-				end
-			end
+	Callback = function(v)
+		InteractDoor = v
+		if v then
+			autoInteract(function() return InteractDoor end, function() return Cached.Doors end)
 		end
 	end,
 }, "InteractDoor")
 sections.AutoInteractSerction1:Toggle({
 	Name = "Auto interact computers",
 	Default = false,
-	Callback = function(bool)
-		InteractComputers = bool
-		if not bool then return end
-
-		local hrp = getHRP()
-		local map = workspace:FindFirstChild(tostring(RS.CurrentMap.Value))
-		local Distance = AutoInteractSettings.Distance
-		local Pods = cacheModels(map, "computer")
-
-		while InteractComputers do task.wait()
-			if not ActionBox.Visible then continue end
-
-			for _, pod in pairs(Pods) do
-				if (hrp.Position - pod:GetPivot().Position).Magnitude <= Distance then
-					Remote:FireServer(AutoInteractSettings.Mode, "Action", true)
-					break
-				end
-			end
+	Callback = function(v)
+		InteractComputers = v
+		if v then
+			autoInteract(function() return InteractComputers end, function() return Cached.Computers end)
 		end
 	end,
-}, "InteractCapsule")
+}, "InteractComputer")
 sections.AutoInteractSerction1:Toggle({
 	Name = "Auto interact freeze pod",
 	Default = false,
-	Callback = function(bool)
-		InteractFreezePod = bool
-		if not bool then return end
-
-		local hrp = getHRP()
-		local map = workspace:FindFirstChild(tostring(RS.CurrentMap.Value))
-		local Distance = AutoInteractSettings.Distance
-		local Pods = cacheModels(map, "freeze")
-
-		while InteractFreezePod do task.wait()
-			if not ActionBox.Visible then continue end
-
-			for _, pod in pairs(Pods) do
-				if (hrp.Position - pod:GetPivot().Position).Magnitude <= Distance then
-					Remote:FireServer(AutoInteractSettings.Mode, "Action", true)
-					break
-				end
-			end
+	Callback = function(v)
+		InteractFreezePod = v
+		if v then
+			autoInteract(function() return InteractFreezePod end, function() return Cached.Pods end)
 		end
 	end,
-}, "InteractCapsule")
+}, "InteractFreeze")
 sections.AutoInteractSerction2:Input({
 	Name = "Auto Interact Distance",
 	Placeholder = "6",
