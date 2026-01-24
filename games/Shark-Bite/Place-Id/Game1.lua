@@ -752,47 +752,51 @@ CharacterGroupBox:AddDivider()
 CharacterGroupBox:AddButton({
 	Text = "Remove remote event",
 	Func = function()
-        local scriptRef = game:GetService("Players").LocalPlayer:WaitForChild("PlayerScripts"):FindFirstChild("LocalScript")
-        local remote = workspace.Terrain:FindFirstChild("RemoteEvent")
-        local remote2 = game:GetService("ReplicatedStorage"):FindFirstChild('HackerMessage')
+        local Players = game:GetService("Players")
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local LocalPlayer = Players.LocalPlayer
 
-        if remote then
+        local scriptRef = LocalPlayer:WaitForChild("PlayerScripts"):FindFirstChild("LocalScript")
+        local remote = workspace.Terrain:FindFirstChild("RemoteEvent")
+        local hackerRemote = ReplicatedStorage:FindFirstChild("HackerMessage")
+
+        local function notify(title, desc, time)
             Library:Notify({
-                Title = "InfinityX",
-                Description = "Remote event removed!",
-                Time = 4,
+                Title = title,
+                Description = desc,
+                Time = time,
             })
-        elseif not remote then
-            Library:Notify({
-                Title = "InfinityX",
-                Description = "Remote event aleady removed!",
-                Time = 4,
-            })
+        end
+
+        if not remote then
+            notify("InfinityX", "Remote event already removed!", 4)
             return
+        else
+            notify("InfinityX", "Remote event removed!", 4)
+        end
+
+        local function disconnectAllConnections(obj)
+            for _, conn in pairs(getconnections(obj)) do
+                pcall(function() conn:Disable() end)
+            end
         end
         if hookfunction and hookmetamethod then
-            local remoteName = "HackerMessage"
             local mt = getrawmetatable(game)
-
             setreadonly(mt, false)
-                local oldNamecall = mt.__namecall
-                mt.__namecall = newcclosure(function(self, ...)
-                    local method = getnamecallmethod()
-                    if method == "FireServer" and tostring(self) == remoteName then
-                        return
-                    end
-                    return oldNamecall(self, ...)
-                end)
-                hookfunction(game.Players.LocalPlayer.Kick, newcclosure(function(...)
-                    return nil
-                end))
-                mt.__namecall = newcclosure(function(self, ...)
-                    local method = getnamecallmethod()
-                    if self == game.Players.LocalPlayer and method == "Kick" then
-                        return nil
-                    end
-                    return oldNamecall(self, ...)
-                end)
+
+            local oldNamecall = mt.__namecall
+            mt.__namecall = newcclosure(function(self, ...)
+                local method = getnamecallmethod()
+                if method == "FireServer" and (tostring(self) == "HackerMessage") then
+                    return
+                elseif method == "Kick" and self == LocalPlayer then
+                    return
+                end
+                return oldNamecall(self, ...)
+            end)
+
+            hookfunction(LocalPlayer.Kick, newcclosure(function(...) return nil end))
+
             setreadonly(mt, true)
 
             for _, func in pairs(getgc(true)) do
@@ -803,19 +807,24 @@ CharacterGroupBox:AddButton({
                     hookfunction(func, function() end)
                 end
             end
-            for _, conn in pairs(getconnections(scriptRef.AncestryChanged)) do conn:Disable() end
-            for _, conn in pairs(getconnections(scriptRef.Changed)) do conn:Disable() end
-            for _, conn in pairs(getconnections(scriptRef:GetPropertyChangedSignal("Parent"))) do conn:Disable() end
 
-            warn('Remote event removed successfully!')
+            disconnectAllConnections(scriptRef.AncestryChanged)
+            disconnectAllConnections(scriptRef.Changed)
+            disconnectAllConnections(scriptRef:GetPropertyChangedSignal("Parent"))
+
+            warn("Remote event removed successfully!")
 
             scriptRef.Disabled = true
-            remote:Destroy()
-            remote2:Destroy()
-        elseif not hookfunction then
+            pcall(function()
+                remote:Destroy()
+                hackerRemote:Destroy()
+            end)
+        else
             scriptRef.Disabled = true
-            remote:Destroy()
-            remote2:Destroy()
+            pcall(function()
+                remote:Destroy()
+                hackerRemote:Destroy()
+            end)
         end
 	end,
 	DoubleClick = false,
@@ -827,33 +836,52 @@ CharacterGroupBox:AddButton({
 	Visible = true,
 	Risky = false,
 })
-CharacterGroupBox:AddButton({
-	Text = "Remove client kick",
-	Func = function()
-        for _, f in pairs(getgc(true)) do
-            if type(f) == "function" then
-                local ok, consts = pcall(debug.getconstants, f)
-                if ok then
-                    for _, c in pairs(consts) do
-                        if type(c) == "string" and c:lower() == "kick" then
-                            hookfunction(f, function()
-                                return nil
-                            end)
-                        end
-                    end
-                end
+do
+    local initialized = false
+
+    CharacterGroupBox:AddButton({
+        Text = "Remove client kick",
+        Func = function()
+            if initialized then
+                Library:Notify({
+                    Title = "InfinityX",
+                    Description = "Kick protection is already active!",
+                    Time = 3,
+                })
+                return
             end
-        end
-	end,
-	DoubleClick = false,
 
-	Tooltip = "Click to remove client kick",
-	DisabledTooltip = "I am disabled!",
+            local mt = getrawmetatable(game)
+            setreadonly(mt, false)
 
-	Disabled = false,
-	Visible = true,
-	Risky = false,
-})
+            local oldNamecall = mt.__namecall
+            mt.__namecall = newcclosure(function(self, ...)
+                local method = getnamecallmethod()
+                if method == "Kick" and self == game.Players.LocalPlayer then
+                    return nil
+                end
+                return oldNamecall(self, ...)
+            end)
+
+            setreadonly(mt, true)
+            initialized = true
+
+            Library:Notify({
+                Title = "InfinityX",
+                Description = "Client Kick protection is now active!",
+                Time = 4,
+            })
+        end,
+        DoubleClick = false,
+
+        Tooltip = "Click to remove client kick",
+        DisabledTooltip = "I am disabled!",
+
+        Disabled = false,
+        Visible = true,
+        Risky = false,
+    })
+end
 CharacterGroupBox:AddButton({
 	Text = "Force day",
 	Func = function()
