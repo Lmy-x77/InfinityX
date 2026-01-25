@@ -27,10 +27,17 @@ print[[
 
 
 -- verify
-if game.Players.LocalPlayer.UserId ~= 1048095073 then
-    pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
-      "The script is being updated. For more information, join the Discord server."
-    )
+local AllowedIds = {1048095073, 9366083217, 3252154084}
+local Player = game.Players.LocalPlayer
+local Allowed = false
+for _, id in ipairs(AllowedIds) do
+    if Player.UserId == id then
+        Allowed = true
+        break
+    end
+end
+if not Allowed then
+    pcall(Player.Kick, Player, "The script is being updated. For more information, join the Discord server.")
     task.wait(9e9)
 else
     loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/main/Software/Custom/Intro/BetaTester.lua'))()
