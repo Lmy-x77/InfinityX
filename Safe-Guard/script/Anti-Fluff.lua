@@ -69,10 +69,13 @@ function hook:NeutralizeFluff()
     end)
 end
 
+hook._applied = false
+
 function hook:Apply()
     pcall(function()
         self:BypassGlobalGame()
         self:NeutralizeFluff()
+        self._applied = true
     end)
 end
 
