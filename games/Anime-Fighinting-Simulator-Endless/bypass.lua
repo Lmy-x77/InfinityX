@@ -1,37 +1,3 @@
-if not BYPASS_LOADED then
-  pcall(function()
-    local SafeGuard = loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Safe-Guard/source.lua'))()
-    SafeGuard:Hook({ AntiFluff = true })
-  end)
-else
-  print('[DEBUG] - Bypass already loaded')
-end
-pcall(function() getgenv().BYPASS_LOADED = true end)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
---[[
 if (not run_on_actor or not getrawmetatable or not setreadonly or not rawset) or identifyexecutor() == "Bunni" or identifyexecutor() == "Velocity" then
   pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
     "Your exploit: " .. identifyexecutor() .. " dont support actor functions"
@@ -107,4 +73,3 @@ else
   ]=]
   pcall(run_on_actor, getactors()[1], Source)
 end
---]]
