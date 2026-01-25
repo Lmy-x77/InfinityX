@@ -43,21 +43,19 @@ else
     loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/main/Software/Custom/Intro/BetaTester.lua'))()
 end
 function CloseScript()
-    local GameVersion = game:GetService("Players").LocalPlayer.PlayerGui.Main.MainHUD.Version.Text
-    if GameVersion ~= 'v4.2' then
-        pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
-          "The script is being updated. For more information, join the Discord server."
-        )
-        task.wait(9e9)
-    end
+  local GameVersion = game:GetService("Players").LocalPlayer.PlayerGui.Main.MainHUD.Version.Text
+  if GameVersion ~= 'v4.3.1' then
+    pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
+      "The script is being updated. For more information, join the Discord server."
+    )
+    task.wait(9e9)
+  end
 end; CloseScript()
 if not BYPASS_LOADED then
   pcall(function()
-    loadstring(game:HttpGet(
-      'https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/bypass.lua'
-    ))()
-    print('[DEBUG] - Bypass loaded! 🟢')
-    print('Thanks @26jc, 090 and @MeowMad Ali')
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/bypass.lua'))()
+    local SafeGuard = loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Safe-Guard/source.lua'))()
+    SafeGuard:Hook({ AntiFluff = true })
   end)
 else
   print('[DEBUG] - Bypass already loaded')
@@ -743,7 +741,7 @@ local Section = AutoFarmTab:Section({
   Title = "Farming Configuration",
 })
 local Paragraph = AutoFarmTab:Paragraph({
-  Title = "Stats Viwer",
+  Title = "Stats Viewer",
   Desc = "",
   Locked = false,
 })
@@ -887,7 +885,7 @@ local Toggle = AutoFarmTab:Toggle({
   end
 })
 local Button = AutoFarmTab:Button({
-  Title = "Viwer player power",
+  Title = "Viewer player power",
   Locked = false,
   Callback = function()
     local stats1 = game.Players[SelectedPlayerToFarm].Stats['1'].Value
@@ -1062,66 +1060,35 @@ AutoFarmTab:Toggle({
 	end
 })
 AutoFarmTab:Toggle({
-	Title = "God mode",
+	Title = "No lava damage",
 	Icon = "check",
 	Type = "Checkbox",
-	Flag = "GodModeBoss",
+	Flag = "SkillsBossToggle",
 	Value = false,
 	Callback = function(state)
-		GodMode = state
-		getgenv().GodModeSettings = getgenv().GodModeSettings or {
-			Enabled = false,
-			Connections = {}
-		}
+    NoLava = state
+    if not NoLava then return end
 
-		getgenv().GodModeSettings.Enabled = state
-
-		if not state then
-			if getgenv().GodModeSettings.Connections.healthChanged then
-				getgenv().GodModeSettings.Connections.healthChanged:Disconnect()
-			end
-			if getgenv().GodModeSettings.Connections.charAdded then
-				getgenv().GodModeSettings.Connections.charAdded:Disconnect()
-			end
-			return
-		end
-
-		local function setGodMode(char)
-			local hum = char:WaitForChild("Humanoid", 5)
-			if not hum then return end
-
-			hum.MaxHealth = math.huge
-			hum.Health = math.huge
-
-			if getgenv().GodModeSettings.Connections.healthChanged then
-				getgenv().GodModeSettings.Connections.healthChanged:Disconnect()
-			end
-
-			getgenv().GodModeSettings.Connections.healthChanged =
-				hum:GetPropertyChangedSignal("Health"):Connect(function()
-					if getgenv().GodModeSettings.Enabled then
-						hum.Health = math.huge
-					end
-				end)
-		end
-
-		local player = game.Players.LocalPlayer
-
-		if player.Character then
-			setGodMode(player.Character)
-		end
-
-		getgenv().GodModeSettings.Connections.charAdded =
-			player.CharacterAdded:Connect(setGodMode)
+    task.spawn(function()
+      while NoLava do task.wait()
+        for _, v in pairs(workspace.Scriptable.BossArena.Lava:GetDescendants()) do
+          if v:IsA('TouchTransmitter') then
+            v:Destroy(); break
+          end
+        end
+      end
+    end)
 	end
 })
+
+
 local Section = AutoFarmTab:Section({
   Title = "Mob Farming",
 })
 local Dropdown = AutoFarmTab:Dropdown({
   Title = "Select mob",
   Desc = "Select the mob you want to farm",
-  Values = { "Sarka", "Gen", "Igicho", "Remgonuk", "Booh", "Saytamu", "Riru", "Paien" },
+  Values = { "Sarka", "Gen", "Igicho", "Remgonuk", "Booh", "Saytamu", "Riru", "Paien", "Minetu" },
   Value = "Sarka",
   Flag = "MobDropdown",
   Callback = function(option)
@@ -1180,6 +1147,8 @@ local Toggle = AutoFarmTab:Toggle({
           MobSelected = '1001'
         elseif SelectedMob == "Paien" then
           MobSelected = '1002'
+        elseif SelectedMob == "Minetu" then
+          MobSelected = '1003'
         end
         AutoFarmMobs(MobSelected)
         for _, skill in ipairs(SelectedSkills) do
@@ -1696,7 +1665,7 @@ local AutoUpgrade = false
 local Section = UpgradeTab:Section({
   Title = "Upgrade Configuration",
 })
-local AutoUpgradeParagraph = UpgradeTab:Paragraph({ Title = "Upgrade Viwer", Desc = "", Locked = false, })
+local AutoUpgradeParagraph = UpgradeTab:Paragraph({ Title = "Upgrade Viewer", Desc = "", Locked = false, })
 task.spawn(function()
 	while true do
 		task.wait(2)
@@ -2286,7 +2255,7 @@ local Section = ShopTab:Section({
   Title = "Class Shop",
 })
 local ClassParagraph = ShopTab:Paragraph({
-  Title = "Class Viwer",
+  Title = "Class Viewer",
   Desc = "nil",
   Locked = false,
 })
@@ -3210,7 +3179,7 @@ local Paragraph = WebhookTab:Paragraph({
 local Dropdown = WebhookTab:Dropdown({
   Title = "Send a message if",
   Desc = "Select the method you want to send the message via the webhook",
-  Values = {'A fruit spawned', 'A chikara boxes spawned', 'A champion collected', 'A boss drop'},
+  Values = {'A fruit spawned', 'A chikara boxes spawned', 'A champion collected', 'A mob boss drop', 'A boss power unlocked'},
   Value = "",
   Flag = "WebhookDropdown",
   AllowNone = true,
@@ -3376,7 +3345,7 @@ local Toggle = WebhookTab:Toggle({
             end
         end)
 
-      elseif SelectedMethodToNotify == 'A boss drop' then
+      elseif SelectedMethodToNotify == 'A mob boss drop' then
         if BossConnection then BossConnection:Disconnect() end
 
         SendWebhook({
@@ -3411,6 +3380,40 @@ local Toggle = WebhookTab:Toggle({
               timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
             })
           end
+        end)
+
+      elseif SelectedMethodToNotify == 'A boss power unlocked' then
+        if BossDropConnection then BossDropConnection:Disconnect() end
+
+        SendWebhook({
+          title = "💀 Unlocked Boss Power Stats",
+          color = AutoKurama and 0x2ECC71 or 0xE74C3C,
+          fields = {
+            { name = "Status", value = tostring(AutoKurama), inline = true },
+            { name = "System", value = "Boss Drop", inline = true },
+            { name = "Player", value = LocalPlayer.Name, inline = true },
+            { name = "UserId", value = tostring(LocalPlayer.UserId), inline = true },
+            { name = "PlaceId", value = tostring(game.PlaceId), inline = true },
+            { name = "JobId", value = game.JobId, inline = false }
+          },
+          footer = { text = "InfinityX • Boss System" },
+          timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+        })
+
+        BossDropConnection = game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Boss.Container.Power.Amount:GetPropertyChangedSignal('TextColor3'):Connect(function(v)
+          if not Webhook then return end
+          SendWebhook({
+            title = "🔥 Boss Power Drop Collect",
+            color = 0xE67E22,
+            fields = {
+              { name = "Power", value = game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Boss.Container.Power.Amount.Text, inline = true },
+              { name = "Collected By", value = LocalPlayer.Name, inline = true },
+              { name = "UserId", value = tostring(LocalPlayer.UserId), inline = true },
+              { name = "Server JobId", value = game.JobId, inline = false }
+            },
+            footer = { text = "InfinityX • Boss Power Drop Tracker" },
+            timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+          })
         end)
       end
     end)
