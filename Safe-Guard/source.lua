@@ -26,6 +26,7 @@ end
 
 function SafeGuard:Hook(info)
   local AntiKick = info.AntiKick
+  local AntiFluff = info.AntiFluff
   local AntiBan = info.AntiBan
   local AntiHttpSpy = info.AntiHttpSpy
   local AntiFling = info.AntiFling
@@ -41,6 +42,16 @@ function SafeGuard:Hook(info)
   end
   if AntiHttpSpy then
     loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Safe-Guard/script/Http-Spy.lua'))()
+  end
+  if AntiFluff then
+    local bypass = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Safe-Guard/script/Anti-Fluff.lua"))()
+    bypass:Apply()
+    if bypass._applied then
+      print('[DEBUG] - Bypass loaded! 🟢')
+      print('Thanks @26jc, 090 and @MeowMad Ali')
+    else
+      warn("[DEBUG] - Bypass failed 🔴")
+    end
   end
   if AntiFling then
     local Players = game:GetService("Players")
