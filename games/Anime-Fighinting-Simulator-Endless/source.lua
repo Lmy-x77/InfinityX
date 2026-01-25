@@ -27,20 +27,12 @@ print[[
 
 
 -- verify
-local AllowedIds = {1048095073, 9366083217, 3252154084, 10369972809}
-local Player = game.Players.LocalPlayer
-local Allowed = false
-for _, id in ipairs(AllowedIds) do
-    if Player.UserId == id then
-        Allowed = true
-        break
-    end
-end
-if not Allowed then
-    pcall(Player.Kick, Player, "The script is being updated. For more information, join the Discord server.")
-    task.wait(9e9)
-else
-    loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/main/Software/Custom/Intro/BetaTester.lua'))()
+local ScriptClosed = false
+if ScriptClosed then
+  pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
+    "The script is being updated. For more information, join the Discord server."
+  )
+  task.wait(9e9)
 end
 if not BYPASS_LOADED then
   pcall(function()
@@ -479,6 +471,81 @@ local function TurnInKitiro()
 		Teleport(nil, 2, 326, 70, -1993)
 	end
 end
+local DailyQuests = LP:WaitForChild("DailyQuests"):WaitForChild("Quests")
+local AutoDaily = false
+local SkillsBoss = false
+local SkillKeysDaily = {"E","R","T","Y","G","H","J","Z","X","C","V","B","N","M"}
+local StatNameToId = {
+	Strength = 1,
+	Durability = 2,
+	Chakra = 3,
+	Sword = 4,
+	Agility = 5,
+	Speed = 6,
+}
+local function TeleportDailyStat(id)
+	local list = Areas[id]
+	if not list then return end
+	Teleport(unpack(list[1][3]))
+end
+local function FarmDailyStatOrIncrement(Q)
+	for _, idx in ipairs({"1","2","3","4","5","6"}) do
+		local goal = Q.Goal:FindFirstChild(idx)
+		local current = Q.Current:FindFirstChild(idx)
+		local statObj = Q.Stats:FindFirstChild(idx)
+
+		if goal and current and statObj then
+			local statId = StatNameToId[statObj.Value]
+			if statId and current.Value < goal.Value then
+				TeleportDailyStat(statId)
+				while AutoDaily and current.Value < goal.Value do
+					Remote:FireServer("Train", statId)
+					task.wait()
+				end
+				return
+			end
+		end
+	end
+end
+local function FarmBossQuest()
+	createArena()
+
+	task.spawn(function()
+		SkillsBoss = true
+		while SkillsBoss and workspace.Scriptable.BossArena:FindFirstChild("Demon Fox") do
+			for _, skill in ipairs(SkillKeysDaily) do
+				local key = Enum.KeyCode[skill]
+				RS.Remotes.RemoteFunction:InvokeServer("UsePower", skill)
+				RS.Remotes.RemoteFunction:InvokeServer("UseSpecialPower", key)
+			end
+			task.wait(0.1)
+		end
+		SkillsBoss = false
+	end)
+
+	while AutoDaily do
+		if not isPlayerInArena() then
+			local ClickBox = workspace.Scriptable.BossArena:FindFirstChild("ClickBox")
+			if ClickBox then
+				fireclickdetector(ClickBox:FindFirstChildWhichIsA("ClickDetector"))
+			end
+		else
+			while AutoDaily and workspace.Scriptable.BossArena:FindFirstChild("Demon Fox") do
+				task.wait()
+			end
+			break
+		end
+		task.wait()
+	end
+end
+function CollectDragonOrbs()
+  for _, v in pairs(workspace.MouseIgnore:GetDescendants()) do
+    if v:IsA('ClickDetector') and v.Name == 'ClickDetector' then
+      fireclickdetector(v)
+      break
+    end
+  end
+end
 function SendWebhook(embed)
   request({
     Url = WEBHOOK_URL,
@@ -635,16 +702,15 @@ Window:CreateTopbarButton(
 <font size="24" color="#00E5FF"><b>✨ NEW UPDATE ✨</b></font>
 
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
-<font size="20" color="#00FF88"><b>🚀 New Features & Changes</b></font>
+<font size="20" color="#00FF88"><b>🚀 New Features & Improvements</b></font>
 <font size="15" color="#E0E0E0">
-• <font color="#FFD166"><b>Added Auto Quests</b></font> – <font size="16">automatic completion for Boom and Reindeer quests.</font>
-• <font color="#FFD166"><b>Added UI Customization</b></font> – <font size="16">new customization options and cleaner interface.</font>
-• <font color="#FFD166"><b>Added Anti-AFK System</b></font> – <font size="16">prevents AFK kicks with improved bypass.</font>
-• <font color="#FFD166"><b>Added Auto Buy Next Class</b></font> – <font size="16">automatically purchases the next class.</font>
-• <font color="#00FFCC"><b>Improved Farming & Teleports</b></font> – <font size="16">better area selection, faster and more stable teleports.</font>
-• <font color="#00FFCC"><b>Improved Auto Upgrade & Config</b></font> – <font size="16">smoother upgrades and improved config tab.</font>
-• <font color="#00FFCC"><b>Improved Verification Bypass</b></font> – <font size="16">higher stability and success rate.</font>
-• <font color="#FF6B6B"><b>UI Cleanup</b></font> – <font size="16">removed unnecessary UI tags and layout clutter.</font>
+• <font color="#FFD166"><b>Expanded Zones & Teleports</b></font> – <font size="16">new training and replace zones added, along with additional NPC teleport locations.</font>  
+• <font color="#FFD166"><b>Advanced Webhook System</b></font> – <font size="16">new webhook support with boss drop alerts and improved reporting.</font>  
+• <font color="#FFD166"><b>Boss Automation</b></font> – <font size="16">auto boss detection, farming, and power drop notifications.</font>  
+• <font color="#FFD166"><b>Enhanced Player & Mob Farming</b></font> – <font size="16">includes weaker player viewer, auto skills usage, and optimized farming logic.</font>  
+• <font color="#FFD166"><b>Quest & Daily Automation</b></font> – <font size="16">auto daily quests, auto claim rewards, and improved NPC quest handling.</font>  
+• <font color="#FFD166"><b>Quality of Life Updates</b></font> – <font size="16">no lava damage, auto collect Dragon Orbs, and support for the latest game codes.</font>  
+• <font color="#00FFCC"><b>Core System Improvements</b></font> – <font size="16">major enhancements to player, mob, and stat farming systems.</font>  
 </font>
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
 ]],
@@ -728,7 +794,7 @@ AutoFarmTab:Select()
 
 
 -- source
-local Section = AutoFarmTab:Section({
+AutoFarmTab:Section({
   Title = "Farming Configuration",
 })
 local Paragraph = AutoFarmTab:Paragraph({
@@ -741,7 +807,7 @@ task.spawn(function()
     Paragraph:SetDesc('💪 Strength: '.. GetStats(Strength) ..'\n🛡️ Durability: '.. GetStats(Durability) ..'\n🔥 Chakra: '.. GetStats(Chakra) .. '\n⚔️ Sword: '.. GetStats(Sword) .. '\n🪽 Agility: '.. GetStats(Agility) .. '\n🏃‍♀️ Speed: '.. GetStats(Speed))
   end
 end)
-local Dropdown = AutoFarmTab:Dropdown({
+AutoFarmTab:Dropdown({
   Title = "Select stat",
   Desc = "Select the stat you want to farm",
   Values = { "Strength", 'Durability', 'Chakra', 'Agility', 'Speed', 'Sword' },
@@ -751,7 +817,7 @@ local Dropdown = AutoFarmTab:Dropdown({
     SelectedStat = option
   end
 })
-local Toggle = AutoFarmTab:Toggle({
+AutoFarmTab:Toggle({
   Title = "Start auto farm",
   Desc = "Activate to farm in the best area the stats you selected.",
   Icon = "check",
@@ -814,7 +880,7 @@ local Toggle = AutoFarmTab:Toggle({
     end)
   end
 })
-local Toggle = AutoFarmTab:Toggle({
+AutoFarmTab:Toggle({
   Title = "Delay on dead",
   Desc = "Every time a player dies with auto-farm stats enabled, it takes a while before they can teleport back to the selected training zone.",
   Icon = "check",
@@ -825,7 +891,7 @@ local Toggle = AutoFarmTab:Toggle({
     getgenv().StatsFarm.Delay = state
   end
 })
-local Section = AutoFarmTab:Section({
+AutoFarmTab:Section({
   Title = "Player Farming",
 })
 local PlayersFarmDropdown = AutoFarmTab:Dropdown({
@@ -838,7 +904,7 @@ local PlayersFarmDropdown = AutoFarmTab:Dropdown({
     SelectedPlayerToFarm = option
   end
 })
-local Dropdown = AutoFarmTab:Dropdown({
+AutoFarmTab:Dropdown({
   Title = "Select skills",
   Desc = "Select the skills you want to use to kill selected player",
   Values = SkillKeys,
@@ -850,7 +916,7 @@ local Dropdown = AutoFarmTab:Dropdown({
     SelectedSkillsToPF = option
   end
 })
-local Toggle = AutoFarmTab:Toggle({
+AutoFarmTab:Toggle({
   Title = "Start auto player farm",
   Icon = "check",
   Type = "Checkbox",
@@ -873,6 +939,27 @@ local Toggle = AutoFarmTab:Toggle({
         end
       end
     end)
+  end
+})
+local Button = AutoFarmTab:Button({
+  Title = "Viewer players weaker than you",
+  Locked = false,
+  Callback = function()
+    local WeakerPlayers = {};
+    local MePower = game:GetService("Players").LocalPlayer.OtherData.TotalPower.Value
+    for i,v in pairs(game.Players:GetPlayers()) do
+      if v.Name ~= game.Players.LocalPlayer.Name and v.OtherData.TotalPower.Value < MePower then
+        table.insert(WeakerPlayers, v.Name);
+      end
+    end
+
+    local weakList = table.concat(WeakerPlayers, ", ")
+    WindUI:Notify({
+      Title = "Notification",
+      Content = '<font size="18">The weakest players before you are: <font color="#4CAF50"><b>' .. weakList .. '</b></font></font>',
+      Duration = 5,
+      Icon = "bell-ring",
+    })
   end
 })
 local Button = AutoFarmTab:Button({
@@ -899,10 +986,10 @@ local Button = AutoFarmTab:Button({
     PlayersFarmDropdown:Refresh(GetPlayersOffSafeZone())
   end
 })
-local Section = AutoFarmTab:Section({
+AutoFarmTab:Section({
   Title = "Boss Farming",
 })
-local Dropdown = AutoFarmTab:Dropdown({
+AutoFarmTab:Dropdown({
   Title = "Select boss",
   Desc = "Select the boss you want to farm",
   Values = { "Kurama" },
@@ -912,7 +999,7 @@ local Dropdown = AutoFarmTab:Dropdown({
     SelectedBoss = option
   end
 })
-local Dropdown = AutoFarmTab:Dropdown({
+AutoFarmTab:Dropdown({
   Title = "Select skills",
   Desc = "Select the skills you want to use",
   Values = SkillKeys,
@@ -924,7 +1011,7 @@ local Dropdown = AutoFarmTab:Dropdown({
     SelectedBossSkills = option
   end
 })
-local Dropdown = AutoFarmTab:Dropdown({
+AutoFarmTab:Dropdown({
   Title = "Select tp mode",
   Desc = "Select the tp mode you want to use",
   Values = {"Center", "Bottom", "Top"},
@@ -935,81 +1022,13 @@ local Dropdown = AutoFarmTab:Dropdown({
     SelectedTeleportMode = option
   end
 })
-local Toggle = AutoFarmTab:Toggle({
+AutoFarmTab:Toggle({
   Title = "Start auto boss farm",
   Icon = "check",
   Type = "Checkbox",
   Flag = "BossFarmToggle",
   Value = false,
   Callback = function(state)
-    local arenaPart = workspace.Scriptable.BossArena:FindFirstChild('InArena')
-    local Players = game:GetService("Players")
-    local player = Players.LocalPlayer
-
-    local function createArena()
-      if arenaPart then return arenaPart end
-
-      arenaPart = Instance.new("Part", workspace.Scriptable.BossArena)
-      arenaPart.Name = "InArena"
-      arenaPart.Anchored = true
-      arenaPart.CanCollide = false
-      arenaPart.Transparency = 0.5
-
-      local p1 = Vector3.new(1913, 3122, 468)
-      local p2 = Vector3.new(2586, 3302, 1146)
-      local extraDown = 200
-
-      local size = Vector3.new(
-        math.abs(p2.X - p1.X),
-        math.abs(p2.Y - p1.Y),
-        math.abs(p2.Z - p1.Z)
-      )
-
-      arenaPart.Size = Vector3.new(size.X, size.Y + extraDown, size.Z)
-      arenaPart.Position = ((p1 + p2) / 2) - Vector3.new(0, extraDown / 2, 0)
-
-      return arenaPart
-    end
-
-    local function isPlayerInArena()
-      if not arenaPart then return false end
-
-      local char = player.Character
-      if not char then return false end
-
-      local hrp = char:FindFirstChild("HumanoidRootPart")
-      if not hrp then return false end
-
-      local relative = arenaPart.CFrame:PointToObjectSpace(hrp.Position)
-      local half = arenaPart.Size / 2
-
-      return math.abs(relative.X) <= half.X
-        and math.abs(relative.Y) <= half.Y
-        and math.abs(relative.Z) <= half.Z
-    end
-
-    local function farmKurama(mode)
-      local char = game.Players.LocalPlayer.Character
-      if not char then return end
-
-      local hrp = char:FindFirstChild("HumanoidRootPart")
-      if not hrp then return end
-
-      local boss = workspace.Scriptable.BossArena:FindFirstChild("Demon Fox")
-      if not boss then return end
-
-      local bossHRP = boss:FindFirstChild("HumanoidRootPart")
-      if not bossHRP then return end
-
-      if mode == "Top" then
-        hrp.CFrame = bossHRP.CFrame * CFrame.new(0, 60, 0)
-      elseif mode == "Bottom" then
-        hrp.CFrame = bossHRP.CFrame * CFrame.new(0, -60, 0)
-      elseif mode == "Center" then
-        hrp.CFrame = bossHRP.CFrame
-      end
-    end
-
     AutoKurama = state
     if not AutoKurama then return else createArena() end
 
@@ -1028,7 +1047,7 @@ local Toggle = AutoFarmTab:Toggle({
   end
 })
 AutoFarmTab:Toggle({
-	Title = "Auto use skills",
+	Title = "Auto use selected skills",
 	Icon = "check",
 	Type = "Checkbox",
 	Flag = "SkillsBossToggle",
@@ -1061,7 +1080,7 @@ AutoFarmTab:Toggle({
     if not NoLava then return end
 
     task.spawn(function()
-      while NoLava do task.wait()
+      while NoLava do task.wait(1)
         for _, v in pairs(workspace.Scriptable.BossArena.Lava:GetDescendants()) do
           if v:IsA('TouchTransmitter') then
             v:Destroy(); break
@@ -1073,10 +1092,10 @@ AutoFarmTab:Toggle({
 })
 
 
-local Section = AutoFarmTab:Section({
+AutoFarmTab:Section({
   Title = "Mob Farming",
 })
-local Dropdown = AutoFarmTab:Dropdown({
+AutoFarmTab:Dropdown({
   Title = "Select mob",
   Desc = "Select the mob you want to farm",
   Values = { "Sarka", "Gen", "Igicho", "Remgonuk", "Booh", "Saytamu", "Riru", "Paien", "Minetu" },
@@ -1086,7 +1105,7 @@ local Dropdown = AutoFarmTab:Dropdown({
     SelectedMob = option
   end
 })
-local Dropdown = AutoFarmTab:Dropdown({
+AutoFarmTab:Dropdown({
   Title = "Select skills",
   Desc = "Select the skills you want to use",
   Values = SkillKeys,
@@ -1098,9 +1117,8 @@ local Dropdown = AutoFarmTab:Dropdown({
     SelectedSkills = option
   end
 })
-local Toggle = AutoFarmTab:Toggle({
+AutoFarmTab:Toggle({
   Title = "Use m1",
-  Desc = "Enable this toggle so that Auto Farm uses M1 attacks when farming mobs",
   Icon = "check",
   Type = "Checkbox",
   Flag = "MobFarmM1",
@@ -1109,7 +1127,7 @@ local Toggle = AutoFarmTab:Toggle({
     getgenv().FarmMobSettings.UseM1 = state
   end
 })
-local Toggle = AutoFarmTab:Toggle({
+AutoFarmTab:Toggle({
   Title = "Start auto mob farm",
   Icon = "check",
   Type = "Checkbox",
@@ -1119,8 +1137,8 @@ local Toggle = AutoFarmTab:Toggle({
     AutoFarmMob = state
     if not AutoFarmMob then return end
 
-    task.spawn(function() task.wait()
-      while AutoFarmMob do
+    task.spawn(function()
+      while AutoFarmMob do task.wait()
         local MobSelected = nil
         if SelectedMob == "Sarka" then
           MobSelected = '1'
@@ -1142,19 +1160,37 @@ local Toggle = AutoFarmTab:Toggle({
           MobSelected = '1003'
         end
         AutoFarmMobs(MobSelected)
-        for _, skill in ipairs(SelectedSkills) do
-          local key = Enum.KeyCode[skill]
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("UsePower", skill)
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("UseSpecialPower", key)
-        end
-        if getgenv().FarmMobSettings.UseM1 then
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
+      end
+    end)
+  end
+})
+AutoFarmTab:Toggle({
+  Title = "Auto use selected skills",
+  Icon = "check",
+  Type = "Checkbox",
+  Flag = "MobFarm",
+  Value = false,
+  Callback = function(state)
+    AutoFarmMobSkills = state
+    if not AutoFarmMobSkills then return end
+
+    task.spawn(function() task.wait()
+      while AutoFarmMobSkills do task.wait()
+        while AutoFarmMobSkills and AutoFarmMob do task.wait()
+          for _, skill in ipairs(SelectedSkills) do
+            local key = Enum.KeyCode[skill]
+            game:GetService("ReplicatedStorage").Remotes.RemoteFunction:InvokeServer("UsePower", skill)
+            game:GetService("ReplicatedStorage").Remotes.RemoteFunction:InvokeServer("UseSpecialPower", key)
+            if getgenv().FarmMobSettings.UseM1 then
+              game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
+            end
+          end
         end
       end
     end)
   end
 })
-local Section = AutoFarmTab:Section({
+AutoFarmTab:Section({
   Title = "Auto Summon Champion",
 })
 local ChampionsDropdown = AutoFarmTab:Dropdown({
@@ -1167,7 +1203,7 @@ local ChampionsDropdown = AutoFarmTab:Dropdown({
     SelectedAutoSummonChampion = option
   end
 })
-local Toggle = AutoFarmTab:Toggle({
+AutoFarmTab:Toggle({
   Title = "Auto summon selected champion",
   Icon = "check",
   Type = "Checkbox",
@@ -1208,7 +1244,7 @@ local Button = AutoFarmTab:Button({
     ChampionsDropdown:Refresh(GetChampions())
   end
 })
-local Section = AutoFarmTab:Section({
+AutoFarmTab:Section({
   Title = "Auto Npcs Quest",
 })
 AutoFarmTab:Toggle({
@@ -1442,10 +1478,69 @@ AutoFarmTab:Toggle({
 		end)
 	end
 })
-local Section = AutoFarmTab:Section({ 
+AutoFarmTab:Section({
+  Title = "Auto Dailys Quests",
+})
+AutoFarmTab:Toggle({
+	Title = "Auto Daily Quest",
+	Desc = "Automatically completes daily quests.",
+	Icon = "check",
+	Type = "Checkbox",
+	Flag = "AutoDailyQuestToggle",
+	Value = false,
+	Locked = false,
+	Callback = function(state)
+		AutoDaily = state
+		task.spawn(function()
+			while AutoDaily do
+				for _, Q in ipairs(DailyQuests:GetChildren()) do
+					if not Q.Finished.Value then
+						local qType = Q.Type.Value
+            if qType == "Stat" or qType == "Increment" then
+              FarmDailyStatOrIncrement(Q)
+						elseif qType == "HiddenObject" then
+							CollectDragonOrbs()
+						elseif qType == "Boss" then
+							FarmBossQuest()
+						end
+					end
+				end
+				task.wait(1)
+			end
+		end)
+	end
+})
+AutoFarmTab:Toggle({
+	Title = "Auto claim daily quest",
+	Desc = "Automatically claim all daily quests.",
+	Icon = "check",
+	Type = "Checkbox",
+	Flag = "AutoClaimDailyQuestToggle",
+	Value = false,
+	Locked = false,
+	Callback = function(state)
+    AutoClaim = state
+    if not AutoClaim then return end
+
+    task.spawn(function()
+      while AutoClaim do task.wait(1)
+        for i,v in pairs(game:GetService("Players").LocalPlayer.DailyQuests.Quests:GetChildren()) do
+          if v:IsA("Folder") then
+            local Event = game:GetService("ReplicatedStorage").Remotes.RemoteFunction
+            Event:InvokeServer(
+              "FinishDailyQuest",
+              v.Name
+            ); break
+          end
+        end
+      end
+    end)
+	end
+})
+AutoFarmTab:Section({ 
   Title = "Chikara / Fruit Farming",
 })
-local Toggle = AutoFarmTab:Toggle({
+AutoFarmTab:Toggle({
   Title = "Auto collect dragon orb",
   Desc = "Collect all the dragon orb that appears",
   Icon = "check",
@@ -1478,17 +1573,12 @@ This feature requires full ClickDetector interaction support. Please switch to a
 
     task.spawn(function()
       while DragonOrb do task.wait()
-        for _, v in pairs(workspace.MouseIgnore:GetDescendants()) do
-          if v:IsA('ClickDetector') and v.Name == 'ClickDetector' then
-            fireclickdetector(v)
-            break
-          end
-        end
+        CollectDragonOrbs()
       end
     end)
   end
 })
-local Toggle = AutoFarmTab:Toggle({
+AutoFarmTab:Toggle({
   Title = "Auto collect fruit",
   Desc = "Collect all the fruit that appears",
   Icon = "check",
@@ -1532,7 +1622,7 @@ This feature requires full ClickDetector interaction support. Please switch to a
     end)
   end
 })
-local Toggle = AutoFarmTab:Toggle({
+AutoFarmTab:Toggle({
   Title = "Auto collect chikara box",
   Desc = "Collect all the chikaras on the island you are on",
   Icon = "check",
@@ -1616,7 +1706,7 @@ local Button = AutoFarmTab:Button({
     })
   end
 })
-local Toggle = AutoFarmTab:Toggle({
+AutoFarmTab:Toggle({
   Title = "Use Desync",
   Desc = "Use desync in afk farm chikara",
   Icon = "check",
@@ -1653,7 +1743,7 @@ local UpgradeRefs = {
 local SelectedStatsNumbers = {}
 local SelectedDelay = 2
 local AutoUpgrade = false
-local Section = UpgradeTab:Section({
+UpgradeTab:Section({
   Title = "Upgrade Configuration",
 })
 local AutoUpgradeParagraph = UpgradeTab:Paragraph({ Title = "Upgrade Viewer", Desc = "", Locked = false, })
@@ -1720,7 +1810,7 @@ UpgradeTab:Toggle({
 
 
 local SkillStates = {}
-local Section = SkillTab:Section({
+SkillTab:Section({
   Title = "Auto Use Skills Options",
 })
 for _, v in pairs(SkillKeys) do
@@ -1749,7 +1839,7 @@ for _, v in pairs(SkillKeys) do
 end
 
 
-local Section = EspTab:Section({ 
+EspTab:Section({ 
   Title = "Esp Options",
 })
 local playerAddedConn
@@ -1780,7 +1870,7 @@ EspTab:Toggle({
     end
   end
 })
-local Toggle = EspTab:Toggle({
+EspTab:Toggle({
   Title = "Esp chikara boxes",
   Icon = "check",
   Type = "Checkbox",
@@ -1829,7 +1919,7 @@ EspTab:Toggle({
     end
   end
 })
-local Toggle = EspTab:Toggle({
+EspTab:Toggle({
   Title = "Esp all npcs",
   Icon = "check",
   Type = "Checkbox",
@@ -1850,7 +1940,7 @@ local Toggle = EspTab:Toggle({
     end)
   end
 })
-local Toggle = EspTab:Toggle({
+EspTab:Toggle({
   Title = "Esp all mobs",
   Icon = "check",
   Type = "Checkbox",
@@ -1871,10 +1961,10 @@ local Toggle = EspTab:Toggle({
     end)
   end
 })
-local Section = EspTab:Section({ 
+EspTab:Section({ 
   Title = "Notify Options",
 })
-local Toggle = EspTab:Toggle({
+EspTab:Toggle({
   Title = "Notify chikara box",
   Icon = "check",
   Type = "Checkbox",
@@ -1913,7 +2003,7 @@ local Toggle = EspTab:Toggle({
     end)
   end
 })
-local Toggle = EspTab:Toggle({
+EspTab:Toggle({
   Title = "Notify fruit",
   Icon = "check",
   Type = "Checkbox",
@@ -1962,7 +2052,7 @@ local Button = EspTab:Button({
 })
 
 
-local Section = PlayerTab:Section({ 
+PlayerTab:Section({ 
   Title = "Player Configuration",
 })
 local Slider = PlayerTab:Slider({
@@ -1991,14 +2081,14 @@ local Slider = PlayerTab:Slider({
     game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
   end
 })
-local Toggle = PlayerTab:Button({
+PlayerTab:Button({
   Title = "FE Invisible",
   Locked = false,
   Callback = function()
     loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/universal/invisible.lua'))()
   end
 })
-local Toggle = PlayerTab:Toggle({
+PlayerTab:Toggle({
   Title = "Noclip",
   Icon = "check",
   Type = "Checkbox",
@@ -2033,10 +2123,10 @@ local Button = PlayerTab:Button({
 })
 
 
-local Section = ShopTab:Section({ 
+ShopTab:Section({ 
   Title = "Chest Open Options",
 })
-local Dropdown = ShopTab:Dropdown({
+ShopTab:Dropdown({
   Title = "Select chest",
   Desc = "",
   Values = {'Christmas', 'Gold', 'Dark', 'Electric', 'Sayan', 'Burning', 'Easter'},
@@ -2057,7 +2147,7 @@ local Button = ShopTab:Button({
     game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
   end
 })
-local Toggle = ShopTab:Toggle({
+ShopTab:Toggle({
   Title = "Auto open selected chest",
   Icon = "check",
   Type = "Checkbox",
@@ -2080,10 +2170,10 @@ local Toggle = ShopTab:Toggle({
     end)
   end
 })
-local Section = ShopTab:Section({ 
+ShopTab:Section({ 
   Title = "Champions Options",
 })
-local Dropdown = ShopTab:Dropdown({
+ShopTab:Dropdown({
   Title = "Select gacha",
   Desc = "Select the gacha you want to roll",
   Values = {'1 - 5k Chikara', '2 - 15k Chikara'},
@@ -2093,7 +2183,7 @@ local Dropdown = ShopTab:Dropdown({
     SelectedGacha = option
   end
 })
-local Dropdown = ShopTab:Dropdown({
+ShopTab:Dropdown({
   Title = "Select Champions",
   Desc = "Select the champions you want to get",
   Values = { "Sunji", "Levee", "Keela", "Sarka", "Pilcol", "Toju", "Canakey", "Loofi", "Asto", "Junwon", "Tojaro", "Juyari", "Narnto", "Vetega", "Genas", "Boras", "Igicho", "Remgonuk", "Sasoke ", "Itachu", "Goju", "Bright Yagimi", "Saytamu Serious", "Giovanni", "Booh", "Gen", "Shunro", "Kroll", "Eskano", "Mallyodas", "Gokro", "Saytamu" },
@@ -2197,10 +2287,10 @@ ShopTab:Button({
     end
 	end
 })
-local Section = ShopTab:Section({ 
+ShopTab:Section({ 
   Title = "Gacha Powers Options",
 })
-local Dropdown = ShopTab:Dropdown({
+ShopTab:Dropdown({
   Title = "Select gacha powers",
   Desc = "Select the gacha power you want to roll",
   Values = { 'Jutsu Leveling', 'Nen Leveling', 'Soul Leveling', 'Nichiyin Leveling', 'Seiyen Leveling', 'Hero Leveling' },
@@ -2242,7 +2332,7 @@ ShopTab:Toggle({
 		end)
 	end
 })
-local Section = ShopTab:Section({ 
+ShopTab:Section({ 
   Title = "Class Shop",
 })
 local ClassParagraph = ShopTab:Paragraph({
@@ -2300,7 +2390,7 @@ for category, items in pairs(getgenv().AutoBuySpecials) do
     table.insert(DropdownLists[category], name)
   end
 end
-local Section = SpecialTab:Section({ 
+SpecialTab:Section({ 
   Title = "Stands Options",
 })
 SpecialTab:Dropdown({
@@ -2315,7 +2405,7 @@ SpecialTab:Dropdown({
     SelectedStands = option
   end
 })
-local Toggle = SpecialTab:Toggle({
+SpecialTab:Toggle({
   Title = "Auto roll stands",
   Icon = "check",
   Type = "Checkbox",
@@ -2346,7 +2436,7 @@ local Toggle = SpecialTab:Toggle({
     end)
   end
 })
-local Section = SpecialTab:Section({ 
+SpecialTab:Section({ 
   Title = "Quirks Options",
 })
 SpecialTab:Dropdown({
@@ -2361,7 +2451,7 @@ SpecialTab:Dropdown({
     SelectedQuirks = option
   end
 })
-local Toggle = SpecialTab:Toggle({
+SpecialTab:Toggle({
   Title = "Auto roll quirks",
   Icon = "check",
   Type = "Checkbox",
@@ -2392,7 +2482,7 @@ local Toggle = SpecialTab:Toggle({
     end)
   end
 })
-local Section = SpecialTab:Section({ 
+SpecialTab:Section({ 
   Title = "Kagunes Options",
 })
 SpecialTab:Dropdown({
@@ -2407,7 +2497,7 @@ SpecialTab:Dropdown({
     SelectedKagunes = option
   end
 })
-local Toggle = SpecialTab:Toggle({
+SpecialTab:Toggle({
   Title = "Auto roll kagunes",
   Icon = "check",
   Type = "Checkbox",
@@ -2438,7 +2528,7 @@ local Toggle = SpecialTab:Toggle({
     end)
   end
 })
-local Section = SpecialTab:Section({ 
+SpecialTab:Section({ 
   Title = "Grimoires Options",
 })
 SpecialTab:Dropdown({
@@ -2453,7 +2543,7 @@ SpecialTab:Dropdown({
     SelectedGrimoires = option
   end
 })
-local Toggle = SpecialTab:Toggle({
+SpecialTab:Toggle({
   Title = "Auto roll grimoires",
   Icon = "check",
   Type = "Checkbox",
@@ -2484,7 +2574,7 @@ local Toggle = SpecialTab:Toggle({
     end)
   end
 })
-local Section = SpecialTab:Section({ 
+SpecialTab:Section({ 
   Title = "Bloodlines Options",
 })
 SpecialTab:Dropdown({
@@ -2499,7 +2589,7 @@ SpecialTab:Dropdown({
     SelectedBloodlines = option
   end
 })
-local Toggle = SpecialTab:Toggle({
+SpecialTab:Toggle({
   Title = "Auto roll bloodlines",
   Icon = "check",
   Type = "Checkbox",
@@ -2641,7 +2731,7 @@ task.spawn(function()
 end)
 
 
-local Section = TeleportTab:Section({
+TeleportTab:Section({
   Title = "NPC Teleport Options",
 })
 local NPCQuestDropdown = TeleportTab:Dropdown({
@@ -2686,7 +2776,7 @@ TeleportTab:Button({
     end
   end
 })
-local Dropdown = TeleportTab:Dropdown({
+TeleportTab:Dropdown({
   Title = "Special NPC",
   Desc = "Select a special shop NPC",
   Values = { "Grimoires", "Kagunes", "Quirks", "Stands", "Bloodlines" },
@@ -2722,7 +2812,7 @@ local Button = TeleportTab:Button({
     NPCChampionDropdown:Refresh(GetChampionsNpc())
   end
 })
-local Section = TeleportTab:Section({ 
+TeleportTab:Section({ 
   Title = "Training Area Teleport",
 })
 local TrainingAreaDropdown = TeleportTab:Dropdown({
@@ -2771,10 +2861,10 @@ local Button = TeleportTab:Button({
     TrainingAreaDropdown:Refresh(GetTrainingAreas())
   end
 })
-local Section = TeleportTab:Section({ 
+TeleportTab:Section({ 
   Title = "Gacha Powers Teleport Options",
 })
-local Dropdown = TeleportTab:Dropdown({
+TeleportTab:Dropdown({
   Title = "Select gacha powers",
   Desc = "Select the gacha you want to teleport",
   Values = { 'Jutsu Leveling', 'Nen Leveling', 'Soul Leveling', 'Nichiyin Leveling', 'Seiyen Leveling' },
@@ -2802,7 +2892,7 @@ TeleportTab:Button({
     end
 	end
 })
-local Section = TeleportTab:Section({ 
+TeleportTab:Section({ 
   Title = "Player Teleport Options",
 })
 local PlayersDropdown = TeleportTab:Dropdown({
@@ -2816,7 +2906,7 @@ local PlayersDropdown = TeleportTab:Dropdown({
     SelectedPlayer = option
   end
 })
-local Toggle = TeleportTab:Toggle({
+TeleportTab:Toggle({
   Title = "Spectate player",
   Icon = "check",
   Type = "Checkbox",
@@ -2861,7 +2951,7 @@ local Button = TeleportTab:Button({
 })
 
 
-local Section = MiscTab:Section({
+MiscTab:Section({
   Title = "Misc Options",
 })
 local Button = MiscTab:Button({
@@ -2990,7 +3080,7 @@ local Button = MiscTab:Button({
     end
   end
 })
-local Toggle = MiscTab:Toggle({
+MiscTab:Toggle({
   Title = "Unlock FPS",
   Icon = "check",
   Type = "Checkbox",
@@ -3013,7 +3103,7 @@ local Toggle = MiscTab:Toggle({
   end
 })
 local AntiAfkConn
-local Toggle = MiscTab:Toggle({
+MiscTab:Toggle({
 	Title = "Anti Afk",
 	Icon = "check",
 	Type = "Checkbox",
@@ -3066,7 +3156,7 @@ local Toggle = MiscTab:Toggle({
     end
 	end
 })
-local Toggle = MiscTab:Toggle({
+MiscTab:Toggle({
 	Title = "Mobile Auto Clicker",
 	Icon = "check",
 	Type = "Checkbox",
@@ -3081,7 +3171,7 @@ local Toggle = MiscTab:Toggle({
     end
 	end
 })
-local Section = MiscTab:Section({ 
+MiscTab:Section({ 
   Title = "Server Information",
 })
 task.spawn(function()
@@ -3159,7 +3249,7 @@ local Button = MiscTab:Button({
 })
 
 
-local Section = WebhookTab:Section({
+WebhookTab:Section({
   Title = "Webhook Configuration",
 })
 local Paragraph = WebhookTab:Paragraph({
@@ -3167,7 +3257,7 @@ local Paragraph = WebhookTab:Paragraph({
   Desc = "Copy the URL of your webhook on your Discord server and paste it into the input field, then select the options you want to send there. Remember that this function only notifies your server if something has been generated. If you want it to be collected, make sure you activate automatic collection in the options on the “Auto Farm” tab to avoid any confusion.",
   Locked = false,
 })
-local Dropdown = WebhookTab:Dropdown({
+WebhookTab:Dropdown({
   Title = "Send a message if",
   Desc = "Select the method you want to send the message via the webhook",
   Values = {'A fruit spawned', 'A chikara boxes spawned', 'A champion collected', 'A mob boss drop', 'A boss power unlocked'},
@@ -3188,7 +3278,7 @@ local Input = WebhookTab:Input({
     WEBHOOK_URL = tostring(input)
   end
 })
-local Toggle = WebhookTab:Toggle({
+WebhookTab:Toggle({
   Title = "Enable webhook report",
   Icon = "check",
   Type = "Checkbox",
