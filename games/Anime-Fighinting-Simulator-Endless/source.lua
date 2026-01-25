@@ -27,13 +27,23 @@ print[[
 
 
 -- verify
-local scriptClosed = true
-if scriptClosed then
-  pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
-    "The script is being updated. For more information, join the Discord server."
-  )
-  task.wait(9e9)
+if game.Players.LocalPlayer.UserId ~= 1048095073 then
+    pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
+      "The script is being updated. For more information, join the Discord server."
+    )
+    task.wait(9e9)
+else
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/main/Software/Custom/Intro/BetaTester.lua'))()
 end
+function CloseScript()
+    local GameVersion = game:GetService("Players").LocalPlayer.PlayerGui.Main.MainHUD.Version.Text
+    if GameVersion ~= 'v4.2' then
+        pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
+          "The script is being updated. For more information, join the Discord server."
+        )
+        task.wait(9e9)
+    end
+end; CloseScript()
 if not BYPASS_LOADED then
   pcall(function()
     loadstring(game:HttpGet(
@@ -234,11 +244,13 @@ local Areas = {
 		{1e9,1e11,{nil,2,721,149,925}},
 		{1e11,5e12,{nil,2,1842,139,96}},
 		{5e12,2.5e14,{nil,2,621,662,413}},
-		{2.5e14,7.5e16,{nil,2,4289,163,-601}},
-		{7.5e16,2.5e18,{nil,2,798,231,-1004}},
-		{2.5e18,1e21,{nil,2,3873,138,873}},
-		{1e21,1e22,{nil,2,3858,669,-1076}},
-		{1e22,math.huge,{nil,2,2385,246,-624}},
+		{2.5e14,5e16,{nil,2,4289,163,-601}},
+		{5e16,1e18,{nil,2,798,231,-1004}},
+		{1e18,1e20,{nil,2,3873,138,873}},
+		{1e20,1e21,{nil,2,3858,669,-1076}},
+		{1e21,1e23,{nil,2,2385,246,-624}},
+    {1e23,1e24,{nil,2,-2345,508,1857}},
+    {1e24,math.huge,{nil,2,-2045,1464,-2122}},
 	},
 	[2] = {
 		{100,1e4,{nil,2,67,69,878}},
@@ -250,11 +262,13 @@ local Areas = {
 		{1e9,1e11,{nil,2,2508,1543,-380}},
 		{1e11,5e12,{nil,2,-2802,-228,355}},
 		{5e12,2.5e14,{nil,2,2187,517,581}},
-		{2.5e14,7.5e16,{nil,2,1671,423,-1293}},
-		{7.5e16,2.5e18,{nil,2,155,772,-699}},
-		{2.5e18,1e21,{nil,2,2568,92,1762}},
-		{1e21,1e22,{nil,2,1673,2305,-78}},
-		{1e22,math.huge,{nil,2,3529,258,1451}},
+		{2.5e14,5e16,{nil,2,1671,423,-1293}},
+		{5e16,1e18,{nil,2,155,772,-699}},
+		{1e18,1e20,{nil,2,2568,92,1762}},
+		{1e20,1e21,{nil,2,1673,2305,-78}},
+		{1e21,1e23,{nil,2,3529,258,1451}},
+		{1e23,1e24,{nil,2,-2358,86,-87}},
+    {1e24,math.huge,{nil,2,-1185,83,-1889}},
 	},
 	[3] = {
 		{100,1e4,{nil,2,4,64,-124}},
@@ -266,11 +280,13 @@ local Areas = {
 		{1e9,1e11,{nil,2,3054,110,1105}},
 		{1e11,5e12,{nil,2,1710,577,1743}},
 		{5e12,2.5e14,{nil,2,-16,61,-475}},
-		{2.5e14,7.5e16,{nil,2,-411,1255,663}},
-		{7.5e16,2.5e18,{nil,2,-732,2791,628}},
-		{2.5e18,1e21,{nil,2,3242,-441,-233}},
-		{1e21,1e22,{nil,2,341,237,1867}},
-		{1e22,math.huge,{nil,2,-1072,608,1506}},
+		{2.5e14,5e16,{nil,2,-411,1255,663}},
+		{5e16,1e18,{nil,2,-732,2791,628}},
+		{1e18,1e20,{nil,2,3242,-441,-233}},
+		{1e20,1e21,{nil,2,341,237,1867}},
+		{1e21,1e23,{nil,2,-1123,607,1492}},
+    {1e23,1e24,{nil,2,1413,232,-714}},
+    {1e24,math.huge,{nil,2,3361,59,-1676}},
 	},
 	[5] = {
 		{100,1e4,{nil,2,37,69,459}},
@@ -578,7 +594,7 @@ end
 WindUI:AddTheme({
   Name = "InfinityX",
 
-  Accent = Color3.fromHex("#b91c1c"),
+  Accent = Color3.fromHex("#6c1bb9"),
   Dialog = Color3.fromHex("#450a0a"),
   Outline = Color3.fromHex("#fca5a5"),
   Text = Color3.fromHex("#fef2f2"),
@@ -652,63 +668,63 @@ Window:CreateTopbarButton(
 
 -- tabs
 local AutoFarmTab = Window:Tab({
-  Title = "| Auto Farm",
+  Title = "┌ Auto Farm",
   Icon = "swords",
   Locked = false,
 })
 local UpgradeTab = Window:Tab({
-  Title = "| Upgrade",
+  Title = "├ Upgrade",
   Icon = "chevrons-up",
   Locked = false,
 })
 local SkillTab = Window:Tab({
-  Title = "| Auto Skill",
+  Title = "├ Auto Skill",
   Icon = "zap",
   Locked = false,
 })
 local EspTab = Window:Tab({
-  Title = "| Visual",
+  Title = "├ Visual",
   Icon = "eye",
   Locked = false,
 })
 local PlayerTab = Window:Tab({
-  Title = "| Player",
+  Title = "├ Player",
   Icon = "circle-user-round",
   Locked = false,
 })
 local ShopTab = Window:Tab({
-  Title = "| Shop",
+  Title = "├ Shop",
   Icon = "shopping-cart",
   Locked = false,
 })
 local SpecialTab = Window:Tab({
-  Title = "| Special",
+  Title = "├ Special",
   Icon = "sparkles",
   Locked = false,
 })
 local QuestTab = Window:Tab({
-  Title = "| Quest",
+  Title = "├ Quest",
   Icon = "clipboard-list",
   Locked = false,
 })
 local TeleportTab = Window:Tab({
-  Title = "| Teleports",
+  Title = "├ Teleports",
   Icon = "map-pin",
   Locked = false,
 })
 local MiscTab = Window:Tab({
-  Title = "| Misc",
+  Title = "└ Misc",
   Icon = "layers",
   Locked = false,
 })
 Window:Divider()
 local WebhookTab = Window:Tab({
-  Title = "| Webhook",
+  Title = "┌ Webhook",
   Icon = "webhook",
   Locked = false,
 })
 local ConfigTab = Window:Tab({
-  Title = "| Config Usage",
+  Title = "└ Config Usage",
   Icon = "settings",
   Locked = false,
 })
@@ -886,6 +902,211 @@ local Button = AutoFarmTab:Button({
   Callback = function()
     PlayersFarmDropdown:Refresh(GetPlayersOffSafeZone())
   end
+})
+local Section = AutoFarmTab:Section({
+  Title = "Boss Farming",
+})
+local Dropdown = AutoFarmTab:Dropdown({
+  Title = "Select boss",
+  Desc = "Select the boss you want to farm",
+  Values = { "Kurama" },
+  Value = "Kurama",
+  Flag = "MobDropdown",
+  Callback = function(option)
+    SelectedBoss = option
+  end
+})
+local Dropdown = AutoFarmTab:Dropdown({
+  Title = "Select skills",
+  Desc = "Select the skills you want to use",
+  Values = SkillKeys,
+  Value = {"Z","X","C"},
+  Flag = "SkillsDropdownBoss",
+  Multi = true,
+  AllowNone = true,
+  Callback = function(option)
+    SelectedBossSkills = option
+  end
+})
+local Dropdown = AutoFarmTab:Dropdown({
+  Title = "Select tp mode",
+  Desc = "Select the tp mode you want to use",
+  Values = {"Center", "Bottom", "Top"},
+  Value = "Center",
+  Flag = "TeleportMode",
+  Multi = false,
+  Callback = function(option)
+    SelectedTeleportMode = option
+  end
+})
+local Toggle = AutoFarmTab:Toggle({
+  Title = "Start auto boss farm",
+  Icon = "check",
+  Type = "Checkbox",
+  Flag = "BossFarmToggle",
+  Value = false,
+  Callback = function(state)
+    local arenaPart = workspace.Scriptable.BossArena:FindFirstChild('InArena')
+    local Players = game:GetService("Players")
+    local player = Players.LocalPlayer
+
+    local function createArena()
+      if arenaPart then return arenaPart end
+
+      arenaPart = Instance.new("Part", workspace.Scriptable.BossArena)
+      arenaPart.Name = "InArena"
+      arenaPart.Anchored = true
+      arenaPart.CanCollide = false
+      arenaPart.Transparency = 0.5
+
+      local p1 = Vector3.new(1913, 3122, 468)
+      local p2 = Vector3.new(2586, 3302, 1146)
+      local extraDown = 200
+
+      local size = Vector3.new(
+        math.abs(p2.X - p1.X),
+        math.abs(p2.Y - p1.Y),
+        math.abs(p2.Z - p1.Z)
+      )
+
+      arenaPart.Size = Vector3.new(size.X, size.Y + extraDown, size.Z)
+      arenaPart.Position = ((p1 + p2) / 2) - Vector3.new(0, extraDown / 2, 0)
+
+      return arenaPart
+    end
+
+    local function isPlayerInArena()
+      if not arenaPart then return false end
+
+      local char = player.Character
+      if not char then return false end
+
+      local hrp = char:FindFirstChild("HumanoidRootPart")
+      if not hrp then return false end
+
+      local relative = arenaPart.CFrame:PointToObjectSpace(hrp.Position)
+      local half = arenaPart.Size / 2
+
+      return math.abs(relative.X) <= half.X
+        and math.abs(relative.Y) <= half.Y
+        and math.abs(relative.Z) <= half.Z
+    end
+
+    local function farmKurama(mode)
+      local char = game.Players.LocalPlayer.Character
+      if not char then return end
+
+      local hrp = char:FindFirstChild("HumanoidRootPart")
+      if not hrp then return end
+
+      local boss = workspace.Scriptable.BossArena:FindFirstChild("Demon Fox")
+      if not boss then return end
+
+      local bossHRP = boss:FindFirstChild("HumanoidRootPart")
+      if not bossHRP then return end
+
+      if mode == "Top" then
+        hrp.CFrame = bossHRP.CFrame * CFrame.new(0, 60, 0)
+      elseif mode == "Bottom" then
+        hrp.CFrame = bossHRP.CFrame * CFrame.new(0, -60, 0)
+      elseif mode == "Center" then
+        hrp.CFrame = bossHRP.CFrame
+      end
+    end
+
+    AutoKurama = state
+    if not AutoKurama then return else createArena() end
+
+    task.spawn(function()
+      while AutoKurama do task.wait()
+        if not isPlayerInArena() then
+          local ClickBox = workspace.Scriptable.BossArena:FindFirstChild('ClickBox')
+          if ClickBox then fireclickdetector(ClickBox:FindFirstChildWhichIsA('ClickDetector')) end
+        elseif isPlayerInArena() then
+          while AutoKurama and workspace.Scriptable.BossArena:FindFirstChild("Demon Fox") do task.wait()
+            farmKurama(SelectedTeleportMode)
+          end
+        end
+      end
+    end)
+  end
+})
+AutoFarmTab:Toggle({
+	Title = "Auto use skills",
+	Icon = "check",
+	Type = "Checkbox",
+	Flag = "SkillsBossToggle",
+	Value = false,
+	Callback = function(state)
+		SkillsBoss = state
+		if not SkillsBoss then return end
+
+		task.spawn(function()
+      while SkillsBoss do task.wait()
+        while SkillsBoss and workspace.Scriptable.BossArena:FindFirstChild("Demon Fox") do task.wait()
+          for _, skill in ipairs(SelectedBossSkills) do
+            local key = Enum.KeyCode[skill]
+            game:GetService("ReplicatedStorage").Remotes.RemoteFunction:InvokeServer("UsePower", skill)
+            game:GetService("ReplicatedStorage").Remotes.RemoteFunction:InvokeServer("UseSpecialPower", key)
+          end
+        end
+      end
+		end)
+	end
+})
+AutoFarmTab:Toggle({
+	Title = "God mode",
+	Icon = "check",
+	Type = "Checkbox",
+	Flag = "GodModeBoss",
+	Value = false,
+	Callback = function(state)
+		GodMode = state
+		getgenv().GodModeSettings = getgenv().GodModeSettings or {
+			Enabled = false,
+			Connections = {}
+		}
+
+		getgenv().GodModeSettings.Enabled = state
+
+		if not state then
+			if getgenv().GodModeSettings.Connections.healthChanged then
+				getgenv().GodModeSettings.Connections.healthChanged:Disconnect()
+			end
+			if getgenv().GodModeSettings.Connections.charAdded then
+				getgenv().GodModeSettings.Connections.charAdded:Disconnect()
+			end
+			return
+		end
+
+		local function setGodMode(char)
+			local hum = char:WaitForChild("Humanoid", 5)
+			if not hum then return end
+
+			hum.MaxHealth = math.huge
+			hum.Health = math.huge
+
+			if getgenv().GodModeSettings.Connections.healthChanged then
+				getgenv().GodModeSettings.Connections.healthChanged:Disconnect()
+			end
+
+			getgenv().GodModeSettings.Connections.healthChanged =
+				hum:GetPropertyChangedSignal("Health"):Connect(function()
+					if getgenv().GodModeSettings.Enabled then
+						hum.Health = math.huge
+					end
+				end)
+		end
+
+		local player = game.Players.LocalPlayer
+
+		if player.Character then
+			setGodMode(player.Character)
+		end
+
+		getgenv().GodModeSettings.Connections.charAdded =
+			player.CharacterAdded:Connect(setGodMode)
+	end
 })
 local Section = AutoFarmTab:Section({
   Title = "Mob Farming",
@@ -1256,6 +1477,49 @@ AutoFarmTab:Toggle({
 })
 local Section = AutoFarmTab:Section({ 
   Title = "Chikara / Fruit Farming",
+})
+local Toggle = AutoFarmTab:Toggle({
+  Title = "Auto collect dragon orb",
+  Desc = "Collect all the dragon orb that appears",
+  Icon = "check",
+  Type = "Checkbox",
+  Flag = "AutoDragonOrb",
+  Value = false,
+  Callback = function(state)
+    DragonOrb = state
+
+    if not DragonOrb then return end
+    if not fireclickdetector then
+      WindUI:Notify({
+        Title = "<font size='14'><b>Executor Compatibility Warning</b></font>",
+        Content = [[
+<font size='14' color='#FF6B6B'><b>Unsupported Function Detected</b></font>
+
+<font size='14' color='#E0E0E0'>
+The executor you are currently using does not support the function
+</font>
+<font size='12' color='#FFD166'><b>fireclickdetector()</b></font>
+<font size='11' color='#E0E0E0'>
+This feature requires full ClickDetector interaction support. Please switch to a compatible executor to ensure proper functionality and avoid unexpected behavior.
+</font>
+        ]],
+        Duration = 10,
+        Icon = "bell-ring",
+      })
+      return
+    end
+
+    task.spawn(function()
+      while DragonOrb do task.wait()
+        for _, v in pairs(workspace.MouseIgnore:GetDescendants()) do
+          if v:IsA('ClickDetector') and v.Name == 'ClickDetector' then
+            fireclickdetector(v)
+            break
+          end
+        end
+      end
+    end)
+  end
 })
 local Toggle = AutoFarmTab:Toggle({
   Title = "Auto collect fruit",
@@ -2020,8 +2284,24 @@ local ClassParagraph = ShopTab:Paragraph({
   Locked = false,
 })
 task.spawn(function()
+  local function updateClassDesc()
+    local char = game.Players.LocalPlayer.Character
+    if not char then return end
+
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    local overhead = hrp:FindFirstChild("Overhead")
+    if not overhead then return end
+
+    local class = overhead:FindFirstChild("Class")
+    if not class then return end
+
+    ClassParagraph:SetDesc("Current Class: " .. class.Text)
+  end
+
   while true do task.wait(2)
-    ClassParagraph:SetDesc('Current Class: ' .. game.Players.LocalPlayer.Character.HumanoidRootPart.Overhead.Class.Text)
+    updateClassDesc()
   end
 end)
 ShopTab:Toggle({
@@ -2622,8 +2902,20 @@ local Button = MiscTab:Button({
   Locked = false,
   Callback = function()
     local codes = {
+      'SATURDAYBUGSPATCH',
+      '175KLIKES',
+      '200KLIKES',
+      'SMALLCHIKARACODE',
+      'BIGCHIKARACODE',
+      'FIGHTINGPASS',
+      'KURAMAUPDATE',
       'WednesdayYenCode',
       'WednesdayBoostsCode',
+      'NewFridayYenCode',
+      'NewFridayBoostsCode',
+      'ThursdayYenNewCode',
+      'ThursdayBoostsNewCode',
+      'KuramaUpdateSoon',
       'BUGSPATCH4',
       'BUGSPATCH3',
       'BUGSPATCH2',
@@ -2816,7 +3108,7 @@ local Toggle = MiscTab:Toggle({
 	Callback = function(state)
     AutoClicker = state
     if not AutoClicker then return end
-    
+
     if AutoClicker then
       loadstring(game:HttpGet("https://raw.githubusercontent.com/rrixh/uwuware/main/Kustom/autoklicker-mobile_lulaslollipop",true))();
     end
@@ -3131,17 +3423,17 @@ local ConfigNameInput = ConfigTab:Input({
     ConfigName = value
   end
 })
-ConfigTab:Space()
-local AutoLoadToggle = ConfigTab:Toggle({
-  Title = "Enable Auto Load to Selected Config",
-  Value = false,
-  Callback = function(v)
-    local cfg = ConfigManager:GetConfig(ConfigName)
-    if cfg then
-      cfg:SetAutoLoad(v)
-    end
-  end
-})
+-- ConfigTab:Space()
+-- local AutoLoadToggle = ConfigTab:Toggle({
+--   Title = "Enable Auto Load to Selected Config",
+--   Value = false,
+--   Callback = function(v)
+--     local cfg = ConfigManager:GetConfig(ConfigName)
+--     if cfg then
+--       cfg:SetAutoLoad(v)
+--     end
+--   end
+-- })
 ConfigTab:Space()
 local function RefreshConfigs()
   local all = ConfigManager:AllConfigs()
