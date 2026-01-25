@@ -27,7 +27,7 @@ print[[
 
 
 -- verify
-local AllowedIds = {1048095073, 9366083217, 3252154084}
+local AllowedIds = {1048095073, 9366083217, 3252154084, 10369972809}
 local Player = game.Players.LocalPlayer
 local Allowed = false
 for _, id in ipairs(AllowedIds) do
