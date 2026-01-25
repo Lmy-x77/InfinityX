@@ -42,15 +42,6 @@ if not Allowed then
 else
     loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/main/Software/Custom/Intro/BetaTester.lua'))()
 end
-function CloseScript()
-  local GameVersion = game:GetService("Players").LocalPlayer.PlayerGui.Main.MainHUD.Version.Text
-  if GameVersion ~= 'v4.3.1' then
-    pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
-      "The script is being updated. For more information, join the Discord server."
-    )
-    task.wait(9e9)
-  end
-end; CloseScript()
 if not BYPASS_LOADED then
   pcall(function()
     loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/bypass.lua'))()
