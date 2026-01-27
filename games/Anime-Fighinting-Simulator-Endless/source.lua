@@ -28,6 +28,10 @@ print[[
 
 -- verify
 local ScriptClosed = false
+game:GetService("Players").LocalPlayer.PlayerGui.Main.MainClient.Notifications.NotifExample.RichText = true
+require(game:GetService("Players").LocalPlayer.PlayerGui.Main.MainClient.Notifications).Notify({
+  "  <b><font color='rgb(0,170,255)'>[InfinityX]</font></b> <i>Initializing modules...</i>"
+}); wait(2)
 if ScriptClosed then
   pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
     "The script is being updated. For more information, join the Discord server."
@@ -506,6 +510,112 @@ local function FarmDailyStatOrIncrement(Q)
 			end
 		end
 	end
+end
+local arenaPart
+local TeleportSafeZone = false
+getgenv().IsDodging = false
+local function createArena()
+	arenaPart = workspace.Scriptable.BossArena:FindFirstChild("InArena")
+	if arenaPart then return arenaPart end
+
+	arenaPart = Instance.new("Part")
+	arenaPart.Name = "InArena"
+	arenaPart.Anchored = true
+	arenaPart.CanCollide = false
+	arenaPart.Transparency = 0.5
+	arenaPart.Parent = workspace.Scriptable.BossArena
+
+	local p1 = Vector3.new(1913, 3122, 468)
+	local p2 = Vector3.new(2586, 3302, 1146)
+	local extraDown = 200
+
+	local size = Vector3.new(
+		math.abs(p2.X - p1.X),
+		math.abs(p2.Y - p1.Y),
+		math.abs(p2.Z - p1.Z)
+	)
+
+	arenaPart.Size = Vector3.new(size.X, size.Y + extraDown, size.Z)
+	arenaPart.CFrame = CFrame.new((p1 + p2) / 2 - Vector3.new(0, extraDown / 2, 0))
+
+	return arenaPart
+end
+local function isPlayerInArena()
+	if not arenaPart then return false end
+
+	local char = game.Players.LocalPlayer.Character
+	if not char then return false end
+
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	if not hrp then return false end
+
+	local relative = arenaPart.CFrame:PointToObjectSpace(hrp.Position)
+	local half = arenaPart.Size / 2
+
+	return math.abs(relative.X) <= half.X
+		and math.abs(relative.Y) <= half.Y
+		and math.abs(relative.Z) <= half.Z
+end
+local function farmKurama(mode)
+	local char = game.Players.LocalPlayer.Character
+	if not char then return end
+
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	if not hrp then return end
+
+	local boss = workspace.Scriptable.BossArena:FindFirstChild("Demon Fox")
+	if not boss then return end
+
+	local bossHRP = boss:FindFirstChild("HumanoidRootPart")
+	if not bossHRP then return end
+
+	if mode == "Top" then
+		hrp.CFrame = bossHRP.CFrame * CFrame.new(0, 50, 0)
+	elseif mode == "Bottom" then
+		hrp.CFrame = bossHRP.CFrame * CFrame.new(0, -10, 0)
+	elseif mode == "Center" then
+		hrp.CFrame = bossHRP.CFrame
+	else
+		pcall(function()
+			game:GetService("VirtualInputManager"):SendKeyEvent(true, mode, false, game)
+			task.wait()
+			game:GetService("VirtualInputManager"):SendKeyEvent(false, mode, false, game)
+		end)
+	end
+end
+function CreateSafeZone()
+  if not workspace.Scriptable.BossArena:FindFirstChild('SafeZone') then
+      local SafeZone = Instance.new("Part", workspace.Scriptable.BossArena)
+      SafeZone.Position = Vector3.new(1933, 3283, 1119)
+      SafeZone.Name = "SafeZone"
+      SafeZone.Size = Vector3.new(10, 1, 10)
+      SafeZone.Transparency = 0.35
+      SafeZone.Anchored = true
+      SafeZone.CanCollide = true
+      SafeZone.Material = Enum.Material.SmoothPlastic
+      SafeZone.Color = Color3.fromRGB(120, 70, 200)
+
+      local gui = Instance.new("BillboardGui", SafeZone)
+      gui.Name = "SafeZoneGui"
+      gui.Size = UDim2.fromScale(7, 2.5)
+      gui.StudsOffset = Vector3.new(0, 4, 0)
+      gui.AlwaysOnTop = true
+      gui.MaxDistance = 300
+
+      local label = Instance.new("TextLabel", gui)
+      label.Size = UDim2.fromScale(1, 1)
+      label.BackgroundTransparency = 1
+      label.RichText = true
+      label.TextScaled = true
+      label.Font = Enum.Font.GothamBold
+      label.Text = [[
+      <font size="52" color="#b388ff">SAFE ZONE</font>
+      <br/>
+      <font size="20" color="#e6d9ff">Protected Area</font>
+      ]]
+      label.TextStrokeTransparency = 0.2
+      label.TextStrokeColor3 = Color3.fromRGB(20, 0, 40)
+  end
 end
 local function FarmBossQuest()
 	createArena()
@@ -1023,28 +1133,36 @@ AutoFarmTab:Dropdown({
   end
 })
 AutoFarmTab:Toggle({
-  Title = "Start auto boss farm",
-  Icon = "check",
-  Type = "Checkbox",
-  Flag = "BossFarmToggle",
-  Value = false,
-  Callback = function(state)
-    AutoKurama = state
-    if not AutoKurama then return else createArena() end
+	Title = "Start auto boss farm",
+	Icon = "check",
+	Type = "Checkbox",
+	Flag = "BossFarmToggle",
+	Value = false,
+	Callback = function(state)
+		AutoKurama = state
+		if not AutoKurama then return else createArena(); CreateSafeZone() end
 
-    task.spawn(function()
-      while AutoKurama do task.wait()
-        if not isPlayerInArena() then
-          local ClickBox = workspace.Scriptable.BossArena:FindFirstChild('ClickBox')
-          if ClickBox then fireclickdetector(ClickBox:FindFirstChildWhichIsA('ClickDetector')) end
-        elseif isPlayerInArena() then
-          while AutoKurama and workspace.Scriptable.BossArena:FindFirstChild("Demon Fox") do task.wait()
-            farmKurama(SelectedTeleportMode)
-          end
-        end
-      end
-    end)
-  end
+		task.spawn(function()
+			while AutoKurama do task.wait()
+				if getgenv().IsDodging then task.wait(0.2) continue end
+
+				if not isPlayerInArena() then
+					local ClickBox = workspace.Scriptable.BossArena:FindFirstChild("ClickBox")
+					if ClickBox then
+						fireclickdetector(ClickBox:FindFirstChildWhichIsA("ClickDetector"))
+          else
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(37, 80, 10)
+					end
+				else
+					while AutoKurama and workspace.Scriptable.BossArena:FindFirstChild("Demon Fox") do
+						if getgenv().IsDodging then break end
+						task.wait()
+						farmKurama(SelectedTeleportMode)
+					end
+				end
+			end
+		end)
+	end
 })
 AutoFarmTab:Toggle({
 	Title = "Auto use selected skills",
@@ -1066,6 +1184,80 @@ AutoFarmTab:Toggle({
           end
         end
       end
+		end)
+	end
+})
+AutoFarmTab:Toggle({
+	Title = "Auto dodge boss attack",
+	Icon = "check",
+	Type = "Checkbox",
+	Flag = "SkillsBossToggle",
+	Value = false,
+	Callback = function(state)
+		AutoDodge = state
+		if not state then return end
+
+		getgenv().IsDodging = false
+
+		task.spawn(function()
+			local lp = game.Players.LocalPlayer
+
+			local SPECIAL_ANIMS = {
+				["99370260062067"] = true,
+				["81691614828849"] = true,
+			}
+
+			local dodging = false
+
+			while AutoDodge do
+				task.wait(0.1)
+
+				local char = lp.Character
+				if not char then continue end
+
+				local hum = char:FindFirstChildOfClass("Humanoid")
+				local hrp = char:FindFirstChild("HumanoidRootPart")
+				if not hum or not hrp then continue end
+
+				local arena = workspace.Scriptable.BossArena
+				local boss = arena:FindFirstChild("Demon Fox")
+				if not boss then continue end
+
+				local bossHum = boss:FindFirstChildOfClass("Humanoid")
+				if not bossHum then continue end
+
+				local animator = bossHum:FindFirstChildOfClass("Animator")
+				if not animator then continue end
+
+				for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+					local id = string.match(track.Animation.AnimationId, "%d+")
+					if id and SPECIAL_ANIMS[id] and not dodging then
+						dodging = true
+						getgenv().IsDodging = true
+
+						hum:ChangeState(Enum.HumanoidStateType.Physics)
+						hrp.Anchored = true
+
+						char:PivotTo(
+							arena.SafeZone:GetPivot() * CFrame.new(0, 3, 0)
+						); wait(.2)
+						char:PivotTo(
+							arena.SafeZone:GetPivot() * CFrame.new(0, 3, 0)
+						); wait(.2)
+						char:PivotTo(
+							arena.SafeZone:GetPivot() * CFrame.new(0, 3, 0)
+						); wait(.2)
+
+						task.wait(2.5)
+
+						hrp.Anchored = false
+						hum:ChangeState(Enum.HumanoidStateType.Running)
+
+						getgenv().IsDodging = false
+						dodging = false
+					end
+				end
+			end
 		end)
 	end
 })
@@ -2054,6 +2246,23 @@ local Button = EspTab:Button({
 
 PlayerTab:Section({ 
   Title = "Player Configuration",
+})
+local Slider = PlayerTab:Slider({
+  Title = "Flight Speed",
+  Desc = "Manage player fly speed settings",
+  Step = 1,
+  Value = {
+    Min = 0,
+    Max = 1000,
+    Default = 0,
+  },
+  Callback = function(value)
+    local FlySpeed = value
+    local VisualClient = require(game:GetService("Players").LocalPlayer.PlayerGui.Main.MainClient.VisualClient)
+
+    VisualClient.flightSpeed = FlySpeed
+    VisualClient.flameFlight = FlySpeed * 0.35
+  end
 })
 local Slider = PlayerTab:Slider({
   Title = "WalkSpeed",
@@ -3601,4 +3810,11 @@ ConfigTab:Paragraph({
       end
     }
   }
+})
+
+
+-- notify
+require(game:GetService("Players").LocalPlayer.PlayerGui.Main.MainClient.Notifications).Notify({
+  "<b><font color='rgb(0,255,0)'>InfinityX successfully loaded</font></b>",
+  "LevelUp"
 })
