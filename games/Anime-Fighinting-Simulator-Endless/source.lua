@@ -27,7 +27,7 @@ print[[
 
 
 -- verify
-local ScriptClosed = false
+local ScriptClosed = true
 game:GetService("Players").LocalPlayer.PlayerGui.Main.MainClient.Notifications.NotifExample.RichText = true
 require(game:GetService("Players").LocalPlayer.PlayerGui.Main.MainClient.Notifications).Notify({
   "  <b><font color='rgb(0,170,255)'>[InfinityX]</font></b> <i>Initializing modules...</i>"
