@@ -27,6 +27,7 @@ end
 function SafeGuard:Hook(info)
   local AntiKick = info.AntiKick
   local AntiFluff = info.AntiFluff
+  local AntiLogger = info.AntiLogger
   local AntiBan = info.AntiBan
   local AntiHttpSpy = info.AntiHttpSpy
   local AntiFling = info.AntiFling
@@ -52,6 +53,9 @@ function SafeGuard:Hook(info)
     else
       warn("[DEBUG] - Bypass failed 🔴")
     end
+  end
+  if AntiLogger then
+    print('In dev')
   end
   if AntiFling then
     local Players = game:GetService("Players")
