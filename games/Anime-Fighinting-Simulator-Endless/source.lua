@@ -1,4 +1,7 @@
 ---@diagnostic disable: undefined-global
+---@diagnostic disable: undefined-doc-module
+
+
 -- services
 pcall(function() assert(cloneref or game.Players.LocalPlayer:Kick("Your exploit doesn't support cloneref")) end)
 local Workspace = cloneref(game:GetService("Workspace"));
@@ -44,7 +47,7 @@ print[[
 local ScriptClosed = false
 Players.LocalPlayer.PlayerGui.Main.MainClient.Notifications.NotifExample.RichText = true
 require(Players.LocalPlayer.PlayerGui.Main.MainClient.Notifications).Notify({
-  "  <b><font color='rgb(0,170,255)'>[InfinityX]</font></b> <i>Initializing modules...</i>"
+  "<b><font color='rgb(140,90,200)'>[InfinityX]</font></b> <i>Initializing core system modules...</i>"
 }); wait(2)
 if ScriptClosed then
   pcall(Players.LocalPlayer.Kick, Players.LocalPlayer,
@@ -66,7 +69,7 @@ pcall(function() getgenv().BYPASS_LOADED = true end)
 -- variables
 local SkillKeys = { "Z","X","C","E","R","T","Y","U","F","G","H","J","K","L","V","B","N","M" }
 local SelectedSkills = {}
-getgenv().StatsFarm = { Delay = false }
+getgenv().StatsFarm = { Delay = false, EquipBestChampion = false }
 getgenv().AfkFarmSettings = { Desync = true }
 getgenv().FarmMobSettings = { UseM1 = false }
 getgenv().AutoSellChampionsSettings = { Enabled = false }
@@ -142,6 +145,58 @@ function Teleport(path : Instance, method : number, x,y,z)
       end
     end
   end
+end
+local Champions = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/modules/Champions.lua"))()
+local LastEquipped
+local LastStat
+local LastSummon = 0
+local SUMMON_COOLDOWN = 1.2
+local function CanSummon()
+  return os.clock() - LastSummon >= SUMMON_COOLDOWN
+end
+local function Summon(champ)
+  if not CanSummon() then return end
+  LastSummon = os.clock()
+
+  ReplicatedStorage.Remotes.RemoteFunction:InvokeServer(
+    "SummonChamp",
+    champ
+  )
+end
+local function EquipBestChampion(statId)
+  if not getgenv().StatsFarm.EquipBestChampion then return end
+
+  local player = Players.LocalPlayer
+  local char = player.Character
+  if not char then return end
+
+  local bestId, bestValue = nil, 0
+
+  for _, v in pairs(player.Champions:GetChildren()) do
+    local id = v.Name
+    local data = Champions[id]
+
+    if data and data.Abilities and data.Abilities.AutoTrainer then
+      local value = data.Abilities.AutoTrainer[tostring(statId)]
+      if value and value > bestValue then
+        bestValue = value
+        bestId = id
+      end
+    end
+  end
+
+  if not bestId then return end
+
+  if LastStat ~= statId then
+    LastStat = statId
+    LastEquipped = nil
+    return
+  end
+
+  if LastEquipped == bestId then return end
+
+  Summon(player.Champions[bestId])
+  LastEquipped = bestId
 end
 function GetQuestNpc()
   local npcs = {}
@@ -515,7 +570,7 @@ local function TeleportDailyStat(id)
 
 	Teleport(unpack(list[#list][3]))
 end
-local function FarmDailyStatOrIncrement(Q)
+function FarmDailyStatOrIncrement(Q)
 	for _, idx in ipairs({"1","2","3","4","5","6"}) do
 		local goal = Q.Goal:FindFirstChild(idx)
 		local current = Q.Current:FindFirstChild(idx)
@@ -537,7 +592,7 @@ end
 local arenaPart
 local TeleportSafeZone = false
 getgenv().IsDodging = false
-local function createArena()
+function createArena()
 	arenaPart = Workspace.Scriptable.BossArena:FindFirstChild("InArena")
 	if arenaPart then return arenaPart end
 
@@ -563,7 +618,7 @@ local function createArena()
 
 	return arenaPart
 end
-local function isPlayerInArena()
+function isPlayerInArena()
 	if not arenaPart then return false end
 
 	local char = Players.LocalPlayer.Character
@@ -640,7 +695,7 @@ function CreateSafeZone()
       label.TextStrokeColor3 = Color3.fromRGB(20, 0, 40)
   end
 end
-local function FarmBossQuest()
+function FarmBossQuest()
 	createArena()
 
 	task.spawn(function()
@@ -791,7 +846,7 @@ WindUI:AddTheme({
   Name = "InfinityX",
 
   Accent = Color3.fromHex("#6c1bb9"),
-  Dialog = Color3.fromHex("#450a0a"),
+  Dialog = Color3.fromHex("#160729"),
   Outline = Color3.fromHex("#fca5a5"),
   Text = Color3.fromHex("#fef2f2"),
   Placeholder = Color3.fromHex("#6f757b"),
@@ -996,17 +1051,19 @@ AutoFarmTab:Toggle({
         local char = Players.LocalPlayer.Character
         local hum = char and char:FindFirstChildOfClass("Humanoid")
 
-        if not hum or hum.Health <= 0 and getgenv().StatsFarm.Delay then
-          task.wait(6)
-          repeat task.wait()
-            char = Players.LocalPlayer.Character
-            hum = char and char:FindFirstChildOfClass("Humanoid")
-          until hum and hum.Health > 0 or not AutoFarm
+        if (not hum or hum.Health <= 0) and getgenv().StatsFarm.Delay then
+            task.wait(6)
+            repeat task.wait()
+                char = Players.LocalPlayer.Character
+                hum = char and char:FindFirstChildOfClass("Humanoid")
+            until (hum and hum.Health > 0) or not AutoFarm
         end
 
         local statId = StatMap[SelectedStat]
         if not statId then continue end
+
         TeleportBestByStat(statId)
+        EquipBestChampion(statId)
         Remote:FireServer("Train", statId)
       end
     end)
@@ -1014,13 +1071,24 @@ AutoFarmTab:Toggle({
 })
 AutoFarmTab:Toggle({
   Title = "Delay on dead",
-  Desc = "Every time a player dies with auto-farm stats enabled, it takes a while before they can teleport back to the selected training zone.",
+  Desc = "Auto-farm death causes a teleport delay.",
   Icon = "check",
   Type = "Checkbox",
   Flag = "StatFarm",
   Value = false,
   Callback = function(state)
     getgenv().StatsFarm.Delay = state
+  end
+})
+AutoFarmTab:Toggle({
+  Title = "Auto equip best champion",
+  Desc = "Auto-equips the best champion for the selected stat/area. Unequip your current champion to enable.",
+  Icon = "check",
+  Type = "Checkbox",
+  Flag = "StatFarm",
+  Value = false,
+  Callback = function(state)
+    getgenv().StatsFarm.EquipBestChampion = state
   end
 })
 AutoFarmTab:Section({
@@ -3827,6 +3895,6 @@ ConfigTab:Paragraph({
 
 -- notify
 require(Players.LocalPlayer.PlayerGui.Main.MainClient.Notifications).Notify({
-  "<b><font color='rgb(0,255,0)'>InfinityX successfully loaded</font></b>",
+  "<b><font color='rgb(140,90,200)'>InfinityX successfully initialized</font></b>",
   "LevelUp"
 })
