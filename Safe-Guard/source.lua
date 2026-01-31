@@ -55,7 +55,7 @@ function SafeGuard:Hook(info)
     end
   end
   if AntiLogger then
-    print('In dev')
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Safe-Guard/script/AntiLogger.lua'))()
   end
   if AntiFling then
     local Players = game:GetService("Players")
