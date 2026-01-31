@@ -1,6 +1,20 @@
 ---@diagnostic disable: undefined-global
+-- services
+pcall(function() assert(cloneref or game.Players.LocalPlayer:Kick("Your exploit doesn't support cloneref")) end)
+local Workspace = cloneref(game:GetService("Workspace"));
+local Players = cloneref(game:GetService("Players"));
+local ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"));
+local ReplicatedFirst = cloneref(game:GetService("ReplicatedFirst"));
+local TweenService = cloneref(game:GetService("TweenService"));
+local RunService = cloneref(game:GetService("RunService"));
+local TeleportService = cloneref(game:GetService("TeleportService"));
+local HttpService = cloneref(game:GetService("HttpService"));
+local VirtualUser = cloneref(game:GetService("VirtualUser"));
+local UserInputService = cloneref(game:GetService("UserInputService"));
+local VirtualInputManager = cloneref(game:GetService("VirtualInputManager"));
+
+
 -- detect service
-local UserInputService = game:GetService("UserInputService")
 IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS}, UserInputService:GetPlatform())
 if IsOnMobile then
   print("Mobile device")
@@ -27,22 +41,21 @@ print[[
 
 
 -- verify
-local ScriptClosed = true
-game:GetService("Players").LocalPlayer.PlayerGui.Main.MainClient.Notifications.NotifExample.RichText = true
-require(game:GetService("Players").LocalPlayer.PlayerGui.Main.MainClient.Notifications).Notify({
+local ScriptClosed = false
+Players.LocalPlayer.PlayerGui.Main.MainClient.Notifications.NotifExample.RichText = true
+require(Players.LocalPlayer.PlayerGui.Main.MainClient.Notifications).Notify({
   "  <b><font color='rgb(0,170,255)'>[InfinityX]</font></b> <i>Initializing modules...</i>"
 }); wait(2)
 if ScriptClosed then
-  pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
+  pcall(Players.LocalPlayer.Kick, Players.LocalPlayer,
     "The script is being updated. For more information, join the Discord server."
   )
   task.wait(9e9)
 end
 if not BYPASS_LOADED then
   pcall(function()
-    loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/bypass.lua'))()
     local SafeGuard = loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Safe-Guard/source.lua'))()
-    SafeGuard:Hook({ AntiFluff = true })
+    SafeGuard:Hook({ AntiFluff = true, AntiLogger = true })
   end)
 else
   print('[DEBUG] - Bypass already loaded')
@@ -101,16 +114,14 @@ local FruitConn
 local Applied = {}
 local FruitConnection
 local ChikaraConnection
-local HttpService = game:GetService("HttpService")
-local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local WEBHOOK_URL = ""
-local Strength = game:GetService("Players").LocalPlayer.Stats["1"]
-local Durability = game:GetService("Players").LocalPlayer.Stats["2"]
-local Chakra = game:GetService("Players").LocalPlayer.Stats["3"]
-local Sword = game:GetService("Players").LocalPlayer.Stats["4"]
-local Agility = game:GetService("Players").LocalPlayer.Stats["5"]
-local Speed = game:GetService("Players").LocalPlayer.Stats["6"]
+local Strength = Players.LocalPlayer.Stats["1"]
+local Durability = Players.LocalPlayer.Stats["2"]
+local Chakra = Players.LocalPlayer.Stats["3"]
+local Sword = Players.LocalPlayer.Stats["4"]
+local Agility = Players.LocalPlayer.Stats["5"]
+local Speed = Players.LocalPlayer.Stats["6"]
 function GetStats(path)
   local v = typeof(path) == "Instance" and path.Value or path
   v = math.floor(tonumber(v) or 0)
@@ -122,7 +133,7 @@ function GetStats(path)
   return s
 end
 function Teleport(path : Instance, method : number, x,y,z)
-  for _, v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+  for _, v in pairs(Players.LocalPlayer.Character:GetChildren()) do
     if v:IsA('Part') and v.Name == 'HumanoidRootPart' then
       if method == 1 then
         v:PivotTo(path:GetPivot())
@@ -134,7 +145,7 @@ function Teleport(path : Instance, method : number, x,y,z)
 end
 function GetQuestNpc()
   local npcs = {}
-  for _, v in pairs(workspace.Scriptable.NPC.Quest:GetChildren()) do
+  for _, v in pairs(Workspace.Scriptable.NPC.Quest:GetChildren()) do
     if v:IsA('Model') then
       table.insert(npcs, v.Name)
     end
@@ -143,7 +154,7 @@ function GetQuestNpc()
 end
 function GetChampionsNpc()
   local npcs = {}
-  for _, v in pairs(workspace.Scriptable.NPC.Shops.Champions:GetChildren()) do
+  for _, v in pairs(Workspace.Scriptable.NPC.Shops.Champions:GetChildren()) do
     if v:IsA('Model') then
       table.insert(npcs, v.Name)
     end
@@ -152,8 +163,8 @@ function GetChampionsNpc()
 end
 function GetPlayers()
   local players = {}
-  for _, v in pairs(game.Players:GetPlayers()) do
-    if v.Name ~= game.Players.LocalPlayer.Name then
+  for _, v in pairs(Players:GetPlayers()) do
+    if v.Name ~= Players.LocalPlayer.Name then
       table.insert(players, v.Name)
     end
   end
@@ -161,7 +172,7 @@ function GetPlayers()
 end
 function GetTrainingAreas()
   local areas = {}
-  for _, v in pairs(workspace.Map.TrainingAreas:GetChildren()) do
+  for _, v in pairs(Workspace.Map.TrainingAreas:GetChildren()) do
     if v:IsA('Model') then
       table.insert(areas, v.Name)
     end
@@ -169,10 +180,10 @@ function GetTrainingAreas()
   return areas
 end
 function AutoFarmMobs(mob : string)
-  local plr = game.Players.LocalPlayer
+  local plr = Players.LocalPlayer
   local char = plr.Character
   if not char then return end
-  for _, v in pairs(workspace.Scriptable.Mobs:GetChildren()) do
+  for _, v in pairs(Workspace.Scriptable.Mobs:GetChildren()) do
     if v:IsA("Model") and v.Name == mob and v.PrimaryPart then
       local cf = v.PrimaryPart.CFrame
       local behind = cf * CFrame.new(0, 0, 3.5)
@@ -182,8 +193,8 @@ function AutoFarmMobs(mob : string)
 end
 function GetChampions()
   local champions = {}
-  for _, v in pairs(game:GetService("Players").LocalPlayer.Champions:GetChildren()) do
-    for _, x in pairs(game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List:GetChildren()) do
+  for _, v in pairs(Players.LocalPlayer.Champions:GetChildren()) do
+    for _, x in pairs(Players.LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List:GetChildren()) do
       if x:IsA('Frame') and x.Name == v.Name then
         table.insert(champions,
           x.Container.ChampionName.Text
@@ -195,8 +206,8 @@ function GetChampions()
 end
 function GetPlayersOffSafeZone()
   local players = {}
-  for _, v in ipairs(game.Players:GetPlayers()) do
-    if v ~= game.Players.LocalPlayer then
+  for _, v in ipairs(Players:GetPlayers()) do
+    if v ~= Players.LocalPlayer then
       local character = v.Character
       if character then
         local pvpFolder = character:FindFirstChild("PVPFolder")
@@ -211,10 +222,8 @@ function GetPlayersOffSafeZone()
   end
   return players
 end
-local Players = game:GetService("Players")
-local RS = game:GetService("ReplicatedStorage")
 local LP = Players.LocalPlayer
-local Remote = RS.Remotes.RemoteEvent
+local Remote = ReplicatedStorage.Remotes.RemoteEvent
 local Char = LP.Character or LP.CharacterAdded:Wait()
 local HRP = Char:WaitForChild("HumanoidRootPart")
 local Stats = {
@@ -315,7 +324,7 @@ local function GetBoomQuest()
 		end
 	end
 end
-local BoomNPC = workspace.Scriptable.NPC.Quest:FindFirstChild("Boom")
+local BoomNPC = Workspace.Scriptable.NPC.Quest:FindFirstChild("Boom")
 local function TurnInBoom()
   if BoomNPC then
 	  HRP:PivotTo(BoomNPC:GetPivot())
@@ -335,7 +344,7 @@ local function TurnInBoom()
 	  fireclickdetector(click:FindFirstChildOfClass("ClickDetector"))
   end
 end
-local ReindeerNPC = workspace.Scriptable.NPC.Quest:FindFirstChild("Reindeer")
+local ReindeerNPC = Workspace.Scriptable.NPC.Quest:FindFirstChild("Reindeer")
 local function TurnInReindeer()
 	if ReindeerNPC then
 		Teleport(nil, 2, -33, 105, 37)
@@ -392,7 +401,7 @@ local function KillPlayerSword(plr)
 		Remote:FireServer("Train", 4)
 	end
 end
-local SwordMasterNPC = workspace.Scriptable.NPC.Quest:FindFirstChild("Sword Master")
+local SwordMasterNPC = Workspace.Scriptable.NPC.Quest:FindFirstChild("Sword Master")
 local function TurnInSwordMaster()
 	if SwordMasterNPC then
 		HRP:PivotTo(SwordMasterNPC:GetPivot())
@@ -413,8 +422,8 @@ local function TurnInSwordMaster()
 	end
 end
 local function EquipBestSword()
-  local Sword = game:GetService("Players").LocalPlayer.OtherData.Sword.Value
-  local Event = game:GetService("ReplicatedStorage").Remotes.RemoteFunction
+  local Sword = Players.LocalPlayer.OtherData.Sword.Value
+  local Event = ReplicatedStorage.Remotes.RemoteFunction
   Event:InvokeServer(
     "SwordEquip",
     Sword
@@ -437,7 +446,7 @@ end
 local MAX_DISTANCE = 60
 local currentNPC
 local function GetNPC1Alive()
-	for _, v in ipairs(workspace:GetDescendants()) do
+	for _, v in ipairs(Workspace:GetDescendants()) do
 		if v:IsA("Model") and v.Name == "1" and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("PVPFolder") and v.PVPFolder:FindFirstChild("NewHealth") and v.PVPFolder.NewHealth.Value > 0 then
 			return v
 		end
@@ -488,9 +497,23 @@ local StatNameToId = {
 	Speed = 6,
 }
 local function TeleportDailyStat(id)
+	if id == 4 then return end
+
 	local list = Areas[id]
-	if not list then return end
-	Teleport(unpack(list[1][3]))
+	local stat = Stats[id]
+	if not list or not stat then return end
+
+	local value = stat.Value
+
+	for _, area in ipairs(list) do
+		local min, max, tp = area[1], area[2], area[3]
+		if value >= min and value < max then
+			Teleport(unpack(tp))
+			return
+		end
+	end
+
+	Teleport(unpack(list[#list][3]))
 end
 local function FarmDailyStatOrIncrement(Q)
 	for _, idx in ipairs({"1","2","3","4","5","6"}) do
@@ -515,7 +538,7 @@ local arenaPart
 local TeleportSafeZone = false
 getgenv().IsDodging = false
 local function createArena()
-	arenaPart = workspace.Scriptable.BossArena:FindFirstChild("InArena")
+	arenaPart = Workspace.Scriptable.BossArena:FindFirstChild("InArena")
 	if arenaPart then return arenaPart end
 
 	arenaPart = Instance.new("Part")
@@ -523,7 +546,7 @@ local function createArena()
 	arenaPart.Anchored = true
 	arenaPart.CanCollide = false
 	arenaPart.Transparency = 0.5
-	arenaPart.Parent = workspace.Scriptable.BossArena
+	arenaPart.Parent = Workspace.Scriptable.BossArena
 
 	local p1 = Vector3.new(1913, 3122, 468)
 	local p2 = Vector3.new(2586, 3302, 1146)
@@ -543,7 +566,7 @@ end
 local function isPlayerInArena()
 	if not arenaPart then return false end
 
-	local char = game.Players.LocalPlayer.Character
+	local char = Players.LocalPlayer.Character
 	if not char then return false end
 
 	local hrp = char:FindFirstChild("HumanoidRootPart")
@@ -557,13 +580,13 @@ local function isPlayerInArena()
 		and math.abs(relative.Z) <= half.Z
 end
 local function farmKurama(mode)
-	local char = game.Players.LocalPlayer.Character
+	local char = Players.LocalPlayer.Character
 	if not char then return end
 
 	local hrp = char:FindFirstChild("HumanoidRootPart")
 	if not hrp then return end
 
-	local boss = workspace.Scriptable.BossArena:FindFirstChild("Demon Fox")
+	local boss = Workspace.Scriptable.BossArena:FindFirstChild("Demon Fox")
 	if not boss then return end
 
 	local bossHRP = boss:FindFirstChild("HumanoidRootPart")
@@ -577,15 +600,15 @@ local function farmKurama(mode)
 		hrp.CFrame = bossHRP.CFrame
 	else
 		pcall(function()
-			game:GetService("VirtualInputManager"):SendKeyEvent(true, mode, false, game)
+			VirtualInputManager:SendKeyEvent(true, mode, false, game)
 			task.wait()
-			game:GetService("VirtualInputManager"):SendKeyEvent(false, mode, false, game)
+			VirtualInputManager:SendKeyEvent(false, mode, false, game)
 		end)
 	end
 end
 function CreateSafeZone()
-  if not workspace.Scriptable.BossArena:FindFirstChild('SafeZone') then
-      local SafeZone = Instance.new("Part", workspace.Scriptable.BossArena)
+  if not Workspace.Scriptable.BossArena:FindFirstChild('SafeZone') then
+      local SafeZone = Instance.new("Part", Workspace.Scriptable.BossArena)
       SafeZone.Position = Vector3.new(1933, 3283, 1119)
       SafeZone.Name = "SafeZone"
       SafeZone.Size = Vector3.new(10, 1, 10)
@@ -622,11 +645,11 @@ local function FarmBossQuest()
 
 	task.spawn(function()
 		SkillsBoss = true
-		while SkillsBoss and workspace.Scriptable.BossArena:FindFirstChild("Demon Fox") do
+		while SkillsBoss and Workspace.Scriptable.BossArena:FindFirstChild("Demon Fox") do
 			for _, skill in ipairs(SkillKeysDaily) do
 				local key = Enum.KeyCode[skill]
-				RS.Remotes.RemoteFunction:InvokeServer("UsePower", skill)
-				RS.Remotes.RemoteFunction:InvokeServer("UseSpecialPower", key)
+				ReplicatedStorage.Remotes.RemoteFunction:InvokeServer("UsePower", skill)
+				ReplicatedStorage.Remotes.RemoteFunction:InvokeServer("UseSpecialPower", key)
 			end
 			task.wait(0.1)
 		end
@@ -635,12 +658,12 @@ local function FarmBossQuest()
 
 	while AutoDaily do
 		if not isPlayerInArena() then
-			local ClickBox = workspace.Scriptable.BossArena:FindFirstChild("ClickBox")
+			local ClickBox = Workspace.Scriptable.BossArena:FindFirstChild("ClickBox")
 			if ClickBox then
 				fireclickdetector(ClickBox:FindFirstChildWhichIsA("ClickDetector"))
 			end
 		else
-			while AutoDaily and workspace.Scriptable.BossArena:FindFirstChild("Demon Fox") do
+			while AutoDaily and Workspace.Scriptable.BossArena:FindFirstChild("Demon Fox") do
 				task.wait()
 			end
 			break
@@ -649,7 +672,7 @@ local function FarmBossQuest()
 	end
 end
 function CollectDragonOrbs()
-  for _, v in pairs(workspace.MouseIgnore:GetDescendants()) do
+  for _, v in pairs(Workspace.MouseIgnore:GetDescendants()) do
     if v:IsA('ClickDetector') and v.Name == 'ClickDetector' then
       fireclickdetector(v)
       break
@@ -699,7 +722,7 @@ local function ApplyEspToPlayer(plr)
   plr.CharacterAdded:Connect(onChar)
 end
 function ApplyEspToChikara()
-  for _, v in pairs(workspace.Scriptable.ChikaraBoxes:GetChildren()) do
+  for _, v in pairs(Workspace.Scriptable.ChikaraBoxes:GetChildren()) do
     if v:IsA('UnionOperation') and v.Name == 'ChikaraCrate' then
       EspLib.ApplyESP(v, {
         Color = Color3.fromRGB(173, 52, 102),
@@ -722,14 +745,14 @@ local function ApplyFruit(fruit)
   })
 end
 local function ApplyEspToFruit()
-  for _, v in ipairs(workspace.Scriptable.Fruits:GetChildren()) do
+  for _, v in ipairs(Workspace.Scriptable.Fruits:GetChildren()) do
     if v:IsA("Model") then
       ApplyFruit(v)
     end
   end
 end
 function ApplyEspToNPCs()
-  for _, v in pairs(workspace.Scriptable.NPC:GetDescendants()) do
+  for _, v in pairs(Workspace.Scriptable.NPC:GetDescendants()) do
     if v:IsA("Model") and v.Name ~= "Model" and v.Name ~= "NPCModel" then
       EspLib.ApplyESP(v, {
         Color = Color3.fromRGB(52, 135, 173),
@@ -741,7 +764,7 @@ function ApplyEspToNPCs()
   end
 end
 function ApplyEspToMobs()
-  for _, v in pairs(workspace.Scriptable.Mobs:GetDescendants()) do
+  for _, v in pairs(Workspace.Scriptable.Mobs:GetDescendants()) do
     if v:IsA('Model') then
       EspLib.ApplyESP(v, {
         Color = Color3.fromRGB(52, 173, 68),
@@ -814,13 +837,12 @@ Window:CreateTopbarButton(
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
 <font size="20" color="#00FF88"><b>🚀 New Features & Improvements</b></font>
 <font size="15" color="#E0E0E0">
-• <font color="#FFD166"><b>Expanded Zones & Teleports</b></font> – <font size="16">new training and replace zones added, along with additional NPC teleport locations.</font>  
-• <font color="#FFD166"><b>Advanced Webhook System</b></font> – <font size="16">new webhook support with boss drop alerts and improved reporting.</font>  
-• <font color="#FFD166"><b>Boss Automation</b></font> – <font size="16">auto boss detection, farming, and power drop notifications.</font>  
-• <font color="#FFD166"><b>Enhanced Player & Mob Farming</b></font> – <font size="16">includes weaker player viewer, auto skills usage, and optimized farming logic.</font>  
-• <font color="#FFD166"><b>Quest & Daily Automation</b></font> – <font size="16">auto daily quests, auto claim rewards, and improved NPC quest handling.</font>  
-• <font color="#FFD166"><b>Quality of Life Updates</b></font> – <font size="16">no lava damage, auto collect Dragon Orbs, and support for the latest game codes.</font>  
-• <font color="#00FFCC"><b>Core System Improvements</b></font> – <font size="16">major enhancements to player, mob, and stat farming systems.</font>  
+• <font color="#FFD166"><b>Advanced Bypass System</b></font> – <font size="16">introduced a new bypass method for improved stability and execution.</font>  
+• <font color="#FFD166"><b>Daily Quest Automation</b></font> – <font size="16">added full auto daily quest support with new skill usage.</font>  
+• <font color="#FFD166"><b>Boss Combat Enhancements</b></font> – <font size="16">automatic dodge for boss attacks and improved combat handling.</font>  
+• <font color="#FFD166"><b>Notification Module</b></font> – <font size="16">a redesigned notification system for clearer and more reliable alerts.</font>  
+• <font color="#00FFCC"><b>Kurama System Improvements</b></font> – <font size="16">enhanced auto Kurama logic with fixed teleport and stability issues.</font>  
+• <font color="#00FFCC"><b>Movement & Skill Optimization</b></font> – <font size="16">improved auto teleport, auto skills, and no-lava-damage behavior.</font>  
 </font>
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
 ]],
@@ -938,7 +960,7 @@ AutoFarmTab:Toggle({
     AutoFarm = state
     if not AutoFarm then return end
 
-    local Remote = game:GetService("ReplicatedStorage").Remotes.RemoteEvent
+    local Remote = ReplicatedStorage.Remotes.RemoteEvent
     local StatMap = {
       Strength = 1,
       Durability = 2,
@@ -971,13 +993,13 @@ AutoFarmTab:Toggle({
 
     task.spawn(function()
       while AutoFarm do task.wait()
-        local char = game.Players.LocalPlayer.Character
+        local char = Players.LocalPlayer.Character
         local hum = char and char:FindFirstChildOfClass("Humanoid")
 
         if not hum or hum.Health <= 0 and getgenv().StatsFarm.Delay then
           task.wait(6)
           repeat task.wait()
-            char = game.Players.LocalPlayer.Character
+            char = Players.LocalPlayer.Character
             hum = char and char:FindFirstChildOfClass("Humanoid")
           until hum and hum.Health > 0 or not AutoFarm
         end
@@ -1038,13 +1060,13 @@ AutoFarmTab:Toggle({
 
     task.spawn(function()
       while AutoFarmPlayer do task.wait()
-        game.Players.LocalPlayer.Character:PivotTo(game.Players[SelectedPlayerToFarm].Character:GetPivot())
-        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
+        Players.LocalPlayer.Character:PivotTo(Players[SelectedPlayerToFarm].Character:GetPivot())
+        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
         for _, skill in ipairs(SelectedSkills) do
           local key = Enum.KeyCode[skill]
-          game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("UsePower", skill)
+          ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("UsePower", skill)
           if key then
-            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("UseSpecialPower", key)
+            ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("UseSpecialPower", key)
           end
         end
       end
@@ -1056,9 +1078,9 @@ local Button = AutoFarmTab:Button({
   Locked = false,
   Callback = function()
     local WeakerPlayers = {};
-    local MePower = game:GetService("Players").LocalPlayer.OtherData.TotalPower.Value
-    for i,v in pairs(game.Players:GetPlayers()) do
-      if v.Name ~= game.Players.LocalPlayer.Name and v.OtherData.TotalPower.Value < MePower then
+    local MePower = Players.LocalPlayer.OtherData.TotalPower.Value
+    for i,v in pairs(Players:GetPlayers()) do
+      if v.Name ~= Players.LocalPlayer.Name and v.OtherData.TotalPower.Value < MePower then
         table.insert(WeakerPlayers, v.Name);
       end
     end
@@ -1076,10 +1098,10 @@ local Button = AutoFarmTab:Button({
   Title = "Viewer player power",
   Locked = false,
   Callback = function()
-    local stats1 = game.Players[SelectedPlayerToFarm].Stats['1'].Value
-    local stats2 = game.Players[SelectedPlayerToFarm].Stats['2'].Value
-    local stats3 = game.Players[SelectedPlayerToFarm].Stats['3'].Value
-    local stats4 = game.Players[SelectedPlayerToFarm].Stats['4'].Value
+    local stats1 = Players[SelectedPlayerToFarm].Stats['1'].Value
+    local stats2 = Players[SelectedPlayerToFarm].Stats['2'].Value
+    local stats3 = Players[SelectedPlayerToFarm].Stats['3'].Value
+    local stats4 = Players[SelectedPlayerToFarm].Stats['4'].Value
     local total = stats1 + stats2 + stats3 + stats4
     WindUI:Notify({
       Title = "Notification",
@@ -1147,14 +1169,14 @@ AutoFarmTab:Toggle({
 				if getgenv().IsDodging then task.wait(0.2) continue end
 
 				if not isPlayerInArena() then
-					local ClickBox = workspace.Scriptable.BossArena:FindFirstChild("ClickBox")
+					local ClickBox = Workspace.Scriptable.BossArena:FindFirstChild("ClickBox")
 					if ClickBox then
 						fireclickdetector(ClickBox:FindFirstChildWhichIsA("ClickDetector"))
           else
-            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(37, 80, 10)
+            Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(37, 80, 10)
 					end
 				else
-					while AutoKurama and workspace.Scriptable.BossArena:FindFirstChild("Demon Fox") do
+					while AutoKurama and Workspace.Scriptable.BossArena:FindFirstChild("Demon Fox") do
 						if getgenv().IsDodging then break end
 						task.wait()
 						farmKurama(SelectedTeleportMode)
@@ -1176,11 +1198,11 @@ AutoFarmTab:Toggle({
 
 		task.spawn(function()
       while SkillsBoss do task.wait()
-        while SkillsBoss and workspace.Scriptable.BossArena:FindFirstChild("Demon Fox") do task.wait()
+        while SkillsBoss and Workspace.Scriptable.BossArena:FindFirstChild("Demon Fox") do task.wait()
           for _, skill in ipairs(SelectedBossSkills) do
             local key = Enum.KeyCode[skill]
-            game:GetService("ReplicatedStorage").Remotes.RemoteFunction:InvokeServer("UsePower", skill)
-            game:GetService("ReplicatedStorage").Remotes.RemoteFunction:InvokeServer("UseSpecialPower", key)
+            ReplicatedStorage.Remotes.RemoteFunction:InvokeServer("UsePower", skill)
+            ReplicatedStorage.Remotes.RemoteFunction:InvokeServer("UseSpecialPower", key)
           end
         end
       end
@@ -1200,7 +1222,7 @@ AutoFarmTab:Toggle({
 		getgenv().IsDodging = false
 
 		task.spawn(function()
-			local lp = game.Players.LocalPlayer
+			local lp = Players.LocalPlayer
 
 			local SPECIAL_ANIMS = {
 				["99370260062067"] = true,
@@ -1219,7 +1241,7 @@ AutoFarmTab:Toggle({
 				local hrp = char:FindFirstChild("HumanoidRootPart")
 				if not hum or not hrp then continue end
 
-				local arena = workspace.Scriptable.BossArena
+				local arena = Workspace.Scriptable.BossArena
 				local boss = arena:FindFirstChild("Demon Fox")
 				if not boss then continue end
 
@@ -1273,7 +1295,7 @@ AutoFarmTab:Toggle({
 
     task.spawn(function()
       while NoLava do task.wait(1)
-        for _, v in pairs(workspace.Scriptable.BossArena.Lava:GetDescendants()) do
+        for _, v in pairs(Workspace.Scriptable.BossArena.Lava:GetDescendants()) do
           if v:IsA('TouchTransmitter') then
             v:Destroy(); break
           end
@@ -1371,10 +1393,10 @@ AutoFarmTab:Toggle({
         while AutoFarmMobSkills and AutoFarmMob do task.wait()
           for _, skill in ipairs(SelectedSkills) do
             local key = Enum.KeyCode[skill]
-            game:GetService("ReplicatedStorage").Remotes.RemoteFunction:InvokeServer("UsePower", skill)
-            game:GetService("ReplicatedStorage").Remotes.RemoteFunction:InvokeServer("UseSpecialPower", key)
+            ReplicatedStorage.Remotes.RemoteFunction:InvokeServer("UsePower", skill)
+            ReplicatedStorage.Remotes.RemoteFunction:InvokeServer("UseSpecialPower", key)
             if getgenv().FarmMobSettings.UseM1 then
-              game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
+              ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer('Train', 1)
             end
           end
         end
@@ -1408,18 +1430,18 @@ AutoFarmTab:Toggle({
 
     task.spawn(function()
       while AutoSummmonChampion do task.wait()
-        local findChampion = game.Players.LocalPlayer.Character:FindFirstChild('ChampWeld')
-        for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List:GetDescendants()) do
+        local findChampion = Players.LocalPlayer.Character:FindFirstChild('ChampWeld')
+        for _, v in pairs(Players.LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List:GetDescendants()) do
           if v:IsA('TextLabel') and v.Name == 'ChampionName' and v.Text == SelectedAutoSummonChampion then
             local champion = v.Parent.Parent.Name
-            for _, x in pairs(game:GetService("Players").LocalPlayer.Champions:GetChildren()) do
+            for _, x in pairs(Players.LocalPlayer.Champions:GetChildren()) do
               if x.Name == champion then
                 if not findChampion then
                   local args = {
                     "SummonChamp",
                     x
                   }
-                  game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+                  ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
                 end
               end
             end
@@ -1716,9 +1738,9 @@ AutoFarmTab:Toggle({
 
     task.spawn(function()
       while AutoClaim do task.wait(1)
-        for i,v in pairs(game:GetService("Players").LocalPlayer.DailyQuests.Quests:GetChildren()) do
+        for i,v in pairs(Players.LocalPlayer.DailyQuests.Quests:GetChildren()) do
           if v:IsA("Folder") then
-            local Event = game:GetService("ReplicatedStorage").Remotes.RemoteFunction
+            local Event = ReplicatedStorage.Remotes.RemoteFunction
             Event:InvokeServer(
               "FinishDailyQuest",
               v.Name
@@ -1803,7 +1825,7 @@ This feature requires full ClickDetector interaction support. Please switch to a
 
     task.spawn(function()
       while Fruit do task.wait()
-        for _, v in pairs(workspace.Scriptable.Fruits:GetDescendants()) do
+        for _, v in pairs(Workspace.Scriptable.Fruits:GetDescendants()) do
           if v:IsA('ClickDetector') and v.Name == 'ClickDetector' then
             fireclickdetector(v)
             wait(2)
@@ -1847,7 +1869,7 @@ This feature requires full ClickDetector interaction support. Please switch to a
 
     task.spawn(function()
       while ChikaraBox do task.wait()
-        for _, v in pairs(workspace.Scriptable.ChikaraBoxes:GetDescendants()) do
+        for _, v in pairs(Workspace.Scriptable.ChikaraBoxes:GetDescendants()) do
             if v:IsA('ClickDetector') then
             fireclickdetector(v)
             wait(2)
@@ -1911,10 +1933,8 @@ AutoFarmTab:Toggle({
 })
 
 
-local Players = game:GetService("Players")
-local RS = game:GetService("ReplicatedStorage")
 local LP = Players.LocalPlayer
-local Event = RS.Remotes.RemoteFunction
+local Event = ReplicatedStorage.Remotes.RemoteFunction
 local StatMap = {
 	Strength = 1,
 	Durability = 2,
@@ -2019,7 +2039,7 @@ for _, v in pairs(SkillKeys) do
       task.spawn(function()
         while SkillStates[v] do task.wait(2)
           local key = Enum.KeyCode[v]
-          local rf = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction")
+          local rf = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteFunction")
           rf:InvokeServer("UsePower", v)
           if key then
             rf:InvokeServer("UseSpecialPower", key)
@@ -2075,7 +2095,7 @@ EspTab:Toggle({
       if EspLib.ESPValues.ChikaraBoxesESP then
         ApplyEspToChikara()
       end
-      workspace.Scriptable.ChikaraBoxes.ChildAdded:Connect(function(chikara)
+      Workspace.Scriptable.ChikaraBoxes.ChildAdded:Connect(function(chikara)
         if EspLib.ESPValues.ChikaraBoxesESP and chikara:IsA('UnionOperation') then
           ApplyEspToChikara()
         end
@@ -2096,7 +2116,7 @@ EspTab:Toggle({
       ApplyEspToFruit()
 
       if not FruitConn then
-        FruitConn = workspace.Scriptable.Fruits.ChildAdded:Connect(function(fruit)
+        FruitConn = Workspace.Scriptable.Fruits.ChildAdded:Connect(function(fruit)
           if EspLib.ESPValues.FruitESP and fruit:IsA("Model") then
             ApplyFruit(fruit)
           end
@@ -2124,7 +2144,7 @@ EspTab:Toggle({
       if EspLib.ESPValues.NPCsESP then
         ApplyEspToNPCs()
       end
-      workspace.Scriptable.NPC.DescendantAdded:Connect(function(npcs)
+      Workspace.Scriptable.NPC.DescendantAdded:Connect(function(npcs)
         if EspLib.ESPValues.NPCsESP and npcs:IsA('Model') then
           ApplyEspToNPCs()
         end
@@ -2145,7 +2165,7 @@ EspTab:Toggle({
       if EspLib.ESPValues.MobsESP then
         ApplyEspToMobs()
       end
-      workspace.Scriptable.Mobs.ChildAdded:Connect(function(mobs)
+      Workspace.Scriptable.Mobs.ChildAdded:Connect(function(mobs)
         if EspLib.ESPValues.MobsESP and mobs:IsA('Model') then
           ApplyEspToMobs()
         end
@@ -2168,7 +2188,7 @@ EspTab:Toggle({
     task.spawn(function()
       if ChikaraNotify then
         local count = 0
-        for _, v in pairs(workspace.Scriptable.ChikaraBoxes:GetChildren()) do
+        for _, v in pairs(Workspace.Scriptable.ChikaraBoxes:GetChildren()) do
           if v:IsA("UnionOperation") and v.Name == "ChikaraCrate" then
             count += 1
           end
@@ -2181,7 +2201,7 @@ EspTab:Toggle({
             Icon = "bell-ring",
           })
         end
-        workspace.Scriptable.ChikaraBoxes.ChildAdded:Connect(function(chikara)
+        Workspace.Scriptable.ChikaraBoxes.ChildAdded:Connect(function(chikara)
           if ChikaraNotify and chikara:IsA('UnionOperation') then
             WindUI:Notify({
               Title = "Chikara Notification",
@@ -2206,7 +2226,7 @@ EspTab:Toggle({
 
     task.spawn(function()
       if FruitNotify then
-        for i, v in pairs(workspace.Scriptable.Fruits:GetChildren()) do
+        for i, v in pairs(Workspace.Scriptable.Fruits:GetChildren()) do
           if v:IsA('Model') then
             WindUI:Notify({
               Title = "Fruit Notification",
@@ -2216,7 +2236,7 @@ EspTab:Toggle({
             })
           end
         end
-        workspace.Scriptable.Fruits.ChildAdded:Connect(function(fruit)
+        Workspace.Scriptable.Fruits.ChildAdded:Connect(function(fruit)
           if FruitNotify and fruit:IsA('Model') then
             WindUI:Notify({
               Title = "Fruit Notification",
@@ -2234,7 +2254,7 @@ local Button = EspTab:Button({
   Title = "Fast teleport to fruit",
   Locked = false,
   Callback = function()
-    for _, v in pairs(workspace.Scriptable.Fruits:GetChildren()) do
+    for _, v in pairs(Workspace.Scriptable.Fruits:GetChildren()) do
       if v:IsA('Model') then
         Teleport(v, 1, nil,nil,nil)
         return
@@ -2258,7 +2278,7 @@ local Slider = PlayerTab:Slider({
   },
   Callback = function(value)
     local FlySpeed = value
-    local VisualClient = require(game:GetService("Players").LocalPlayer.PlayerGui.Main.MainClient.VisualClient)
+    local VisualClient = require(Players.LocalPlayer.PlayerGui.Main.MainClient.VisualClient)
 
     VisualClient.flightSpeed = FlySpeed
     VisualClient.flameFlight = FlySpeed * 0.35
@@ -2274,7 +2294,7 @@ local Slider = PlayerTab:Slider({
     Default = 16,
   },
   Callback = function(value)
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+    Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
   end
 })
 local Slider = PlayerTab:Slider({
@@ -2287,7 +2307,7 @@ local Slider = PlayerTab:Slider({
     Default = 50,
   },
   Callback = function(value)
-    game.Players.LocalPlayer.Character.Humanoid.JumpPower = value
+    Players.LocalPlayer.Character.Humanoid.JumpPower = value
   end
 })
 PlayerTab:Button({
@@ -2309,14 +2329,14 @@ PlayerTab:Toggle({
 
     if Noclip then
       starter = true
-      for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+      for _, v in pairs(Players.LocalPlayer.Character:GetDescendants()) do
         if v:IsA("BasePart") and v.CanCollide == true then
           task.spawn(function() while Noclip do task.wait() v.CanCollide = false end end)
         end
       end
     else
       if not starter then return end
-      for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+      for _, v in pairs(Players.LocalPlayer.Character:GetDescendants()) do
         if v:IsA("BasePart") and v.CanCollide == false then
           v.CanCollide = true
         end
@@ -2327,7 +2347,7 @@ PlayerTab:Toggle({
 local Button = PlayerTab:Button({
   Title = "Respawn player",
   Callback = function(option)
-    game.Players.LocalPlayer.Character.Humanoid.Health = 0
+    Players.LocalPlayer.Character.Humanoid.Health = 0
   end
 })
 
@@ -2353,7 +2373,7 @@ local Button = ShopTab:Button({
       "BuyBox",
       SelectedChest
     }
-    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+    ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
   end
 })
 ShopTab:Toggle({
@@ -2373,7 +2393,7 @@ ShopTab:Toggle({
           "BuyBox",
           SelectedChest
         }
-        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
         task.wait(.5)
       end
     end)
@@ -2419,7 +2439,7 @@ ShopTab:Toggle({
 				task.wait(1)
 				getgenv().ProtectedChampion = false
 
-				for _,v in ipairs(game.Players.LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List:GetDescendants()) do
+				for _,v in ipairs(Players.LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List:GetDescendants()) do
 					if v:IsA("TextLabel") and v.Name == "ChampionName" then
 						for _,n in ipairs(SelectedChampionsToRoll) do
 							if v.Text == n then
@@ -2433,9 +2453,9 @@ ShopTab:Toggle({
 
 				if getgenv().ProtectedChampion then continue end
 
-				for _,c in ipairs(game.Players.LocalPlayer.Champions:GetChildren()) do
+				for _,c in ipairs(Players.LocalPlayer.Champions:GetChildren()) do
 					if c.Value ~= 1 then
-						game.ReplicatedStorage.Remotes.RemoteEvent:FireServer("SellChamp", c)
+						ReplicatedStorage.Remotes.RemoteEvent:FireServer("SellChamp", c)
 					end
 				end
 			end
@@ -2461,7 +2481,7 @@ ShopTab:Toggle({
 			end
 
 			while getgenv().AutoSellChampionsSettings.Enabled do task.wait(1)
-				for _,v in ipairs(game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List:GetDescendants()) do
+				for _,v in ipairs(Players.LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List:GetDescendants()) do
 					if v:IsA("TextLabel") and v.Name == "ChampionName" then
 						for _,n in ipairs(SelectedChampionsToRoll) do
 							if v.Text == n then
@@ -2478,7 +2498,7 @@ ShopTab:Toggle({
 					end
 				end
 
-				game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainerChamp", GachaSelected)
+				ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainerChamp", GachaSelected)
 			end
 		end)
 	end
@@ -2486,12 +2506,12 @@ ShopTab:Toggle({
 ShopTab:Button({
 	Title = "Lock all champions",
 	Callback = function()
-    for _, v in pairs(game:GetService("Players").LocalPlayer.Champions:GetChildren()) do
+    for _, v in pairs(Players.LocalPlayer.Champions:GetChildren()) do
       local args = {
         "LockChamp",
         v
       }
-      game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+      ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
       wait(1)
     end
 	end
@@ -2520,7 +2540,7 @@ ShopTab:Toggle({
 		if not AutoRollGachaPower then return end
 
 		task.spawn(function()
-      local remote = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction")
+      local remote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteFunction")
       if AutoRollGachaPower then
         while AutoRollGachaPower do task.wait(0.5)
           if SelectedGachaPower == 'Jutsu Leveling' then
@@ -2551,7 +2571,7 @@ local ClassParagraph = ShopTab:Paragraph({
 })
 task.spawn(function()
   local function updateClassDesc()
-    local char = game.Players.LocalPlayer.Character
+    local char = Players.LocalPlayer.Character
     if not char then return end
 
     local hrp = char:FindFirstChild("HumanoidRootPart")
@@ -2582,7 +2602,7 @@ ShopTab:Toggle({
 
 		task.spawn(function()
       while Class do task.wait(2)
-        local Event = game:GetService("ReplicatedStorage").Remotes.RemoteFunction
+        local Event = ReplicatedStorage.Remotes.RemoteFunction
         Event:InvokeServer(
           "Class"
         )
@@ -2626,7 +2646,7 @@ SpecialTab:Toggle({
 
     task.spawn(function()
       while AutoStands do task.wait()
-        local ownedValue = game.Players.LocalPlayer:WaitForChild("Specials"):FindFirstChild('Stands')
+        local ownedValue = Players.LocalPlayer:WaitForChild("Specials"):FindFirstChild('Stands')
         if not ownedValue then return end
         for _, name in pairs(SelectedStands) do
           local id = getgenv().AutoBuySpecials['Stands'][name]
@@ -2640,7 +2660,7 @@ SpecialTab:Toggle({
             return
           end
         end
-        game:GetService('ReplicatedStorage'):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainer", "Stands", 1)
+        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainer", "Stands", 1)
       end
     end)
   end
@@ -2672,7 +2692,7 @@ SpecialTab:Toggle({
 
     task.spawn(function()
       while AutoQuirks do task.wait()
-        local ownedValue = game.Players.LocalPlayer:WaitForChild("Specials"):FindFirstChild('Quirks')
+        local ownedValue = Players.LocalPlayer:WaitForChild("Specials"):FindFirstChild('Quirks')
         if not ownedValue then return end
         for _, name in pairs(SelectedQuirks) do
           local id = getgenv().AutoBuySpecials['Quirks'][name]
@@ -2686,7 +2706,7 @@ SpecialTab:Toggle({
             return
           end
         end
-        game:GetService('ReplicatedStorage'):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainer", "Quirks", 1)
+        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainer", "Quirks", 1)
       end
     end)
   end
@@ -2718,7 +2738,7 @@ SpecialTab:Toggle({
 
     task.spawn(function()
       while AutoKagunes do task.wait()
-        local ownedValue = game.Players.LocalPlayer:WaitForChild("Specials"):FindFirstChild('Kagunes')
+        local ownedValue = Players.LocalPlayer:WaitForChild("Specials"):FindFirstChild('Kagunes')
         if not ownedValue then return end
         for _, name in pairs(SelectedKagunes) do
           local id = getgenv().AutoBuySpecials['Kagunes'][name]
@@ -2732,7 +2752,7 @@ SpecialTab:Toggle({
             return
           end
         end
-        game:GetService('ReplicatedStorage'):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainer", "Kagunes", 1)
+        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainer", "Kagunes", 1)
       end
     end)
   end
@@ -2764,7 +2784,7 @@ SpecialTab:Toggle({
 
     task.spawn(function()
       while AutoGrimoires do task.wait()
-        local ownedValue = game.Players.LocalPlayer:WaitForChild("Specials"):FindFirstChild('Grimoires')
+        local ownedValue = Players.LocalPlayer:WaitForChild("Specials"):FindFirstChild('Grimoires')
         if not ownedValue then return end
         for _, name in pairs(SelectedGrimoires) do
           local id = getgenv().AutoBuySpecials['Grimoires'][name]
@@ -2778,7 +2798,7 @@ SpecialTab:Toggle({
             return
           end
         end
-        game:GetService('ReplicatedStorage'):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainer", "Grimoires", 1)
+        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainer", "Grimoires", 1)
       end
     end)
   end
@@ -2810,7 +2830,7 @@ SpecialTab:Toggle({
 
     task.spawn(function()
       while AutoBloodlines do task.wait()
-        local ownedValue = game.Players.LocalPlayer:WaitForChild("Specials"):FindFirstChild('Bloodlines')
+        local ownedValue = Players.LocalPlayer:WaitForChild("Specials"):FindFirstChild('Bloodlines')
         if not ownedValue then return end
         for _, name in pairs(SelectedBloodlines) do
           local id = getgenv().AutoBuySpecials['Bloodlines'][name]
@@ -2824,7 +2844,7 @@ SpecialTab:Toggle({
             return
           end
         end
-        game:GetService('ReplicatedStorage'):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainer", "Bloodlines", 1)
+        ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("BuyContainer", "Bloodlines", 1)
       end
     end)
   end
@@ -2832,7 +2852,6 @@ SpecialTab:Toggle({
 
 
 task.spawn(function()
-	local Players = game:GetService("Players")
 	local Quests = Players.LocalPlayer.Quests
 
 	local Paragraphs = {}
@@ -2844,7 +2863,7 @@ task.spawn(function()
 
 	local function FindNPC(questName)
 		local target = CleanName(questName):lower()
-		for _, obj in ipairs(workspace.Scriptable.NPC:GetDescendants()) do
+		for _, obj in ipairs(Workspace.Scriptable.NPC:GetDescendants()) do
 			if obj:IsA("Model") and obj.Name:lower():find(target, 1, true) then
 				return obj
 			end
@@ -2957,7 +2976,7 @@ TeleportTab:Button({
   Title = "Teleport to Quest NPC",
   Locked = false,
   Callback = function()
-    for _, v in pairs(workspace.Scriptable.NPC.Quest:GetChildren()) do
+    for _, v in pairs(Workspace.Scriptable.NPC.Quest:GetChildren()) do
       if v:IsA("Model") and v.Name == SelectedQNPC then
         Teleport(v, 1, nil, nil, nil)
       end
@@ -2978,7 +2997,7 @@ TeleportTab:Button({
   Title = "Teleport to Champion NPC",
   Locked = false,
   Callback = function()
-    for _, v in pairs(workspace.Scriptable.NPC.Shops.Champions:GetChildren()) do
+    for _, v in pairs(Workspace.Scriptable.NPC.Shops.Champions:GetChildren()) do
       if v:IsA("Model") and v.Name == SelectedCNPC then
         Teleport(v, 1, nil, nil, nil)
       end
@@ -3001,15 +3020,15 @@ TeleportTab:Button({
   Locked = false,
   Callback = function()
     if SelectedSNPC == "Grimoires" then
-      Teleport(workspace.Scriptable.NPC.Shops.Special.Grimoires["1"], 1, nil, nil, nil)
+      Teleport(Workspace.Scriptable.NPC.Shops.Special.Grimoires["1"], 1, nil, nil, nil)
     elseif SelectedSNPC == "Kagunes" then
-      Teleport(workspace.Scriptable.NPC.Shops.Special.Kagunes["1"], 1, nil, nil, nil)
+      Teleport(Workspace.Scriptable.NPC.Shops.Special.Kagunes["1"], 1, nil, nil, nil)
     elseif SelectedSNPC == "Quirks" then
-      Teleport(workspace.Scriptable.NPC.Shops.Special.Quirks["1"], 1, nil, nil, nil)
+      Teleport(Workspace.Scriptable.NPC.Shops.Special.Quirks["1"], 1, nil, nil, nil)
     elseif SelectedSNPC == "Stands" then
-      Teleport(workspace.Scriptable.NPC.Shops.Special.Stands["1"], 1, nil, nil, nil)
+      Teleport(Workspace.Scriptable.NPC.Shops.Special.Stands["1"], 1, nil, nil, nil)
     elseif SelectedSNPC == "Bloodlines" then
-      Teleport(workspace.Scriptable.NPC.Shops.Special.Bloodlines["1"], 1, nil, nil, nil)
+      Teleport(Workspace.Scriptable.NPC.Shops.Special.Bloodlines["1"], 1, nil, nil, nil)
     end
   end
 })
@@ -3039,7 +3058,7 @@ local Button = TeleportTab:Button({
   Title = "Teleport selected area",
   Locked = false,
   Callback = function()
-    game.Players.LocalPlayer.Character:PivotTo(workspace.Map.TrainingAreas[SelectedArea]:GetPivot())
+    Players.LocalPlayer.Character:PivotTo(Workspace.Map.TrainingAreas[SelectedArea]:GetPivot())
   end
 })
 local Button = TeleportTab:Button({
@@ -3126,16 +3145,14 @@ TeleportTab:Toggle({
 
     task.spawn(function()
       if Spactate then
-        local Players = game:GetService("Players")
-        local Camera = workspace.CurrentCamera
+        local Camera = Workspace.CurrentCamera
         local playerToSpec = SelectedPlayer
         local target = Players:FindFirstChild(playerToSpec)
         if target and target.Character and target.Character:FindFirstChild("Humanoid") then
           Camera.CameraSubject = target.Character:FindFirstChild("Humanoid")
         end
       else
-        local Players = game:GetService("Players")
-        local Camera = workspace.CurrentCamera
+        local Camera = Workspace.CurrentCamera
         local localPlayer = Players.LocalPlayer
         if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then
           Camera.CameraSubject = localPlayer.Character:FindFirstChild("Humanoid")
@@ -3148,7 +3165,7 @@ local Button = TeleportTab:Button({
   Title = "Teleport player",
   Locked = false,
   Callback = function()
-    game.Players.LocalPlayer.Character:PivotTo(game.Players[SelectedPlayer].Character:GetPivot())
+    Players.LocalPlayer.Character:PivotTo(Players[SelectedPlayer].Character:GetPivot())
   end
 })
 local Button = TeleportTab:Button({
@@ -3168,6 +3185,7 @@ local Button = MiscTab:Button({
   Locked = false,
   Callback = function()
     local codes = {
+      '50KCHIKARACODE',
       'SATURDAYBUGSPATCH',
       '175KLIKES',
       '200KLIKES',
@@ -3225,7 +3243,7 @@ local Button = MiscTab:Button({
       '100Favs',
     }
     for _, v in pairs(codes) do
-      game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer(
+      ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer(
         "Code",
         v
       )
@@ -3237,9 +3255,9 @@ local Button = MiscTab:Button({
   Title = "Rejoin server",
   Locked = false,
   Callback = function()
-    game:GetService("TeleportService"):Teleport(
+    TeleportService:Teleport(
       game.PlaceId,
-      game:GetService("Players").LocalPlayer
+      Players.LocalPlayer
     )
   end
 })
@@ -3247,12 +3265,12 @@ local Button = MiscTab:Button({
   Title = "Server Hop",
   Locked = false,
   Callback = function()
-    for _, v in pairs(game:GetService("HttpService"):JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/".. game.PlaceId .."/servers/Public?sortOrder=Asc&limit=100")).data) do
+    for _, v in pairs(HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/".. game.PlaceId .."/servers/Public?sortOrder=Asc&limit=100")).data) do
       if v.playing < v.maxPlayers and v.id ~= game.JobId then
-        game:GetService("TeleportService"):TeleportToPlaceInstance(
+        TeleportService:TeleportToPlaceInstance(
           game.PlaceId,
           v.id,
-          game:GetService("Players").LocalPlayer
+          Players.LocalPlayer
         )
         break
       end
@@ -3263,9 +3281,6 @@ local Button = MiscTab:Button({
   Title = "Rejoin smallest server",
   Locked = false,
   Callback = function()
-    local HttpService = game:GetService("HttpService")
-    local TeleportService = game:GetService("TeleportService")
-    local Players = game:GetService("Players")
     local PlaceId = game.PlaceId
     local JobId = game.JobId
     local function GetServer()
@@ -3299,9 +3314,9 @@ MiscTab:Toggle({
     fps = state
     function UnlockFPS()
       local RefreshRate = 60
-      if game:GetService("UserInputService").TouchEnabled then
+      if UserInputService.TouchEnabled then
           RefreshRate = 120
-      elseif game:GetService("UserInputService").KeyboardEnabled then
+      elseif UserInputService.KeyboardEnabled then
           RefreshRate = 240
       end
       setfpscap(RefreshRate * 2)
@@ -3321,13 +3336,11 @@ MiscTab:Toggle({
 	Callback = function(state)
 		AntiAfk = state
     if AntiAfk then
-      local Players = game:GetService("Players")
-      local VirtualUser = game:GetService("VirtualUser")
       local player = Players.LocalPlayer
       player.Idled:Connect(function()
-          VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+          VirtualUser:Button2Down(Vector2.new(0,0), Workspace.CurrentCamera.CFrame)
           task.wait(1)
-          VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+          VirtualUser:Button2Up(Vector2.new(0,0), Workspace.CurrentCamera.CFrame)
       end)
       if hookmetamethod then
         pcall(function()
@@ -3384,8 +3397,7 @@ MiscTab:Section({
   Title = "Server Information",
 })
 task.spawn(function()
-	local Players = game:GetService("Players")
-	local TeleportService = game:GetService("TeleportService")
+	local TeleportService = TeleportService
 	local LocalPlayer = Players.LocalPlayer
 
 	local Paragraph = MiscTab:Paragraph({
@@ -3453,7 +3465,7 @@ local Button = MiscTab:Button({
   Title = "Join Jobid",
   Locked = false,
   Callback = function()
-    game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, SelectedJobId)
+    TeleportService:TeleportToPlaceInstance(game.PlaceId, SelectedJobId)
   end
 })
 
@@ -3531,7 +3543,7 @@ WebhookTab:Toggle({
           timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
         })
 
-        FruitConnection = workspace.Scriptable.Fruits.ChildAdded:Connect(function(model)
+        FruitConnection = Workspace.Scriptable.Fruits.ChildAdded:Connect(function(model)
           if not Webhook then return end
           if not model:IsA("Model") then return end
 
@@ -3572,7 +3584,7 @@ WebhookTab:Toggle({
           timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
         })
 
-        ChikaraConnection = workspace.Scriptable.ChikaraBoxes.ChildAdded:Connect(function(obj)
+        ChikaraConnection = Workspace.Scriptable.ChikaraBoxes.ChildAdded:Connect(function(obj)
           if not Webhook then return end
           if not obj:IsA("UnionOperation") then return end
 
@@ -3613,7 +3625,7 @@ WebhookTab:Toggle({
           timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
         })
 
-        ChampionConnection = game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List.DescendantAdded:Connect(function(v)
+        ChampionConnection = Players.LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List.DescendantAdded:Connect(function(v)
             if not Webhook then return end
             if not v:IsA("TextLabel") or v.Name ~= "ChampionName" then return end
             for _, n in ipairs(SelectedChampionsToRoll) do
@@ -3653,7 +3665,7 @@ WebhookTab:Toggle({
           timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
         })
 
-        BossConnection = game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List.DescendantAdded:Connect(function(v)
+        BossConnection = Players.LocalPlayer.PlayerGui.Main.Frames.Champions.Container.List.DescendantAdded:Connect(function(v)
           if not Webhook then return end
           if not v:IsA("TextLabel") or v.Name ~= "ChampionName" then return end
           if v.Text == "Riru" or v.Text == "Paien" then
@@ -3690,13 +3702,13 @@ WebhookTab:Toggle({
           timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
         })
 
-        BossDropConnection = game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Boss.Container.Power.Amount:GetPropertyChangedSignal('TextColor3'):Connect(function(v)
+        BossDropConnection = Players.LocalPlayer.PlayerGui.Main.Frames.Boss.Container.Power.Amount:GetPropertyChangedSignal('TextColor3'):Connect(function(v)
           if not Webhook then return end
           SendWebhook({
             title = "🔥 Boss Power Drop Collect",
             color = 0xE67E22,
             fields = {
-              { name = "Power", value = game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Boss.Container.Power.Amount.Text, inline = true },
+              { name = "Power", value = Players.LocalPlayer.PlayerGui.Main.Frames.Boss.Container.Power.Amount.Text, inline = true },
               { name = "Collected By", value = LocalPlayer.Name, inline = true },
               { name = "UserId", value = tostring(LocalPlayer.UserId), inline = true },
               { name = "Server JobId", value = game.JobId, inline = false }
@@ -3814,7 +3826,7 @@ ConfigTab:Paragraph({
 
 
 -- notify
-require(game:GetService("Players").LocalPlayer.PlayerGui.Main.MainClient.Notifications).Notify({
+require(Players.LocalPlayer.PlayerGui.Main.MainClient.Notifications).Notify({
   "<b><font color='rgb(0,255,0)'>InfinityX successfully loaded</font></b>",
   "LevelUp"
 })
