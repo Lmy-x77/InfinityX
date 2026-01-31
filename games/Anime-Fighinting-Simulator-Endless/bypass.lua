@@ -1,4 +1,8 @@
 task.wait(math.huge)
+
+
+
+
 if (not run_on_actor or not getrawmetatable or not setreadonly or not rawset) or identifyexecutor() == "Bunni" or identifyexecutor() == "Velocity" then
   pcall(game.Players.LocalPlayer.Kick, game.Players.LocalPlayer,
     "Your exploit: " .. identifyexecutor() .. " dont support actor functions"
