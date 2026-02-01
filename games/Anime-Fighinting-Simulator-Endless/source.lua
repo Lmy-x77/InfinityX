@@ -904,12 +904,11 @@ Window:CreateTopbarButton(
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
 <font size="20" color="#00FF88"><b>🚀 New Features & Improvements</b></font>
 <font size="15" color="#E0E0E0">
-• <font color="#FFD166"><b>Advanced Bypass System</b></font> – <font size="16">introduced a new bypass method for improved stability and execution.</font>  
-• <font color="#FFD166"><b>Daily Quest Automation</b></font> – <font size="16">added full auto daily quest support with new skill usage.</font>  
-• <font color="#FFD166"><b>Boss Combat Enhancements</b></font> – <font size="16">automatic dodge for boss attacks and improved combat handling.</font>  
-• <font color="#FFD166"><b>Notification Module</b></font> – <font size="16">a redesigned notification system for clearer and more reliable alerts.</font>  
-• <font color="#00FFCC"><b>Kurama System Improvements</b></font> – <font size="16">enhanced auto Kurama logic with fixed teleport and stability issues.</font>  
-• <font color="#00FFCC"><b>Movement & Skill Optimization</b></font> – <font size="16">improved auto teleport, auto skills, and no-lava-damage behavior.</font>  
+• <font color="#FFD166"><b>Config Management System</b></font> – <font size="16">introduced a new Config Manager with full support for saving, loading, auto-loading, and deleting all configurations.</font>  
+• <font color="#FFD166"><b>New UI Theme</b></font> – <font size="16">added a refreshed visual theme for a cleaner and more modern interface.</font>  
+• <font color="#FFD166"><b>Boss Teleport Bypass</b></font> – <font size="16">implemented a bypass allowing safe return teleport after boss encounters.</font>  
+• <font color="#FFD166"><b>Performance Boost</b></font> – <font size="16">added an FPS booster to improve overall game smoothness.</font>  
+• <font color="#00FFCC"><b>Stability & Combat Improvements</b></font> – <font size="16">fixed all config save/load issues and improved the auto-dodge system.</font>  
 </font>
 <font size="15" color="#FFFFFF">━━━━━━━━━━━━━━━━━━━━━━</font>
 ]],
