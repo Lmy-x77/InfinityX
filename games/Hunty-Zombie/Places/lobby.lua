@@ -2443,7 +2443,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Normal' and selectedPlayerSize == '1' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2473,7 +2473,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Normal' and selectedPlayerSize == '2' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2503,7 +2503,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Normal' and selectedPlayerSize == '3' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2533,7 +2533,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Normal' and selectedPlayerSize == '4' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2563,7 +2563,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Normal' and selectedPlayerSize == '5' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2593,7 +2593,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Normal' and selectedPlayerSize == '6' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2619,7 +2619,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Hard' and selectedPlayerSize == '1' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2649,7 +2649,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Hard' and selectedPlayerSize == '2' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2679,7 +2679,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Hard' and selectedPlayerSize == '3' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2709,7 +2709,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Hard' and selectedPlayerSize == '4' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2739,7 +2739,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Hard' and selectedPlayerSize == '5' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2769,7 +2769,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Hard' and selectedPlayerSize == '6' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2795,7 +2795,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '1' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2825,7 +2825,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '2' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2855,7 +2855,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '3' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2885,7 +2885,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '4' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2915,7 +2915,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '5' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2945,7 +2945,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Nightmare' and selectedPlayerSize == '6' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -2971,7 +2971,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Hell' and selectedPlayerSize == '1' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -3001,7 +3001,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Hell' and selectedPlayerSize == '2' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -3031,7 +3031,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Hell' and selectedPlayerSize == '3' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -3061,7 +3061,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Hell' and selectedPlayerSize == '4' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -3091,7 +3091,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Hell' and selectedPlayerSize == '5' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -3121,7 +3121,7 @@ Tabs.AutoLobby:AddToggle("AcrylicToggle", {
         elseif selectedmap == 'Island' and selecteddifficulty == 'Hell' and selectedPlayerSize == '6' then
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosemap)
           wait()
-          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[8])
+          ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.maps:GetChildren()[9])
           wait()
           ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.StartPlaceRedo.Content.iContent.options.buttons.choosediffs)
           wait()
@@ -3181,7 +3181,7 @@ Tabs.AutoRoll:AddSection("[⚔️] - Weapon Roll")
 Tabs.AutoRoll:AddDropdown("InterfaceTheme", {
   Title = "Select weapon",
   KeepSearch = false,
-  Values = { "Baseball", "Axes", 'Pure Hand', 'Guitar', 'Dual Gun', 'Zombie Claws', 'Sledge Hammer', 'Chainsaw', 'Katana', 'Greatsword', 'Scissors', 'Anchor', 'HandFan', 'Shoes', 'Ghost', 'Spinal Blade', 'Wizard', 'Christmas Sword', 'Blindfold', 'Krampus Claw'},
+  Values = { "Baseball", "Axes", 'Pure Hand', 'Guitar', 'Dual Gun', 'Zombie Claws', 'Sledge Hammer', 'Chainsaw', 'Katana', 'Greatsword', 'Scissors', 'Anchor', 'HandFan', 'Shoes', 'Ghost', 'Spinal Blade', 'Wizard', 'Christmas Sword', 'Blindfold', 'Flow', 'Krampus Claw', 'Bald', 'Coyote'},
   Default = "--",
   Callback = function(Value)
     selectedweapon = Value
@@ -3202,7 +3202,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
   Callback = function(Value)
     autoroll = Value
     if autoroll then
-      local spingui = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28]
+      local spingui = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Weapons
       if spingui.Visible == false then
         ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.Hud.Left.Row1.Weapon.Shape.Fill)
         GuiService.GuiNavigationEnabled = false
@@ -3216,7 +3216,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
       wait(1.5)
     end
     while autoroll do task.wait()
-      local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28].Header.Text
+      local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Weapons.Header
       if string.find(string.lower(verify), string.lower(selectedweapon)) then
         Fluent:Notify({
           Title = "Notification",
@@ -3241,7 +3241,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
   Callback = function(Value)
     autorolll = Value
     if autorolll then
-      local spingui = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28]
+      local spingui = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Weapons
       if spingui.Visible == false then
         ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.Hud.Left.Row1.Weapon.Shape.Fill)
         GuiService.GuiNavigationEnabled = false
@@ -3255,7 +3255,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
       wait(1.5)
     end
     while autorolll do task.wait()
-      local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28].Header.Text
+      local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Weapons.Header
       if verify == 'GUITAR' or verify == 'DUAL GUN' or verify == 'ZOMBIE CLAWS' or verify == 'SLEDGE HAMMER' or verify == 'CHAINSAW' then
         Fluent:Notify({
           Title = "Notification",
@@ -3281,7 +3281,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
   Callback = function(Value)
     autorollm = Value
     if autorollm then
-      local spingui = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28]
+      local spingui = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Weapons
       if spingui.Visible == false then
         ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.Hud.Left.Row1.Weapon.Shape.Fill)
         GuiService.GuiNavigationEnabled = false
@@ -3295,7 +3295,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
       wait(1.5)
     end
     while autorollm do task.wait()
-      local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28].Header.Text
+      local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Weapons.Header
       if verify == 'KATANA' or verify == 'GREATSWORD' or verify == 'SCISSORS' or verify == 'ANCHOR' or verify == 'HANDFAN' then
         Fluent:Notify({
           Title = "Notification",
@@ -3320,7 +3320,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
   Callback = function(Value)
     autorolld = Value
     if autorolld then
-      local spingui = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28]
+      local spingui = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Weapons
       if spingui.Visible == false then
         ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.Hud.Left.Row1.Weapon.Shape.Fill)
         GuiService.GuiNavigationEnabled = false
@@ -3334,7 +3334,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
       wait(1.5)
     end
     while autorolld do task.wait()
-      local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28].Header.Text
+      local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Weapons.Header
       if verify == 'SHOES' or verify == 'GHOST' or verify == 'SPINAL BLADE' or verify == 'WIZARD' then
         Fluent:Notify({
           Title = "Notification",
@@ -3360,7 +3360,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
   Callback = function(Value)
     autorolld = Value
     if autorolld then
-      local spingui = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28]
+      local spingui = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Weapons
       if spingui.Visible == false then
         ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.Hud.Left.Row1.Weapon.Shape.Fill)
         GuiService.GuiNavigationEnabled = false
@@ -3374,8 +3374,8 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
       wait(1.5)
     end
     while autorolld do task.wait()
-      local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI:GetChildren()[28].Header.Text
-      if verify == 'BLINDFOLD' or verify == 'KRAMPUS CLAW' then
+      local verify = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Weapons.Header
+      if verify == 'BLINDFOLD' or verify == 'FLOW' or verify == 'KRAMPUS CLAW' or verify == 'BALD' or verify == 'COYOTE' then
         Fluent:Notify({
           Title = "Notification",
           Content = "The weapon: " .. verify .. ' has been collected',
@@ -3398,7 +3398,7 @@ Tabs.AutoRoll:AddSection("[⭐] - Perks Roll")
 Tabs.AutoRoll:AddDropdown("InterfaceTheme", {
   Title = "Select perk",
   KeepSearch = false,
-  Values = { "Berserker", "Healer", "Flame", "Critical", "Undead", "Lasthope", "Andrenaline", "Vampire", "DoubleDmg", "DamageShield", "Joker", "Overload" },
+  Values = { "Berserker", "Healer", "Flame", "Critical", "Undead", "Lasthope", "Andrenaline", "Vampire", "DoubleDmg", "DamageShield", "Joker", "Overload", "LimitBreaker" },
   Default = "--",
   Callback = function(Value)
     selectedperk = Value
@@ -3419,7 +3419,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
   Callback = function(Value)
     pautoroll = Value
     if pautoroll then
-      local perkgui = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin
+      local perkgui = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Perks
       if perkgui.Visible == false then
         ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.Hud.Left.Row1.Perks.Shape.Fill)
         GuiService.GuiNavigationEnabled = false
@@ -3433,7 +3433,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
       wait(1.5)
     end
     while pautoroll do task.wait()
-      local verifyp = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin.Header.Text
+      local verifyp = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Perks.Header.Text
       if string.find(string.lower(verifyp), string.lower(selectedperk)) then
         Fluent:Notify({
           Title = "Notification",
@@ -3459,7 +3459,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
   Callback = function(Value)
     pautorolll = Value
     if pautorolll then
-      local perkgui = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin
+      local perkgui = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Perks
       if perkgui.Visible == false then
         ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.Hud.Left.Row1.Perks.Shape.Fill)
         GuiService.GuiNavigationEnabled = false
@@ -3473,7 +3473,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
       wait(1.5)
     end
     while pautorolll do task.wait()
-      local verifyp = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin.Header.Text
+      local verifyp = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Perks.Header.Text
       if verifyp == 'CRITICAL' or verifyp == 'UNDEAD' or verifyp == 'LASTHOPE' or verifyp == 'ADRENALINE' then
         Fluent:Notify({
           Title = "Notification",
@@ -3499,7 +3499,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
   Callback = function(Value)
     pautorollm = Value
     if pautorollm then
-      local perkgui = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin
+      local perkgui = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Perks
       if perkgui.Visible == false then
         ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.Hud.Left.Row1.Perks.Shape.Fill)
         GuiService.GuiNavigationEnabled = false
@@ -3513,7 +3513,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
       wait(1.5)
     end
     while pautorollm do task.wait()
-      local verifyp = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin.Header.Text
+      local verifyp = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Perks.Header.Text
       if verifyp == 'VAMPIRE' or verifyp == 'DOUBLEDMG' or verifyp == 'DAMAGESHIELD' then
         Fluent:Notify({
           Title = "Notification",
@@ -3539,7 +3539,7 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
   Callback = function(Value)
     pautorollm = Value
     if pautorollm then
-      local perkgui = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin
+      local perkgui = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Perks
       if perkgui.Visible == false then
         ClickGuiNavigation(game:GetService("Players").LocalPlayer.PlayerGui.GUI.Hud.Left.Row1.Perks.Shape.Fill)
         GuiService.GuiNavigationEnabled = false
@@ -3553,13 +3553,12 @@ Tabs.AutoRoll:AddToggle("TransparentToggle", {
       wait(1.5)
     end
     while pautorollm do task.wait()
-      local verifyp = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin.Header.Text
-      if verifyp == 'JOKER' or verifyp == 'OVERLOAD' then
+      local verifyp = game:GetService("Players").LocalPlayer.PlayerGui.GUI.Spin_Perks.Header.Text
+      if verifyp == 'JOKER' or verifyp == 'OVERLOAD' or verifyp == 'LIMITBREAKER' then
         Fluent:Notify({
           Title = "Notification",
           Content = "The perk: " .. verifyp .. ' has been collected',
           Duration = 5,
-
         })
         return
       else
@@ -3808,12 +3807,9 @@ Tabs.Misc:AddButton({
   Title = "Reedem all codes",
   Callback = function()
     local codes = {
-      "FLOWUPDATE",
-      "FLOWUPDATE2",
-      "ALMOSTCHRISTMASEVE",
-      "ALMOSTCHRISTMASEVE2",
-      "ALMOSTCHRISTMASEVE3",
-      "ALMOSTCHRISTMASEVE4"
+      "DUNGEON",
+      "DUNGEON",
+      "LETSGOOO",
     }
     local remote = game:GetService("ReplicatedStorage"):WaitForChild("Packets"):WaitForChild("RedeemCode")
     for _, code in ipairs(codes) do
