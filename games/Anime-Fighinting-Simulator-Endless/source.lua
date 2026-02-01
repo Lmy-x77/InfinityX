@@ -67,6 +67,7 @@ pcall(function() getgenv().BYPASS_LOADED = true end)
 
 
 -- variables
+local Champions = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/modules/Champions.lua"))()
 local SkillKeys = { "Z","X","C","E","R","T","Y","U","F","G","H","J","K","L","V","B","N","M" }
 local SelectedSkills = {}
 getgenv().StatsFarm = { Delay = false, EquipBestChampion = false }
@@ -145,58 +146,6 @@ function Teleport(path : Instance, method : number, x,y,z)
       end
     end
   end
-end
-local Champions = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/modules/Champions.lua"))()
-local LastEquipped
-local LastStat
-local LastSummon = 0
-local SUMMON_COOLDOWN = 1.2
-local function CanSummon()
-  return os.clock() - LastSummon >= SUMMON_COOLDOWN
-end
-local function Summon(champ)
-  if not CanSummon() then return end
-  LastSummon = os.clock()
-
-  ReplicatedStorage.Remotes.RemoteFunction:InvokeServer(
-    "SummonChamp",
-    champ
-  )
-end
-local function EquipBestChampion(statId)
-  if not getgenv().StatsFarm.EquipBestChampion then return end
-
-  local player = Players.LocalPlayer
-  local char = player.Character
-  if not char then return end
-
-  local bestId, bestValue = nil, 0
-
-  for _, v in pairs(player.Champions:GetChildren()) do
-    local id = v.Name
-    local data = Champions[id]
-
-    if data and data.Abilities and data.Abilities.AutoTrainer then
-      local value = data.Abilities.AutoTrainer[tostring(statId)]
-      if value and value > bestValue then
-        bestValue = value
-        bestId = id
-      end
-    end
-  end
-
-  if not bestId then return end
-
-  if LastStat ~= statId then
-    LastStat = statId
-    LastEquipped = nil
-    return
-  end
-
-  if LastEquipped == bestId then return end
-
-  Summon(player.Champions[bestId])
-  LastEquipped = bestId
 end
 function GetQuestNpc()
   local npcs = {}
@@ -298,7 +247,7 @@ local Areas = {
 		{1e7,1e8,{nil,2,-2245,617,533}},
 		{1e8,1e9,{nil,2,-42,65,-1248}},
 		{1e9,1e11,{nil,2,721,149,925}},
-		{1e11,5e12,{nil,2,1842,139,96}},
+		{1e11,5e12,{nil,2,1855,150,93}},
 		{5e12,2.5e14,{nil,2,621,662,413}},
 		{2.5e14,5e16,{nil,2,4289,163,-601}},
 		{5e16,1e18,{nil,2,798,231,-1004}},
@@ -589,6 +538,57 @@ function FarmDailyStatOrIncrement(Q)
 		end
 	end
 end
+local LastEquipped
+local LastStat
+local LastSummon = 0
+local SUMMON_COOLDOWN = 1.2
+local function CanSummon()
+  return os.clock() - LastSummon >= SUMMON_COOLDOWN
+end
+local function Summon(champ)
+  if not CanSummon() then return end
+  LastSummon = os.clock()
+
+  ReplicatedStorage.Remotes.RemoteFunction:InvokeServer(
+    "SummonChamp",
+    champ
+  )
+end
+local function EquipBestChampion(statId)
+  if not getgenv().StatsFarm.EquipBestChampion then return end
+
+  local player = Players.LocalPlayer
+  local char = player.Character
+  if not char then return end
+
+  local bestId, bestValue = nil, 0
+
+  for _, v in pairs(player.Champions:GetChildren()) do
+    local id = v.Name
+    local data = Champions[id]
+
+    if data and data.Abilities and data.Abilities.AutoTrainer then
+      local value = data.Abilities.AutoTrainer[tostring(statId)]
+      if value and value > bestValue then
+        bestValue = value
+        bestId = id
+      end
+    end
+  end
+
+  if not bestId then return end
+
+  if LastStat ~= statId then
+    LastStat = statId
+    LastEquipped = nil
+    return
+  end
+
+  if LastEquipped == bestId then return end
+
+  Summon(player.Champions[bestId])
+  LastEquipped = bestId
+end
 local arenaPart
 local TeleportSafeZone = false
 getgenv().IsDodging = false
@@ -693,6 +693,18 @@ function CreateSafeZone()
       ]]
       label.TextStrokeTransparency = 0.2
       label.TextStrokeColor3 = Color3.fromRGB(20, 0, 40)
+  end
+end
+local cancel = false
+function ReturnTeleportBossBypass()
+  if not cancel then
+    local InZone = require(game:GetService("ReplicatedStorage").Modules.InZone);
+    for i,v in pairs(InZone) do
+      if type(v) == "function" and i == "BossZone" then
+        hookfunction(v, function() end)
+      end
+    end
+    cancel = true
   end
 end
 function FarmBossQuest()
@@ -845,14 +857,14 @@ end
 WindUI:AddTheme({
   Name = "InfinityX",
 
-  Accent = Color3.fromHex("#6c1bb9"),
-  Dialog = Color3.fromHex("#160729"),
-  Outline = Color3.fromHex("#fca5a5"),
-  Text = Color3.fromHex("#fef2f2"),
-  Placeholder = Color3.fromHex("#6f757b"),
-  Background = Color3.fromHex("#0c0404"),
-  Button = Color3.fromHex("9F2ED1"),
-  Icon = Color3.fromHex("#9F2ED1"),
+  Accent = Color3.fromHex("#A855F7"),
+  Dialog = Color3.fromHex("#12071C"),
+  Outline = Color3.fromHex("#3B1E5C"),
+  Text = Color3.fromHex("#F8F7FF"),
+  Placeholder = Color3.fromHex("#B3A6D6"),
+  Background = Color3.fromHex("#08040F"),
+  Button = Color3.fromHex("#7C3AED"),
+  Icon = Color3.fromHex("#C084FC"),
 })
 local Window = WindUI:CreateWindow({
   Title = "InfinityX",
@@ -1074,7 +1086,7 @@ AutoFarmTab:Toggle({
   Desc = "Auto-farm death causes a teleport delay.",
   Icon = "check",
   Type = "Checkbox",
-  Flag = "StatFarm",
+  Flag = "DelayOnDeadToggle",
   Value = false,
   Callback = function(state)
     getgenv().StatsFarm.Delay = state
@@ -1085,7 +1097,7 @@ AutoFarmTab:Toggle({
   Desc = "Auto-equips the best champion for the selected stat/area. Unequip your current champion to enable.",
   Icon = "check",
   Type = "Checkbox",
-  Flag = "StatFarm",
+  Flag = "AutoEquipBestChampionToggle",
   Value = false,
   Callback = function(state)
     getgenv().StatsFarm.EquipBestChampion = state
@@ -1154,12 +1166,21 @@ local Button = AutoFarmTab:Button({
     end
 
     local weakList = table.concat(WeakerPlayers, ", ")
-    WindUI:Notify({
-      Title = "Notification",
-      Content = '<font size="18">The weakest players before you are: <font color="#4CAF50"><b>' .. weakList .. '</b></font></font>',
-      Duration = 5,
-      Icon = "bell-ring",
-    })
+    if #WeakerPlayers == 0 then
+      WindUI:Notify({
+        Title = "Notification",
+        Content = '<font size="18">You are the weakest player on the server, lol.</font>',
+        Duration = 5,
+        Icon = "bell-ring",
+      })
+    else
+      WindUI:Notify({
+        Title = "Notification",
+        Content = '<font size="18">The weakest players before you are: <font color="#4CAF50"><b>' .. weakList .. '</b></font></font>',
+        Duration = 5,
+        Icon = "bell-ring",
+      })
+    end
   end
 })
 local Button = AutoFarmTab:Button({
@@ -1299,9 +1320,11 @@ AutoFarmTab:Toggle({
 
 			local dodging = false
 
-			while AutoDodge do
-				task.wait(0.1)
+      if AutoDodge and hookfunction and require then
+        ReturnTeleportBossBypass()
+      end
 
+			while AutoDodge do task.wait()
 				local char = lp.Character
 				if not char then continue end
 
@@ -3394,6 +3417,20 @@ MiscTab:Toggle({
     end
   end
 })
+MiscTab:Toggle({
+  Title = "FPS Booster",
+  Icon = "check",
+  Type = "Checkbox",
+  Flag = "FPSBoosterToggle",
+  Value = false,
+  Callback = function(state)
+    FpsBoost = state
+    if FpsBoost then
+      local FpsBooster = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/modules/FpsBooster.lua"))()
+      FpsBooster:Apply()
+    end
+  end
+})
 local AntiAfkConn
 MiscTab:Toggle({
 	Title = "Anti Afk",
@@ -3791,88 +3828,110 @@ WebhookTab:Toggle({
 })
 
 
+local ConfigManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/modules/ConfigManager.lua"))()
+ConfigManager:Init(Window)
 local Section = ConfigTab:Section({
-  Title = "Save Configuration",
+	Title = "Save Configuration",
 })
-local ConfigManager = Window.ConfigManager
 local ConfigName = "default"
 local ConfigNameInput = ConfigTab:Input({
-  Title = "Config Name",
-  Icon = "file-cog",
-  Callback = function(value)
-    ConfigName = value
-  end
+	Title = "Config Name",
+	Icon = "file-cog",
+	Locked = false,
+	Callback = function(v)
+		ConfigName = v
+	end
 })
--- ConfigTab:Space()
--- local AutoLoadToggle = ConfigTab:Toggle({
---   Title = "Enable Auto Load to Selected Config",
---   Value = false,
---   Callback = function(v)
---     local cfg = ConfigManager:GetConfig(ConfigName)
---     if cfg then
---       cfg:SetAutoLoad(v)
---     end
---   end
--- })
+ConfigTab:Space()
+local AutoLoadToggle = ConfigTab:Toggle({
+	Title = "Enable Auto Load to Selected Config",
+	Value = false,
+	Locked = false,
+	Callback = function(v)
+		local cfg = ConfigManager:GetConfig(ConfigName)
+		if cfg then
+			cfg:SetAutoLoad(v)
+		end
+	end
+})
 ConfigTab:Space()
 local function RefreshConfigs()
-  local all = ConfigManager:AllConfigs()
-  AllConfigsDropdown:Refresh(all)
+	local all = ConfigManager:AllConfigs()
+	AllConfigsDropdown:Refresh(all)
 end
 local AllConfigs = ConfigManager:AllConfigs()
 local DefaultValue = table.find(AllConfigs, ConfigName) and ConfigName or nil
 AllConfigsDropdown = ConfigTab:Dropdown({
-  Title = "All Configs",
-  Desc = "Select existing configs",
-  Values = AllConfigs,
-  Value = DefaultValue,
-  Callback = function(value)
-    ConfigName = value
-    ConfigNameInput:Set(value)
+	Title = "All Configs",
+	Desc = "Select existing configs",
+	Values = AllConfigs,
+	Value = DefaultValue,
+	Locked = false,
+	Callback = function(value)
+		ConfigName = value
+		ConfigNameInput:Set(value)
 
-    local cfg = ConfigManager:GetConfig(value)
-    AutoLoadToggle:Set(cfg and cfg.AutoLoad or false)
-  end
+		local cfg = ConfigManager:GetConfig(value)
+		AutoLoadToggle:Set(cfg and cfg.AutoLoad or false)
+	end
 })
 ConfigTab:Space()
 ConfigTab:Button({
-  Title = "Load Config",
-  Justify = "Center",
-  Callback = function()
-    local cfg = ConfigManager:CreateConfig(ConfigName)
-    if cfg:Load() then
-      Window.CurrentConfig = cfg
-      WindUI:Notify({
-        Title = "Config Loaded",
-        Desc = "Config '" .. ConfigName .. "' loaded",
-        Icon = "refresh-cw",
-      })
-    end
-  end
+	Title = "Load Config",
+	Justify = "Center",
+	Locked = false,
+	Callback = function()
+		local cfg = ConfigManager:GetConfig(ConfigName) or ConfigManager:CreateConfig(ConfigName)
+		if cfg:Load() then
+			Window.CurrentConfig = cfg
+			WindUI:Notify({
+				Title = "Config Loaded",
+				Desc = "Config '" .. ConfigName .. "' loaded",
+				Icon = "refresh-cw",
+			})
+		end
+	end
 })
 ConfigTab:Space()
 ConfigTab:Button({
-  Title = "Save Config",
-  Justify = "Center",
-  Callback = function()
-    local cfg = ConfigManager:Config(ConfigName)
-    if cfg:Save() then
-      WindUI:Notify({
-        Title = "Config Saved",
-        Desc = "Config '" .. ConfigName .. "' saved",
-        Icon = "check",
-      })
+	Title = "Save Config",
+	Justify = "Center",
+	Locked = false,
+	Callback = function()
+		local cfg = ConfigManager:CreateConfig(ConfigName)
+		if cfg:Save() then
+			WindUI:Notify({
+				Title = "Config Saved",
+				Desc = "Config '" .. ConfigName .. "' saved",
+				Icon = "check",
+			})
+		end
+		RefreshConfigs()
+	end
+})
+ConfigTab:Space()
+ConfigTab:Button({
+	Title = "Delete All Configs",
+	Justify = "Center",
+	Locked = false,
+	Callback = function()
+    local folder = "WindUI/InfinityX/Settings/config"
+    if isfolder(folder) then
+      for _, path in ipairs(listfiles(folder)) do
+        delfile(path)
+      end
     end
     RefreshConfigs()
-  end
+	end
 })
 ConfigTab:Space()
 ConfigTab:Button({
-  Title = "Print AutoLoad Configs",
-  Justify = "Center",
-  Callback = function()
-    print(HttpService:JSONDecode(ConfigManager:GetAutoLoadConfigs()))
-  end
+	Title = "Print AutoLoad Configs",
+	Justify = "Center",
+	Locked = false,
+	Callback = function()
+		print(ConfigManager:GetAutoLoadConfigs())
+	end
 })
 ConfigTab:Section({
   Title = "Join our Discord server!",
