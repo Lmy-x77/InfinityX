@@ -698,7 +698,7 @@ end
 local cancel = false
 function ReturnTeleportBossBypass()
   if not cancel then
-    local InZone = require(game:GetService("ReplicatedStorage").Modules.InZone);
+    local InZone = require(ReplicatedStorage.Modules.InZone);
     for i,v in pairs(InZone) do
       if type(v) == "function" and i == "BossZone" then
         hookfunction(v, function() end)
