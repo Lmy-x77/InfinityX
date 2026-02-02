@@ -870,7 +870,7 @@ local Window = WindUI:CreateWindow({
   Title = "InfinityX",
   Author = "Anime Fighinting Simulator",
   Folder = "InfinityX/Settings",
-  Icon = "rbxassetid://72212320253117",
+  Icon = "rbxassetid://90772127577731",
   Theme = "InfinityX",
   NewElements = true,
   Size = UDim2.fromOffset(680, 580),
@@ -880,12 +880,12 @@ local Window = WindUI:CreateWindow({
 })
 Window:EditOpenButton({
   Title = ".gg/emKJgWMHAr",
-  Icon = "rbxassetid://72212320253117",
+  Icon = "rbxassetid://90772127577731",
   CornerRadius = UDim.new(0,16),
   StrokeThickness = 2,
   Color = ColorSequence.new(
-    Color3.fromRGB(129, 63, 214),
-    Color3.fromRGB(63, 61, 204)
+    Color3.fromRGB(146, 84, 228),
+    Color3.fromRGB(99, 61, 204)
   ),
   OnlyMobile = false,
   Enabled = true,
