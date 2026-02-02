@@ -549,11 +549,7 @@ end
 local function Summon(champ)
   if not CanSummon() then return end
   LastSummon = os.clock()
-
-  ReplicatedStorage.Remotes.RemoteFunction:InvokeServer(
-    "SummonChamp",
-    champ
-  )
+  ReplicatedStorage.Remotes.RemoteFunction:InvokeServer("SummonChamp", champ)
 end
 local function EquipBestChampion(statId)
   if not getgenv().StatsFarm.EquipBestChampion then return end
@@ -579,16 +575,22 @@ local function EquipBestChampion(statId)
 
   if not bestId then return end
 
-  if LastStat ~= statId then
+  local equippedObj = player:FindFirstChild("ChampionEquipped")
+  local currentlyEquipped = equippedObj and equippedObj.Value
+
+  if currentlyEquipped == bestId then
+    LastEquipped = bestId
     LastStat = statId
-    LastEquipped = nil
     return
   end
 
-  if LastEquipped == bestId then return end
+  if currentlyEquipped and player.Champions:FindFirstChild(currentlyEquipped) then
+    Summon(player.Champions[currentlyEquipped])
+  end
 
   Summon(player.Champions[bestId])
   LastEquipped = bestId
+  LastStat = statId
 end
 local arenaPart
 getgenv().IsDodging = false
@@ -1073,16 +1075,17 @@ AutoFarmTab:Toggle({
     end
 
     task.spawn(function()
-      while AutoFarm do task.wait()
+      while AutoFarm do
+        task.wait()
         local char = Players.LocalPlayer.Character
         local hum = char and char:FindFirstChildOfClass("Humanoid")
 
         if (not hum or hum.Health <= 0) and getgenv().StatsFarm.Delay then
-            task.wait(6)
-            repeat task.wait()
-                char = Players.LocalPlayer.Character
-                hum = char and char:FindFirstChildOfClass("Humanoid")
-            until (hum and hum.Health > 0) or not AutoFarm
+          task.wait(6)
+          repeat task.wait()
+            char = Players.LocalPlayer.Character
+            hum = char and char:FindFirstChildOfClass("Humanoid")
+          until (hum and hum.Health > 0) or not AutoFarm
         end
 
         local statId = StatMap[SelectedStat]
