@@ -1897,9 +1897,6 @@ AutoFarmTab:Toggle({
     end)
 	end
 })
-AutoFarmTab:Section({ 
-  Title = "Chikara / Fruit Farming",
-})
 AutoFarmTab:Toggle({
   Title = "Auto collect dragon orb",
   Desc = "Collect all the dragon orb that appears",
@@ -1938,49 +1935,8 @@ This feature requires full ClickDetector interaction support. Please switch to a
     end)
   end
 })
-AutoFarmTab:Toggle({
-  Title = "Auto collect fruit",
-  Desc = "Collect all the fruit that appears",
-  Icon = "check",
-  Type = "Checkbox",
-  Flag = "AutoFruit",
-  Value = false,
-  Callback = function(state)
-    Fruit = state
-
-    if not Fruit then return end
-    if not fireclickdetector then
-      WindUI:Notify({
-        Title = "<font size='14'><b>Executor Compatibility Warning</b></font>",
-        Content = [[
-<font size='14' color='#FF6B6B'><b>Unsupported Function Detected</b></font>
-
-<font size='14' color='#E0E0E0'>
-The executor you are currently using does not support the function
-</font>
-<font size='12' color='#FFD166'><b>fireclickdetector()</b></font>
-<font size='11' color='#E0E0E0'>
-This feature requires full ClickDetector interaction support. Please switch to a compatible executor to ensure proper functionality and avoid unexpected behavior.
-</font>
-        ]],
-        Duration = 10,
-        Icon = "bell-ring",
-      })
-      return
-    end
-
-    task.spawn(function()
-      while Fruit do task.wait()
-        for _, v in pairs(Workspace.Scriptable.Fruits:GetDescendants()) do
-          if v:IsA('ClickDetector') and v.Name == 'ClickDetector' then
-            fireclickdetector(v)
-            wait(2)
-            break
-          end
-        end
-      end
-    end)
-  end
+AutoFarmTab:Section({ 
+  Title = "Chikara Farming",
 })
 AutoFarmTab:Toggle({
   Title = "Auto collect chikara box",
@@ -2075,6 +2031,131 @@ AutoFarmTab:Toggle({
   Value = true,
   Callback = function(state)
     getgenv().AfkFarmSettings.Desync = state
+  end
+})
+AutoFarmTab:Section({ 
+  Title = "Fruit Farming",
+})
+AutoFarmTab:Dropdown({
+	Title = "Select fruit",
+	Values = {"Explosive Fruit","Rubber Fruit","Thunder Fruit","Quake Fruit","Dark Fruit","Light Fruit"},
+  Desc = "Select the fruits you want to auto collect",
+	Multi = true,
+	AllowNone = true,
+  Flag = "FruitSniperDropdown",
+	Callback = function(options)
+    FruitSniped = options
+	end
+})
+AutoFarmTab:Toggle({
+	Title = "Auto collect selected fruit",
+	Desc = "Collect selected fruit that appears",
+	Icon = "check",
+	Type = "Checkbox",
+	Flag = "AutoSelectedFruit",
+	Value = false,
+	Callback = function(state)
+		SFruit = state
+
+		if not SFruit then return end
+    if not fireclickdetector then
+      WindUI:Notify({
+        Title = "<font size='14'><b>Executor Compatibility Warning</b></font>",
+        Content = [[
+<font size='14' color='#FF6B6B'><b>Unsupported Function Detected</b></font>
+
+<font size='14' color='#E0E0E0'>
+The executor you are currently using does not support the function
+</font>
+<font size='12' color='#FFD166'><b>fireclickdetector()</b></font>
+<font size='11' color='#E0E0E0'>
+This feature requires full ClickDetector interaction support. Please switch to a compatible executor to ensure proper functionality and avoid unexpected behavior.
+</font>
+        ]],
+        Duration = 10,
+        Icon = "bell-ring",
+      })
+      return
+    end
+
+		local FruitsFolder = Workspace:WaitForChild("Scriptable"):WaitForChild("Fruits")
+
+		local function matchFruit(model)
+			for _,v in pairs(FruitSniped or {}) do
+				if string.find(string.lower(model.Name), string.lower(v)) then
+					return true
+				end
+			end
+		end
+
+		local function collect(fruit)
+			for _,d in pairs(fruit:GetDescendants()) do
+				if d:IsA("ClickDetector") then
+					fireclickdetector(d)
+					break
+				end
+			end
+		end
+
+		task.spawn(function()
+			FruitsFolder.ChildAdded:Connect(function(fruit)
+				if SFruit and fruit:IsA("Model") and matchFruit(fruit) then
+					collect(fruit)
+				end
+			end)
+
+			while SFruit do task.wait()
+				for _,fruit in pairs(FruitsFolder:GetChildren()) do
+					if fruit:IsA("Model") and matchFruit(fruit) then
+						collect(fruit)
+					end
+				end
+			end
+		end)
+	end
+})
+AutoFarmTab:Toggle({
+  Title = "Auto collect all fruit",
+  Desc = "Collect all the fruit that appears",
+  Icon = "check",
+  Type = "Checkbox",
+  Flag = "AutoFruit",
+  Value = false,
+  Callback = function(state)
+    Fruit = state
+
+    if not Fruit then return end
+    if not fireclickdetector then
+      WindUI:Notify({
+        Title = "<font size='14'><b>Executor Compatibility Warning</b></font>",
+        Content = [[
+<font size='14' color='#FF6B6B'><b>Unsupported Function Detected</b></font>
+
+<font size='14' color='#E0E0E0'>
+The executor you are currently using does not support the function
+</font>
+<font size='12' color='#FFD166'><b>fireclickdetector()</b></font>
+<font size='11' color='#E0E0E0'>
+This feature requires full ClickDetector interaction support. Please switch to a compatible executor to ensure proper functionality and avoid unexpected behavior.
+</font>
+        ]],
+        Duration = 10,
+        Icon = "bell-ring",
+      })
+      return
+    end
+
+    task.spawn(function()
+      while Fruit do task.wait()
+        for _, v in pairs(Workspace.Scriptable.Fruits:GetDescendants()) do
+          if v:IsA('ClickDetector') and v.Name == 'ClickDetector' then
+            fireclickdetector(v)
+            wait(2)
+            break
+          end
+        end
+      end
+    end)
   end
 })
 
