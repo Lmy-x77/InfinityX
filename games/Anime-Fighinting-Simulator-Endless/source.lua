@@ -4,17 +4,18 @@
 
 -- services
 pcall(function() assert(cloneref or game.Players.LocalPlayer:Kick("Your exploit doesn't support cloneref")) end)
-local Workspace = cloneref(game:GetService("Workspace"));
-local Players = cloneref(game:GetService("Players"));
-local ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"));
-local ReplicatedFirst = cloneref(game:GetService("ReplicatedFirst"));
-local TweenService = cloneref(game:GetService("TweenService"));
-local RunService = cloneref(game:GetService("RunService"));
-local TeleportService = cloneref(game:GetService("TeleportService"));
-local HttpService = cloneref(game:GetService("HttpService"));
-local VirtualUser = cloneref(game:GetService("VirtualUser"));
-local UserInputService = cloneref(game:GetService("UserInputService"));
-local VirtualInputManager = cloneref(game:GetService("VirtualInputManager"));
+local Workspace                = cloneref(game:GetService("Workspace"));
+local Players                  = cloneref(game:GetService("Players"));
+local ReplicatedStorage        = cloneref(game:GetService("ReplicatedStorage"));
+local ReplicatedFirst          = cloneref(game:GetService("ReplicatedFirst"));
+local TweenService             = cloneref(game:GetService("TweenService"));
+local RunService               = cloneref(game:GetService("RunService"));
+local TeleportService          = cloneref(game:GetService("TeleportService"));
+local HttpService              = cloneref(game:GetService("HttpService"));
+local VirtualUser              = cloneref(game:GetService("VirtualUser"));
+local UserInputService         = cloneref(game:GetService("UserInputService"));
+local VirtualInputManager      = cloneref(game:GetService("VirtualInputManager"));
+
 
 
 -- detect service
@@ -590,7 +591,6 @@ local function EquipBestChampion(statId)
   LastEquipped = bestId
 end
 local arenaPart
-local TeleportSafeZone = false
 getgenv().IsDodging = false
 function createArena()
 	arenaPart = Workspace.Scriptable.BossArena:FindFirstChild("InArena")
@@ -651,6 +651,8 @@ local function farmKurama(mode)
 		hrp.CFrame = bossHRP.CFrame * CFrame.new(0, 50, 0)
 	elseif mode == "Bottom" then
 		hrp.CFrame = bossHRP.CFrame * CFrame.new(0, -10, 0)
+	elseif mode == "Back" then
+		hrp.CFrame = bossHRP.CFrame * CFrame.new(0, 0, 50)
 	elseif mode == "Center" then
 		hrp.CFrame = bossHRP.CFrame
 	else
@@ -663,36 +665,36 @@ local function farmKurama(mode)
 end
 function CreateSafeZone()
   if not Workspace.Scriptable.BossArena:FindFirstChild('SafeZone') then
-      local SafeZone = Instance.new("Part", Workspace.Scriptable.BossArena)
-      SafeZone.Position = Vector3.new(1933, 3283, 1119)
-      SafeZone.Name = "SafeZone"
-      SafeZone.Size = Vector3.new(10, 1, 10)
-      SafeZone.Transparency = 0.35
-      SafeZone.Anchored = true
-      SafeZone.CanCollide = true
-      SafeZone.Material = Enum.Material.SmoothPlastic
-      SafeZone.Color = Color3.fromRGB(120, 70, 200)
+    local SafeZone = Instance.new("Part", Workspace.Scriptable.BossArena)
+    SafeZone.Position = Vector3.new(1933, 3283, 1119)
+    SafeZone.Name = "SafeZone"
+    SafeZone.Size = Vector3.new(10, 1, 10)
+    SafeZone.Transparency = 0.35
+    SafeZone.Anchored = true
+    SafeZone.CanCollide = true
+    SafeZone.Material = Enum.Material.SmoothPlastic
+    SafeZone.Color = Color3.fromRGB(120, 70, 200)
 
-      local gui = Instance.new("BillboardGui", SafeZone)
-      gui.Name = "SafeZoneGui"
-      gui.Size = UDim2.fromScale(7, 2.5)
-      gui.StudsOffset = Vector3.new(0, 4, 0)
-      gui.AlwaysOnTop = true
-      gui.MaxDistance = 300
+    local gui = Instance.new("BillboardGui", SafeZone)
+    gui.Name = "SafeZoneGui"
+    gui.Size = UDim2.fromScale(7, 2.5)
+    gui.StudsOffset = Vector3.new(0, 4, 0)
+    gui.AlwaysOnTop = true
+    gui.MaxDistance = 300
 
-      local label = Instance.new("TextLabel", gui)
-      label.Size = UDim2.fromScale(1, 1)
-      label.BackgroundTransparency = 1
-      label.RichText = true
-      label.TextScaled = true
-      label.Font = Enum.Font.GothamBold
-      label.Text = [[
-      <font size="52" color="#b388ff">SAFE ZONE</font>
-      <br/>
-      <font size="20" color="#e6d9ff">Protected Area</font>
-      ]]
-      label.TextStrokeTransparency = 0.2
-      label.TextStrokeColor3 = Color3.fromRGB(20, 0, 40)
+    local label = Instance.new("TextLabel", gui)
+    label.Size = UDim2.fromScale(1, 1)
+    label.BackgroundTransparency = 1
+    label.RichText = true
+    label.TextScaled = true
+    label.Font = Enum.Font.GothamBold
+    label.Text = [[
+    <font size="52" color="#b388ff">SAFE ZONE</font>
+    <br/>
+    <font size="20" color="#e6d9ff">Protected Area</font>
+    ]]
+    label.TextStrokeTransparency = 0.2
+    label.TextStrokeColor3 = Color3.fromRGB(20, 0, 40)
   end
 end
 local cancel = false
@@ -764,6 +766,7 @@ end
 local EspLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Esp%20v2/source.lua", true))()
 EspLib.ESPValues.PlayersESP = false
 EspLib.ESPValues.ChikaraBoxesESP = false
+EspLib.ESPValues.DragonOrbESP = false
 EspLib.ESPValues.FruitESP = false
 EspLib.ESPValues.NPCsESP = false
 EspLib.ESPValues.MobsESP = false
@@ -795,6 +798,18 @@ function ApplyEspToChikara()
         Color = Color3.fromRGB(173, 52, 102),
         Text = v.Name,
         ESPName = "ChikaraBoxesESP",
+        HighlightEnabled = true,
+      })
+    end
+  end
+end
+function ApplyEspToDragonOrb()
+  for _, v in pairs(workspace.MouseIgnore:GetChildren()) do
+    if v:IsA('Model') and v.Name == 'Model' then
+      EspLib.ApplyESP(v, {
+        Color = Color3.fromRGB(221, 141, 20),
+        Text = "Dragon Orb",
+        ESPName = "DragonOrbESP",
         HighlightEnabled = true,
       })
     end
@@ -1234,7 +1249,7 @@ AutoFarmTab:Dropdown({
 AutoFarmTab:Dropdown({
   Title = "Select tp mode",
   Desc = "Select the tp mode you want to use",
-  Values = {"Center", "Bottom", "Top"},
+  Values = {"Center", "Bottom", "Top", "Back"},
   Value = "Center",
   Flag = "TeleportMode",
   Multi = false,
@@ -1295,6 +1310,44 @@ AutoFarmTab:Toggle({
         end
       end
 		end)
+	end
+})
+AutoFarmTab:Toggle({
+	Title = "Aimbot selected boss",
+	Icon = "check",
+	Type = "Checkbox",
+	Flag = "SkillsBossToggle",
+	Value = false,
+	Callback = function(state)
+    Aimbot = state
+    if not Aimbot then return end
+
+    local Camera = Workspace.CurrentCamera
+    local mob = Workspace.Scriptable.BossArena:WaitForChild("Demon Fox")
+    local hrp = mob:WaitForChild("HumanoidRootPart")
+    local AutoKurama = true
+    local aimbotConn
+
+    task.spawn(function()
+      while Aimbot do task.wait()
+        if Aimbot and AutoKurama then
+          UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
+          if not aimbotConn then
+            aimbotConn = RunService.RenderStepped:Connect(function()
+              if Aimbot and hrp and hrp.Parent then
+                Camera.CFrame = CFrame.new(Camera.CFrame.Position, hrp.Position)
+              end
+            end)
+          end
+        else
+          UserInputService.MouseBehavior = Enum.MouseBehavior.Default
+          if aimbotConn then
+            aimbotConn:Disconnect()
+            aimbotConn = nil
+          end
+        end
+      end
+    end)
 	end
 })
 AutoFarmTab:Toggle({
@@ -2188,6 +2241,27 @@ EspTab:Toggle({
       Workspace.Scriptable.ChikaraBoxes.ChildAdded:Connect(function(chikara)
         if EspLib.ESPValues.ChikaraBoxesESP and chikara:IsA('UnionOperation') then
           ApplyEspToChikara()
+        end
+      end)
+    end)
+  end
+})
+EspTab:Toggle({
+  Title = "Esp dragon orbs",
+  Icon = "check",
+  Type = "Checkbox",
+  Flag = "EspDragonOrb",
+  Value = false,
+  Callback = function(state)
+    EspLib.ESPValues.DragonOrbESP = state
+
+    task.spawn(function()
+      if EspLib.ESPValues.DragonOrbESP then
+        ApplyEspToDragonOrb()
+      end
+      workspace.MouseIgnore.ChildAdded:Connect(function(chikara)
+        if EspLib.ESPValues.DragonOrbESP and chikara:IsA('Model') then
+          ApplyEspToDragonOrb()
         end
       end)
     end)
