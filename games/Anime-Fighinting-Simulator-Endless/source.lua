@@ -17,7 +17,6 @@ local UserInputService         = cloneref(game:GetService("UserInputService"));
 local VirtualInputManager      = cloneref(game:GetService("VirtualInputManager"));
 
 
-
 -- detect service
 IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS}, UserInputService:GetPlatform())
 if IsOnMobile then
@@ -71,6 +70,7 @@ pcall(function() getgenv().BYPASS_LOADED = true end)
 local Champions = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/modules/Champions.lua"))()
 local SkillKeys = { "Z","X","C","E","R","T","Y","U","F","G","H","J","K","L","V","B","N","M" }
 local SelectedSkills = {}
+getgenv().BossFarm = { Distance = 50 }
 getgenv().StatsFarm = { Delay = false, EquipBestChampion = false }
 getgenv().AfkFarmSettings = { Desync = true }
 getgenv().FarmMobSettings = { UseM1 = false }
@@ -593,7 +593,6 @@ local function EquipBestChampion(statId)
   LastStat = statId
 end
 local arenaPart
-getgenv().IsDodging = false
 function createArena()
 	arenaPart = Workspace.Scriptable.BossArena:FindFirstChild("InArena")
 	if arenaPart then return arenaPart end
@@ -650,11 +649,9 @@ local function farmKurama(mode)
 	if not bossHRP then return end
 
 	if mode == "Top" then
-		hrp.CFrame = bossHRP.CFrame * CFrame.new(0, 50, 0)
-	elseif mode == "Bottom" then
-		hrp.CFrame = bossHRP.CFrame * CFrame.new(0, -10, 0)
+		hrp.CFrame = bossHRP.CFrame * CFrame.new(0, getgenv().BossFarm.Distance, 0)
 	elseif mode == "Back" then
-		hrp.CFrame = bossHRP.CFrame * CFrame.new(0, 0, 50)
+		hrp.CFrame = bossHRP.CFrame * CFrame.new(0, 0, getgenv().BossFarm.Distance)
 	elseif mode == "Center" then
 		hrp.CFrame = bossHRP.CFrame
 	else
@@ -664,40 +661,6 @@ local function farmKurama(mode)
 			VirtualInputManager:SendKeyEvent(false, mode, false, game)
 		end)
 	end
-end
-function CreateSafeZone()
-  if not Workspace.Scriptable.BossArena:FindFirstChild('SafeZone') then
-    local SafeZone = Instance.new("Part", Workspace.Scriptable.BossArena)
-    SafeZone.Position = Vector3.new(1933, 3283, 1119)
-    SafeZone.Name = "SafeZone"
-    SafeZone.Size = Vector3.new(10, 1, 10)
-    SafeZone.Transparency = 0.35
-    SafeZone.Anchored = true
-    SafeZone.CanCollide = true
-    SafeZone.Material = Enum.Material.SmoothPlastic
-    SafeZone.Color = Color3.fromRGB(120, 70, 200)
-
-    local gui = Instance.new("BillboardGui", SafeZone)
-    gui.Name = "SafeZoneGui"
-    gui.Size = UDim2.fromScale(7, 2.5)
-    gui.StudsOffset = Vector3.new(0, 4, 0)
-    gui.AlwaysOnTop = true
-    gui.MaxDistance = 300
-
-    local label = Instance.new("TextLabel", gui)
-    label.Size = UDim2.fromScale(1, 1)
-    label.BackgroundTransparency = 1
-    label.RichText = true
-    label.TextScaled = true
-    label.Font = Enum.Font.GothamBold
-    label.Text = [[
-    <font size="52" color="#b388ff">SAFE ZONE</font>
-    <br/>
-    <font size="20" color="#e6d9ff">Protected Area</font>
-    ]]
-    label.TextStrokeTransparency = 0.2
-    label.TextStrokeColor3 = Color3.fromRGB(20, 0, 40)
-  end
 end
 local cancel = false
 function ReturnTeleportBossBypass()
@@ -709,6 +672,13 @@ function ReturnTeleportBossBypass()
       end
     end
     cancel = true
+  end
+end
+function RemoveLavaDamage()
+  for _, v in pairs(Workspace.Scriptable.BossArena.Lava:GetDescendants()) do
+    if v:IsA('TouchTransmitter') then
+      v:Destroy(); break
+    end
   end
 end
 function FarmBossQuest()
@@ -1074,9 +1044,36 @@ AutoFarmTab:Toggle({
       end
     end
 
+    function TrainBestTicks(statId)
+      if statId == 1 then
+        Remote:FireServer("Train", 1); task.wait(
+          0.125
+        )
+      elseif statId == 2 then
+        Remote:FireServer("Train", 2); task.wait(
+          0.136
+        )
+      elseif statId == 3 then
+        Remote:FireServer("Train", 3); task.wait(
+          0.1070
+        )
+      elseif statId == 4 then
+        Remote:FireServer("Train", 4); task.wait(
+          0.150
+        )
+      elseif statId == 5 then
+        Remote:FireServer("Train", 5); task.wait(
+          0.155
+        )
+      elseif statId == 6 then
+        Remote:FireServer("Train", 6); task.wait(
+          0.155
+        )
+      end
+    end
+
     task.spawn(function()
-      while AutoFarm do
-        task.wait()
+      while AutoFarm do task.wait()
         local char = Players.LocalPlayer.Character
         local hum = char and char:FindFirstChildOfClass("Humanoid")
 
@@ -1093,8 +1090,13 @@ AutoFarmTab:Toggle({
 
         TeleportBestByStat(statId)
         EquipBestChampion(statId)
-        Remote:FireServer("Train", statId)
       end
+    end)
+    task.spawn(function()
+      RunService.Heartbeat:Connect(function()
+        local statId = StatMap[SelectedStat]
+        if AutoFarm then TrainBestTicks(statId) end
+      end)
     end)
   end
 })
@@ -1230,9 +1232,9 @@ AutoFarmTab:Section({
 AutoFarmTab:Dropdown({
   Title = "Select boss",
   Desc = "Select the boss you want to farm",
-  Values = { "Kurama" },
+  Values = { "Kurama", "Broly [ SOON ]" },
   Value = "Kurama",
-  Flag = "MobDropdown",
+  Flag = "BossDropdown",
   Callback = function(option)
     SelectedBoss = option
   end
@@ -1252,7 +1254,7 @@ AutoFarmTab:Dropdown({
 AutoFarmTab:Dropdown({
   Title = "Select tp mode",
   Desc = "Select the tp mode you want to use",
-  Values = {"Center", "Bottom", "Top", "Back"},
+  Values = {"Center", "Top", "Back"},
   Value = "Center",
   Flag = "TeleportMode",
   Multi = false,
@@ -1267,28 +1269,59 @@ AutoFarmTab:Toggle({
 	Flag = "BossFarmToggle",
 	Value = false,
 	Callback = function(state)
-		AutoKurama = state
-		if not AutoKurama then return else createArena(); CreateSafeZone() end
+		AutoBoss = state
+		if not AutoBoss then return end
+
+		createArena()
 
 		task.spawn(function()
-			while AutoKurama do task.wait()
-				if getgenv().IsDodging then task.wait(0.2) continue end
+			local lastBossCheck = 0
+			local spawnTime = 0
+			local bossCached = nil
 
-				if not isPlayerInArena() then
-					local ClickBox = Workspace.Scriptable.BossArena:FindFirstChild("ClickBox")
-					if ClickBox then
-						fireclickdetector(ClickBox:FindFirstChildWhichIsA("ClickDetector"))
-          else
-            Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(37, 80, 10)
-					end
-				else
-					while AutoKurama and Workspace.Scriptable.BossArena:FindFirstChild("Demon Fox") do
-						if getgenv().IsDodging then break end
-						task.wait()
-						farmKurama(SelectedTeleportMode)
-					end
+			while AutoBoss do task.wait()
+				if SelectedBoss == "Kurama" then
+          if not isPlayerInArena() then
+            local arena = Workspace.Scriptable.BossArena
+            local clickBox = arena and arena:FindFirstChild("ClickBox")
+
+            if clickBox then
+              fireclickdetector(clickBox:FindFirstChildWhichIsA("ClickDetector"))
+            else
+              Teleport(nil, 2, 37, 80, 10)
+            end
+
+            spawnTime = 0
+            bossCached = nil
+            continue
+          end
+
+          if tick() - lastBossCheck > 0.4 then
+            lastBossCheck = tick()
+            bossCached = Workspace.Scriptable.BossArena:FindFirstChild("Demon Fox")
+
+            if bossCached and spawnTime == 0 then
+              spawnTime = tick()
+            end
+          end
+
+          if not bossCached then
+            if spawnTime == 0 then
+              spawnTime = tick()
+            end
+
+            if tick() - spawnTime >= 17 then
+              Teleport(nil, 2, 37, 80, 10)
+              spawnTime = 0
+            end
+
+            continue
+          end
+
+          RemoveLavaDamage()
+          farmKurama(SelectedTeleportMode)
 				end
-			end
+      end
 		end)
 	end
 })
@@ -1322,132 +1355,64 @@ AutoFarmTab:Toggle({
 	Flag = "SkillsBossToggle",
 	Value = false,
 	Callback = function(state)
-    Aimbot = state
-    if not Aimbot then return end
+		Aimbot = state
 
-    local Camera = Workspace.CurrentCamera
-    local mob = Workspace.Scriptable.BossArena:WaitForChild("Demon Fox")
-    local hrp = mob:WaitForChild("HumanoidRootPart")
-    local AutoKurama = true
-    local aimbotConn
+		local Camera = Workspace.CurrentCamera
+		local aimbotConn
+		local UIS = UserInputService
 
-    task.spawn(function()
-      while Aimbot do task.wait()
-        if Aimbot and AutoKurama then
-          UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
+		task.spawn(function()
+      while true do task.wait()
+        while Aimbot and AutoBoss do task.wait()
+          if not Aimbot or not AutoBoss then
+            UIS.MouseBehavior = Enum.MouseBehavior.Default
+            if aimbotConn then
+              aimbotConn:Disconnect()
+              aimbotConn = nil
+            end
+            if not Aimbot then break end
+            continue
+          end
+
+          local mob = Workspace.Scriptable.BossArena:FindFirstChild("Demon Fox")
+          local hrp = mob and mob:FindFirstChild("HumanoidRootPart")
+
+          if not hrp then
+            UIS.MouseBehavior = Enum.MouseBehavior.Default
+            if aimbotConn then
+              aimbotConn:Disconnect()
+              aimbotConn = nil
+            end
+            continue
+          end
+
+          local rightMouseDown = UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton2)
+
+          if rightMouseDown then
+            UIS.MouseBehavior = Enum.MouseBehavior.Default
+            continue
+          end
+
+          UIS.MouseBehavior = Enum.MouseBehavior.LockCenter
+
           if not aimbotConn then
             aimbotConn = RunService.RenderStepped:Connect(function()
-              if Aimbot and hrp and hrp.Parent then
-                Camera.CFrame = CFrame.new(Camera.CFrame.Position, hrp.Position)
-              end
+              if not Aimbot or not AutoBoss or not hrp or not hrp.Parent then return end
+              Camera.CFrame = CFrame.new(Camera.CFrame.Position, hrp.Position)
             end)
-          end
-        else
-          UserInputService.MouseBehavior = Enum.MouseBehavior.Default
-          if aimbotConn then
-            aimbotConn:Disconnect()
-            aimbotConn = nil
           end
         end
       end
-    end)
-	end
-})
-AutoFarmTab:Toggle({
-	Title = "Auto dodge boss attack",
-	Icon = "check",
-	Type = "Checkbox",
-	Flag = "SkillsBossToggle",
-	Value = false,
-	Callback = function(state)
-		AutoDodge = state
-		if not state then return end
-
-		getgenv().IsDodging = false
-
-		task.spawn(function()
-			local lp = Players.LocalPlayer
-
-			local SPECIAL_ANIMS = {
-				["99370260062067"] = true,
-				["81691614828849"] = true,
-			}
-
-			local dodging = false
-
-      if AutoDodge and hookfunction and require then
-        ReturnTeleportBossBypass()
-      end
-
-			while AutoDodge do task.wait()
-				local char = lp.Character
-				if not char then continue end
-
-				local hum = char:FindFirstChildOfClass("Humanoid")
-				local hrp = char:FindFirstChild("HumanoidRootPart")
-				if not hum or not hrp then continue end
-
-				local arena = Workspace.Scriptable.BossArena
-				local boss = arena:FindFirstChild("Demon Fox")
-				if not boss then continue end
-
-				local bossHum = boss:FindFirstChildOfClass("Humanoid")
-				if not bossHum then continue end
-
-				local animator = bossHum:FindFirstChildOfClass("Animator")
-				if not animator then continue end
-
-				for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
-					local id = string.match(track.Animation.AnimationId, "%d+")
-					if id and SPECIAL_ANIMS[id] and not dodging then
-						dodging = true
-						getgenv().IsDodging = true
-
-						hum:ChangeState(Enum.HumanoidStateType.Physics)
-						hrp.Anchored = true
-
-						char:PivotTo(
-							arena.SafeZone:GetPivot() * CFrame.new(0, 3, 0)
-						); wait(.2)
-						char:PivotTo(
-							arena.SafeZone:GetPivot() * CFrame.new(0, 3, 0)
-						); wait(.2)
-						char:PivotTo(
-							arena.SafeZone:GetPivot() * CFrame.new(0, 3, 0)
-						); wait(.2)
-
-						task.wait(2.5)
-
-						hrp.Anchored = false
-						hum:ChangeState(Enum.HumanoidStateType.Running)
-
-						getgenv().IsDodging = false
-						dodging = false
-					end
-				end
-			end
 		end)
 	end
 })
-AutoFarmTab:Toggle({
-	Title = "No lava damage",
-	Icon = "check",
-	Type = "Checkbox",
-	Flag = "SkillsBossToggle",
-	Value = false,
-	Callback = function(state)
-    NoLava = state
-    if not NoLava then return end
-
-    task.spawn(function()
-      while NoLava do task.wait(1)
-        for _, v in pairs(Workspace.Scriptable.BossArena.Lava:GetDescendants()) do
-          if v:IsA('TouchTransmitter') then
-            v:Destroy(); break
-          end
-        end
-      end
-    end)
+AutoFarmTab:Slider({
+	Title = "Boss distance",
+	Step = 1,
+	Value = {Min = 0, Max = 100, Default = 50},
+  Flag = "BossDistance",
+	Callback = function(v)
+		getgenv().BossFarm.Distance = tonumber(v) or 50
 	end
 })
 
@@ -3951,9 +3916,9 @@ WebhookTab:Toggle({
 
         SendWebhook({
           title = "💀 Unlocked Boss Power Stats",
-          color = AutoKurama and 0x2ECC71 or 0xE74C3C,
+          color = AutoBoss and 0x2ECC71 or 0xE74C3C,
           fields = {
-            { name = "Status", value = tostring(AutoKurama), inline = true },
+            { name = "Status", value = tostring(AutoBoss), inline = true },
             { name = "System", value = "Boss Drop", inline = true },
             { name = "Player", value = LocalPlayer.Name, inline = true },
             { name = "UserId", value = tostring(LocalPlayer.UserId), inline = true },
