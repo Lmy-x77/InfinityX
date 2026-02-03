@@ -355,15 +355,40 @@ task.spawn(function()
 		task.wait(1)
 	end
 end)
-local function autoInteract(toggleFlag, listGetter)
-	local hrp = getHRP()
+local CachedMapModels = {
+	Door = {},
+	Computer = {},
+	Pod = {}
+}
+local function cacheMap()
+	local map = workspace:FindFirstChild(tostring(game.ReplicatedStorage.CurrentMap.Value))
+	if not map then return end
+
+	for k in pairs(CachedMapModels) do
+		table.clear(CachedMapModels[k])
+	end
+
+	for _, v in ipairs(map:GetDescendants()) do
+		if v:IsA("Model") then
+			for key in pairs(CachedMapModels) do
+				if string.find(v.Name, key) then
+					table.insert(CachedMapModels[key], v)
+				end
+			end
+		end
+	end
+end
+cacheMap()
+game.ReplicatedStorage.CurrentMap:GetPropertyChangedSignal("Value"):Connect(cacheMap)
+local function autoInteract(toggleFlag, cacheKey)
 	local distSq = AutoInteractSettings.Distance ^ 2
 
 	while toggleFlag() do
-		task.wait(0.15)
+		task.wait(0.25)
 		if not ActionBox.Visible then continue end
 
-		for _, obj in ipairs(listGetter()) do
+		local hrp = getHRP()
+		for _, obj in ipairs(CachedMapModels[cacheKey]) do
 			local pos = obj:GetPivot().Position
 			if (hrp.Position - pos).Magnitude ^ 2 <= distSq then
 				Remote:FireServer(AutoInteractSettings.Mode, "Action", true)
@@ -591,7 +616,8 @@ local sections = {
     EspSection6 = tabs.Esp:Section({ Side = "Left" }),
     EspSeettingsSection1 = tabs.EspSettings:Section({ Side = "Right" }),
     AutoInteractSerction1 = tabs.EspSettings:Section({ Side = "Right" }),
-    AutoInteractSerction2 = tabs.EspSettings:Section({ Side = "Left" }),
+    AutoInteractSerction2 = tabs.EspSettings:Section({ Side = "Right" }),
+    DiscordSection = tabs.EspSettings:Section({ Side = "Left" }),
 }
 tabs.Game:Select()
 
@@ -2035,6 +2061,9 @@ sections.AutoInteractSerction1:Header({
 sections.AutoInteractSerction2:Header({
 	Name = "[⚙️] Auto Interact Settings"
 })
+sections.DiscordSection:Header({
+	Name = "[🔥] Discord Server"
+})
 MacLib:SetFolder("Maclib")
 tabs.EspSettings:InsertConfigSection("Left")
 MacLib:LoadAutoLoadConfig()
@@ -2069,7 +2098,9 @@ sections.AutoInteractSerction1:Toggle({
 	Callback = function(v)
 		InteractDoor = v
 		if v then
-			autoInteract(function() return InteractDoor end, function() return Cached.Doors end)
+			task.spawn(function()
+				autoInteract(function() return InteractDoor end, "Door")
+			end)
 		end
 	end,
 }, "InteractDoor")
@@ -2079,7 +2110,9 @@ sections.AutoInteractSerction1:Toggle({
 	Callback = function(v)
 		InteractComputers = v
 		if v then
-			autoInteract(function() return InteractComputers end, function() return Cached.Computers end)
+			task.spawn(function()
+				autoInteract(function() return InteractComputers end, "Computer")
+			end)
 		end
 	end,
 }, "InteractComputer")
@@ -2089,7 +2122,9 @@ sections.AutoInteractSerction1:Toggle({
 	Callback = function(v)
 		InteractFreezePod = v
 		if v then
-			autoInteract(function() return InteractFreezePod end, function() return Cached.Pods end)
+			task.spawn(function()
+				autoInteract(function() return InteractFreezePod end, "Pod")
+			end)
 		end
 	end,
 }, "InteractFreeze")
@@ -2101,6 +2136,12 @@ sections.AutoInteractSerction2:Input({
 		AutoInteractSettings.Distance = tonumber(input)
 	end,
 }, "WalkSpeed")
+sections.DiscordSection:Button({
+	Name = "Copy discord link",
+	Callback = function()
+        setclipboard("https://discord.gg/emKJgWMHAr")
+	end,
+})
 
 
 
