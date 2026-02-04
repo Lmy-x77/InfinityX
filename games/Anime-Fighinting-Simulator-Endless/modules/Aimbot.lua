@@ -25,11 +25,9 @@ function Aimbot:Enable()
 
 	conn = RunService.RenderStepped:Connect(function()
 		if not enabled or not targetPart or not targetPart.Parent then return end
-
-		local camPos = Camera.CFrame.Position
 		Camera.CFrame = Camera.CFrame:Lerp(
-			CFrame.new(camPos, targetPart.Position),
-			IsOnMobile and 0.55 or 0.25
+			CFrame.new(Camera.CFrame.Position, targetPart.Position),
+			IsOnMobile and 0.6 or 0.25
 		)
 	end)
 end
@@ -39,9 +37,6 @@ function Aimbot:Disable()
 	if conn then
 		conn:Disconnect()
 		conn = nil
-	end
-	if not IsOnMobile then
-		UIS.MouseBehavior = Enum.MouseBehavior.Default
 	end
 end
 
