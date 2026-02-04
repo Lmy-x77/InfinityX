@@ -2,6 +2,7 @@ local Aimbot = {}
 Aimbot.__index = Aimbot
 
 local Workspace = cloneref(game:GetService("Workspace"))
+local Players = cloneref(game:GetService("Players"))
 local UIS = cloneref(game:GetService("UserInputService"))
 local RunService = cloneref(game:GetService("RunService"))
 
@@ -25,9 +26,12 @@ function Aimbot:Enable()
 
 	conn = RunService.RenderStepped:Connect(function()
 		if not enabled or not targetPart or not targetPart.Parent then return end
+
+		local camPos = Camera.CFrame.Position
+		local targetPos = targetPart.Position
 		Camera.CFrame = Camera.CFrame:Lerp(
-			CFrame.new(Camera.CFrame.Position, targetPart.Position),
-			IsOnMobile and 0.6 or 0.25
+			CFrame.new(camPos, targetPos),
+			IsOnMobile and 0.35 or 0.2
 		)
 	end)
 end
@@ -38,6 +42,7 @@ function Aimbot:Disable()
 		conn:Disconnect()
 		conn = nil
 	end
+	UIS.MouseBehavior = Enum.MouseBehavior.Default
 end
 
 return Aimbot
