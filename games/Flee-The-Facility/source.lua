@@ -1260,13 +1260,12 @@ sections.LPlayerSection1:Toggle({
         local char = plr.Character or plr.CharacterAdded:Wait()
         local hrp = char:WaitForChild("HumanoidRootPart")
 
-        local map = workspace:FindFirstChild(tostring(game.ReplicatedStorage.CurrentMap.Value))
-        local DetectFrame = plr.PlayerGui.ScreenGui.WarningFrame
-
         local oldCFrame = nil
         local inLocker = false
 
         while seer do task.wait()
+            local map = workspace:FindFirstChild(tostring(game.ReplicatedStorage.CurrentMap.Value))
+            local DetectFrame = plr.PlayerGui.ScreenGui.WarningFrame
             if DetectFrame.Visible and not inLocker then
                 oldCFrame = hrp.CFrame
                 inLocker = true
