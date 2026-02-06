@@ -2226,6 +2226,115 @@ for _, v in pairs(SkillKeys) do
     end
   })
 end
+SkillTab:Section({
+  Title = "Auto Active Mode",
+})
+SkillTab:Dropdown({
+  Title = "Select mode key",
+  Desc = "",
+  Values = SkillKeys,
+  Value = "",
+  Flag = "ModeDropdown",
+  Callback = function(option)
+    SelectedMode = option
+  end
+})
+SkillTab:Toggle({
+  Title = "Auto active mode",
+  Icon = "check",
+  Type = "Checkbox",
+  Flag = "ActiveModeToggle",
+  Value = false,
+  Callback = function(state)
+    AutoMode = state
+    if not AutoMode then return end
+
+    local Active = false
+
+    task.spawn(function()
+      while AutoMode do task.wait()
+        local character = Players.LocalPlayer.Character
+        if not character then continue end
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if not humanoid then continue end
+
+        if not Active then
+          ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("RemoteFunction"):InvokeServer("UsePower", SelectedMode)
+          Active = true
+        end
+
+        if humanoid.Health <= 0 then
+          Active = false
+        end
+      end
+    end)
+  end
+})
+SkillTab:Section({
+  Title = "Auto Active Special",
+})
+SkillTab:Dropdown({
+  Title = "Select special",
+  Desc = "",
+  Values = { "Stands", "Bloodlines", "Fruits", "Quirks", "Grimoires", "Kagunes" },
+  Value = "",
+  Flag = "SpecialDropdown",
+  Callback = function(option)
+    SelectedSpecial = option
+  end
+})
+SkillTab:Toggle({
+  Title = "Auto active special",
+  Icon = "check",
+  Type = "Checkbox",
+  Flag = "EspPlayer",
+  Value = false,
+  Callback = function(state)
+    AutoSpecial = state
+    if not AutoSpecial then return end
+
+    local Active = false
+
+    task.spawn(function()
+      while AutoSpecial do task.wait()
+        local character = Players.LocalPlayer.Character
+        if not character then continue end
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if not humanoid then continue end
+
+        if not Active then
+          for _, v in pairs(game:GetService("Players").LocalPlayer.PlayerGui.Main.Frames.Specials.Container.Buttons:GetDescendants()) do
+            if v:IsA('TextButton') and v.Name == "Key" and v.Parent.Parent.Parent.Name == SelectedSpecial then
+              local KeyText = v.Text
+              local Keys = {
+                ["1"] = Enum.KeyCode.One,
+                ["2"] = Enum.KeyCode.Two,
+                ["3"] = Enum.KeyCode.Three,
+                ["4"] = Enum.KeyCode.Four,
+                ["5"] = Enum.KeyCode.Five,
+                ["6"] = Enum.KeyCode.Six,
+                ["7"] = Enum.KeyCode.Seven,
+                ["8"] = Enum.KeyCode.Eight,
+                ["9"] = Enum.KeyCode.Nine,
+                ["0"] = Enum.KeyCode.Zero
+              }
+              local keyCode = Keys[KeyText]
+              if keyCode then
+                  VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
+                  VirtualInputManager:SendKeyEvent(false, keyCode, false, game)
+              end
+            end
+          end
+          Active = true
+        end
+
+        if humanoid.Health <= 0 then
+          Active = false
+        end
+      end
+    end)
+  end
+})
 
 
 EspTab:Section({ 
