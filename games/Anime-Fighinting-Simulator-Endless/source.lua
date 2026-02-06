@@ -68,6 +68,7 @@ pcall(function() getgenv().BYPASS_LOADED = true end)
 
 -- variables
 local Champions = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/modules/Champions.lua"))()
+local Aimbot = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/modules/Aimbot.lua"))()
 local SkillKeys = { "Z","X","C","E","R","T","Y","U","F","G","H","J","K","L","V","B","N","M" }
 local SelectedSkills = {}
 getgenv().BossFarm = { Distance = 50 }
@@ -543,54 +544,62 @@ local LastEquipped
 local LastStat
 local LastSummon = 0
 local SUMMON_COOLDOWN = 1.2
+
 local function CanSummon()
-  return os.clock() - LastSummon >= SUMMON_COOLDOWN
+    return os.clock() - LastSummon >= SUMMON_COOLDOWN
 end
+
 local function Summon(champ)
-  if not CanSummon() then return end
-  LastSummon = os.clock()
-  ReplicatedStorage.Remotes.RemoteFunction:InvokeServer("SummonChamp", champ)
+    if not champ or not CanSummon() then return end
+    LastSummon = os.clock()
+    ReplicatedStorage.Remotes.RemoteFunction:InvokeServer("SummonChamp", champ)
 end
-local function EquipBestChampion(statId)
-  if not getgenv().StatsFarm.EquipBestChampion then return end
 
-  local player = Players.LocalPlayer
-  local char = player.Character
-  if not char then return end
+function EquipBestChampion(statId)
+    if not getgenv().StatsFarm.EquipBestChampion then return end
+    local player = Players.LocalPlayer
+    if not player or not player.Champions then return end
 
-  local bestId, bestValue = nil, 0
-
-  for _, v in pairs(player.Champions:GetChildren()) do
-    local id = v.Name
-    local data = Champions[id]
-
-    if data and data.Abilities and data.Abilities.AutoTrainer then
-      local value = data.Abilities.AutoTrainer[tostring(statId)]
-      if value and value > bestValue then
-        bestValue = value
-        bestId = id
-      end
+    local bestId, bestValue = nil, 0
+    for _, champ in pairs(player.Champions:GetChildren()) do
+        local data = Champions[champ.Name]
+        if data and data.Abilities and data.Abilities.AutoTrainer then
+            local value = data.Abilities.AutoTrainer[tostring(statId)]
+            if value and value > bestValue then
+                bestValue = value
+                bestId = champ.Name
+            end
+        end
     end
-  end
 
-  if not bestId then return end
+    if not bestId then return end
 
-  local equippedObj = player:FindFirstChild("ChampionEquipped")
-  local currentlyEquipped = equippedObj and equippedObj.Value
+    local equippedObj = player:FindFirstChild("ChampionEquipped")
+    local currentlyEquipped = equippedObj and equippedObj.Value
 
-  if currentlyEquipped == bestId then
+    -- Se o stat não mudou e o campeão já tá equipado, não faz nada
+    if currentlyEquipped == bestId and LastStat == statId then
+        LastEquipped = bestId
+        LastStat = statId
+        return
+    end
+
+    -- Desequipar o atual apenas se for outro campeão
+    if currentlyEquipped and currentlyEquipped ~= bestId then
+        local currentChamp = player.Champions:FindFirstChild(currentlyEquipped)
+        if currentChamp then
+            Summon(currentChamp) -- desequipa
+        end
+    end
+
+    -- Equipar o novo campeão
+    local newChamp = player.Champions:FindFirstChild(bestId)
+    if newChamp then
+        Summon(newChamp)
+    end
+
     LastEquipped = bestId
     LastStat = statId
-    return
-  end
-
-  if currentlyEquipped and player.Champions:FindFirstChild(currentlyEquipped) then
-    Summon(player.Champions[currentlyEquipped])
-  end
-
-  Summon(player.Champions[bestId])
-  LastEquipped = bestId
-  LastStat = statId
 end
 local arenaPart
 function createArena()
@@ -1030,6 +1039,7 @@ AutoFarmTab:Toggle({
       [5] = Agility,
       [6] = Speed,
     }
+
     local function TeleportBestByStat(statId)
       if statId == 4 then return end
       local value = Stats[statId].Value
@@ -1044,33 +1054,17 @@ AutoFarmTab:Toggle({
       end
     end
 
-    function TrainBestTicks(statId)
-      if statId == 1 then
-        Remote:FireServer("Train", 1); task.wait(
-          0.125
-        )
-      elseif statId == 2 then
-        Remote:FireServer("Train", 2); task.wait(
-          0.136
-        )
-      elseif statId == 3 then
-        Remote:FireServer("Train", 3); task.wait(
-          0.1070
-        )
-      elseif statId == 4 then
-        Remote:FireServer("Train", 4); task.wait(
-          0.150
-        )
-      elseif statId == 5 then
-        Remote:FireServer("Train", 5); task.wait(
-          0.155
-        )
-      elseif statId == 6 then
-        Remote:FireServer("Train", 6); task.wait(
-          0.155
-        )
+    local function TrainBestTicks(statId)
+      if statId == 1 then Remote:FireServer("Train", 1); task.wait(0.125)
+      elseif statId == 2 then Remote:FireServer("Train", 2); task.wait(0.136)
+      elseif statId == 3 then Remote:FireServer("Train", 3); task.wait(0.107)
+      elseif statId == 4 then Remote:FireServer("Train", 4); task.wait(0.150)
+      elseif statId == 5 then Remote:FireServer("Train", 5); task.wait(0.155)
+      elseif statId == 6 then Remote:FireServer("Train", 6); task.wait(0.155)
       end
     end
+
+    local LastStatIdEquipped
 
     task.spawn(function()
       while AutoFarm do task.wait()
@@ -1089,13 +1083,19 @@ AutoFarmTab:Toggle({
         if not statId then continue end
 
         TeleportBestByStat(statId)
-        EquipBestChampion(statId)
+
+        if LastStatIdEquipped ~= statId then
+          EquipBestChampion(statId)
+          LastStatIdEquipped = statId
+        end
       end
     end)
+
     task.spawn(function()
       RunService.Heartbeat:Connect(function()
+        if not AutoFarm then return end
         local statId = StatMap[SelectedStat]
-        if AutoFarm then TrainBestTicks(statId) end
+        TrainBestTicks(statId)
       end)
     end)
   end
@@ -1355,54 +1355,39 @@ AutoFarmTab:Toggle({
 	Flag = "SkillsBossToggle",
 	Value = false,
 	Callback = function(state)
-		Aimbot = state
+		AimbotEnabled = state
 
-		local Camera = Workspace.CurrentCamera
-		local aimbotConn
-		local UIS = UserInputService
+		if not state then
+			Aimbot:Disable()
+			return
+		end
 
 		task.spawn(function()
-      while true do task.wait()
-        while Aimbot and AutoBoss do task.wait()
-          if not Aimbot or not AutoBoss then
-            UIS.MouseBehavior = Enum.MouseBehavior.Default
-            if aimbotConn then
-              aimbotConn:Disconnect()
-              aimbotConn = nil
-            end
-            if not Aimbot then break end
-            continue
-          end
+			while AimbotEnabled do task.wait()
+				if not AutoBoss then
+					Aimbot:Disable()
+					continue
+				end
 
-          local mob = Workspace.Scriptable.BossArena:FindFirstChild("Demon Fox")
-          local hrp = mob and mob:FindFirstChild("HumanoidRootPart")
+				local mob = Workspace.Scriptable.BossArena:FindFirstChild("Demon Fox")
+				local hrp = mob and mob:FindFirstChild("HumanoidRootPart")
 
-          if not hrp then
-            UIS.MouseBehavior = Enum.MouseBehavior.Default
-            if aimbotConn then
-              aimbotConn:Disconnect()
-              aimbotConn = nil
-            end
-            continue
-          end
+				if not hrp then
+					Aimbot:Disable()
+					continue
+				end
 
-          local rightMouseDown = UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton2)
+				if not IsOnMobile then
+					UserInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
+				end
 
-          if rightMouseDown then
-            UIS.MouseBehavior = Enum.MouseBehavior.Default
-            continue
-          end
-
-          UIS.MouseBehavior = Enum.MouseBehavior.LockCenter
-
-          if not aimbotConn then
-            aimbotConn = RunService.RenderStepped:Connect(function()
-              if not Aimbot or not AutoBoss or not hrp or not hrp.Parent then return end
-              Camera.CFrame = CFrame.new(Camera.CFrame.Position, hrp.Position)
-            end)
-          end
+        if mob then
+          Aimbot:SetTarget(hrp)
+          Aimbot:Enable()
         end
-      end
+			end
+
+			Aimbot:Disable()
 		end)
 	end
 })
