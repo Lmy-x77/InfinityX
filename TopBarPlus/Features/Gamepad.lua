@@ -46,7 +46,7 @@ function Gamepad.start(incomingIcon)
 		local previousHighlightedIcon
 		local usedIndicatorOnce = DEFAULT_HIGHLIGHT_KEY ~= Icon.highlightKey
 		local usedBOnce = DEFAULT_HIGHLIGHT_KEY ~= Icon.highlightKey
-		local Selection = require(script.Parent.Parent.Elements.Selection)
+		local Selection = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/TopBarPlus/Elements/Selection.lua"))()
 		local function updateSelectedObject()
 			local icon = getIconFromSelectedObject()
 			local isUsingGamepad = UserInputService.PreferredInput == GAMEPAD_INPUT
