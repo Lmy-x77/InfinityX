@@ -7,8 +7,8 @@
 
 -- LOCAL
 local Themes = {}
-local Utility = require(script.Parent.Parent.Utility)
-local baseTheme = require(script.Default)
+local Utility = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/TopBarPlus/Source/Utility.lua"))()
+local baseTheme = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/TopBarPlus/Features/Themes/Default.lua"))()
 
 
 
