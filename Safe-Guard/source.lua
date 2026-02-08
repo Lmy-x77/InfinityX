@@ -34,6 +34,7 @@ function SafeGuard:Hook(info)
   local WalkSpeedBypass = info.WalkSpeedBypass
   local JumpPowerBypass = info.JumpPowerBypass
   local BlockRemote = info.BlockRemote or {}
+  local SafeMode = info.SafeMode
 
   if AntiKick then
     loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Safe-Guard/script/Anti-Kick.lua'))()
@@ -56,6 +57,9 @@ function SafeGuard:Hook(info)
   end
   if AntiLogger then
     loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Safe-Guard/script/AntiLogger.lua'))()
+  end
+  if SafeMode then
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Safe-Guard/script/SafeMode.lua"))()
   end
   if AntiFling then
     local Players = game:GetService("Players")
