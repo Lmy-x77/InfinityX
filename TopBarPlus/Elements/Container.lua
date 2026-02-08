@@ -8,7 +8,7 @@ return function(Icon)
 	local Players =  game:GetService("Players")
 	local UserInputService = game:GetService("UserInputService")
 	local container = {}
-	local Signal = require(script.Parent.Parent.Packages.GoodSignal)
+	local Signal = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/TopBarPlus/Packages/Goodsignal.lua"))()
 	local insetChanged = Signal.new()
 	local guiInset = GuiService:GetGuiInset()
 	local startInset = 0
@@ -50,7 +50,7 @@ return function(Icon)
 			task.defer(function()
 				-- If oldtopbar, apply the Classic theme
 				local themes = script.Parent.Parent.Features.Themes
-				local Classic = require(themes.Classic)
+				local Classic = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/TopBarPlus/Features/Themes/Classic.lua"))()
 				Icon.modifyBaseTheme(Classic)
 
 				-- Also configure the oldtopbar correctly
