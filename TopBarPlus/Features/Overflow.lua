@@ -13,7 +13,7 @@ local iconsDict
 local currentCamera = workspace.CurrentCamera
 local overflowIcons = {}
 local overflowIconUIDs = {}
-local Utility = require(script.Parent.Parent.Utility)
+local Utility = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/TopBarPlus/Source/Utility.lua"))()
 local beginCheckingCenterIcons = false
 local beganSecondaryCenterCheck = false
 local Icon
