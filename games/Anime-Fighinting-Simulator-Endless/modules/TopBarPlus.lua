@@ -1,3 +1,4 @@
+local ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"));
 local Icon = require(ReplicatedStorage.shared.Modules.client.NewIcon)
 
 local gradientText =
