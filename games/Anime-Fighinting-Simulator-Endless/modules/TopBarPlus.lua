@@ -1,4 +1,4 @@
-local Icon = require(game:GetService("ReplicatedStorage").Modules.client.NewIcon)
+local Icon = require(ReplicatedStorage.shared.Modules.client.NewIcon)
 
 local gradientText =
 	"<font color='#6A5ACD'><b>I</b></font>" ..
