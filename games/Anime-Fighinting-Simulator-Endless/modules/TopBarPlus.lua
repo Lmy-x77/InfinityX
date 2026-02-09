@@ -1,5 +1,8 @@
-if not TOPBAR_LOADED then
-    local ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"));
+local ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"));
+local UserInputService = cloneref(game:GetService("UserInputService"));
+IsOnMobile = table.find({Enum.Platform.Android, Enum.Platform.IOS}, UserInputService:GetPlatform())
+
+if not TOPBAR_LOADED and not IsOnMobile then
     local Icon = require(ReplicatedStorage.shared.Modules.client.NewIcon)
 
     local gradientText =
