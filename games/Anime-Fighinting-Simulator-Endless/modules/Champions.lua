@@ -412,11 +412,11 @@ Champions = {
 	};
 	["31"] = {
 		Name = "Saytamu Serious";
-		Desc = "Auto trains 150% of your Strength, 150% of your Durability, Nerfs all player damage by 50%, buffs all Damage by 100%, increases your Chikara Per Min by x1.5, increases your Yen Per Min by x1.25";
+		Desc = "Auto trains 160% of your Strength, 175% of your Durability, Nerfs all player damage by 50%, buffs all Damage by 100%, increases your Chikara Per Min by x1.5, increases your Yen Per Min by x1.25";
 		Abilities = {
 			AutoTrainer = {
-				['1'] = 1.5;
-				['2'] = 1.5;
+				['1'] = 1.6;
+				['2'] = 1.75;
 			};
 			DamageNerfAll = 0.5;
 			DamageBuffAll = 2;
@@ -478,14 +478,14 @@ Champions = {
 	};
 	["35"] = {
 		Name = "Tatashi";
-		Desc = "Auto trains 160% of your Strength, Nerfs all player damage by 20%, buffs all Damage by 25%, increases your Yen Per Min by x1.1";
+		Desc = "Auto trains 160% of your Strength, Nerfs all player damage by 20%, buffs all Damage by 25%, increases your Yen Per Min by x1.15";
 		Abilities = {
 			AutoTrainer = {
 				['1'] = 1.6;
 			};
 			DamageNerfAll = 0.8;
 			DamageBuffAll = 1.25;
-			YenBuff = 1.1;
+			YenBuff = 1.15;
 		};
 		ClassNeeded = "20";
 		SellingValue = 0;
@@ -616,6 +616,35 @@ Champions = {
 		SellingValue = 10000;
 		Rarity = 6;
 	};
+	["109"] = {
+		Name = "Yumeto";
+		Desc = "Auto trains 300% of your Chakra, increases your Yen Per Min by x1.25, increases your Hearts Per Min by x2.5";
+		Abilities = {
+			AutoTrainer = {
+				['3'] = 3;
+			};
+			YenBuff = 1.25;
+			HeartsBuff = 2.5;
+		};
+		ClassNeeded = "17";
+		SellingValue = 10000;
+		Rarity = 7;
+	};
+	["500"] = {
+		Name = "Asuno";
+		Desc = "Auto trains 125% of your Durability, 125% of your Sword, increases your Yen Per Min by x1.15, increases your Hearts Per Min by x2";
+		Abilities = {
+			AutoTrainer = {
+				['2'] = 1.25;
+				['4'] = 1.25;
+			};
+			YenBuff = 1.15;
+			HeartsBuff = 2;
+		};
+		ClassNeeded = "17";
+		SellingValue = 0;
+		Rarity = 6;
+	};
 	["1000"] = {
 		Name = "Top Card";
 		Desc = "Auto trains 140% of your Strength, 140% of your Durability, Nerfs all player damage by 50%, buffs all Damage by 25%, increases your Yen Per Min by x1.1, and prevents you from being stunned.";
@@ -683,21 +712,68 @@ Champions = {
 	};
 	["1004"] = {
 		Name = "Minetu";
-		Desc = "Auto trains 175% of your Chakra, Buffs Kuruma damage by 1.5x and Kuruma drop chances by 1.5x, increases your Yen Per Min by x1.05.";
+		Desc = "Auto trains 175% of your Chakra, Buffs Kuruma damage by 2.5x and Kuruma drop chances by 2x, increases your Yen Per Min by x1.15.";
 		Abilities = {
 			AutoTrainer = {
 				['3'] = 1.75;
 			};
-			BuffDamageKuruma = 1.5;
-			BuffKurumaRate = 1.5;
-			YenBuff = 1.05;
+			BuffDamageKuruma = 2.5;
+			BuffKurumaRate = 2;
+			YenBuff = 1.15;
+		};
+		ClassNeeded = "17";
+		SellingValue = 15000;
+		Rarity = 6;
+	};
+	["1005"] = {
+		Name = "Makimo";
+		Desc = "Auto trains 150% of your Strength, 150% of your Durability, 175% of your Chakra, 120% of your Sword, 90% of your Speed and 90% Agility, increases your Yen Per Min by x1.1, increases your Heart Per Min by x1.5.";
+		Abilities = {
+			AutoTrainer = {
+				['1'] = 1.5;
+				['2'] = 1.5;
+				['3'] = 1.75;
+				['4'] = 1.2;
+				['5'] = 0.9;
+				['6'] = 0.9;
+			};
+			YenBuff = 1.1;
+			HeartsBuff = 1.5;
+		};
+		ClassNeeded = "17";
+		SellingValue = 15000;
+		Rarity = 6;
+	};
+	["1006"] = {
+		Name = "Esdeat";
+		Desc = "Auto trains 150% of your Sword, 160% of your Strength, increases your Yen Per Min by x1.15, increases your Heart Per Min by x2.";
+		Abilities = {
+			AutoTrainer = {
+				['1'] = 1.6;
+				['4'] = 1.5;
+			};
+			YenBuff = 1.15;
+			HeartsBuff = 2;
+		};
+		ClassNeeded = "17";
+		SellingValue = 15000;
+		Rarity = 6;
+	};
+	["1007"] = {
+		Name = "Namo";
+		Desc = "Auto trains 140% of your Sword, increases your Yen Per Min by x1.2.";
+		Abilities = {
+			AutoTrainer = {
+				['4'] = 1.4;
+			};
+			YenBuff = 1.2;
 		};
 		ClassNeeded = "17";
 		SellingValue = 15000;
 		Rarity = 6;
 	};
 	["999999996"] = {
-		Name = "Makima";
+		Name = "DoritosMakima";
 		Desc = longstring1;
 		Abilities = {
 			AutoTrainer = {
@@ -733,7 +809,7 @@ Champions = {
 		Rarity = 7;
 	};
 	["999999997"] = {
-		Name = "Esdeath";
+		Name = "DoritosEsdeath";
 		Desc = longstring1;
 		Abilities = {
 			AutoTrainer = {
