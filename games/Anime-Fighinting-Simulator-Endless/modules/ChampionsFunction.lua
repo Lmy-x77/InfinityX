@@ -2,8 +2,8 @@ local Champions = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy
 
 local ChampionsModule = {}
 
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = cloneref(game:GetService("Players"));
+local ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"));
 local RemoteF = ReplicatedStorage.shared.Remotes.RemoteFunction
 
 local LastSummon = 0
