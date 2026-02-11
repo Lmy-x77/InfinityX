@@ -30,8 +30,6 @@ function ChampionsModule.Refresh()
 end
 
 function ChampionsModule.EquipBest(statId, ChampionsData)
-	if not getgenv().StatsFarm.EquipBestChampion then return end
-
 	local plr = Players.LocalPlayer
 	if not plr or not plr.Champions then return end
 
