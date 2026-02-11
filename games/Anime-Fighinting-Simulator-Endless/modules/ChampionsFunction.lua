@@ -1,3 +1,5 @@
+local Champions = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/modules/Champions.lua"))()
+
 local ChampionsModule = {}
 
 local Players = game:GetService("Players")
