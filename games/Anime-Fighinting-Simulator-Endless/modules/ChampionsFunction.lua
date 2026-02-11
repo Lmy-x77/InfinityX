@@ -1,9 +1,7 @@
-local Champions = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Anime-Fighinting-Simulator-Endless/modules/Champions.lua"))()
-
 local ChampionsModule = {}
 
-local Players = cloneref(game:GetService("Players"));
-local ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"));
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RemoteF = ReplicatedStorage.shared.Remotes.RemoteFunction
 
 local LastSummon = 0
@@ -33,6 +31,7 @@ end
 
 function ChampionsModule.EquipBest(statId, ChampionsData)
 	if not getgenv().StatsFarm.EquipBestChampion then return end
+
 	local plr = Players.LocalPlayer
 	if not plr or not plr.Champions then return end
 
@@ -41,12 +40,18 @@ function ChampionsModule.EquipBest(statId, ChampionsData)
 	end
 
 	local bestName, bestVal = nil, 0
-	for _,c in pairs(plr.Champions:GetChildren()) do
-		local data = ChampionsData[c.Name]
-		local at = data and data.Abilities and data.Abilities.AutoTrainer
-		local v = at and at[tostring(statId)]
-		if v and v > bestVal then
-			bestVal, bestName = v, c.Name
+
+	for _, champInst in pairs(plr.Champions:GetChildren()) do
+		for _, data in pairs(ChampionsData) do
+			if data.Name == champInst.Name then
+				local at = data.Abilities and data.Abilities.AutoTrainer
+				local v = at and at[tostring(statId)]
+				if v and v > bestVal then
+					bestVal = v
+					bestName = champInst.Name
+				end
+				break
+			end
 		end
 	end
 
