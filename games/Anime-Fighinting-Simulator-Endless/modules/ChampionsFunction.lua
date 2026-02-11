@@ -2,13 +2,20 @@ local Champions = loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy
 
 local ChampionsModule = {}
 
-local Players = cloneref(game:GetService("Players"));
-local ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"));
+local Players = cloneref(game:GetService("Players"))
+local ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"))
 local RemoteF = ReplicatedStorage.shared.Remotes.RemoteFunction
 
 local LastSummon = 0
 local SUMMON_CD = 1.2
 local LastStat, LastEquipped
+
+local ChampionsByName = {}
+for _, data in pairs(Champions) do
+	if data.Name then
+		ChampionsByName[data.Name] = data
+	end
+end
 
 local function CanSummon()
 	return os.clock() - LastSummon >= SUMMON_CD
@@ -23,15 +30,20 @@ end
 function ChampionsModule.Refresh()
 	local plr = Players.LocalPlayer
 	if not plr then return end
+
 	local equipped = plr:FindFirstChild("ChampionEquipped")
 	if equipped and equipped.Value ~= "" then
 		local champ = plr.Champions:FindFirstChild(equipped.Value)
 		if champ then Summon(champ) end
 	end
-	LastEquipped, LastStat = nil, nil
+
+	LastEquipped = nil
+	LastStat = nil
 end
 
-function ChampionsModule.EquipBest(statId, ChampionsData)
+function ChampionsModule.EquipBest(statId)
+	if not getgenv().StatsFarm.EquipBestChampion then return end
+
 	local plr = Players.LocalPlayer
 	if not plr or not plr.Champions then return end
 
@@ -39,18 +51,16 @@ function ChampionsModule.EquipBest(statId, ChampionsData)
 		ChampionsModule.Refresh()
 	end
 
-	local bestName, bestVal = nil, 0
+	local bestName
+	local bestValue = 0
 
 	for _, champInst in pairs(plr.Champions:GetChildren()) do
-		for _, data in pairs(ChampionsData) do
-			if data.Name == champInst.Name then
-				local at = data.Abilities and data.Abilities.AutoTrainer
-				local v = at and at[tostring(statId)]
-				if v and v > bestVal then
-					bestVal = v
-					bestName = champInst.Name
-				end
-				break
+		local data = ChampionsByName[champInst.Name]
+		if data and data.Abilities and data.Abilities.AutoTrainer then
+			local value = data.Abilities.AutoTrainer[tostring(statId)]
+			if value and value > bestValue then
+				bestValue = value
+				bestName = champInst.Name
 			end
 		end
 	end
@@ -65,8 +75,8 @@ function ChampionsModule.EquipBest(statId, ChampionsData)
 		if old then Summon(old) end
 	end
 
-	local new = plr.Champions:FindFirstChild(bestName)
-	if new then Summon(new) end
+	local newChamp = plr.Champions:FindFirstChild(bestName)
+	if newChamp then Summon(newChamp) end
 
 	LastEquipped = bestName
 	LastStat = statId
