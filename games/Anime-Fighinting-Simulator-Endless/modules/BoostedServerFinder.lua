@@ -1,4 +1,3 @@
---!strict
 local BoostedServerFinder = {}
 BoostedServerFinder.__index = BoostedServerFinder
 
@@ -14,7 +13,7 @@ function BoostedServerFinder.new(minPlayers, maxPlayers, hopDelay)
     self.MAX_PLAYERS = maxPlayers or 20
     self.HOP_DELAY = hopDelay or 5
 
-    self.WEBHOOK_URLS = {}
+    self.WEBHOOKS = {}
 
     self.sentWebhook = false
     self.hopping = false
@@ -23,21 +22,41 @@ function BoostedServerFinder.new(minPlayers, maxPlayers, hopDelay)
     return self
 end
 
-function BoostedServerFinder:AddWebhook(urls)
-    for _, url in pairs(urls) do
-        if type(url) == "string" and url ~= "" then
+function BoostedServerFinder:AddWebhook(webhookList)
+    for _, wh in pairs(webhookList) do
+        if type(wh) == "table" and wh.Url and wh.Url ~= "" then
             local exists = false
-            for _, existing in pairs(self.WEBHOOK_URLS) do
-                if existing == url then
+            for _, existing in pairs(self.WEBHOOKS) do
+                if existing.Url == wh.Url then
                     exists = true
                     break
                 end
             end
             if not exists then
-                table.insert(self.WEBHOOK_URLS, url)
+                table.insert(self.WEBHOOKS, {
+                    Url = wh.Url,
+                    Color = wh.Color or 65280,
+                    Image = wh.Image or nil
+                })
             end
         end
     end
+end
+
+function BoostedServerFinder:EditWebhook(url, props)
+    for _, wh in pairs(self.WEBHOOKS) do
+        if wh.Url == url then
+            if props.Color then wh.Color = props.Color end
+            if props.Image then wh.Image = props.Image end
+            return true
+        end
+    end
+    return false
+end
+
+function BoostedServerFinder:SetWebhooks(webhookList)
+    self.WEBHOOKS = {}
+    self:AddWebhook(webhookList)
 end
 
 function BoostedServerFinder:GetServerBoost()
@@ -57,26 +76,26 @@ function BoostedServerFinder:FormatTime(seconds)
     local hours = math.floor(totalSeconds / 3600)
     local minutes = math.floor((totalSeconds % 3600) / 60)
     local secs = math.floor(totalSeconds % 60)
-
     return string.format("%02dh %02dm %02ds", hours, minutes, secs)
 end
 
 function BoostedServerFinder:SendWebhook(boostValue, jobId, playerCount)
     local formattedTime = self:FormatTime(boostValue)
 
-    for _, WEBHOOK_URL in pairs(self.WEBHOOK_URLS) do
+    for _, wh in pairs(self.WEBHOOKS) do
         local embed = {
             ["embeds"] = {{
                 ["title"] = "Boosted Server Found!",
-                ["color"] = 65280,
+                ["color"] = wh.Color or 65280,
+                ["thumbnail"] = wh.Image and {["url"] = wh.Image} or nil,
                 ["fields"] = {
                     {["name"] = "Boost Time", ["value"] = formattedTime, ["inline"] = true},
                     {["name"] = "Players", ["value"] = playerCount .. "/" .. self.MAX_PLAYERS, ["inline"] = true},
-                    {["name"] = "Job ID", ["value"] = "```" .. game.JobId .. "```"},
+                    {["name"] = "Job ID", ["value"] = "```" .. jobId .. "```"},
                     {
-                        ["name"] = "Join Command",
+                        ["name"] = "Join Command (Tap to Copy)",
                         ["value"] = "```lua\ngame:GetService('TeleportService'):TeleportToPlaceInstance(" 
-                            .. game.PlaceId .. ", '" .. game.JobId .. "')```"
+                            .. game.PlaceId .. ", '" .. jobId .. "')```"
                     }
                 },
                 ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S")
@@ -85,7 +104,7 @@ function BoostedServerFinder:SendWebhook(boostValue, jobId, playerCount)
 
         pcall(function()
             http_request({
-                Url = WEBHOOK_URL,
+                Url = wh.Url,
                 Method = "POST",
                 Headers = {["Content-Type"] = "application/json"},
                 Body = self.HttpService:JSONEncode(embed)
@@ -128,12 +147,10 @@ end
 
 function BoostedServerFinder:Hop()
     local servers = self:GetServers()
-
     if #servers == 0 then
         warn("No valid servers found.")
         return
     end
-
     local jobId = servers[math.random(1, #servers)]
     self.TeleportService:TeleportToPlaceInstance(game.PlaceId, jobId)
 end
@@ -160,7 +177,6 @@ end
 function BoostedServerFinder:StartMonitoring()
     if self.monitoring then return end
     self.monitoring = true
-
     task.spawn(function()
         while self.monitoring do
             self:VerifyIfServerIsBoosted()
@@ -172,7 +188,6 @@ end
 function BoostedServerFinder:StartHopping()
     if self.hopping then return end
     self.hopping = true
-
     task.spawn(function()
         while self.hopping do
             if not self:VerifyIfServerIsBoosted() then
