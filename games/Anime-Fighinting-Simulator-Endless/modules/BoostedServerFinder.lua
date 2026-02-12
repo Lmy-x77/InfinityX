@@ -87,25 +87,32 @@ end
 
 function BoostedServerFinder:GetServers()
     local servers = {}
+    local cursor = ""
+    
+    repeat
+        local success, response = pcall(function()
+            local url = string.format(
+                "https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100&cursor=%s",
+                game.PlaceId,
+                cursor
+            )
+            return http_request({Url = url, Method = "GET"}).Body
+        end)
 
-    local success, response = pcall(function()
-        local url = string.format(
-            "https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100",
-            game.PlaceId
-        )
-        return http_request({Url = url, Method = "GET"}).Body
-    end)
+        if not success or not response then break end
 
-    if success and response then
         local data = self.HttpService:JSONDecode(response)
+
         for _, server in pairs(data.data or {}) do
             if server.playing >= self.MIN_PLAYERS
-                and server.playing <= self.MAX_PLAYERS
-                and server.id ~= game.JobId then
+            and server.playing <= self.MAX_PLAYERS
+            and server.id ~= game.JobId then
                 table.insert(servers, server.id)
             end
         end
-    end
+
+        cursor = data.nextPageCursor or ""
+    until cursor == ""
 
     return servers
 end
@@ -114,7 +121,7 @@ function BoostedServerFinder:Hop()
     local servers = self:GetServers()
 
     if #servers == 0 then
-        self.TeleportService:Teleport(game.PlaceId)
+        warn("No valid servers found.")
         return
     end
 
