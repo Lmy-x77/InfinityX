@@ -81,8 +81,7 @@ end
 
 function BoostedServerFinder:SendWebhook(boostValue, jobId, playerCount)
     local formattedTime = self:FormatTime(boostValue)
-    
-    -- Preparando os dados que vamos usar nos dois requests
+
     local joinCommand = "game:GetService('TeleportService'):TeleportToPlaceInstance(" 
         .. game.PlaceId .. ", '" .. jobId .. "')"
     
