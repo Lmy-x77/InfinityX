@@ -85,14 +85,22 @@ function BoostedServerFinder:SendWebhook(boostValue, jobId, playerCount)
     for _, wh in pairs(self.WEBHOOKS) do
         if wh.Url and wh.Url ~= "" then
             local embed = {
-                ["title"] = "Boosted Server Found!",
-                ["color"] = wh.Color or 65280,
-                ["thumbnail"] = wh.Thumbnail and {["url"] = wh.Thumbnail} or nil,
-                ["fields"] = {
-                    {["name"] = "Boost Time", ["value"] = formattedTime, ["inline"] = true},
-                    {["name"] = "Players", ["value"] = playerCount .. "/" .. self.MAX_PLAYERS, ["inline"] = true}
-                },
-                ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S")
+                ["embeds"] = {{
+                    ["title"] = "Boosted Server Found!",
+                    ["color"] = wh.Color or 65280,
+                    ["thumbnail"] = wh.Thumbnail and {["url"] = wh.Thumbnail} or nil,
+                    ["fields"] = {
+                        {["name"] = "Boost Time", ["value"] = formattedTime, ["inline"] = true},
+                        {["name"] = "Players", ["value"] = playerCount .. "/" .. self.MAX_PLAYERS, ["inline"] = true},
+                        {["name"] = "Job ID", ["value"] = "```" .. jobId .. "```"},
+                        {
+                            ["name"] = "Join Command (Tap to Copy)",
+                            ["value"] = "```lua\ngame:GetService('TeleportService'):TeleportToPlaceInstance(" 
+                                .. game.PlaceId .. ", '" .. jobId .. "')```"
+                        }
+                    },
+                    ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S")
+                }}
             }
 
             local contentMessage = "**Tap to copy:**\n`game:GetService('TeleportService'):TeleportToPlaceInstance("
