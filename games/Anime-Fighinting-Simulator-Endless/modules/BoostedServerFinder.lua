@@ -81,31 +81,52 @@ end
 
 function BoostedServerFinder:SendWebhook(boostValue, jobId, playerCount)
     local formattedTime = self:FormatTime(boostValue)
-
+    
+    -- Preparando os dados que vamos usar nos dois requests
+    local joinCommand = "game:GetService('TeleportService'):TeleportToPlaceInstance(" 
+        .. game.PlaceId .. ", '" .. jobId .. "')"
+    
+    local contentMessage = "**Tap to copy:**\n`" .. joinCommand .. "`"
+    
+    local embedData = {
+        ["title"] = "Boosted Server Found!",
+        ["color"] = wh.Color or 65280,
+        ["thumbnail"] = nil,
+        ["fields"] = {
+            {["name"] = "Boost Time", ["value"] = formattedTime, ["inline"] = true},
+            {["name"] = "Players",    ["value"] = playerCount .. "/" .. self.MAX_PLAYERS, ["inline"] = true},
+            {["name"] = "Job ID",     ["value"] = "```" .. jobId .. "```"},
+            {
+                ["name"] = "Join Command",
+                ["value"] = "```lua\n" .. joinCommand .. "```"
+            }
+        },
+        ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S")
+    }
+    
     for _, wh in pairs(self.WEBHOOKS) do
         if wh.Url and wh.Url ~= "" then
-            local embed = {
-                ["embeds"] = {{
-                    ["title"] = "Boosted Server Found!",
-                    ["color"] = wh.Color or 65280,
-                    ["thumbnail"] = wh.Thumbnail and {["url"] = wh.Thumbnail} or nil,
-                    ["fields"] = {
-                        {["name"] = "Boost Time", ["value"] = formattedTime, ["inline"] = true},
-                        {["name"] = "Players", ["value"] = playerCount .. "/" .. self.MAX_PLAYERS, ["inline"] = true},
-                        {["name"] = "Job ID", ["value"] = "```" .. jobId .. "```"},
-                        {
-                            ["name"] = "Join Command (Tap to Copy)",
-                            ["value"] = "```lua\ngame:GetService('TeleportService'):TeleportToPlaceInstance(" 
-                                .. game.PlaceId .. ", '" .. jobId .. "')```"
-                        }
-                    },
-                    ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S")
-                }}
+            local embed = embedData
+            embed.color = wh.Color or embed.color
+            if wh.Thumbnail and wh.Thumbnail ~= "" then
+                embed.thumbnail = {["url"] = wh.Thumbnail}
+            end
+            
+            local payloadEmbed = {
+                embeds = {embed},
+                username = "Boosted Server Finder",
+                avatar_url = wh.Image or nil
             }
-
-            local contentMessage = "**Tap to copy:**\n`game:GetService('TeleportService'):TeleportToPlaceInstance("
-                .. game.PlaceId .. ", '" .. jobId .. "')`"
-
+            
+            pcall(function()
+                http_request({
+                    Url = wh.Url,
+                    Method = "POST",
+                    Headers = {["Content-Type"] = "application/json"},
+                    Body = self.HttpService:JSONEncode(payloadEmbed)
+                })
+            end)
+            
             pcall(function()
                 http_request({
                     Url = wh.Url,
@@ -114,8 +135,7 @@ function BoostedServerFinder:SendWebhook(boostValue, jobId, playerCount)
                     Body = self.HttpService:JSONEncode({
                         content = contentMessage,
                         username = "Boosted Server Finder",
-                        avatar_url = wh.Image,
-                        embeds = {embed}
+                        avatar_url = wh.Image or nil
                     })
                 })
             end)
