@@ -1,3 +1,4 @@
+--!strict
 local BoostedServerFinder = {}
 BoostedServerFinder.__index = BoostedServerFinder
 
@@ -7,7 +8,6 @@ function BoostedServerFinder.new(minPlayers, maxPlayers, hopDelay)
     self.HttpService = game:GetService("HttpService")
     self.TeleportService = game:GetService("TeleportService")
     self.Players = game:GetService("Players")
-    self.RunService = game:GetService("RunService")
     self.ReplicatedStorage = game:GetService("ReplicatedStorage")
 
     self.MIN_PLAYERS = minPlayers or 1
@@ -15,8 +15,10 @@ function BoostedServerFinder.new(minPlayers, maxPlayers, hopDelay)
     self.HOP_DELAY = hopDelay or 5
 
     self.WEBHOOK_URLS = {}
+
     self.sentWebhook = false
-    self.boostHopping = false
+    self.hopping = false
+    self.monitoring = false
 
     return self
 end
@@ -61,11 +63,11 @@ function BoostedServerFinder:SendWebhook(boostValue, jobId, playerCount)
                 ["fields"] = {
                     {["name"] = "Boost Time", ["value"] = formattedTime, ["inline"] = true},
                     {["name"] = "Players", ["value"] = playerCount .. "/" .. self.MAX_PLAYERS, ["inline"] = true},
-                    {["name"] = "Job ID", ["value"] = "```" .. jobId .. "```"},
+                    {["name"] = "Job ID", ["value"] = "```" .. game.JobId .. "```"},
                     {
                         ["name"] = "Join Command",
                         ["value"] = "```lua\ngame:GetService('TeleportService'):TeleportToPlaceInstance(" 
-                            .. game.PlaceId .. ", '" .. jobId .. "')```"
+                            .. game.PlaceId .. ", '" .. game.JobId .. "')```"
                     }
                 },
                 ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S")
@@ -126,40 +128,46 @@ function BoostedServerFinder:VerifyIfServerIsBoosted()
     if boostValue > 0 then
         if not self.sentWebhook then
             self.sentWebhook = true
-            self.boostHopping = false
-
             local playerCount = #self.Players:GetPlayers()
             self:SendWebhook(boostValue, game.JobId, playerCount)
         end
         return true
+    else
+        self.sentWebhook = false
     end
 
     return false
 end
 
-function BoostedServerFinder:Start()
-    if self.boostHopping then
-        return
-    end
+function BoostedServerFinder:StartMonitoring()
+    if self.monitoring then return end
+    self.monitoring = true
 
-    self.boostHopping = true
-    self.sentWebhook = false
-
-    self.RunService.Heartbeat:Connect(function()
-        if not self.boostHopping then
-            return
+    task.spawn(function()
+        while self.monitoring do
+            self:VerifyIfServerIsBoosted()
+            task.wait(self.HOP_DELAY)
         end
+    end)
+end
 
-        if not self:VerifyIfServerIsBoosted() then
-            self:Hop()
+function BoostedServerFinder:StartHopping()
+    if self.hopping then return end
+    self.hopping = true
+
+    task.spawn(function()
+        while self.hopping do
+            if not self:VerifyIfServerIsBoosted() then
+                self:Hop()
+            end
+            task.wait(self.HOP_DELAY)
         end
-
-        task.wait(self.HOP_DELAY)
     end)
 end
 
 function BoostedServerFinder:Stop()
-    self.boostHopping = false
+    self.hopping = false
+    self.monitoring = false
 end
 
 return BoostedServerFinder
