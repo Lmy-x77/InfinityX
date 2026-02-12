@@ -140,7 +140,9 @@ function BoostedServerFinder:VerifyIfServerIsBoosted()
         end
         return true
     else
-        self.sentWebhook = false
+        if self.sentWebhook then
+            self.sentWebhook = false
+        end
     end
 
     return false
