@@ -26,7 +26,16 @@ end
 function BoostedServerFinder:AddWebhook(urls)
     for _, url in pairs(urls) do
         if type(url) == "string" and url ~= "" then
-            table.insert(self.WEBHOOK_URLS, url)
+            local exists = false
+            for _, existing in pairs(self.WEBHOOK_URLS) do
+                if existing == url then
+                    exists = true
+                    break
+                end
+            end
+            if not exists then
+                table.insert(self.WEBHOOK_URLS, url)
+            end
         end
     end
 end
