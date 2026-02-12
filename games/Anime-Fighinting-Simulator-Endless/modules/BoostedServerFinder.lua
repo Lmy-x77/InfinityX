@@ -81,34 +81,45 @@ end
 
 function BoostedServerFinder:SendWebhook(boostValue, jobId, playerCount)
     local formattedTime = self:FormatTime(boostValue)
-
-    local joinCommand = "game:GetService('TeleportService'):TeleportToPlaceInstance(" 
+    
+    local joinCommand = "game:GetService('TeleportService'):TeleportToPlaceInstance("
         .. game.PlaceId .. ", '" .. jobId .. "')"
     
     local contentMessage = "**Tap to copy:**\n`" .. joinCommand .. "`"
     
-    local embedData = {
-        ["title"] = "Boosted Server Found!",
-        ["color"] = wh.Color or 65280,
-        ["thumbnail"] = nil,
-        ["fields"] = {
-            {["name"] = "Boost Time", ["value"] = formattedTime, ["inline"] = true},
-            {["name"] = "Players",    ["value"] = playerCount .. "/" .. self.MAX_PLAYERS, ["inline"] = true},
-            {["name"] = "Job ID",     ["value"] = "```" .. jobId .. "```"},
-            {
-                ["name"] = "Join Command",
-                ["value"] = "```lua\n" .. joinCommand .. "```"
-            }
+    local embedBase = {
+        title = "Boosted Server Found!",
+        fields = {
+            {name = "Boost Time", value = formattedTime, inline = true},
+            {name = "Players",    value = playerCount .. "/" .. self.MAX_PLAYERS, inline = true},
+            {name = "Job ID",     value = "```" .. jobId .. "```"},
+            {name = "Join Command", value = "```lua\n" .. joinCommand .. "```"}
         },
-        ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S")
+        timestamp = os.date("!%Y-%m-%dT%H:%M:%S")
     }
     
     for _, wh in pairs(self.WEBHOOKS) do
         if wh.Url and wh.Url ~= "" then
-            local embed = embedData
-            embed.color = wh.Color or embed.color
+            
+            local embed = {}
+            for k, v in pairs(embedBase) do
+                embed[k] = v
+            end
+            
+            embed.color = 65280
+            if wh.Color then
+                if typeof(wh.Color) == "number" then
+                    embed.color = wh.Color
+                elseif typeof(wh.Color) == "string" then
+                    local num = tonumber(wh.Color, 16)
+                    if num then
+                        embed.color = num
+                    end
+                end
+            end
+            
             if wh.Thumbnail and wh.Thumbnail ~= "" then
-                embed.thumbnail = {["url"] = wh.Thumbnail}
+                embed.thumbnail = {url = wh.Thumbnail}
             end
             
             local payloadEmbed = {
