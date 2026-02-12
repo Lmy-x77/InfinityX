@@ -4,10 +4,10 @@ BoostedServerFinder.__index = BoostedServerFinder
 function BoostedServerFinder.new(minPlayers, maxPlayers, hopDelay)
     local self = setmetatable({}, BoostedServerFinder)
 
-    self.HttpService = game:GetService("HttpService")
-    self.TeleportService = game:GetService("TeleportService")
-    self.Players = game:GetService("Players")
-    self.ReplicatedStorage = game:GetService("ReplicatedStorage")
+    self.HttpService = cloneref(game:GetService("HttpService"));
+    self.TeleportService = cloneref(game:GetService("TeleportService"));
+    self.Players = cloneref(game:GetService("Players"));
+    self.ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"));
 
     self.MIN_PLAYERS = minPlayers or 1
     self.MAX_PLAYERS = maxPlayers or 20
