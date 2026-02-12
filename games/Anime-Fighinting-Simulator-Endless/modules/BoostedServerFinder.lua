@@ -155,16 +155,20 @@ end
 
 function BoostedServerFinder:GetServers()
     local servers = {}
-    local cursor = ""
+    local cursor = nil
     
     repeat
+        local url = "https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Desc&limit=100"
+        
+        if cursor then
+            url = url .. "&cursor=" .. cursor
+        end
+
         local success, response = pcall(function()
-            local url = string.format(
-                "https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100&cursor=%s",
-                game.PlaceId,
-                cursor
-            )
-            return http_request({Url = url, Method = "GET"}).Body
+            return http_request({
+                Url = url,
+                Method = "GET"
+            }).Body
         end)
 
         if not success or not response then break end
@@ -173,14 +177,14 @@ function BoostedServerFinder:GetServers()
 
         for _, server in pairs(data.data or {}) do
             if server.playing >= self.MIN_PLAYERS
-            and server.playing <= self.MAX_PLAYERS
+            and server.playing < server.maxPlayers
             and server.id ~= game.JobId then
                 table.insert(servers, server.id)
             end
         end
 
-        cursor = data.nextPageCursor or ""
-    until cursor == ""
+        cursor = data.nextPageCursor
+    until not cursor
 
     return servers
 end
