@@ -83,33 +83,35 @@ function BoostedServerFinder:SendWebhook(boostValue, jobId, playerCount)
     local formattedTime = self:FormatTime(boostValue)
 
     for _, wh in pairs(self.WEBHOOKS) do
-        local embed = {
-            ["embeds"] = {{
+        if wh.Url and wh.Url ~= "" then
+            local embed = {
                 ["title"] = "Boosted Server Found!",
                 ["color"] = wh.Color or 65280,
-                ["thumbnail"] = wh.Image and {["url"] = wh.Image} or nil,
+                ["thumbnail"] = wh.Thumbnail and {["url"] = wh.Thumbnail} or nil,
                 ["fields"] = {
                     {["name"] = "Boost Time", ["value"] = formattedTime, ["inline"] = true},
-                    {["name"] = "Players", ["value"] = playerCount .. "/" .. self.MAX_PLAYERS, ["inline"] = true},
-                    {["name"] = "Job ID", ["value"] = "```" .. jobId .. "```"},
-                    {
-                        ["name"] = "Join Command (Tap to Copy)",
-                        ["value"] = "```lua\ngame:GetService('TeleportService'):TeleportToPlaceInstance(" 
-                            .. game.PlaceId .. ", '" .. jobId .. "')```"
-                    }
+                    {["name"] = "Players", ["value"] = playerCount .. "/" .. self.MAX_PLAYERS, ["inline"] = true}
                 },
                 ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S")
-            }}
-        }
+            }
 
-        pcall(function()
-            http_request({
-                Url = wh.Url,
-                Method = "POST",
-                Headers = {["Content-Type"] = "application/json"},
-                Body = self.HttpService:JSONEncode(embed)
-            })
-        end)
+            local contentMessage = "**Tap to copy:**\n`game:GetService('TeleportService'):TeleportToPlaceInstance("
+                .. game.PlaceId .. ", '" .. jobId .. "')`"
+
+            pcall(function()
+                http_request({
+                    Url = wh.Url,
+                    Method = "POST",
+                    Headers = {["Content-Type"] = "application/json"},
+                    Body = self.HttpService:JSONEncode({
+                        content = contentMessage,
+                        username = "Boosted Server Finder",
+                        avatar_url = wh.Image,
+                        embeds = {embed}
+                    })
+                })
+            end)
+        end
     end
 end
 
