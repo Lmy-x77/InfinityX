@@ -7,6 +7,9 @@ local oldNewIndex
 local ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"))
 local UnreliableRemoteEvent = ReplicatedStorage.shared.Remotes.UnreliableRemoteEvent
 
+local Players = cloneref(game:GetService("Players"));
+local lp = Players.LocalPlayer
+
 function hook:BypassGlobalGame()
     pcall(function()
         if not hookmetamethod then return end
@@ -95,6 +98,41 @@ function hook:NeutralizeUnreliableRemoteEvent()
     end)
 end
 
+function hook:NeutralizeLocalScript()
+    pcall(function()
+        local name = lp.Name
+        local EXCLUDE_PATH = "Players.".. name ..".PlayerGui.Main.MainClient.VisualClient.Quirks"
+
+        local function getScriptPath(func)
+            local env = getfenv(func)
+            if env and typeof(env.script) == "Instance" then
+                return env.script:GetFullName()
+            end
+
+            local info = debug.getinfo(func)
+            return (info.source or "unknown"):gsub("@","")
+        end
+
+        for _, v in ipairs(getgc(true)) do
+            if typeof(v) == "function" and not isexecutorclosure(v) then
+                local info = debug.getinfo(v)
+                if info.name and (
+                    info.name:lower():find("kick") or
+                    info.name:lower():find("ban") or
+                    info.name:lower():find("anti")
+                ) then
+                    local path = getScriptPath(v)
+                    if not path:find(EXCLUDE_PATH, 1, true) then
+                        hookfunction(v, function(...)
+                            return nil
+                        end)
+                    end
+                end
+            end
+        end
+    end)
+end
+
 hook._applied = false
 
 function hook:Apply()
@@ -102,6 +140,7 @@ function hook:Apply()
         self:BypassGlobalGame()
         self:NeutralizeFluff()
         self:NeutralizeUnreliableRemoteEvent()
+        self:NeutralizeLocalScript()
         self._applied = true
     end)
 end
