@@ -4,6 +4,9 @@ hook.__index = hook
 local oldNamecall
 local oldNewIndex
 
+local ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"))
+local UnreliableRemoteEvent = ReplicatedStorage.shared.Remotes.UnreliableRemoteEvent
+
 function hook:BypassGlobalGame()
     pcall(function()
         if not hookmetamethod then return end
@@ -69,12 +72,36 @@ function hook:NeutralizeFluff()
     end)
 end
 
+function hook:NeutralizeUnreliableRemoteEvent()
+    pcall(function()
+        local oldNamecall
+        oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+            if not checkcaller() and self == UnreliableRemoteEvent then
+                if getnamecallmethod() == "Fire" then
+                    return
+                end
+            end
+            return oldNamecall(self, ...)
+        end)
+    end)
+    pcall(function()
+        local oldIndex
+        oldIndex = hookmetamethod(game, "__index", function(self, key)
+            if not checkcaller() and self == UnreliableRemoteEvent and key == "Fire" then
+                return function() end
+            end
+            return oldIndex(self, key)
+        end)
+    end)
+end
+
 hook._applied = false
 
 function hook:Apply()
     pcall(function()
         self:BypassGlobalGame()
         self:NeutralizeFluff()
+        self:NeutralizeUnreliableRemoteEvent()
         self._applied = true
     end)
 end
