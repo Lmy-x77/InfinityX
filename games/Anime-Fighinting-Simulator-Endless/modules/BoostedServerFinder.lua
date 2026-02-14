@@ -82,6 +82,16 @@ function BoostedServerFinder:FormatTime(seconds)
     return table.concat(parts, " ")
 end
 
+function BoostedServerFinder:GetWebhook(url)
+    if url == "https://discord.com/api/webhooks/1471852000399331370/7iivrjq_Cvhdw-8fzGHvXArJKM3AmzJp86xyhiWlDSURIu5dfOb-nNVNGj2uuXFd1Dso" then
+        return "InfinityX"
+    elseif url == "https://discord.com/api/webhooks/1471535113274789958/0sYh5fB9vp7qjwuYcej_DzSn3qEp32ErNivoQqHgYHo7JxniIeVPNhZT53Febo0JLxdQ" then
+        return "Shadow Hub"
+    end
+
+    return "Unknown"
+end
+
 function BoostedServerFinder:SendWebhook(boostValue, jobId, playerCount)
     local formattedTime = self:FormatTime(boostValue)
     local serverType, embedColor = self:GetServerType()
@@ -105,6 +115,9 @@ function BoostedServerFinder:SendWebhook(boostValue, jobId, playerCount)
 
     for _, wh in pairs(self.WEBHOOKS) do
         pcall(function()
+
+            local webhookName = self:GetWebhook(wh.Url)
+
             request({
                 Url = wh.Url,
                 Method = "POST",
@@ -151,7 +164,7 @@ function BoostedServerFinder:SendWebhook(boostValue, jobId, playerCount)
                             }
                         },
                         footer = {
-                            text = "InfinityX • Boost Finder"
+                            text = webhookName .. " • Boost Finder"
                         },
                         timestamp = timestamp
                     }}
