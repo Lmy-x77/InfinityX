@@ -125,6 +125,10 @@ function BoostedServerFinder:SendWebhook(boostValue, jobId, playerCount)
                     ["Content-Type"] = "application/json"
                 },
                 Body = self.HttpService:JSONEncode({
+
+                    username = webhookName,
+                    avatar_url = wh.Thumbnail or wh.Image,
+
                     embeds = {{
                         title = "🚀 Boosted Server Found!",
                         description = "Active boosted server detected.",
