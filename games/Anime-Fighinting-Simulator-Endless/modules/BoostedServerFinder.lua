@@ -4,10 +4,10 @@ BoostedServerFinder.__index = BoostedServerFinder
 function BoostedServerFinder.new(minPlayers, maxPlayers, hopDelay)
     local self = setmetatable({}, BoostedServerFinder)
 
-    self.HttpService = cloneref(game:GetService("HttpService"));
-    self.TeleportService = cloneref(game:GetService("TeleportService"));
-    self.Players = cloneref(game:GetService("Players"));
-    self.ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"));
+    self.HttpService = cloneref(game:GetService("HttpService"))
+    self.TeleportService = cloneref(game:GetService("TeleportService"))
+    self.Players = cloneref(game:GetService("Players"))
+    self.ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"))
 
     self.MIN_PLAYERS = minPlayers or 1
     self.MAX_PLAYERS = maxPlayers or 20
@@ -16,8 +16,8 @@ function BoostedServerFinder.new(minPlayers, maxPlayers, hopDelay)
     self.WEBHOOKS = {}
 
     self.sentWebhook = false
-    self.hopping = false
     self.monitoring = false
+    self.hopping = false
 
     return self
 end
@@ -25,38 +25,33 @@ end
 function BoostedServerFinder:AddWebhook(webhookList)
     for _, wh in pairs(webhookList) do
         if type(wh) == "table" and wh.Url and wh.Url ~= "" then
-            local exists = false
-            for _, existing in pairs(self.WEBHOOKS) do
-                if existing.Url == wh.Url then
-                    exists = true
-                    break
-                end
-            end
-            if not exists then
-                table.insert(self.WEBHOOKS, {
-                    Url = wh.Url,
-                    Color = wh.Color or 65280,
-                    Image = wh.Image or nil
-                })
-            end
+            table.insert(self.WEBHOOKS, {
+                Url = wh.Url,
+                Color = wh.Color or 65280,
+                Image = wh.Image
+            })
         end
     end
 end
 
-function BoostedServerFinder:EditWebhook(url, props)
-    for _, wh in pairs(self.WEBHOOKS) do
-        if wh.Url == url then
-            if props.Color then wh.Color = props.Color end
-            if props.Image then wh.Image = props.Image end
-            return true
-        end
+function BoostedServerFinder:IsPrivateServer()
+    local success, id = pcall(function()
+        return game.PrivateServerId
+    end)
+
+    if success and id and id ~= "" and game.PrivateServerOwnerId ~= 0 then
+        return true
     end
+
     return false
 end
 
-function BoostedServerFinder:SetWebhooks(webhookList)
-    self.WEBHOOKS = {}
-    self:AddWebhook(webhookList)
+function BoostedServerFinder:GetServerType()
+    if self:IsPrivateServer() then
+        return "Private Server", 16776960
+    else
+        return "Public Server", 65280
+    end
 end
 
 function BoostedServerFinder:GetServerBoost()
@@ -73,99 +68,111 @@ end
 
 function BoostedServerFinder:FormatTime(seconds)
     local totalSeconds = tonumber(seconds) or 0
-    local hours = math.floor(totalSeconds / 3600)
+    local days = math.floor(totalSeconds / 86400)
+    local hours = math.floor((totalSeconds % 86400) / 3600)
     local minutes = math.floor((totalSeconds % 3600) / 60)
     local secs = math.floor(totalSeconds % 60)
-    return string.format("%02dh %02dm %02ds", hours, minutes, secs)
+
+    local parts = {}
+    if days > 0 then table.insert(parts, days .. "d") end
+    if hours > 0 or days > 0 then table.insert(parts, hours .. "h") end
+    if minutes > 0 or hours > 0 or days > 0 then table.insert(parts, minutes .. "m") end
+    table.insert(parts, secs .. "s")
+
+    return table.concat(parts, " ")
 end
 
 function BoostedServerFinder:SendWebhook(boostValue, jobId, playerCount)
     local formattedTime = self:FormatTime(boostValue)
-    
-    local joinCommand = "game:GetService('TeleportService'):TeleportToPlaceInstance("
-        .. game.PlaceId .. ", '" .. jobId .. "')"
-    
-    local contentMessage = "**Tap to copy:**\n`" .. joinCommand .. "`"
-    
-    local embedBase = {
-        title = "Boosted Server Found!",
-        fields = {
-            {name = "Boost Time", value = formattedTime, inline = true},
-            {name = "Players",    value = playerCount .. "/" .. self.MAX_PLAYERS, inline = true},
-            {name = "Job ID",     value = "```" .. jobId .. "```"},
-            {name = "Join Command", value = "```lua\n" .. joinCommand .. "```"}
-        },
-        timestamp = os.date("!%Y-%m-%dT%H:%M:%S")
-    }
-    
+    local serverType, embedColor = self:GetServerType()
+
+    local robloxLink = string.format(
+        "https://www.roblox.com/games/start?placeId=%d&gameInstanceId=%s",
+        game.PlaceId,
+        jobId
+    )
+
+    local currentTime = os.date("*t")
+    local timestamp = string.format(
+        "%04d-%02d-%02dT%02d:%02d:%02dZ",
+        currentTime.year,
+        currentTime.month,
+        currentTime.day,
+        currentTime.hour,
+        currentTime.min,
+        currentTime.sec
+    )
+
     for _, wh in pairs(self.WEBHOOKS) do
-        if wh.Url and wh.Url ~= "" then
-            
-            local embed = {}
-            for k, v in pairs(embedBase) do
-                embed[k] = v
-            end
-            
-            embed.color = 65280
-            if wh.Color then
-                if typeof(wh.Color) == "number" then
-                    embed.color = wh.Color
-                elseif typeof(wh.Color) == "string" then
-                    local num = tonumber(wh.Color, 16)
-                    if num then
-                        embed.color = num
-                    end
-                end
-            end
-            
-            if wh.Thumbnail and wh.Thumbnail ~= "" then
-                embed.thumbnail = {url = wh.Thumbnail}
-            end
-            
-            local payloadEmbed = {
-                embeds = {embed},
-                username = "Boosted Server Finder",
-                avatar_url = wh.Image or nil
-            }
-            
-            pcall(function()
-                http_request({
-                    Url = wh.Url,
-                    Method = "POST",
-                    Headers = {["Content-Type"] = "application/json"},
-                    Body = self.HttpService:JSONEncode(payloadEmbed)
+        pcall(function()
+            request({
+                Url = wh.Url,
+                Method = "POST",
+                Headers = {
+                    ["Content-Type"] = "application/json"
+                },
+                Body = self.HttpService:JSONEncode({
+                    embeds = {{
+                        title = "🚀 Boosted Server Found!",
+                        description = "Active boosted server detected.",
+                        color = wh.Color or embedColor,
+                        thumbnail = wh.Image and { url = wh.Image } or nil,
+                        fields = {
+                            {
+                                name = "⏰ Boost Time Remaining",
+                                value = "```" .. formattedTime .. "```",
+                                inline = true
+                            },
+                            {
+                                name = "👥 Players",
+                                value = "```" .. playerCount .. "/" .. self.MAX_PLAYERS .. "```",
+                                inline = true
+                            },
+                            {
+                                name = "🌐 Server Type",
+                                value = "```" .. serverType .. "```",
+                                inline = true
+                            },
+                            {
+                                name = "🆔 Job ID",
+                                value = "```" .. jobId .. "```",
+                                inline = false
+                            },
+                            {
+                                name = "🔗 Direct Join",
+                                value = "[Click here to join](" .. robloxLink .. ")",
+                                inline = false
+                            },
+                            {
+                                name = "💻 Join via Script",
+                                value = "```lua\ngame:GetService('TeleportService'):TeleportToPlaceInstance(" 
+                                    .. game.PlaceId .. ", '" .. jobId .. "')```",
+                                inline = false
+                            }
+                        },
+                        footer = {
+                            text = "InfinityX • Boost Finder"
+                        },
+                        timestamp = timestamp
+                    }}
                 })
-            end)
-            
-            pcall(function()
-                http_request({
-                    Url = wh.Url,
-                    Method = "POST",
-                    Headers = {["Content-Type"] = "application/json"},
-                    Body = self.HttpService:JSONEncode({
-                        content = contentMessage,
-                        username = "Boosted Server Finder",
-                        avatar_url = wh.Image or nil
-                    })
-                })
-            end)
-        end
+            })
+        end)
     end
 end
 
 function BoostedServerFinder:GetServers()
     local servers = {}
     local cursor = nil
-    
+
     repeat
-        local url = "https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Desc&limit=100"
-        
+        local url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Desc&limit=100"
         if cursor then
             url = url .. "&cursor=" .. cursor
         end
 
         local success, response = pcall(function()
-            return http_request({
+            return request({
                 Url = url,
                 Method = "GET"
             }).Body
@@ -191,10 +198,7 @@ end
 
 function BoostedServerFinder:Hop()
     local servers = self:GetServers()
-    if #servers == 0 then
-        warn("No valid servers found.")
-        return
-    end
+    if #servers == 0 then return end
     local jobId = servers[math.random(1, #servers)]
     self.TeleportService:TeleportToPlaceInstance(game.PlaceId, jobId)
 end
@@ -205,14 +209,11 @@ function BoostedServerFinder:VerifyIfServerIsBoosted()
     if boostValue > 0 then
         if not self.sentWebhook then
             self.sentWebhook = true
-            local playerCount = #self.Players:GetPlayers()
-            self:SendWebhook(boostValue, game.JobId, playerCount)
+            self:SendWebhook(boostValue, game.JobId, #self.Players:GetPlayers())
         end
         return true
     else
-        if self.sentWebhook then
-            self.sentWebhook = false
-        end
+        self.sentWebhook = false
     end
 
     return false
@@ -221,6 +222,7 @@ end
 function BoostedServerFinder:StartMonitoring()
     if self.monitoring then return end
     self.monitoring = true
+
     task.spawn(function()
         while self.monitoring do
             self:VerifyIfServerIsBoosted()
@@ -232,6 +234,7 @@ end
 function BoostedServerFinder:StartHopping()
     if self.hopping then return end
     self.hopping = true
+
     task.spawn(function()
         while self.hopping do
             if not self:VerifyIfServerIsBoosted() then
@@ -243,8 +246,8 @@ function BoostedServerFinder:StartHopping()
 end
 
 function BoostedServerFinder:Stop()
-    self.hopping = false
     self.monitoring = false
+    self.hopping = false
 end
 
 return BoostedServerFinder
