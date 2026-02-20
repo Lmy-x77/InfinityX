@@ -645,6 +645,54 @@ Champions = {
 		SellingValue = 0;
 		Rarity = 6;
 	};
+	["501"] = {
+		Name = "Arice";
+		Desc = "Auto trains 200% of your Sword, increases your Yen Per Min by x1.25, increases your Hearts Per Min by x2.5";
+		Abilities = {
+			AutoTrainer = {
+				['4'] = 2;
+			};
+			YenBuff = 1.25;
+			HeartsBuff = 2.5;
+		};
+		ClassNeeded = "17";
+		SellingValue = 0;
+		Rarity = 6;
+	};
+	["502"] = {
+		Name = "Riah";
+		HasShiny = true;
+		Desc = "Auto trains 175% of your Durability, increases your Yen Per Min by x1.15, increases your Hearts Per Min by x2.5. While unequipped unit provides 1.25x to all Event Currency.";
+		Abilities = {
+			AutoTrainer = {
+				['2'] = 1.75;
+			};
+			YenBuff = 1.15;
+			HeartsBuff = 2.5;
+		};
+		Passives = {
+			EventCurrency = 1.25;
+		};
+		ClassNeeded = "17";
+		SellingValue = 0;
+		Rarity = 6;
+	};
+	["503"] = {
+		HasShiny = true;
+		Name = "Whitehair";
+		Desc = "Auto trains 160% of your Strength, Auto trains 175% of your Durability,  increases your Yen Per Min by x1.2, increases your Hearts Per Min by x2";
+		Abilities = {
+			AutoTrainer = {
+				['1'] = 1.6;
+				['2'] = 1.75;
+			};
+			YenBuff = 1.2;
+			HeartsBuff = 2;
+		};
+		ClassNeeded = "17";
+		SellingValue = 0;
+		Rarity = 6;
+	};
 	["1000"] = {
 		Name = "Top Card";
 		Desc = "Auto trains 140% of your Strength, 140% of your Durability, Nerfs all player damage by 50%, buffs all Damage by 25%, increases your Yen Per Min by x1.1, and prevents you from being stunned.";
@@ -727,7 +775,7 @@ Champions = {
 	};
 	["1005"] = {
 		Name = "Makimo";
-		Desc = "Auto trains 150% of your Strength, 150% of your Durability, 175% of your Chakra, 120% of your Sword, 90% of your Speed and 90% Agility, increases your Yen Per Min by x1.1, increases your Heart Per Min by x1.5.";
+		Desc = "Auto trains 150% of your Strength, 150% of your Durability, 175% of your Chakra, 120% of your Sword, 90% of your Speed and 90% Agility, increases your Yen Per Min by x1.1, increases your Hearts Per Min by x1.5.";
 		Abilities = {
 			AutoTrainer = {
 				['1'] = 1.5;
@@ -741,12 +789,13 @@ Champions = {
 			HeartsBuff = 1.5;
 		};
 		ClassNeeded = "17";
-		SellingValue = 15000;
+		HeartsValue = 250000;
+		SellingValue = 0;
 		Rarity = 6;
 	};
 	["1006"] = {
 		Name = "Esdeat";
-		Desc = "Auto trains 150% of your Sword, 160% of your Strength, increases your Yen Per Min by x1.15, increases your Heart Per Min by x2.";
+		Desc = "Auto trains 150% of your Sword, 160% of your Strength, increases your Yen Per Min by x1.15, increases your Hearts Per Min by x2.";
 		Abilities = {
 			AutoTrainer = {
 				['1'] = 1.6;
@@ -756,7 +805,8 @@ Champions = {
 			HeartsBuff = 2;
 		};
 		ClassNeeded = "17";
-		SellingValue = 15000;
+		HeartsValue = 500000;
+		SellingValue = 0;
 		Rarity = 6;
 	};
 	["1007"] = {
@@ -767,6 +817,20 @@ Champions = {
 				['4'] = 1.4;
 			};
 			YenBuff = 1.2;
+		};
+		ClassNeeded = "17";
+		SellingValue = 15000;
+		Rarity = 6;
+	};
+	["1008"] = {
+		Name = "Ezra";
+		Desc = "Auto trains 175% of your Durability, increases your Yen Per Min by x1.15, increases your Hearts Per Min by x2.";
+		Abilities = {
+			AutoTrainer = {
+				['2'] = 1.75;
+			};
+			YenBuff = 1.15;
+			HeartsBuff = 2;
 		};
 		ClassNeeded = "17";
 		SellingValue = 15000;
