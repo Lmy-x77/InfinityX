@@ -28,6 +28,7 @@ function SafeGuard:Hook(info)
   local AntiKick = info.AntiKick
   local AntiFluff = info.AntiFluff
   local AntiLogger = info.AntiLogger
+  local NilInstances = info.HookNilInstances
   local AntiBan = info.AntiBan
   local AntiHttpSpy = info.AntiHttpSpy
   local AntiFling = info.AntiFling
@@ -57,6 +58,9 @@ function SafeGuard:Hook(info)
   end
   if AntiLogger then
     loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Safe-Guard/script/AntiLogger.lua'))()
+  end
+  if NilInstances then
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Safe-Guard/script/NilInstances.lua'))()
   end
   if SafeMode then
     loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/library/Safe-Guard/script/SafeMode.lua"))()
