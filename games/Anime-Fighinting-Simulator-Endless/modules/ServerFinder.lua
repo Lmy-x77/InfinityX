@@ -1,19 +1,31 @@
 local ServerFinder = {}
 ServerFinder.__index = ServerFinder
 
+local Workspace                = cloneref(game:GetService("Workspace"));
+local Players                  = cloneref(game:GetService("Players"));
+local ReplicatedStorage        = cloneref(game:GetService("ReplicatedStorage"));
+local ReplicatedFirst          = cloneref(game:GetService("ReplicatedFirst"));
+local TweenService             = cloneref(game:GetService("TweenService"));
+local RunService               = cloneref(game:GetService("RunService"));
+local TeleportService          = cloneref(game:GetService("TeleportService"));
+local HttpService              = cloneref(game:GetService("HttpService"));
+local VirtualUser              = cloneref(game:GetService("VirtualUser"));
+local UserInputService         = cloneref(game:GetService("UserInputService"));
+local VirtualInputManager      = cloneref(game:GetService("VirtualInputManager"));
+
 function ServerFinder.new(minPlayers, maxPlayers, hopDelay)
     local self = setmetatable({}, ServerFinder)
 
-    self.HttpService = cloneref(game:GetService("HttpService"))
-    self.TeleportService = cloneref(game:GetService("TeleportService"))
-    self.Players = cloneref(game:GetService("Players"))
-    self.ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"))
+    self.HttpService = HttpService
+    self.TeleportService = TeleportService
+    self.Players = Players
+    self.ReplicatedStorage = ReplicatedStorage
 
     self.MIN_PLAYERS = minPlayers or 1
     self.MAX_PLAYERS = maxPlayers or 20
     self.HOP_DELAY = hopDelay or 5
 
-    self.WEBHOOKS = {}
+    self.Webhooks = {}
 
     self.sentWebhook = false
     self.monitoring = false
@@ -23,9 +35,14 @@ function ServerFinder.new(minPlayers, maxPlayers, hopDelay)
 end
 
 function ServerFinder:AddWebhook(webhookList)
+    if type(webhookList) ~= "table" then return end
+    if not self.Webhooks then
+        self.Webhooks = {}
+    end
+
     for _, wh in pairs(webhookList) do
         if type(wh) == "table" and wh.Url and wh.Url ~= "" then
-            table.insert(self.WEBHOOKS, {
+            table.insert(self.Webhooks, {
                 Url = wh.Url,
                 Type = wh.Type or "All",
                 Color = wh.Color or 65280,
@@ -238,27 +255,19 @@ function ServerFinder:SendWhitehairWebhook(tier)
     local now = os.date("!*t")
     local isoTime = string.format(
         "%04d-%02d-%02dT%02d:%02d:%02dZ",
-        now.year,
-        now.month,
-        now.day,
-        now.hour,
-        now.min,
-        now.sec
+        now.year, now.month, now.day,
+        now.hour, now.min, now.sec
     )
 
-    for _, wh in pairs(self.WEBHOOKS) do
+    for _, wh in pairs(self.Webhooks) do
         if self:ShouldSendToWebhook(wh, "Boss") then
 
             local webhookName = self:GetWebhook(wh.Url)
 
-            local authorName
-            if webhookName == "InfinityX" then
-                authorName = "InfinityX | Whitehair Spawn Notifier"
-            elseif webhookName == "Shadow Hub" then
-                authorName = "Shadow Hub | Whitehair Spawn Notifier"
-            else
-                authorName = "Whitehair Spawn Notifier"
-            end
+            local authorName =
+                webhookName == "InfinityX" and "InfinityX | Whitehair Spawn Notifier"
+                or webhookName == "Shadow Hub" and "Shadow Hub | Whitehair Spawn Notifier"
+                or "Whitehair Spawn Notifier"
 
             local embed = {
                 title = "WHITEHAIR WORLD BOSS  |  " .. tierLabel,
@@ -273,7 +282,7 @@ function ServerFinder:SendWhitehairWebhook(tier)
                 },
 
                 thumbnail = {
-                    url = "https://cdn.discordapp.com/attachments/1463173656250159164/1472876603674464378/file_0000000091d471fabc24f33eaecfc3d7_1.png"
+                    url = wh.Thumbnail
                 },
 
                 fields = {
@@ -284,7 +293,7 @@ function ServerFinder:SendWhitehairWebhook(tier)
                     },
                     {
                         name = "👥 Players",
-                        value = "```" .. #self.Players:GetPlayers() .. " / 24```",
+                        value = "```" .. #Players:GetPlayers() .. " / 24```",
                         inline = true
                     },
                     {
@@ -318,6 +327,12 @@ function ServerFinder:SendWhitehairWebhook(tier)
                 timestamp = isoTime
             }
 
+            local payload = {
+                username = webhookName,
+                avatar_url = wh.Thumbnail,
+                embeds = { embed }
+            }
+
             pcall(function()
                 request({
                     Url = wh.Url,
@@ -325,29 +340,15 @@ function ServerFinder:SendWhitehairWebhook(tier)
                     Headers = {
                         ["Content-Type"] = "application/json"
                     },
-                    Body = self.HttpService:JSONEncode({
-                        embeds = { embed }
-                    })
+                    Body = HttpService:JSONEncode(payload)
                 })
             end)
         end
     end
 end
 
-local HttpService = game:GetService("HttpService")
-local Players = game:GetService("Players")
-
-function ServerFinder:SendFruitWebhook(fruitList)
-    if not self.WEBHOOKS or #self.WEBHOOKS == 0 then
-        warn("No webhooks registered.")
-        return
-    end
-
-    local fruitName = type(fruitList) == "table"
-        and table.concat(fruitList, ", ")
-        or tostring(fruitList)
-
-    local serverType, embedColor = self:GetServerType()
+function ServerFinder:SendFruitWebhook(fruitName)
+    local serverType = select(1, self:GetServerType())
 
     local joinLink = string.format(
         "https://www.roblox.com/games/start?placeId=%d&gameInstanceId=%s",
@@ -362,36 +363,34 @@ function ServerFinder:SendFruitWebhook(fruitList)
         now.hour, now.min, now.sec
     )
 
-    for _, wh in pairs(self.WEBHOOKS) do
+    for _, wh in pairs(self.Webhooks) do
         if self:ShouldSendToWebhook(wh, "Fruit") then
 
             local webhookName = self:GetWebhook(wh.Url)
 
-            local authorName
-            if webhookName == "InfinityX" then
-                authorName = "InfinityX | Fruit Spawn Notifier"
-            elseif webhookName == "Shadow Hub" then
-                authorName = "Shadow Hub | Fruit Spawn Notifier"
-            else
-                authorName = "Fruit Spawn Notifier"
-            end
+            local authorName =
+                webhookName == "InfinityX" and "InfinityX | Fruit Spawn Notifier"
+                or webhookName == "Shadow Hub" and "Shadow Hub | Fruit Spawn Notifier"
+                or "Fruit Spawn Notifier"
 
             local embed = {
-                title = "🍎 FRUIT SPAWNED",
-                description = "**A fruit has spawned in this server!**",
-                color = wh.Color or embedColor,
+                title = "FRUIT SPAWN DETECTED",
+                description = "**A rare fruit has appeared in this server!**",
+                color = wh.Color or 10846687,
 
                 author = {
                     name = authorName,
                     icon_url = wh.Image
                 },
 
-                thumbnail = wh.Thumbnail and { url = wh.Thumbnail } or nil,
+                thumbnail = {
+                    url = wh.Thumbnail
+                },
 
                 fields = {
                     {
-                        name = "🍎 Fruit Name",
-                        value = "```" .. fruitName .. "```",
+                        name = "🍎 Fruit",
+                        value = "```" .. tostring(fruitName) .. "```",
                         inline = true
                     },
                     {
@@ -401,7 +400,7 @@ function ServerFinder:SendFruitWebhook(fruitList)
                     },
                     {
                         name = "👥 Players",
-                        value = "```" .. #self.Players:GetPlayers() .. " / 24```",
+                        value = "```" .. #Players:GetPlayers() .. " / 24```",
                         inline = true
                     },
                     {
@@ -410,18 +409,30 @@ function ServerFinder:SendFruitWebhook(fruitList)
                         inline = false
                     },
                     {
-                        name = "🔗 Direct Join",
-                        value = "[Click here to join](" .. joinLink .. ")",
+                        name = "🔗 Direct Join Link",
+                        value = "[Click here to join the server](" .. joinLink .. ")",
+                        inline = false
+                    },
+                    {
+                        name = "💻 Join via Script",
+                        value = "```lua\nlocal ts = game:GetService('TeleportService')\nts:TeleportToPlaceInstance(" 
+                            .. game.PlaceId .. ", \"" .. game.JobId .. "\")```",
                         inline = false
                     }
                 },
 
                 footer = {
-                    text = webhookName .. " | Fruit Notifier | " .. os.date("%b %d, %Y  %H:%M UTC"),
+                    text = webhookName .. " | Fruit Spawn Notifier | " .. os.date("%b %d, %Y  %H:%M UTC"),
                     icon_url = wh.Image
                 },
 
                 timestamp = isoTime
+            }
+
+            local payload = {
+                username = webhookName,
+                avatar_url = wh.Thumbnail,
+                embeds = { embed }
             }
 
             pcall(function()
@@ -431,9 +442,7 @@ function ServerFinder:SendFruitWebhook(fruitList)
                     Headers = {
                         ["Content-Type"] = "application/json"
                     },
-                    Body = self.HttpService:JSONEncode({
-                        embeds = { embed }
-                    })
+                    Body = HttpService:JSONEncode(payload)
                 })
             end)
         end
@@ -527,7 +536,16 @@ function ServerFinder:StartMonitoring()
             local fruits = self:GetSpawnedFruits()
             if #fruits > 0 and not fruitSent then
                 fruitSent = true
-                self:SendFruitWebhook(fruits)
+                local fruitNames = {}
+                for _, fruit in pairs(fruits) do
+                    if type(fruit) == "table" and fruit.Name then
+                        table.insert(fruitNames, fruit.Name)
+                    else
+                        table.insert(fruitNames, tostring(fruit))
+                    end
+                end
+                self:SendFruitWebhook(table.concat(fruitNames, ", "))
+            
             elseif #fruits == 0 then
                 fruitSent = false
             end
