@@ -100,7 +100,7 @@ end
 function ServerFinder:GetSpawnedFruits()
     local fruits = {}
 
-    for _, obj in ipairs(workspace:GetDescendants()) do
+    for _, obj in ipairs(Workspace.Scriptable.Fruits:GetDescendants()) do
         if obj:IsA("Model") and obj.Name:lower():find("fruit") then
             table.insert(fruits, obj.Name)
         end
