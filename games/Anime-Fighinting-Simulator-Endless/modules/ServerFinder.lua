@@ -178,14 +178,26 @@ function ServerFinder:SendWebhook(boostValue, jobId, playerCount)
     local formattedTime = self:FormatTime(boostValue)
     local serverType, embedColor = self:GetServerType()
 
+    local webhookName = "Boost Finder"
+
+    local now = os.date("!*t")
+    local timestamp = string.format(
+        "%04d-%02d-%02dT%02d:%02d:%02dZ",
+        now.year, now.month, now.day,
+        now.hour, now.min, now.sec
+    )
+
     local robloxLink = string.format(
         "https://www.roblox.com/games/start?placeId=%d&gameInstanceId=%s",
         game.PlaceId,
         jobId
     )
 
-    for _, wh in pairs(self.WEBHOOKS) do
+    for _, wh in pairs(self.Webhooks) do
         if self:ShouldSendToWebhook(wh, "BoostServer") then
+
+            local webhookName = self:GetWebhook(wh.Url)
+
             pcall(function()
                 request({
                     Url = wh.Url,
@@ -194,17 +206,16 @@ function ServerFinder:SendWebhook(boostValue, jobId, playerCount)
                         ["Content-Type"] = "application/json"
                     },
                     Body = self.HttpService:JSONEncode({
-                        username = "Boost Server Notifier",
+                        username = webhookName,
                         avatar_url = wh.Thumbnail or wh.Image,
                         embeds = {{
                             title = "🚀 Boosted Server Found!",
                             description = "Active boosted server detected.",
                             color = wh.Color or embedColor,
-                            thumbnail = wh.Image and { url = wh.Image } or nil,
                             fields = {
                                 {
                                     name = "⏰ Boost Time Remaining",
-                                    value = "```" .. formattedTime .. "```",
+                                    value = "```ansi\n[35m" .. formattedTime .. "[0m```",
                                     inline = true
                                 },
                                 {
