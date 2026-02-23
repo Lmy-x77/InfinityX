@@ -220,7 +220,7 @@ function ServerFinder:SendWebhook(boostValue, jobId, playerCount)
                                 },
                                 {
                                     name = "👥 Players",
-                                    value = "```" .. playerCount .. "```",
+                                    value = "```" .. playerCount .. " / 24```",
                                     inline = true
                                 },
                                 {
