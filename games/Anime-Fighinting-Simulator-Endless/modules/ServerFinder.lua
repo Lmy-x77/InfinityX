@@ -61,40 +61,6 @@ function ServerFinder:ShouldSendToWebhook(wh, eventType)
     return string.lower(wh.Type) == string.lower(eventType)
 end
 
-function ServerFinder:IsPrivateServer()
-    local success, id = pcall(function()
-        return game.PrivateServerId
-    end)
-
-    if success and id and id ~= "" and game.PrivateServerOwnerId ~= 0 then
-        return true
-    end
-
-    return false
-end
-
-function ServerFinder:GetServerType()
-    local isPrivate = game.PrivateServerId ~= "" and game.PrivateServerOwnerId ~= 0
-    local isReserved = game.PrivateServerId ~= "" and game.PrivateServerOwnerId == 0
-
-    local serverType = "Public Server"
-    local color = 65280
-
-    if isPrivate then
-        serverType = "Private Server"
-        color = 255
-    elseif isReserved then
-        serverType = "Reserved Server"
-        color = 16776960
-    end
-
-    if rawget(_G, "IsBoostedServer") and _G.IsBoostedServer == true then
-        serverType = "Boosted Server"
-        color = 16711680
-    end
-
-    return serverType, color
-end
 
 function ServerFinder:GetServerBoost()
     local success, value = pcall(function()
@@ -176,7 +142,7 @@ end
 
 function ServerFinder:SendWebhook(boostValue, jobId, playerCount)
     local formattedTime = self:FormatTime(boostValue)
-    local serverType, embedColor = self:GetServerType()
+    local serverType, embedColor = detectServerType()
 
     local webhookName = "Boost Finder"
 
@@ -255,7 +221,7 @@ function ServerFinder:SendWhitehairWebhook(tier)
     local tierLabel = tier == 3 and "TIER 3"
         or (tier == 2 and "TIER 2" or "TIER 1")
 
-    local serverType = select(1, self:GetServerType())
+    local serverType = select(1, detectServerType())
 
     local joinLink = string.format(
         "https://www.roblox.com/games/start?placeId=%d&gameInstanceId=%s",
@@ -359,7 +325,7 @@ function ServerFinder:SendWhitehairWebhook(tier)
 end
 
 function ServerFinder:SendFruitWebhook(fruitName)
-    local serverType = select(1, self:GetServerType())
+    local serverType = select(1, detectServerType())
 
     local joinLink = string.format(
         "https://www.roblox.com/games/start?placeId=%d&gameInstanceId=%s",
@@ -583,6 +549,116 @@ end
 function ServerFinder:Stop()
     self.monitoring = false
     self.hopping = false
+end
+
+
+function detectServerType()
+    local playerCount = #Players:GetPlayers()
+
+    local serverTypeResult = nil
+    pcall(function()
+        local remote = game:GetService("RobloxReplicatedStorage"):FindFirstChild("GetServerType")
+        if remote then
+            serverTypeResult = remote:InvokeServer()
+        end
+    end)
+
+    if serverTypeResult then
+        if serverTypeResult == "PrivateServer" or serverTypeResult == "ReservedServer" then
+            return "Private Server", 10181046
+        end
+        if serverTypeResult == "StandardServer" then
+            return "Public Server", 10181046
+        end
+    end
+
+    if playerCount <= 8 then
+        return "Private Server", 10181046
+    end
+
+    local cursor = nil
+    local apiFound = false
+    local apiExhausted = false
+    local apiFailed = false
+
+    for _ = 1, 30 do
+        local url = string.format(
+            "https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100",
+            game.PlaceId
+        )
+        if cursor then
+            url = url .. "&cursor=" .. cursor
+        end
+        local success, response = pcall(function()
+            return http_request({ Url = url, Method = "GET" }).Body
+        end)
+        if not success or not response then
+            apiFailed = true
+            break
+        end
+        local ok, data = pcall(function()
+            return HttpService:JSONDecode(response)
+        end)
+        if not ok or not data or not data.data then
+            apiFailed = true
+            break
+        end
+        for _, server in pairs(data.data) do
+            if server.id == game.JobId then
+                apiFound = true
+                break
+            end
+        end
+        if apiFound then break end
+        if data.nextPageCursor and data.nextPageCursor ~= "" then
+            cursor = data.nextPageCursor
+        else
+            apiExhausted = true
+            break
+        end
+    end
+
+    if apiFound then
+        return "Public Server", 10181046
+    end
+
+    if apiExhausted then
+        return "Private Server", 10181046
+    end
+
+    if apiFailed then
+        if playerCount <= 8 then
+            return "Private Server", 10181046
+        end
+        return "Public Server", 10181046
+    end
+
+    return "Private Server", 10181046
+end
+
+function getAllServers()
+    local servers = {}
+    local cursor = ""
+    for i = 1, 3 do
+        local success, response = pcall(function()
+            local url = string.format("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100", game.PlaceId)
+            if cursor ~= "" then url = url .. "&cursor=" .. cursor end
+            return http_request({Url = url, Method = "GET"}).Body
+        end)
+        if success and response then
+            local data = HttpService:JSONDecode(response)
+            for _, server in pairs(data.data or {}) do
+                if server.id ~= game.JobId and server.playing < server.maxPlayers then
+                    table.insert(servers, server.id)
+                end
+            end
+            cursor = data.nextPageCursor or ""
+            if cursor == "" then break end
+        else
+            break
+        end
+    end
+    return servers
 end
 
 return ServerFinder
