@@ -16,17 +16,17 @@ replicatesignal = missing("function", replicatesignal)
 getconnections = missing("function", getconnections or get_signal_cons)
 
 Services = setmetatable({}, {
-  __index = function(self, name)
-    local success, cache = pcall(function()
-      return cloneref(game:GetService(name))
-    end)
-    if success then
-      rawset(self, name, cache)
-      return cache
-    else
-      error("Invalid Service: " .. tostring(name))
+    __index = function(self, name)
+        local success, cache = pcall(function()
+            return cloneref(game:GetService(name))
+        end)
+        if success then
+            rawset(self, name, cache)
+            return cache
+        else
+            error("Invalid Service: " .. tostring(name))
+        end
     end
-  end
 })
 
 local Workspace = Services.Workspace
