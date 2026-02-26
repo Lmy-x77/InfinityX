@@ -52,70 +52,55 @@ scriptVersion = "3.2a"
 
 
 -- ui library
-local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+local WindUI
+local ok, result = pcall(function()
+  return require("./src/Init")
+end)
+if ok then
+  WindUI = result
+else
+  WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
+end
 WindUI:AddTheme({
   Name = "InfinityX",
-  Accent = "#18181b",
-  Outline = "#450b9c",
-  Text = "#924aff",
-  Placeholder = "#999999",
-  Background = "#0e0e10",
-  Button = "#924aff",
-  Icon = "#924aff",
+
+  Accent = Color3.fromHex("#A855F7"),
+  Dialog = Color3.fromHex("#12071C"),
+  Outline = Color3.fromHex("#3B1E5C"),
+  Text = Color3.fromHex("#F8F7FF"),
+  Placeholder = Color3.fromHex("#B3A6D6"),
+  Background = Color3.fromHex("#08040F"),
+  Button = Color3.fromHex("#7C3AED"),
+  Icon = Color3.fromHex("#C084FC"),
 })
-
-WindUI:Popup({
-  Title = "Welcome to " .. gradient("InfinityX", Color3.fromRGB(129, 63, 214), Color3.fromRGB(63, 61, 204)),
-  Icon = "info",
-  Content = game.Players.LocalPlayer.Name .. ", I hope you enjoy the experience\nHave fun!",
-  Buttons = {
-      {
-          Title = "Cancel",
-          Icon = "",
-          Callback = function() end,
-          Variant = "Tertiary",
-      },
-      {
-          Title = "Continue",
-          Icon = "arrow-right",
-          Callback = function() Confirmed = true end,
-          Variant = "Primary",
-      }
-  }
-})
-
-repeat wait() until Confirmed
-
 local Window = WindUI:CreateWindow({
-  Title = "InfinityX - "..scriptVersion,
-  Icon = "rbxassetid://126527122577864",
-  Author = game:GetService('MarketplaceService'):GetProductInfo(game.PlaceId).Name,
-  Folder = "CloudHub",
-  Size = GetSize(),
-  Transparent = false,
+  Title = "InfinityX",
+  Author = "Anime Fighinting Simulator",
+  Folder = "InfinityX/Settings",
+  Icon = "rbxassetid://90772127577731",
   Theme = "InfinityX",
+  NewElements = true,
+  Size = UDim2.fromOffset(680, 580),
+  Transparent = false,
+  HideSearchBar = true,
   SideBarWidth = 180,
-  Background = "",
-  User = {
-      Enabled = true,
-      Anonymous = false,
-      Callback = function()
-          print("clicked")
-      end,
-  },
 })
 Window:EditOpenButton({
-  Title = "Click here to open "..gradient("InfinityX", Color3.fromRGB(129, 63, 214), Color3.fromRGB(63, 61, 204)),
-  Icon = "monitor",
+  Title = ".gg/emKJgWMHAr",
+  Icon = "rbxassetid://90772127577731",
   CornerRadius = UDim.new(0,16),
-  StrokeThickness = 1.5,
+  StrokeThickness = 2,
   Color = ColorSequence.new(
-    Color3.fromRGB(129, 63, 214),
-    Color3.fromRGB(63, 61, 204)
+    Color3.fromRGB(146, 84, 228),
+    Color3.fromRGB(99, 61, 204)
   ),
+  OnlyMobile = false,
   Enabled = true,
-  Dragable = false,
+  Draggable = true,
 })
+
+
+-- tabs
 local Tabs = {
   Main = Window:Tab({
     Title = "| Main",
@@ -237,7 +222,7 @@ local Section = Tabs.Op:Section({
   TextSize = 17,
 })
 local Paragraph = Tabs.Op:Paragraph({
-  Title = "WARING",
+  Title = "WARING [ Don't use this function too much, it's not working properly because of Update and it's also not secure ]",
   Desc = "How it works is that it runs 450 automatic spins for you for free and then rejoins the server. Why 450? because if it goes beyond that because it's too fast, the game detects it and bans you. To prevent this, the script has security and activates it and rejoins you.\n\nI don't recommend abusing this function, the script has been tested several times and hasn't been banned, but just to be on the safe side, don't abuse it too much or even don't use it on your main account.\n\nRemembering that this is only for pharma spins and not auras",
   Locked = false,
 })
@@ -384,15 +369,15 @@ local Toggle = Tabs.Op:Toggle({
         return
       end
 
-      loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Huzz-Rng/Settings/Create-info.lua",true))()
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/scripts/games/HuzzRng/create_info.lua",true))()
       wait(.5)
-      loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Huzz-Rng/Settings/Auto-execute.lua",true))()
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/scripts/games/HuzzRng/auto_execute.lua",true))()
 
       local TeleportCheck = false
       Game.Players.LocalPlayer.OnTeleport:Connect(function(State)
         if (not TeleportCheck) and queueteleport then
           TeleportCheck = true
-          queueteleport('repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.LoadingScreen.Enabled == false wait(2) loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Huzz-Rng/Settings/Create-info.lua",true))() wait(0.5) getgenv().infiniteSpinSettings = {Keep = false, Delete = false} loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-x77/InfinityX/refs/heads/scripts/games/Huzz-Rng/Settings/Auto-execute.lua",true))()')
+          queueteleport('repeat task.wait() until game:GetService("Players").LocalPlayer.PlayerGui.LoadingScreen.Enabled == false wait(2) loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/scripts/games/HuzzRng/create_info.lua",true))() wait(0.5) getgenv().infiniteSpinSettings = {Keep = false, Delete = false} loadstring(game:HttpGet("https://raw.githubusercontent.com/Lmy-77/InfinityX/refs/heads/scripts/games/HuzzRng/auto_execute.lua",true))()')
         end
       end)
     end
@@ -477,7 +462,7 @@ local Section = Tabs.Misc:Section({
 local Button = Tabs.Misc:Button({
   Title = "Reedem all codes",
   Callback = function()
-    local codes = {'WEARESOBACK', 'SORRYFORMINORLOSS!'}
+    local codes = {'FREESTUFF!!', 'NAHIDLOSE!!', 'TYFOR200K!!'}
     for _, v in pairs(codes) do
       local args = {
         v
