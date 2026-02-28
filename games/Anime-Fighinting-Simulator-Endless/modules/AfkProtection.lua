@@ -48,10 +48,10 @@ stroke.Color = Color3.new(1, 1, 1)
 local gradient = Instance.new("UIGradient", stroke)
 gradient.Rotation = 180
 gradient.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(130, 0, 255)),
-	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(130, 0, 255)),
-	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(130, 0, 255)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(130, 0, 255))
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 120, 255)),
+	ColorSequenceKeypoint.new(0.33, Color3.fromRGB(150, 80, 255)),
+	ColorSequenceKeypoint.new(0.66, Color3.fromRGB(120, 40, 220)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 150, 255))
 }
 gradient.Transparency = NumberSequence.new{
 	NumberSequenceKeypoint.new(0, 0),
