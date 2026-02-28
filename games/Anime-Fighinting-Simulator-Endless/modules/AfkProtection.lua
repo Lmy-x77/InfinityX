@@ -40,18 +40,28 @@ local mainCorner = Instance.new("UICorner", main)
 mainCorner.CornerRadius = UDim.new(0,6)
 
 local stroke = Instance.new("UIStroke", main)
-stroke.Thickness = 1.5
+stroke.Thickness = 0.8
+stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+stroke.LineJoinMode = Enum.LineJoinMode.Round
+stroke.Color = Color3.new(1, 1, 1)
 
 local gradient = Instance.new("UIGradient", stroke)
+gradient.Rotation = 180
 gradient.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(170, 85, 255)),
-	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(120, 50, 220)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 120, 255))
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(130, 0, 255)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(130, 0, 255)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(130, 0, 255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(130, 0, 255))
+}
+gradient.Transparency = NumberSequence.new{
+	NumberSequenceKeypoint.new(0, 0),
+	NumberSequenceKeypoint.new(0.5, 1),
+	NumberSequenceKeypoint.new(1, 0)
 }
 
 task.spawn(function()
 	while true do
-		gradient.Rotation += 1
+		gradient.Rotation = (gradient.Rotation + 3) % 360
 		RunService.RenderStepped:Wait()
 	end
 end)
@@ -141,6 +151,13 @@ local fpsValue = createRow("FPS:",56)
 local versionValue = createRow("Version:",84)
 versionValue.Text = "4.2a"
 
+local fpstikcs
+
+if fpstikcs then
+    fpstikcs:Disconnect()
+    fpstikcs = nil
+end
+
 local startTime = tick()
 local fps = 0
 local frames = 0
@@ -153,7 +170,7 @@ local function formatTime(sec)
 	return string.format("%02d:%02d:%02d",h,m,s)
 end
 
-RunService.RenderStepped:Connect(function()
+fpstikcs = RunService.RenderStepped:Connect(function()
 	frames += 1
 	if tick()-last >= 1 then
 		fps = frames
