@@ -26,7 +26,7 @@ end
 local function applyToFrame(frame)
     for _, icon in pairs(frame:GetDescendants()) do
         if icon:IsA("ImageLabel") and icon.Name == "PlayerIcon" then
-            icon.Image = "rbxassetid://90772127577731"
+            icon.Image = "rbxassetid://92308401887821"
         end
     end
 
