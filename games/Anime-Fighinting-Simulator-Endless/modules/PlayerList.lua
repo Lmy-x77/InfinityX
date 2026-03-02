@@ -6,8 +6,8 @@ local LocalPlayer = Players.LocalPlayer
 local UserId = LocalPlayer.UserId
 local findUser = tostring(UserId)
 
-local startColor = Color3.fromRGB(180, 123, 255)
-local endColor = Color3.fromRGB(102, 0, 204)
+local startColor = Color3.fromHex("#C084FC")
+local endColor = Color3.fromHex("#5B21B6")
 
 function gradient(text, startColor, endColor)
     local result = ""
