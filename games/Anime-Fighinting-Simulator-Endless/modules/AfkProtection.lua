@@ -90,7 +90,7 @@ local logo = Instance.new("ImageLabel", top)
 logo.Size = UDim2.new(0,22,0,22)
 logo.Position = UDim2.new(0,8,0.5,-11)
 logo.BackgroundTransparency = 1
-logo.Image = "rbxassetid://90772127577731"
+logo.Image = "rbxassetid://92308401887821"
 
 local title = Instance.new("TextLabel", top)
 title.Size = UDim2.new(1,-60,1,0)
