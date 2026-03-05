@@ -13025,7 +13025,7 @@ ap.Tween
 local as=a.load's'
 
 
-local at=protectgui or(syn and syn.protect_gui)or function()end
+local at= function()end
 
 local au=game:GetService("CoreGui"):WaitForChild("RobloxGui")
 
