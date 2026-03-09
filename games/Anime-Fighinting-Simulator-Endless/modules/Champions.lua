@@ -323,7 +323,7 @@ Champions = {
 			};
 		};
 		ClassNeeded = "16";
-		SellingValue = 7500;
+		SellingValue = 15000;
 		Rarity = 6;
 	};
 	["27"] = {
@@ -346,7 +346,7 @@ Champions = {
 			ChikaraBuff = 1.5;
 		};
 		ClassNeeded = "16";
-		SellingValue = 7500;
+		SellingValue = 15000;
 		Rarity = 6;
 	};
 	["28"] = {
@@ -369,7 +369,7 @@ Champions = {
 			YenBuff = 1.05;
 		};
 		ClassNeeded = "16";
-		SellingValue = 7500;
+		SellingValue = 15000;
 		Rarity = 6;
 	};
 	["29"] = {
@@ -392,7 +392,7 @@ Champions = {
 			};
 		};
 		ClassNeeded = "16";
-		SellingValue = 10000;
+		SellingValue = 15000;
 		Rarity = 6;
 	};
 	["30"] = {
@@ -407,16 +407,16 @@ Champions = {
 			ChikaraBuff = 1.5;
 		};
 		ClassNeeded = "17";
-		SellingValue = 10000;
+		SellingValue = 15000;
 		Rarity = 6;
 	};
 	["31"] = {
 		Name = "Saytamu Serious";
-		Desc = "Auto trains 160% of your Strength, 175% of your Durability, Nerfs all player damage by 50%, buffs all Damage by 100%, increases your Chikara Per Min by x1.5, increases your Yen Per Min by x1.25";
+		Desc = "Auto trains 175% of your Strength, 195% of your Durability, Nerfs all player damage by 50%, buffs all Damage by 100%, increases your Chikara Per Min by x1.5, increases your Yen Per Min by x1.25";
 		Abilities = {
 			AutoTrainer = {
-				['1'] = 1.6;
-				['2'] = 1.75;
+				['1'] = 1.75;
+				['2'] = 1.95;
 			};
 			DamageNerfAll = 0.5;
 			DamageBuffAll = 2;
@@ -627,7 +627,7 @@ Champions = {
 			HeartsBuff = 2.5;
 		};
 		ClassNeeded = "17";
-		SellingValue = 10000;
+		SellingValue = 50000;
 		Rarity = 7;
 	};
 	["500"] = {
@@ -656,7 +656,7 @@ Champions = {
 			HeartsBuff = 2.5;
 		};
 		ClassNeeded = "17";
-		SellingValue = 0;
+		SellingValue = 50000;
 		Rarity = 6;
 	};
 	["502"] = {
@@ -674,7 +674,7 @@ Champions = {
 			EventCurrency = 1.25;
 		};
 		ClassNeeded = "17";
-		SellingValue = 0;
+		SellingValue = 100000;
 		Rarity = 6;
 	};
 	["503"] = {
@@ -690,7 +690,7 @@ Champions = {
 			HeartsBuff = 2;
 		};
 		ClassNeeded = "17";
-		SellingValue = 0;
+		SellingValue = 50000;
 		Rarity = 6;
 	};
 	["1000"] = {
@@ -738,7 +738,7 @@ Champions = {
 			ChikaraBuff = 2;
 		};
 		ClassNeeded = "17";
-		SellingValue = 10000;
+		SellingValue = 15000;
 		Rarity = 7;
 	};
 	["1003"] = {
@@ -789,8 +789,7 @@ Champions = {
 			HeartsBuff = 1.5;
 		};
 		ClassNeeded = "17";
-		HeartsValue = 250000;
-		SellingValue = 0;
+		SellingValue = 12500;
 		Rarity = 6;
 	};
 	["1006"] = {
@@ -805,8 +804,7 @@ Champions = {
 			HeartsBuff = 2;
 		};
 		ClassNeeded = "17";
-		HeartsValue = 500000;
-		SellingValue = 0;
+		SellingValue = 25000;
 		Rarity = 6;
 	};
 	["1007"] = {
@@ -836,26 +834,95 @@ Champions = {
 		SellingValue = 15000;
 		Rarity = 6;
 	};
-	["999999996"] = {
-		Name = "DoritosMakima";
-		Desc = longstring1;
+	["1009"] = {
+		Name = "Yota";
+		Desc = "Auto trains 325% of your Chakra, increases your Yen Per Min by x1.2.";
 		Abilities = {
 			AutoTrainer = {
-				['1'] = 0.01;
-				['2'] = 0.01;
-				['3'] = 0.01;
-				['4'] = 0.01;
+				['3'] = 3.25;
 			};
-			DamageNerfAll = 1;
-			DamageBuffAll = 0.01;
-			ChikaraBuff = 0;
+			YenBuff = 1.2;
 		};
-		ClassNeeded = "99";
+		ClassNeeded = "17";
 		SellingValue = 0;
+		Rarity = 6;
+	};
+	["1010"] = {
+		Name = "Maky";
+		Desc = "Auto trains 195% of your Durability, increases your Yen Per Min by x1.25.";
+		Abilities = {
+			AutoTrainer = {
+				['2'] = 1.95;
+			};
+			YenBuff = 1.25;
+		};
+		ClassNeeded = "17";
+		SellingValue = 0;
+		Rarity = 6;
+	};
+	["1011"] = {
+		Name = "Doi";
+		Desc = "Auto trains 160% of your Strength, 160% of your Durability, 215% of your Chakra, 125% of your Sword, 125% of your Speed, 125% of your Agility, increases your Yen Per Min by x1.15.";
+		Abilities = {
+			AutoTrainer = {
+				['1'] = 1.6;
+				['2'] = 1.6;
+				['3'] = 2.15;
+				['4'] = 1.25;
+				['5'] = 1.25;
+				['6'] = 1.25;
+			};
+			YenBuff = 1.15;
+		};
+		ClassNeeded = "17";
+		SellingValue = 25000;
+		Rarity = 7;
+	};
+	["1012"] = {
+		Name = "Keton";
+		Desc = "Auto trains 185% of your Sword, increases your Yen Per Min by x1.2, Increases cursed technique damage by 1.5x.";
+		Abilities = {
+			AutoTrainer = {
+				['4'] = 1.85;
+			};
+			YenBuff = 1.2;
+		};
+		ClassNeeded = "17";
+		SellingValue = 25000;
+		Rarity = 7;
+	};
+	["1013"] = {
+		Name = "Jotaru";
+		Desc = "Auto trains 175% of your Strength, increases your Yen Per Min by x1.25, increases your Stand Damage by x1.5.";
+		Abilities = {
+			AutoTrainer = {
+				['1'] = 1.75;
+			};
+			YenBuff = 1.25;
+			SpecialBuff = {"Stand", 1.5};
+		};
+		ClassNeeded = "17";
+		SellingValue = 25000;
+		Rarity = 7;
+	};
+	["1014"] = {
+		Name = "Broli";
+		Desc = "Auto trains 185% of your Durability, 190% of your Sword, Buffs Broli damage by 2.5x and Broli drop chances by 2x, increases your Yen Per Min by x1.25.";
+		Abilities = {
+			AutoTrainer = {
+				['2'] = 1.85;
+				['4'] = 1.9;
+			};
+			YenBuff = 1.25;
+			BroliDamage = 2.5;
+			BroliDrop = 2;
+		};
+		ClassNeeded = "17";
+		SellingValue = 25000;
 		Rarity = 7;
 	};
 	["999999995"] = {
-		Name = "Enid";
+		Name = "ResteliaEsdeath";
 		Desc = longstring1;
 		Abilities = {
 			AutoTrainer = {
@@ -872,8 +939,8 @@ Champions = {
 		SellingValue = 0;
 		Rarity = 7;
 	};
-	["999999997"] = {
-		Name = "DoritosEsdeath";
+	["999999996"] = {
+		Name = "DoritosMakima";
 		Desc = longstring1;
 		Abilities = {
 			AutoTrainer = {
@@ -908,8 +975,41 @@ Champions = {
 		SellingValue = 0;
 		Rarity = 7;
 	};
+	["999999991"] = {
+		Name = "Happi";
+		Desc = "Be careful when pinging him.";
+		Abilities = {
+			AutoTrainer = {
+				['1'] = 0.01;
+				['2'] = 0.01;
+			};
+			DamageNerfAll = 300;
+			DamageBuffAll = 300;
+		};
+		ClassNeeded = "17";
+		SellingValue = 0;
+		Rarity = 7;
+	};
 	["999999998"] = {
 		Name = "Wednesday";
+		Desc = longstring1;
+		Abilities = {
+			AutoTrainer = {
+				['1'] = 0.01;
+				['2'] = 0.01;
+				['3'] = 0.01;
+				['4'] = 0.01;
+			};
+			DamageNerfAll = 1;
+			DamageBuffAll = 0.01;
+			ChikaraBuff = 0;
+		};
+		ClassNeeded = "99";
+		SellingValue = 0;
+		Rarity = 7;
+	};
+	["999999993"] = {
+		Name = "Hell";
 		Desc = longstring1;
 		Abilities = {
 			AutoTrainer = {
