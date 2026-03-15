@@ -630,6 +630,19 @@ Champions = {
 		SellingValue = 50000;
 		Rarity = 7;
 	};
+	["110"] = {
+		Name = "Unsealed Goju";
+		Desc = "Auto trains 300% of your Chakra, increases your Yen Per Min by x1.25, increases your Hearts Per Min by x2.5";
+		Abilities = {
+			AutoTrainer = {
+				['3'] = 3;
+			};
+			YenBuff = 1.25;
+		};
+		ClassNeeded = "17";
+		SellingValue = 50000;
+		Rarity = 7;
+	};
 	["500"] = {
 		Name = "Asuno";
 		Desc = "Auto trains 125% of your Durability, 125% of your Sword, increases your Yen Per Min by x1.15, increases your Hearts Per Min by x2";
