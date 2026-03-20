@@ -23,7 +23,7 @@ gui.ResetOnSpawn = false
 
 local Main = Instance.new("TextButton")
 Main.Parent = gui
-Main.Size = UDim2.fromOffset(45,45)
+Main.Size = UDim2.fromOffset(38,38)
 Main.Position = UDim2.new(0.05,0,0.15,0)
 Main.BackgroundColor3 = Color3.fromRGB(28,22,40)
 Main.BorderSizePixel = 0
