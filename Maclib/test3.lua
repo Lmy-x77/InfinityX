@@ -5880,7 +5880,7 @@ function MacLib:Watermark(Settings)
 	gui.ResetOnSpawn = false
 	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	gui.DisplayOrder = 2147483647
-	gui.Parent = gethui and gethui() or WMacLib.GetService("CoreGui")
+	gui.Parent = gethui and gethui() or game:GetService("CoreGui")
 
 	local frame = Instance.new("Frame")
 	frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
