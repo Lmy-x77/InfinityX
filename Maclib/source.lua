@@ -5873,4 +5873,108 @@ function MacLib:Demo()
 	MacLib:LoadAutoLoadConfig()
 end
 
+function MacLib:Watermark(Settings)
+	local interFont = assets.interFont
+
+	local gui = Instance.new("ScreenGui")
+	gui.ResetOnSpawn = false
+	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	gui.DisplayOrder = 2147483647
+	gui.Parent = gethui and gethui() or game:GetService("CoreGui")
+
+	local frame = Instance.new("Frame")
+	frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+	frame.BackgroundTransparency = 0.28
+	frame.BorderSizePixel = 0
+	frame.AnchorPoint = Vector2.new(0, 1)
+	frame.Position = UDim2.new(0, 16, 1, -16)
+	frame.AutomaticSize = Enum.AutomaticSize.XY
+	frame.Parent = gui
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 8)
+	corner.Parent = frame
+
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Color3.fromRGB(255, 255, 255)
+	stroke.Transparency = 0.9
+	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	stroke.Parent = frame
+
+	local layout = Instance.new("UIListLayout")
+	layout.FillDirection = Enum.FillDirection.Horizontal
+	layout.VerticalAlignment = Enum.VerticalAlignment.Center
+	layout.Padding = UDim.new(0, 8)
+	layout.Parent = frame
+
+	local padding = Instance.new("UIPadding")
+	padding.PaddingLeft = UDim.new(0, 12)
+	padding.PaddingRight = UDim.new(0, 12)
+	padding.PaddingTop = UDim.new(0, 6)
+	padding.PaddingBottom = UDim.new(0, 6)
+	padding.Parent = frame
+
+	local statsLabels = {}
+	local statsOrder = {}
+
+	local function makeDivider(order)
+		local d = Instance.new("Frame")
+		d.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		d.BackgroundTransparency = 0.8
+		d.BorderSizePixel = 0
+		d.Size = UDim2.new(0, 1, 0, 12)
+		d.LayoutOrder = order
+		d.Parent = frame
+		return d
+	end
+
+	local function makeLabel(text, alpha, order)
+		local lbl = Instance.new("TextLabel")
+		lbl.BackgroundTransparency = 1
+		lbl.BorderSizePixel = 0
+		lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+		lbl.TextTransparency = alpha or 0.1
+		lbl.TextSize = 13
+		lbl.FontFace = Font.new(interFont, Enum.FontWeight.Medium)
+		lbl.AutomaticSize = Enum.AutomaticSize.XY
+		lbl.LayoutOrder = order
+		lbl.Text = text
+		lbl.Parent = frame
+		return lbl
+	end
+
+	makeLabel(Settings.Name or "Script", 0.1, 1)
+	makeDivider(2)
+	makeLabel(Settings.Version or "v1.0.0", 0.55, 3)
+	makeDivider(4)
+
+	local nextOrder = 5
+
+	local WatermarkFunctions = {}
+
+	function WatermarkFunctions:Set(key, value)
+		if statsLabels[key] then
+			statsLabels[key].Text = tostring(value)
+		else
+			table.insert(statsOrder, key)
+			if #statsOrder > 1 then
+				makeDivider(nextOrder)
+				nextOrder += 1
+			end
+			statsLabels[key] = makeLabel(tostring(value), 0.55, nextOrder)
+			nextOrder += 1
+		end
+	end
+
+	function WatermarkFunctions:Destroy()
+		gui:Destroy()
+	end
+
+	function WatermarkFunctions:SetVisible(bool)
+		gui.Enabled = bool
+	end
+
+	return WatermarkFunctions
+end
+
 return MacLib
