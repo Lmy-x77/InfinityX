@@ -5875,6 +5875,8 @@ end
 
 function MacLib:Watermark(Settings)
 	local interFont = assets.interFont
+	local icons = Settings.Icons or {}
+	local iconSize = Settings.IconSize or 14
 
 	local gui = Instance.new("ScreenGui")
 	gui.ResetOnSpawn = false
@@ -5883,8 +5885,8 @@ function MacLib:Watermark(Settings)
 	gui.Parent = gethui and gethui() or game:GetService("CoreGui")
 
 	local frame = Instance.new("Frame")
-	frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-	frame.BackgroundTransparency = 0.28
+	frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+	frame.BackgroundTransparency = 0.15
 	frame.BorderSizePixel = 0
 	frame.AnchorPoint = Vector2.new(0, 1)
 	frame.Position = UDim2.new(0, 16, 1, -16)
@@ -5892,26 +5894,33 @@ function MacLib:Watermark(Settings)
 	frame.Parent = gui
 
 	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0, 8)
+	corner.CornerRadius = UDim.new(0, 10)
 	corner.Parent = frame
 
 	local stroke = Instance.new("UIStroke")
 	stroke.Color = Color3.fromRGB(255, 255, 255)
-	stroke.Transparency = 0.9
-	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	stroke.Transparency = 0.85
 	stroke.Parent = frame
+
+	local gradient = Instance.new("UIGradient")
+	gradient.Color = ColorSequence.new{
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255,255,255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(180,180,180))
+	}
+	gradient.Rotation = 90
+	gradient.Parent = stroke
 
 	local layout = Instance.new("UIListLayout")
 	layout.FillDirection = Enum.FillDirection.Horizontal
 	layout.VerticalAlignment = Enum.VerticalAlignment.Center
-	layout.Padding = UDim.new(0, 8)
+	layout.Padding = UDim.new(0, 10)
 	layout.Parent = frame
 
 	local padding = Instance.new("UIPadding")
-	padding.PaddingLeft = UDim.new(0, 12)
-	padding.PaddingRight = UDim.new(0, 12)
-	padding.PaddingTop = UDim.new(0, 6)
-	padding.PaddingBottom = UDim.new(0, 6)
+	padding.PaddingLeft = UDim.new(0, 14)
+	padding.PaddingRight = UDim.new(0, 14)
+	padding.PaddingTop = UDim.new(0, 8)
+	padding.PaddingBottom = UDim.new(0, 8)
 	padding.Parent = frame
 
 	local statsLabels = {}
@@ -5920,36 +5929,54 @@ function MacLib:Watermark(Settings)
 	local function makeDivider(order)
 		local d = Instance.new("Frame")
 		d.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		d.BackgroundTransparency = 0.8
+		d.BackgroundTransparency = 0.85
 		d.BorderSizePixel = 0
-		d.Size = UDim2.new(0, 1, 0, 12)
+		d.Size = UDim2.new(0, 1, 0, iconSize)
 		d.LayoutOrder = order
 		d.Parent = frame
-		return d
 	end
 
-	local function makeLabel(text, alpha, order)
+	local function makeItem(text, iconId, alpha, order)
+		local container = Instance.new("Frame")
+		container.BackgroundTransparency = 1
+		container.AutomaticSize = Enum.AutomaticSize.XY
+		container.LayoutOrder = order
+		container.Parent = frame
+
+		local list = Instance.new("UIListLayout")
+		list.FillDirection = Enum.FillDirection.Horizontal
+		list.VerticalAlignment = Enum.VerticalAlignment.Center
+		list.Padding = UDim.new(0, 6)
+		list.Parent = container
+
+		if iconId then
+			local img = Instance.new("ImageLabel")
+			img.BackgroundTransparency = 1
+			img.Size = UDim2.new(0, iconSize, 0, iconSize)
+			img.Image = iconId
+			img.ImageTransparency = alpha or 0.2
+			img.Parent = container
+		end
+
 		local lbl = Instance.new("TextLabel")
 		lbl.BackgroundTransparency = 1
-		lbl.BorderSizePixel = 0
 		lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
 		lbl.TextTransparency = alpha or 0.1
 		lbl.TextSize = 13
 		lbl.FontFace = Font.new(interFont, Enum.FontWeight.Medium)
 		lbl.AutomaticSize = Enum.AutomaticSize.XY
-		lbl.LayoutOrder = order
 		lbl.Text = text
-		lbl.Parent = frame
+		lbl.Parent = container
+
 		return lbl
 	end
 
-	makeLabel(Settings.Name or "Script", 0.1, 1)
+	makeItem(Settings.Name or "Script", icons.Name, 0.05, 1)
 	makeDivider(2)
-	makeLabel(Settings.Version or "v1.0.0", 0.55, 3)
+	makeItem(Settings.Version or "v1.0.0", icons.Version, 0.5, 3)
 	makeDivider(4)
 
 	local nextOrder = 5
-
 	local WatermarkFunctions = {}
 
 	function WatermarkFunctions:Set(key, value)
@@ -5961,7 +5988,7 @@ function MacLib:Watermark(Settings)
 				makeDivider(nextOrder)
 				nextOrder += 1
 			end
-			statsLabels[key] = makeLabel(tostring(value), 0.55, nextOrder)
+			statsLabels[key] = makeItem(tostring(value), icons[key], 0.5, nextOrder)
 			nextOrder += 1
 		end
 	end
