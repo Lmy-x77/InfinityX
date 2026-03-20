@@ -1,167 +1,127 @@
-local Button = Instance.new("ScreenGui")
+Services = setmetatable({}, {
+  __index = function(self, name)
+    local ok, svc = pcall(function()
+      return cloneref(game:GetService(name))
+    end)
+    if ok then
+      rawset(self, name, svc)
+      return svc
+    end
+  end
+})
+
+local TweenService = Services.TweenService
+local RunService = Services.RunService
+local CoreGui = Services.CoreGui
+local VIM = Services.VirtualInputManager
+local UIS = game:GetService("UserInputService")
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "Button"
+gui.Parent = (CoreGui or gethui())
+gui.ResetOnSpawn = false
+
 local Main = Instance.new("TextButton")
-local UICorner = Instance.new("UICorner")
-local Icon = Instance.new("ImageLabel")
-local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
-local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
-local UIStroke = Instance.new("UIStroke")
-local UIGradient = Instance.new("UIGradient")
-
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-
-
-Button.Name = "Button"
-Button.Parent = (game:GetService("CoreGui") or gethui())
-Button.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-Button.ResetOnSpawn = false
-
-Main.Name = "Main"
-Main.Parent = Button
-Main.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+Main.Parent = gui
+Main.Size = UDim2.fromOffset(45,45)
+Main.Position = UDim2.new(0.05,0,0.15,0)
+Main.BackgroundColor3 = Color3.fromRGB(28,22,40)
 Main.BorderSizePixel = 0
-Main.Position = UDim2.new(0.043, 0, 0.12, 0)
-Main.Size = UDim2.new(0.05, 0, 0.085, 0)
-Main.AutoButtonColor = false
-Main.Font = Enum.Font.GothamBold
 Main.Text = ""
-Main.TextColor3 = Color3.fromRGB(255, 255, 255)
-Main.TextSize = 14
 
-UICorner.CornerRadius = UDim.new(0.25, 0)
-UICorner.Parent = Main
+local corner = Instance.new("UICorner", Main)
+corner.CornerRadius = UDim.new(1,0)
 
-Icon.Name = "Icon"
-Icon.Parent = Main
-Icon.BackgroundTransparency = 1
-Icon.Size = UDim2.new(0.85, 0, 0.85, 0)
-Icon.Position = UDim2.new(0.075, 0, 0.075, 0)
-Icon.Image = "http://www.roblox.com/asset/?id=126527122577864"
-Icon.ImageColor3 = Color3.fromRGB(220, 220, 220)
+local icon = Instance.new("ImageLabel", Main)
+icon.BackgroundTransparency = 1
+icon.Size = UDim2.fromScale(0.7,0.7)
+icon.Position = UDim2.fromScale(0.15,0.15)
+icon.Image = "rbxassetid://92308401887821"
+icon.ImageColor3 = Color3.fromRGB(240,230,255)
 
-UIAspectRatioConstraint.Parent = Icon
-UIAspectRatioConstraint.AspectRatio = 1.1
-
-UIAspectRatioConstraint_2.Parent = Main
-UIAspectRatioConstraint_2.AspectRatio = 1.02
-
-
-
+local UIStroke = Instance.new("UIStroke")
 UIStroke.Parent = Main
-UIStroke.Thickness = 0.8
+UIStroke.Thickness = 2
 UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 UIStroke.LineJoinMode = Enum.LineJoinMode.Round
-UIStroke.Color = Color3.new(1, 1, 1)
+UIStroke.Color = Color3.new(1,1,1)
 
+local UIGradient = Instance.new("UIGradient")
 UIGradient.Parent = UIStroke
-UIGradient.Rotation = 180
+UIGradient.Rotation = 0
 UIGradient.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(130, 0, 255)),
-	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(130, 0, 255)),
-	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(130, 0, 255)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(130, 0, 255))
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(170,110,255)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255,140,220)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(170,110,255))
 }
 UIGradient.Transparency = NumberSequence.new{
 	NumberSequenceKeypoint.new(0, 0),
-	NumberSequenceKeypoint.new(0.5, 1),
+	NumberSequenceKeypoint.new(0.5, 0.6),
 	NumberSequenceKeypoint.new(1, 0)
 }
 
 task.spawn(function()
 	while true do
-		UIGradient.Rotation = (UIGradient.Rotation + 3) % 360 -- rotação rápida
+		UIGradient.Rotation = (UIGradient.Rotation + 2) % 360
 		RunService.RenderStepped:Wait()
 	end
 end)
 
-
-
-local defaultColor = Main.BackgroundColor3
-local hoverColor = Color3.fromRGB(55, 55, 60)
+local default = Main.BackgroundColor3
+local hover = Color3.fromRGB(50,40,70)
 
 Main.MouseEnter:Connect(function()
-	TweenService:Create(Main, TweenInfo.new(0.2), {BackgroundColor3 = hoverColor}):Play()
+	TweenService:Create(Main, TweenInfo.new(0.15), {BackgroundColor3 = hover}):Play()
 end)
 
 Main.MouseLeave:Connect(function()
-	TweenService:Create(Main, TweenInfo.new(0.2), {BackgroundColor3 = defaultColor}):Play()
+	TweenService:Create(Main, TweenInfo.new(0.15), {BackgroundColor3 = default}):Play()
 end)
 
-
-
-
-local function MHFYJL_fake_script() -- Main.hideUi 
-	local script = Instance.new('LocalScript', Main)
-
-        local button = script.Parent
-        function GetGui()
-            for _, v in pairs(game:GetService("CoreGui"):GetDescendants()) do
-                if v:IsA('Frame') and v.Name == 'Base' then
-                    return v
-                end
-            end
-        end
-        if GetGui() then GetGui().Visible = not GetGui().Visible end
-        local function toggleVisibility()
-			local VirtualInputManager = game:GetService("VirtualInputManager")
-            if game.PlaceId == 537413528 then
-			    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.LeftControl, false, nil)
-			    task.wait(0.1)
-			    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.LeftControl, false, nil)
-            else
-			    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.K, false, nil)
-			    task.wait(0.1)
-			    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.K, false, nil)
-            end
-        end
-
-        button.TouchTap:Connect(toggleVisibility)
+local function toggle()
+     if game.PlaceId == 537413528 then
+        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.LeftControl, false, nil)
+        task.wait(0.1)
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.LeftControl, false, nil)
+    elseif CoreGui:FindFirstChild("ScreenGui"):FindFirstChild("Base") then
+        CoreGui.ScreenGui.Base.Visible = not CoreGui.ScreenGui.Base.Visible
+    else
+        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.K, false, nil)
+        task.wait(0.1)
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.K, false, nil)
+     end
 end
-coroutine.wrap(MHFYJL_fake_script)()
-local function QFEYM_fake_script() -- Main.dragable 
-	local script = Instance.new('LocalScript', Main)
 
-	local frame = script.Parent
-	local userInputService = game:GetService("UserInputService")
-	
-	local dragging = false
-	local dragStart, startPos
-	
-	local function update(input)
-		local delta = input.Position - dragStart
-		frame.Position = UDim2.new(
-			startPos.X.Scale,
-			startPos.X.Offset + delta.X,
-			startPos.Y.Scale,
-			startPos.Y.Offset + delta.Y
-		)
+Main.TouchTap:Connect(toggle)
+
+local dragging, dragStart, startPos
+
+local function update(input)
+	local delta = input.Position - dragStart
+	Main.Position = UDim2.new(
+		startPos.X.Scale,
+		startPos.X.Offset + delta.X,
+		startPos.Y.Scale,
+		startPos.Y.Offset + delta.Y
+	)
+end
+
+Main.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = Main.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
 	end
-	
-	frame.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			dragging = true
-			dragStart = input.Position
-			startPos = frame.Position
-	
-			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then
-					dragging = false
-				end
-			end)
-		end
-	end)
-	
-	frame.InputChanged:Connect(function(input)
-		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-			update(input)
-		end
-	end)
-	
-	userInputService.InputChanged:Connect(function(input)
-		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-			update(input)
-		end
-	end)
-	
-end
-coroutine.wrap(QFEYM_fake_script)()
+end)
+
+UIS.InputChanged:Connect(function(input)
+	if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+		update(input)
+	end
+end)
