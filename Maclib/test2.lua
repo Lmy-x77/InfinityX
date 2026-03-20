@@ -5876,6 +5876,7 @@ end
 function MacLib:Watermark(Settings)
 	local interFont = assets.interFont
 	local icons = Settings.Icons or {}
+	local iconSize = Settings.IconSize or 14
 
 	local gui = Instance.new("ScreenGui")
 	gui.ResetOnSpawn = false
@@ -5930,7 +5931,7 @@ function MacLib:Watermark(Settings)
 		d.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		d.BackgroundTransparency = 0.85
 		d.BorderSizePixel = 0
-		d.Size = UDim2.new(0, 1, 0, 14)
+		d.Size = UDim2.new(0, 1, 0, iconSize)
 		d.LayoutOrder = order
 		d.Parent = frame
 	end
@@ -5951,7 +5952,7 @@ function MacLib:Watermark(Settings)
 		if iconId then
 			local img = Instance.new("ImageLabel")
 			img.BackgroundTransparency = 1
-			img.Size = UDim2.new(0, 14, 0, 14)
+			img.Size = UDim2.new(0, iconSize, 0, iconSize)
 			img.Image = iconId
 			img.ImageTransparency = alpha or 0.2
 			img.Parent = container
