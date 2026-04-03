@@ -8422,9 +8422,9 @@ function Library:CreateWindow(WindowInfo)
     end
 
 do
-        local ToggleBtnTexture = "rbxassetid://72530843154458"
+        local ToggleBtnTexture = "rbxassetid://92308401887821"
         
-        local ToggleBtnSize = 56   
+        local ToggleBtnSize = 48   
         local ToggleBtnIconSize = 34 
 
         local ToggleBtnFrame = New("ImageButton", {
