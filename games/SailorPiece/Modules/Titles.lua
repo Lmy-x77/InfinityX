@@ -73,29 +73,4 @@ function Titles:GetBestLuckyTitle()
     return bestTitle
 end
 
-function Titles:GetBestDamageTitle()
-    local bestTitle = nil
-    local bestValue = 0
-
-    for titleName, value in pairs(self.AutoEquip.DamageTitles) do
-        local searchName = titleName:gsub("%s+", "")
-
-        for _, v in pairs(holder:GetChildren()) do
-            if v.Name:gsub("%s+", ""):find(searchName) then
-                local txt = v:FindFirstChild("BuffButtonsHolder")
-                    and v.BuffButtonsHolder:FindFirstChild("Txt")
-
-                if txt and txt:IsA("TextLabel") and not txt.Text:find("Locked") then
-                    if value and value > bestValue then
-                        bestValue = value
-                        bestTitle = titleName
-                    end
-                end
-            end
-        end
-    end
-
-    return bestTitle
-end
-
 return Titles
