@@ -1,3 +1,7 @@
+print('Disabled script')
+task.wait(9e999999)
+
+
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
