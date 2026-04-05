@@ -1,3 +1,11 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+local RequestInventory = Remotes:WaitForChild("RequestInventory")
+local UpdateInventory = Remotes:WaitForChild("UpdateInventory")
+
+local CachedAccessories = {}
+
 local Accessorys = {}
 Accessorys.__index = Accessorys
 
@@ -330,30 +338,43 @@ local v32 = {
 v2["Moon Outfit"] = v32
 
 
+UpdateInventory.OnClientEvent:Connect(function(type, data)
+    if type == "Accessories" then
+        CachedAccessories = data
+    end
+end)
+
+function Accessorys:UpdateAccessories()
+    RequestInventory:FireServer()
+    task.wait(0.5)
+    return CachedAccessories
+end
+
+local function NormalizeName(name)
+    return name:match("^(.-)%s*%[") or name
+end
+
 function Accessorys:GetBestDamageAccessory()
-    local player = game:GetService("Players").LocalPlayer
-    local storage = player.PlayerGui.InventoryPanelUI.MainFrame.Frame.Content.Holder.StorageHolder.Storage
+    local accessories = self:UpdateAccessories()
 
     local bestName = nil
     local bestDamage = 0
 
-    for accName, data in pairs(v2) do
-        local searchKey = accName:gsub("%s+", "")
-        local searchDisplay = data.DisplayName and data.DisplayName:gsub("%s+", "")
+    for _, acc in pairs(accessories) do
+        local cleanName = NormalizeName(acc.name)
 
-        for _, v in pairs(storage:GetChildren()) do
-            local invName = v.Name:gsub("%s+", "")
+        local data = v2[cleanName]
+        if data and data.stats and data.stats.Damage then
+            local dmg = data.stats.Damage
 
-            if invName:find(searchKey) or (searchDisplay and invName:find(searchDisplay)) then
-                if data.stats and data.stats.Damage and data.stats.Damage > bestDamage then
-                    bestDamage = data.stats.Damage
-                    bestName = accName
-                end
+            if dmg > bestDamage then
+                bestDamage = dmg
+                bestName = cleanName
             end
         end
     end
 
-    return bestName
+    return bestName, bestDamage
 end
 
 return Accessorys
