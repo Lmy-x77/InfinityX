@@ -87,42 +87,112 @@ local TowerGroupBox = Tabs.Main:AddLeftGroupbox("Tower", "tower-control")
 local CharacterGroupBox = Tabs.Main:AddRightGroupbox("Character", "user")
 local ToolGroupBox = Tabs.Main:AddRightGroupbox("Item Sniper", "hammer")
 TowerGroupBox:AddButton("Finish tower", function()
-  if game.PlaceId == 1962086868 then
-    game:GetService("TweenService"):Create(
-      game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"),
-      TweenInfo.new(25, Enum.EasingStyle.Sine, Enum.EasingDirection.Out),
-      {Position = tweenPart.Position + Vector3.new(0, 10, 0)}
-    ):Play() wait(25.2) game.Players.LocalPlayer.Character.Humanoid.Health = 0
-  elseif game.PlaceId == 3582763398 then
-    game:GetService("TweenService"):Create(
-      game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"),
-      TweenInfo.new(35, Enum.EasingStyle.Sine, Enum.EasingDirection.Out),
-      {Position = tweenPart.Position + Vector3.new(0, 10, 0)}
-    ):Play() wait(35.2) game.Players.LocalPlayer.Character.Humanoid.Health = 0
-  end
+	local TweenService = game:GetService("TweenService")
+	local player = game.Players.LocalPlayer
+	local char = player.Character or player.CharacterAdded:Wait()
+	local root = char:WaitForChild("HumanoidRootPart")
+
+	local sections = workspace.tower.sections
+	local starts = {}
+
+	for _, model in pairs(sections:GetChildren()) do
+		if model:IsA("Model") and model.Name ~= "Lobby" then
+			local start = model:FindFirstChild("start")
+			if start and start:IsA("BasePart") then
+				table.insert(starts, start)
+			end
+		end
+	end
+
+	local function getClosest(pos, list)
+		local closest, dist = nil, math.huge
+		for i, part in pairs(list) do
+			local d = (part.Position - pos).Magnitude
+			if d < dist then
+				dist = d
+				closest = i
+			end
+		end
+		return closest
+	end
+
+	local function tweenTo(position)
+		local tween = TweenService:Create(root, TweenInfo.new(4, Enum.EasingStyle.Linear), {CFrame = CFrame.new(position)})
+		tween:Play()
+		tween.Completed:Wait()
+	end
+
+	while #starts > 0 do
+		local index = getClosest(root.Position, starts)
+		if not index then break end
+
+		local target = starts[index]
+		tweenTo(target.Position)
+		task.wait(2)
+		table.remove(starts, index)
+	end
+
+	local finish = sections.finish:FindFirstChild("FinishGlow")
+	if finish then
+		tweenTo(finish.Position)
+	end
 end)
 TowerGroupBox:AddButton("Finish tower + rejoin", function()
-  if game.PlaceId == 1962086868 then
-    game:GetService("TweenService"):Create(
-      game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"),
-      TweenInfo.new(25, Enum.EasingStyle.Sine, Enum.EasingDirection.Out),
-      {Position = tweenPart.Position + Vector3.new(0, 10, 0)}
-    ):Play() wait(25.2) game.Players.LocalPlayer.Character.Humanoid.Health = 0
-    wait(1.5)
-    game:GetService("TeleportService"):TeleportToPlaceInstance(
-      game.PlaceId, game.JobId, game:GetService("Players").LocalPlayer
-    )
-  elseif game.PlaceId == 3582763398 then
-    game:GetService("TweenService"):Create(
-      game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart"),
-      TweenInfo.new(35, Enum.EasingStyle.Sine, Enum.EasingDirection.Out),
-      {Position = tweenPart.Position + Vector3.new(0, 10, 0)}
-    ):Play() wait(35.2) game.Players.LocalPlayer.Character.Humanoid.Health = 0
-    wait(1.5)
-    game:GetService("TeleportService"):TeleportToPlaceInstance(
-      game.PlaceId, game.JobId, game:GetService("Players").LocalPlayer
-    )
-  end
+	local TweenService = game:GetService("TweenService")
+	local player = game.Players.LocalPlayer
+	local char = player.Character or player.CharacterAdded:Wait()
+	local root = char:WaitForChild("HumanoidRootPart")
+
+	local sections = workspace.tower.sections
+	local starts = {}
+
+	for _, model in pairs(sections:GetChildren()) do
+		if model:IsA("Model") and model.Name ~= "Lobby" then
+			local start = model:FindFirstChild("start")
+			if start and start:IsA("BasePart") then
+				table.insert(starts, start)
+			end
+		end
+	end
+
+	local function getClosest(pos, list)
+		local closest, dist = nil, math.huge
+		for i, part in pairs(list) do
+			local d = (part.Position - pos).Magnitude
+			if d < dist then
+				dist = d
+				closest = i
+			end
+		end
+		return closest
+	end
+
+	local function tweenTo(position)
+		local tween = TweenService:Create(root, TweenInfo.new(4, Enum.EasingStyle.Linear), {CFrame = CFrame.new(position)})
+		tween:Play()
+		tween.Completed:Wait()
+	end
+
+	while #starts > 0 do
+		local index = getClosest(root.Position, starts)
+		if not index then break end
+
+		local target = starts[index]
+		tweenTo(target.Position)
+		task.wait(2)
+		table.remove(starts, index)
+	end
+
+	local finish = sections.finish:FindFirstChild("FinishGlow")
+	if finish then
+		tweenTo(finish.Position)
+	end
+
+  task.wait(1)
+
+  game:GetService("TeleportService"):TeleportToPlaceInstance(
+    game.PlaceId, game.JobId, game:GetService("Players").LocalPlayer
+  )
 end)
 TowerGroupBox:AddDivider()
 TowerGroupBox:AddParagraph({
