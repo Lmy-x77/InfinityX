@@ -5751,7 +5751,9 @@ do
 
         -- Outer wrapper in the parent groupbox's list
         local TabboxWrapper = New("Frame", {
-            BackgroundColor3 = "BackgroundColor",
+            BackgroundColor3 = function()
+                return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
+            end,
             Size = UDim2.fromScale(1, 0),
             Parent = Container,
         })
@@ -7457,7 +7459,7 @@ function Library:CreateWindow(WindowInfo)
             do
                 GroupboxHolder = New("Frame", {
                     BackgroundColor3 = function()
-                        return Library:GetBetterColor(Library.Scheme.BackgroundColor, 6)
+                        return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
                     end,
                     ClipsDescendants = true,
                     Size = UDim2.fromScale(1, 0),
@@ -7668,7 +7670,7 @@ function Library:CreateWindow(WindowInfo)
             do
                 TabboxHolder = New("Frame", {
                     BackgroundColor3 = function()
-                        return Library:GetBetterColor(Library.Scheme.BackgroundColor, 6)
+                        return Library:GetBetterColor(Library.Scheme.BackgroundColor, 2)
                     end,
                     Size = UDim2.fromScale(1, 0),
                     Parent = BoxHolder,
