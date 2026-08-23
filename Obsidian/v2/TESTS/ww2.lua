@@ -319,7 +319,7 @@ local Templates = {
         Resizable = true,
         SearchbarSize = UDim2.fromScale(1, 1),
         GlobalSearch = false,
-        CornerRadius = 4,
+        CornerRadius = 10,
         NotifySide = "Right",
         ShowCustomCursor = true,
         Font = Enum.Font.Code,
@@ -4425,8 +4425,8 @@ do
                 return
             end
 
-            for _, Side in Library.ActiveTab.Sides do
-                Side.ScrollingEnabled = false
+            if Library.ActiveTab.ScrollFrame then
+                Library.ActiveTab.ScrollFrame.ScrollingEnabled = false
             end
 
             while IsDragInput(Input) do
@@ -4445,8 +4445,8 @@ do
                 RunService.RenderStepped:Wait()
             end
 
-            for _, Side in Library.ActiveTab.Sides do
-                Side.ScrollingEnabled = true
+            if Library.ActiveTab.ScrollFrame then
+                Library.ActiveTab.ScrollFrame.ScrollingEnabled = true
             end
         end)
 
@@ -5016,8 +5016,8 @@ do
                 return
             end
 
-            for _, Side in Groupbox.Tab.Sides do
-                Side.ScrollingEnabled = false
+            if Groupbox.Tab and Groupbox.Tab.ScrollFrame then
+                Groupbox.Tab.ScrollFrame.ScrollingEnabled = false
             end
         end)
 
@@ -5026,8 +5026,8 @@ do
                 return
             end
 
-            for _, Side in Groupbox.Tab.Sides do
-                Side.ScrollingEnabled = true
+            if Groupbox.Tab and Groupbox.Tab.ScrollFrame then
+                Groupbox.Tab.ScrollFrame.ScrollingEnabled = true
             end
         end)
 
@@ -6959,6 +6959,7 @@ function Library:CreateWindow(WindowInfo)
         local TabIcon
 
         local TabContainer
+        local TabScroll
         local TabLeft
         local TabRight
 
@@ -7040,14 +7041,22 @@ function Library:CreateWindow(WindowInfo)
                 Parent = Container,
             })
 
-            TabLeft = New("ScrollingFrame", {
+            TabScroll = New("ScrollingFrame", {
                 AutomaticCanvasSize = Enum.AutomaticSize.Y,
                 BackgroundTransparency = 1,
                 CanvasSize = UDim2.fromScale(0, 0),
                 ScrollBarImageTransparency = 1,
                 ScrollBarThickness = 0,
-                Size = UDim2.new(0.5, -3, 1, 0),
+                ScrollingDirection = Enum.ScrollingDirection.Y,
+                Size = UDim2.fromScale(1, 1),
                 Parent = TabContainer,
+            })
+
+            TabLeft = New("Frame", {
+                AutomaticSize = Enum.AutomaticSize.Y,
+                BackgroundTransparency = 1,
+                Size = UDim2.new(0.5, -3, 0, 0),
+                Parent = TabScroll,
             })
             New("UIListLayout", {
                 Padding = UDim.new(0, 2),
@@ -7073,16 +7082,13 @@ function Library:CreateWindow(WindowInfo)
                 })
             end
 
-            TabRight = New("ScrollingFrame", {
+            TabRight = New("Frame", {
                 AnchorPoint = Vector2.new(1, 0),
-                AutomaticCanvasSize = Enum.AutomaticSize.Y,
+                AutomaticSize = Enum.AutomaticSize.Y,
                 BackgroundTransparency = 1,
-                CanvasSize = UDim2.fromScale(0, 0),
                 Position = UDim2.fromScale(1, 0),
-                ScrollBarImageTransparency = 1,
-                ScrollBarThickness = 0,
-                Size = UDim2.new(0.5, -3, 1, 0),
-                Parent = TabContainer,
+                Size = UDim2.new(0.5, -3, 0, 0),
+                Parent = TabScroll,
             })
             New("UIListLayout", {
                 Padding = UDim.new(0, 2),
@@ -7115,7 +7121,7 @@ function Library:CreateWindow(WindowInfo)
             Position = UDim2.fromOffset(2, 0),
             Size = UDim2.new(1, -4, 0, 0),
             AutomaticSize = Enum.AutomaticSize.Y,
-            Parent = TabContainer,
+            Parent = TabScroll,
         })
         New("UIPadding", {
             PaddingTop = UDim.new(0, 2),
@@ -7161,7 +7167,7 @@ function Library:CreateWindow(WindowInfo)
             Position = UDim2.fromOffset(2, 0),
             Size = UDim2.new(1, -4, 0, 0),
             AutomaticSize = Enum.AutomaticSize.Y,
-            Parent = TabContainer,
+            Parent = TabScroll,
         })
         New("UIListLayout", {
             Padding = UDim.new(0, 6),
@@ -7175,7 +7181,7 @@ function Library:CreateWindow(WindowInfo)
             Position = UDim2.fromOffset(0, 7),
             Size = UDim2.fromScale(1, 0),
             Visible = false,
-            Parent = TabContainer,
+            Parent = TabScroll,
         })
 
         local WarningBox
@@ -7260,6 +7266,7 @@ function Library:CreateWindow(WindowInfo)
             Groupboxes = {},
             Tabboxes = {},
             DependencyGroupboxes = {},
+            ScrollFrame = TabScroll,
             Sides = {
                 TabLeft,
                 TabRight,
@@ -7346,24 +7353,35 @@ function Library:CreateWindow(WindowInfo)
         end
 
         function Tab:RefreshSides()
-            local Offset = TabHeaderInfo.AbsoluteSize.Y + TabFull.AbsoluteSize.Y
+            --// Header primeiro
+            local Offset = TabHeaderInfo.AbsoluteSize.Y
+
+            --// Warning box logo abaixo do header
             if WarningBoxHolder.Visible then
-                Offset += WarningBox.Size.Y.Offset + 8
+                WarningBoxHolder.Position = UDim2.fromOffset(0, Offset + 7)
+                Offset += WarningBox.Size.Y.Offset + 8 + 7
             end
 
-            TabFull.Position = UDim2.fromOffset(2, TabHeaderInfo.AbsoluteSize.Y) -- << linha nova
-            WarningBoxHolder.Position = UDim2.fromOffset(0, TabHeaderInfo.AbsoluteSize.Y + TabFull.AbsoluteSize.Y + 7)
-
+            --// Left/Right lado a lado, abaixo do header (e do warning box, se houver)
             for _, Side in Tab.Sides do
                 Side.Position = UDim2.new(Side.Position.X.Scale, 0, 0, Offset)
-                Side.Size = UDim2.new(0.5, -3, 1, -Offset)
             end
+
+            --// Full groupboxes ficam por último, abaixo da coluna mais alta
+            local ColumnsHeight = math.max(TabLeft.AbsoluteSize.Y, TabRight.AbsoluteSize.Y)
+            TabFull.Position = UDim2.fromOffset(2, Offset + ColumnsHeight + 8)
         end
 
         TabHeaderInfo:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
             Tab:RefreshSides()
         end)
         TabFull:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+            Tab:RefreshSides()
+        end)
+        TabLeft:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+            Tab:RefreshSides()
+        end)
+        TabRight:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
             Tab:RefreshSides()
         end)
 
