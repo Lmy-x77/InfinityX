@@ -232,13 +232,16 @@ local NavigationConfig = {
     SidebarWidth = 56,
     IconSize = 20,
     TabButtonHeight = 40,
-    TabSpacing = 4,
+    TabSpacing = 10,
     IndicatorWidth = 3,
-    HeaderHeight = 42,
+    HeaderHeight = 49,
     ActiveIconTransparency = 0,
-    InactiveIconTransparency = 0.55,
+    InactiveIconTransparency = 0.6,
     HoverIconTransparency = 0.25,
     AnimationTime = 0.15,
+    SidebarTopPadding = 16,
+    SidebarBottomPadding = 16,
+    HeaderButtonSize = 28,
 }
 
 if RunService:IsStudio() then
@@ -6331,10 +6334,12 @@ function Library:CreateWindow(WindowInfo)
             })
         )
         Library:AddOutline(MainFrame)
-        Library:MakeLine(MainFrame, {
-            Position = UDim2.fromOffset(0, 48),
+        local HeaderSeparator = Library:MakeLine(MainFrame, {
+            Position = UDim2.fromOffset(0, NavigationConfig.HeaderHeight - 1),
             Size = UDim2.new(1, 0, 0, 1),
         })
+        Library.Registry[HeaderSeparator].BackgroundTransparency = nil
+        HeaderSeparator.BackgroundTransparency = 0.7
 
         DividerLine = New("Frame", {
             BackgroundColor3 = "OutlineColor",
@@ -6537,19 +6542,99 @@ function Library:CreateWindow(WindowInfo)
             })
         end
 
-        if MoveIcon then
-            New("ImageLabel", {
-                AnchorPoint = Vector2.new(1, 0.5),
-                Image = MoveIcon.Url,
-                ImageColor3 = "AccentColor",
-                ImageRectOffset = MoveIcon.ImageRectOffset,
-                ImageRectSize = MoveIcon.ImageRectSize,
-                Position = UDim2.new(1, -10, 0.5, 0),
-                Size = UDim2.fromOffset(28, 28),
-                SizeConstraint = Enum.SizeConstraint.RelativeYY,
-                Parent = TopBar,
+        --// Header Controls: Search / Minimize / Maximize / Close
+        local HeaderControls = New("Frame", {
+            AnchorPoint = Vector2.new(1, 0.5),
+            BackgroundTransparency = 1,
+            Position = UDim2.new(1, -14, 0.5, 0),
+            Size = UDim2.new(0, 4 * NavigationConfig.HeaderButtonSize + 3 * 6, 0, NavigationConfig.HeaderButtonSize),
+            Parent = TopBar,
+        })
+        New("UIListLayout", {
+            FillDirection = Enum.FillDirection.Horizontal,
+            HorizontalAlignment = Enum.HorizontalAlignment.Right,
+            VerticalAlignment = Enum.VerticalAlignment.Center,
+            Padding = UDim.new(0, 6),
+            Parent = HeaderControls,
+        })
+
+        local HeaderIconNames = { "search", "minus", "square", "x" }
+        local HeaderIconButtons = {}
+
+        for _, IconName in ipairs(HeaderIconNames) do
+            local IconData = Library:GetIcon(IconName)
+
+            local HBtn = New("TextButton", {
+                BackgroundColor3 = "MainColor",
+                BackgroundTransparency = 1,
+                Size = UDim2.fromOffset(NavigationConfig.HeaderButtonSize, NavigationConfig.HeaderButtonSize),
+                Text = "",
+                Parent = HeaderControls,
             })
+            table.insert(
+                Library.Corners,
+                New("UICorner", {
+                    CornerRadius = UDim.new(0, 5),
+                    Parent = HBtn,
+                })
+            )
+
+            local HIcon = New("ImageLabel", {
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                Image = IconData and IconData.Url or "",
+                ImageColor3 = "FontColor",
+                ImageRectOffset = IconData and IconData.ImageRectOffset or Vector2.zero,
+                ImageRectSize = IconData and IconData.ImageRectSize or Vector2.zero,
+                ImageTransparency = 0.35,
+                Position = UDim2.fromScale(0.5, 0.5),
+                Size = UDim2.fromOffset(15, 15),
+                Parent = HBtn,
+            })
+
+            HBtn.MouseEnter:Connect(function()
+                TweenService:Create(HBtn, Library.TweenInfo, { BackgroundTransparency = 0.85 }):Play()
+                TweenService:Create(HIcon, Library.TweenInfo, { ImageTransparency = 0 }):Play()
+            end)
+            HBtn.MouseLeave:Connect(function()
+                TweenService:Create(HBtn, Library.TweenInfo, { BackgroundTransparency = 1 }):Play()
+                TweenService:Create(HIcon, Library.TweenInfo, { ImageTransparency = 0.35 }):Play()
+            end)
+
+            HeaderIconButtons[IconName] = { Button = HBtn, Icon = HIcon }
         end
+
+        -- Search: alterna a searchbar existente
+        HeaderIconButtons["search"].Button.MouseButton1Click:Connect(function()
+            SearchBox.Visible = not SearchBox.Visible
+            if SearchBox.Visible then
+                SearchBox:CaptureFocus()
+            end
+        end)
+
+        -- Minimize: esconde a janela mantendo o estado
+        HeaderIconButtons["minus"].Button.MouseButton1Click:Connect(function()
+            Library:Toggle(false)
+        end)
+
+        -- Maximize/Restore: alterna entre tamanho atual e MinSize
+        local IsMaximized = true
+        local PreMaxSize, PreMaxPos = WindowInfo.Size, MainFrame.Position
+        HeaderIconButtons["square"].Button.MouseButton1Click:Connect(function()
+            if IsMaximized then
+                PreMaxSize = MainFrame.Size
+                PreMaxPos = MainFrame.Position
+                MainFrame.Size = UDim2.fromOffset(Library.MinSize.X, Library.MinSize.Y)
+            else
+                MainFrame.Size = PreMaxSize
+                MainFrame.Position = PreMaxPos
+            end
+            IsMaximized = not IsMaximized
+        end)
+
+        -- Close: fecha a janela
+        HeaderIconButtons["x"].Button.MouseButton1Click:Connect(function()
+            Library:Toggle(false)
+        end)
 
         --// Bottom Bar \\--
         BottomBackground = New("Frame", {
@@ -6635,6 +6720,13 @@ function Library:CreateWindow(WindowInfo)
             Parent = MainFrame,
         })
         New("UIListLayout", {
+            HorizontalAlignment = Enum.HorizontalAlignment.Center,
+            Padding = UDim.new(0, NavigationConfig.TabSpacing),
+            Parent = Tabs,
+        })
+        New("UIPadding", {
+            PaddingTop = UDim.new(0, NavigationConfig.SidebarTopPadding),
+            PaddingBottom = UDim.new(0, NavigationConfig.SidebarBottomPadding),
             Parent = Tabs,
         })
 
