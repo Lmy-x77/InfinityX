@@ -153,7 +153,7 @@ local Library = {
 
     SearchText = "",
     Searching = false,
-    GlobalSearch = false,
+    GlobalSearch = true,
     LastSearchTab = nil,
 
     ActiveTab = nil,
@@ -720,7 +720,7 @@ local function ApplySearchToTab(Tab, Search)
             end
 
             --// Check if Search matches Element's Name and if Element is Visible
-            if ElementInfo.Text and ElementInfo.Text:lower():match(Search) and ElementInfo.Visible then
+            if ElementInfo.Text and ElementInfo.Text:lower():find(Search, 1, true) and ElementInfo.Visible then
                 ElementInfo.Holder.Visible = true
                 VisibleElements += 1
             else
@@ -786,7 +786,7 @@ local function ApplySearchToTab(Tab, Search)
                 end
 
                 --// Check if Search matches Element's Name and if Element is Visible
-                if ElementInfo.Text and ElementInfo.Text:lower():match(Search) and ElementInfo.Visible then
+                if ElementInfo.Text and ElementInfo.Text:lower():find(Search, 1, true) and ElementInfo.Visible then
                     ElementInfo.Holder.Visible = true
                     VisibleElements[SubTab] += 1
                 else
@@ -6635,7 +6635,7 @@ function Library:CreateWindow(WindowInfo)
                 ImageRectOffset = SearchIcon.ImageRectOffset,
                 ImageRectSize = SearchIcon.ImageRectSize,
                 ImageTransparency = 0.5,
-                Position = UDim2.fromOffset(8, 0.5 * SearchMenu.Menu.AbsoluteSize.Y),
+                Position = UDim2.new(0, 8, 0.5, 0),
                 Size = UDim2.fromOffset(14, 14),
                 Parent = SearchBox,
             })
@@ -7656,7 +7656,9 @@ function Library:CreateWindow(WindowInfo)
 
             do
                 TabboxHolder = New("Frame", {
-                    BackgroundColor3 = "BackgroundColor",
+                    BackgroundColor3 = function()
+                        return Library:GetBetterColor(Library.Scheme.BackgroundColor, 2)
+                    end,
                     Size = UDim2.fromScale(1, 0),
                     Parent = BoxHolder,
                 })
