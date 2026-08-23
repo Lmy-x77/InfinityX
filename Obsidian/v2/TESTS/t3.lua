@@ -7459,7 +7459,7 @@ function Library:CreateWindow(WindowInfo)
             do
                 GroupboxHolder = New("Frame", {
                     BackgroundColor3 = function()
-                        return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
+                        return Library:GetBetterColor(Library.Scheme.BackgroundColor, 2)
                     end,
                     ClipsDescendants = true,
                     Size = UDim2.fromScale(1, 0),
