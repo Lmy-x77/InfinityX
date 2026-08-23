@@ -6782,7 +6782,7 @@ function Library:CreateWindow(WindowInfo)
 
         -- Close: fecha a janela
         HeaderIconButtons["x"].Button.MouseButton1Click:Connect(function()
-            Library:Destroy()
+            Library:Unload()
         end)
 
         --// Bottom Bar \\--
