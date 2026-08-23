@@ -228,6 +228,19 @@ local UI_CONFIG = {
     AnimTime = 0.18,
 }
 
+local NavigationConfig = {
+    SidebarWidth = 56,
+    IconSize = 20,
+    TabButtonHeight = 40,
+    TabSpacing = 4,
+    IndicatorWidth = 3,
+    HeaderHeight = 42,
+    ActiveIconTransparency = 0,
+    InactiveIconTransparency = 0.55,
+    HoverIconTransparency = 0.25,
+    AnimationTime = 0.15,
+}
+
 if RunService:IsStudio() then
     if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then
         Library.IsMobile = true
@@ -311,7 +324,7 @@ local Templates = {
         UnlockMouseWhileOpen = true,
 
         EnableSidebarResize = false,
-        EnableCompacting = true,
+        EnableCompacting = false,
         DisableCompactingSnap = false,
         SidebarCompacted = false,
         MinContainerWidth = 256,
@@ -6283,7 +6296,7 @@ function Library:CreateWindow(WindowInfo)
     local BottomBackground
     local FooterLabel
 
-    local InitialLeftWidth = math.ceil(WindowInfo.Size.X.Offset * 0.3)
+    local InitialLeftWidth = NavigationConfig.SidebarWidth
     local IsCompact = WindowInfo.SidebarCompacted
     local LastExpandedWidth = InitialLeftWidth
 
@@ -6325,6 +6338,7 @@ function Library:CreateWindow(WindowInfo)
 
         DividerLine = New("Frame", {
             BackgroundColor3 = "OutlineColor",
+            BackgroundTransparency = 0.75,
             Position = UDim2.fromOffset(InitialLeftWidth, 0),
             Size = UDim2.new(0, 1, 1, -21),
             Parent = MainFrame,
@@ -6364,6 +6378,7 @@ function Library:CreateWindow(WindowInfo)
         Library:MakeDraggable(MainFrame, TopBar, false, true)
 
         --// Title
+        --// Brand (logo fica só na sidebar, largura fixa e estreita)
         TitleHolder = New("Frame", {
             BackgroundTransparency = 1,
             Size = UDim2.new(0, InitialLeftWidth, 1, 0),
@@ -6390,24 +6405,25 @@ function Library:CreateWindow(WindowInfo)
                 BackgroundTransparency = 1,
                 Size = WindowInfo.IconSize,
                 Text = WindowInfo.Title:sub(1, 1),
-                TextScaled = true,
-                Visible = false,
+                TextSize = 16,
+                TextColor3 = "AccentColor",
                 Parent = TitleHolder,
             })
+            Library.Registry[WindowIcon].TextColor3 = "AccentColor"
         end
 
-        local X = Library:GetTextBounds(
-            WindowInfo.Title,
-            Library.Scheme.Font,
-            20,
-            TitleHolder.AbsoluteSize.X - (WindowInfo.Icon and WindowInfo.IconSize.X.Offset + 6 or 0) - 12
-        )
+        --// Título centralizado no header inteiro (estilo minimalista)
+        local X = Library:GetTextBounds(WindowInfo.Title, Library.Scheme.Font, 15, TopBar.AbsoluteSize.X - 140)
         WindowTitle = New("TextLabel", {
+            AnchorPoint = Vector2.new(0.5, 0.5),
             BackgroundTransparency = 1,
-            Size = UDim2.new(0, X, 1, 0),
+            Position = UDim2.fromScale(0.5, 0.5),
+            Size = UDim2.new(0, X, 0, 20),
             Text = WindowInfo.Title,
-            TextSize = 20,
-            Parent = TitleHolder,
+            TextSize = 15,
+            TextTransparency = 0.15,
+            ZIndex = 1,
+            Parent = TopBar,
         })
 
         --// Top Right Bar
@@ -6609,7 +6625,9 @@ function Library:CreateWindow(WindowInfo)
         --// Tabs \\--
         Tabs = New("ScrollingFrame", {
             AutomaticCanvasSize = Enum.AutomaticSize.Y,
-            BackgroundColor3 = "BackgroundColor",
+            BackgroundColor3 = function()
+                return Library:GetBetterColor(Library.Scheme.BackgroundColor, -1)
+            end,
             CanvasSize = UDim2.fromScale(0, 0),
             Position = UDim2.fromOffset(0, 49),
             ScrollBarThickness = 0,
@@ -6707,7 +6725,7 @@ function Library:CreateWindow(WindowInfo)
         end
 
         for _, Button in Library.TabButtons do
-            if not Button.Icon then
+            if not Button.Icon or not Button.Padding then
                 continue
             end
 
@@ -6792,52 +6810,73 @@ function Library:CreateWindow(WindowInfo)
         local TabRight
 
         Icon = Library:GetCustomIcon(Icon)
+        local TabIndicator
         do
             TabButton = New("TextButton", {
-                BackgroundColor3 = "MainColor",
+                BackgroundColor3 = "AccentColor",
                 BackgroundTransparency = 1,
-                Size = UDim2.new(1, 0, 0, 40),
+                Size = UDim2.new(1, -12, 0, NavigationConfig.TabButtonHeight),
+                Position = UDim2.fromOffset(6, 0),
                 Text = "",
                 Parent = Tabs,
             })
-            local ButtonPadding = New("UIPadding", {
-                PaddingBottom = UDim.new(0, IsCompact and 6 or 11),
-                PaddingLeft = UDim.new(0, IsCompact and 6 or 12),
-                PaddingRight = UDim.new(0, IsCompact and 6 or 12),
-                PaddingTop = UDim.new(0, IsCompact and 6 or 11),
+            table.insert(
+                Library.Corners,
+                New("UICorner", {
+                    CornerRadius = UDim.new(0, 6),
+                    Parent = TabButton,
+                })
+            )
+
+            -- Indicador lateral fino (substitui o "card" grande)
+            TabIndicator = New("Frame", {
+                AnchorPoint = Vector2.new(0, 0.5),
+                BackgroundColor3 = "AccentColor",
+                BackgroundTransparency = 1,
+                Position = UDim2.fromScale(0, 0.5),
+                Size = UDim2.fromOffset(NavigationConfig.IndicatorWidth, 0),
                 Parent = TabButton,
             })
+            table.insert(
+                Library.Corners,
+                New("UICorner", {
+                    CornerRadius = UDim.new(1, 0),
+                    Parent = TabIndicator,
+                })
+            )
 
+            -- Label mantido só por compatibilidade (não é mais mostrado, o nome vira tooltip)
             TabLabel = New("TextLabel", {
                 BackgroundTransparency = 1,
-                Position = UDim2.fromOffset(30, 0),
                 Size = UDim2.new(1, -30, 1, 0),
                 Text = Name,
                 TextSize = 16,
-                TextTransparency = 0.5,
+                TextTransparency = 1,
                 TextXAlignment = Enum.TextXAlignment.Left,
-                Visible = not IsCompact,
+                Visible = false,
                 Parent = TabButton,
             })
 
             if Icon then
                 TabIcon = New("ImageLabel", {
+                    AnchorPoint = Vector2.new(0.5, 0.5),
                     Image = Icon.Url,
                     ImageColor3 = Icon.Custom and "WhiteColor" or "AccentColor",
                     ImageRectOffset = Icon.ImageRectOffset,
                     ImageRectSize = Icon.ImageRectSize,
-                    ImageTransparency = 0.5,
+                    ImageTransparency = NavigationConfig.InactiveIconTransparency,
                     ScaleType = Enum.ScaleType.Fit,
-                    Size = UDim2.fromScale(1, 1),
-                    SizeConstraint = IsCompact and Enum.SizeConstraint.RelativeXY or Enum.SizeConstraint.RelativeYY,
+                    Position = UDim2.fromScale(0.5, 0.5),
+                    Size = UDim2.fromOffset(NavigationConfig.IconSize, NavigationConfig.IconSize),
                     Parent = TabButton,
                 })
             end
 
             table.insert(Library.TabButtons, {
                 Label = TabLabel,
-                Padding = ButtonPadding,
+                Padding = nil,
                 Icon = TabIcon,
+                Indicator = TabIndicator,
             })
 
             --// Tab Container \\--
@@ -7589,17 +7628,17 @@ function Library:CreateWindow(WindowInfo)
             return Tab:AddTabbox({ Side = 2, Name = Name })
         end
 
+        local NavAnim = TweenInfo.new(NavigationConfig.AnimationTime, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
         function Tab:Hover(Hovering)
             if Library.ActiveTab == Tab then
                 return
             end
 
-            TweenService:Create(TabLabel, Library.TweenInfo, {
-                TextTransparency = Hovering and 0.25 or 0.5,
-            }):Play()
             if TabIcon then
-                TweenService:Create(TabIcon, Library.TweenInfo, {
-                    ImageTransparency = Hovering and 0.25 or 0.5,
+                TweenService:Create(TabIcon, NavAnim, {
+                    ImageTransparency = Hovering and NavigationConfig.HoverIconTransparency
+                        or NavigationConfig.InactiveIconTransparency,
                 }):Play()
             end
         end
@@ -7609,15 +7648,16 @@ function Library:CreateWindow(WindowInfo)
                 Library.ActiveTab:Hide()
             end
 
-            TweenService:Create(TabButton, Library.TweenInfo, {
-                BackgroundTransparency = 0,
+            TweenService:Create(TabButton, NavAnim, {
+                BackgroundTransparency = 0.92,
             }):Play()
-            TweenService:Create(TabLabel, Library.TweenInfo, {
-                TextTransparency = 0,
+            TweenService:Create(TabIndicator, NavAnim, {
+                BackgroundTransparency = 0,
+                Size = UDim2.fromOffset(NavigationConfig.IndicatorWidth, NavigationConfig.IconSize + 10),
             }):Play()
             if TabIcon then
-                TweenService:Create(TabIcon, Library.TweenInfo, {
-                    ImageTransparency = 0,
+                TweenService:Create(TabIcon, NavAnim, {
+                    ImageTransparency = NavigationConfig.ActiveIconTransparency,
                 }):Play()
             end
 
@@ -7636,15 +7676,16 @@ function Library:CreateWindow(WindowInfo)
         end
 
         function Tab:Hide()
-            TweenService:Create(TabButton, Library.TweenInfo, {
+            TweenService:Create(TabButton, NavAnim, {
                 BackgroundTransparency = 1,
             }):Play()
-            TweenService:Create(TabLabel, Library.TweenInfo, {
-                TextTransparency = 0.5,
+            TweenService:Create(TabIndicator, NavAnim, {
+                BackgroundTransparency = 1,
+                Size = UDim2.fromOffset(NavigationConfig.IndicatorWidth, 0),
             }):Play()
             if TabIcon then
-                TweenService:Create(TabIcon, Library.TweenInfo, {
-                    ImageTransparency = 0.5,
+                TweenService:Create(TabIcon, NavAnim, {
+                    ImageTransparency = NavigationConfig.InactiveIconTransparency,
                 }):Play()
             end
             TabContainer.Visible = false
