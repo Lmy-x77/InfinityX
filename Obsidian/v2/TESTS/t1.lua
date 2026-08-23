@@ -5782,6 +5782,7 @@ do
             ActiveTab = nil,
             Tabs = {},
             Groupbox = Groupbox,
+            BoxHolder = TabboxWrapper,
         }
 
         local TotalButtons = 0
@@ -5910,6 +5911,10 @@ do
             InnerTabbox.Tabs[Name] = Tab
 
             return Tab
+        end
+
+        if Groupbox.Tab and Groupbox.Tab.Tabboxes then
+            table.insert(Groupbox.Tab.Tabboxes, InnerTabbox)
         end
 
         return InnerTabbox
@@ -6603,28 +6608,20 @@ function Library:CreateWindow(WindowInfo)
             Parent = SearchMenu.Menu,
         })
 
-        SearchBox = New("TextBox", {
+        local SearchBoxWrapper = New("Frame", {
             BackgroundColor3 = "BackgroundColor",
             BorderColor3 = "OutlineColor",
             BorderSizePixel = 1,
-            PlaceholderText = "Search...",
             Size = UDim2.fromScale(1, 1),
-            TextSize = 14,
-            TextXAlignment = Enum.TextXAlignment.Left,
             Parent = SearchMenu.Menu,
         })
         table.insert(
             Library.Corners,
             New("UICorner", {
                 CornerRadius = UDim.new(0, 6),
-                Parent = SearchBox,
+                Parent = SearchBoxWrapper,
             })
         )
-        New("UIPadding", {
-            PaddingLeft = UDim.new(0, 30),
-            PaddingRight = UDim.new(0, 26),
-            Parent = SearchBox,
-        })
 
         local SearchIcon = Library:GetIcon("search")
         if SearchIcon then
@@ -6637,9 +6634,23 @@ function Library:CreateWindow(WindowInfo)
                 ImageTransparency = 0.5,
                 Position = UDim2.new(0, 8, 0.5, 0),
                 Size = UDim2.fromOffset(14, 14),
-                Parent = SearchBox,
+                Parent = SearchBoxWrapper,
             })
         end
+
+        SearchBox = New("TextBox", {
+            BackgroundTransparency = 1,
+            PlaceholderText = "Search...",
+            Size = UDim2.fromScale(1, 1),
+            TextSize = 14,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = SearchBoxWrapper,
+        })
+        New("UIPadding", {
+            PaddingLeft = UDim.new(0, 30),
+            PaddingRight = UDim.new(0, 26),
+            Parent = SearchBox,
+        })
 
         local ClearIcon = Library:GetIcon("x")
         SearchClearButton = New("ImageButton", {
@@ -7446,7 +7457,7 @@ function Library:CreateWindow(WindowInfo)
             do
                 GroupboxHolder = New("Frame", {
                     BackgroundColor3 = function()
-                        return Library:GetBetterColor(Library.Scheme.BackgroundColor, 2)
+                        return Library:GetBetterColor(Library.Scheme.BackgroundColor, 6)
                     end,
                     ClipsDescendants = true,
                     Size = UDim2.fromScale(1, 0),
@@ -7657,7 +7668,7 @@ function Library:CreateWindow(WindowInfo)
             do
                 TabboxHolder = New("Frame", {
                     BackgroundColor3 = function()
-                        return Library:GetBetterColor(Library.Scheme.BackgroundColor, 2)
+                        return Library:GetBetterColor(Library.Scheme.BackgroundColor, 6)
                     end,
                     Size = UDim2.fromScale(1, 0),
                     Parent = BoxHolder,
