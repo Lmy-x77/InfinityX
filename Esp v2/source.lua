@@ -1,5 +1,5 @@
 -- Credits by: InfernusScripts/Null-Fire
--- Modified ESP UI options
+-- Modified ESP Library by lmy77
 
 local function getGlobalTable()
   return typeof(getfenv().getgenv) == "function"
@@ -12,23 +12,28 @@ if getGlobalTable().ESPLib then
   return getGlobalTable().ESPLib
 end
 
+local RunService = game:GetService("RunService")
+
 local ESPChange = Instance.new("BindableEvent")
 
 local espLib
+
 espLib = {
   ESPValues = setmetatable({}, {
-    __index = function(self, name)
+    __index = function(_, name)
       if typeof(espLib.Values) ~= "table" then
         espLib.Values = {}
       end
 
-      return not not espLib.Values[name]
+      return espLib.Values[name] == true
     end,
 
-    __newindex = function(self, name, value)
+    __newindex = function(_, name, value)
       if typeof(espLib.Values) ~= "table" then
         espLib.Values = {}
       end
+
+      value = value == true
 
       if espLib.Values[name] == value then
         return
@@ -43,339 +48,303 @@ espLib = {
   ESPApplied = {}
 }
 
-local cons = {}
+local connections = {}
 local speed = 24
 
 local function GetRGBValue()
   return Color3.new(
-    math.sin(((os.clock() * speed) % 360) / 360 * 2 * math.pi) * 0.5 + 0.5,
-    math.sin((((os.clock() * speed) % 360) / 360 + 1 / 3) * 2 * math.pi) * 0.5 + 0.5,
-    math.sin((((os.clock() * speed) % 360) / 360 + 2 / 3) * 2 * math.pi) * 0.5 + 0.5
+    math.sin(os.clock() * speed) * 0.5 + 0.5,
+    math.sin(os.clock() * speed + 2.094) * 0.5 + 0.5,
+    math.sin(os.clock() * speed + 4.188) * 0.5 + 0.5
   )
 end
 
-local function GetTextPosition(textPos)
+local function DisconnectAll(obj)
+  if connections[obj] then
+    for _, connection in pairs(connections[obj]) do
+      if connection and typeof(connection) == "RBXScriptConnection" then
+        connection:Disconnect()
+      end
+    end
+  end
+
+  connections[obj] = nil
+end
+
+local function GetTextOffset(textPos)
   textPos = string.lower(tostring(textPos or "below"))
 
   if textPos == "above" then
-    return {
-      Position = UDim2.new(0, 0, 0, -35),
-      AnchorPoint = Vector2.new(0, 1)
-    }
+    return Vector3.new(0, 3.5, 0)
   end
 
   if textPos == "center" then
-    return {
-      Position = UDim2.new(0, 0, 0.5, 0),
-      AnchorPoint = Vector2.new(0, 0.5)
-    }
+    return Vector3.new(0, 0, 0)
   end
 
-  -- Below (padrão)
-  return {
-    Position = UDim2.new(0, 0, 0.5, 10),
-    AnchorPoint = Vector2.new(0, 0)
-  }
+  return Vector3.new(0, -3.5, 0)
 end
 
-local function applyESP(obj, espSettings)
+local function NormalizeObject(obj)
+  if not obj then
+    return nil
+  end
+
+  if obj:IsA("Model") then
+    return obj
+  end
+
+  return obj:FindFirstAncestorOfClass("Model") or obj
+end
+
+local function RemoveESPFolder(obj)
   if not obj then
     return
   end
 
-  obj = obj:IsA("Model")
-    and obj
-    or obj:FindFirstAncestorOfClass("Model")
-    or obj
+  local folder = obj:FindFirstChild("ESPFolder")
 
-  espSettings = espSettings or {}
-
-  espSettings.Color = espSettings.Color or Color3.new(1, 1, 1)
-
-  espSettings.HighlightEnabled =
-    type(espSettings.HighlightEnabled) ~= "nil"
-      and espSettings.HighlightEnabled
-      or true
-
-  espSettings.Text = espSettings.Text or obj.Name
-  espSettings.TextPos = espSettings.TextPos or "Below"
-  espSettings.ESPName = espSettings.ESPName or ""
-  espSettings.CircleVisible =
-    type(espSettings.CircleVisible) == "boolean"
-      and espSettings.CircleVisible
-      or true
-
-  local col = espSettings.Color
-  local con1
-  local con2
-  local con3
-  local con4
-
-  local function updateESP()
-    local found = table.find(espLib.ESPApplied, obj)
-
-    if not found then
-      table.insert(espLib.ESPApplied, obj)
-    end
-
-    local ESPFolder =
-      obj:FindFirstChild("ESPFolder")
-      or Instance.new("Folder", obj)
-
-    ESPFolder.Name = "ESPFolder"
-
-    --
-    -- Highlight
-    --
-
-    local hl =
-      ESPFolder:FindFirstChild("Highlight")
-      or Instance.new("Highlight", ESPFolder)
-
-    hl.Adornee = obj
-    hl.OutlineColor = col
-    hl.FillColor = col
-    hl.FillTransparency = 0.8
-    hl.OutlineTransparency = 0.5
-
-    hl.Enabled =
-      espSettings.HighlightEnabled
-      and not not espLib.ESPValues[espSettings.ESPName]
-
-    if not espSettings.HighlightEnabled then
-      hl:Destroy()
-    end
-
-    --
-    -- BillboardGui
-    --
-
-    local bg =
-      ESPFolder:FindFirstChild("BillboardGui")
-      or Instance.new("BillboardGui", ESPFolder)
-
-    bg.Adornee = espSettings.Object or obj
-    bg.AlwaysOnTop = true
-    bg.ClipsDescendants = false
-    bg.Size = UDim2.fromOffset(250, 200)
-    bg.MaxDistance = math.huge
-
-    bg.Enabled = not not espLib.ESPValues[espSettings.ESPName]
-
-    --
-    -- Circle
-    --
-
-    local circle =
-      bg:FindFirstChild("Frame")
-      or Instance.new("Frame", bg)
-
-    circle.Name = "Circle"
-
-    circle.Position = UDim2.fromScale(0.5, 0.5)
-    circle.AnchorPoint = Vector2.new(0.5, 0.5)
-    circle.Size = UDim2.fromOffset(10, 10)
-    circle.BackgroundColor3 = col
-
-    circle.Visible = espSettings.CircleVisible
-
-    local corner =
-      circle:FindFirstChild("UICorner")
-      or Instance.new("UICorner", circle)
-
-    corner.CornerRadius = UDim.new(1, 0)
-
-    local gradient =
-      circle:FindFirstChild("UIGradient")
-      or Instance.new("UIGradient", circle)
-
-    gradient.Rotation = 90
-    gradient.Color = ColorSequence.new({
-      ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
-      ColorSequenceKeypoint.new(1, Color3.new(0.5, 0.5, 0.5))
-    })
-
-    local circleStroke =
-      circle:FindFirstChild("UIStroke")
-      or Instance.new("UIStroke", circle)
-
-    circleStroke.Thickness = 2.5
-
-    --
-    -- TextLabel
-    --
-
-    local label =
-      bg:FindFirstChild("TextLabel")
-      or Instance.new("TextLabel", bg)
-
-    label.Name = "TextLabel"
-    label.TextStrokeTransparency = 1
-    label.BackgroundTransparency = 1
-    label.TextColor3 = col
-    label.Text = espSettings.Text
-    label.TextScaled = true
-    label.Font = Enum.Font.Code
-
-    label.Size = UDim2.new(
-      1,
-      0,
-      0,
-      #label.Text:gsub("\r", "\n"):split("\n") * 20
-    )
-
-    --
-    -- Text position
-    --
-
-    local textPosition = GetTextPosition(espSettings.TextPos)
-
-    label.Position = textPosition.Position
-    label.AnchorPoint = textPosition.AnchorPoint
-
-    label.RichText = true
-
-    cons[obj] = cons[obj] or {}
-
-    cons[obj][4] =
-      cons[obj][4]
-      or label:GetPropertyChangedSignal("Text"):Connect(function()
-        label.Size = UDim2.new(
-          1,
-          0,
-          0,
-          #label.Text:gsub("\r", "\n"):split("\n") * 20
-        )
-      end)
-
-    con4 = cons[obj][4]
-
-    local textStroke =
-      label:FindFirstChild("UIStroke")
-      or Instance.new("UIStroke", label)
-
-    textStroke.Thickness = 2.5
-  end
-
-  deapplyESP(obj)
-  updateESP()
-
-  cons[obj] = {}
-
-  local function doCon3()
-    if con3 then
-      con3:Disconnect()
-      con3 = nil
-      cons[obj][3] = nil
-    end
-
-    con3 = game:GetService("RunService").RenderStepped:Connect(function()
-      if not obj or not obj.Parent or not obj:FindFirstChild("ESPFolder") then
-        if con1 then
-          con1:Disconnect()
-        end
-
-        if con2 then
-          con2:Disconnect()
-        end
-
-        if con3 then
-          con3:Disconnect()
-        end
-
-        if con4 then
-          con4:Disconnect()
-          con4 = nil
-        end
-
-        con3 = nil
-        cons[obj][3] = nil
-
-        return
-      end
-
-      col = GetRGBValue()
-      updateESP()
-    end)
-
-    cons[obj][3] = con3
-  end
-
-  con1 = ESPChange.Event:Connect(function()
-    updateESP()
-
-    if espLib.ESPValues.RGBESP and not con3 then
-      doCon3()
-
-    elseif not espLib.ESPValues.RGBESP and con3 then
-      con3:Disconnect()
-      con3 = nil
-
-      cons[obj][3] = nil
-      col = espSettings.Color
-
-      updateESP()
-    end
-  end)
-
-  con2 = obj.Destroying:Connect(function()
-    if con1 then
-      con1:Disconnect()
-    end
-
-    if con2 then
-      con2:Disconnect()
-    end
-
-    if con4 then
-      con4:Disconnect()
-      con4 = nil
-    end
-
-    if con3 then
-      con3:Disconnect()
-      con3 = nil
-      cons[obj][3] = nil
-    end
-  end)
-
-  cons[obj][1] = con1
-  cons[obj][2] = con2
-
-  if espLib.ESPValues.RGBESP then
-    doCon3()
+  if folder then
+    folder:Destroy()
   end
 end
 
-function deapplyESP(obj)
+local function RemoveFromApplied(obj)
+  local index = table.find(espLib.ESPApplied, obj)
+
+  if index then
+    table.remove(espLib.ESPApplied, index)
+  end
+end
+
+local function AddToApplied(obj)
+  if not table.find(espLib.ESPApplied, obj) then
+    table.insert(espLib.ESPApplied, obj)
+  end
+end
+
+local function applyESP(obj, settings)
+  obj = NormalizeObject(obj)
+
   if not obj then
     return
   end
 
-  obj = obj:IsA("Model")
-    and obj
-    or obj:FindFirstAncestorOfClass("Model")
-    or obj
+  settings = settings or {}
 
-  local found = table.find(espLib.ESPApplied, obj)
+  local espName = settings.ESPName or ""
+  local text = settings.Text or obj.Name
+  local textPos = settings.TextPos or "Below"
 
-  if found then
-    table.remove(espLib.ESPApplied, found)
+  local highlightEnabled = settings.HighlightEnabled
+  if highlightEnabled == nil then
+    highlightEnabled = true
   end
 
-  for _, v in pairs(cons[obj] or {}) do
-    if v then
-      v:Disconnect()
+  local circleVisible = settings.CircleVisible
+  if circleVisible == nil then
+    circleVisible = true
+  end
+
+  local color = settings.Color or Color3.new(1, 1, 1)
+
+  -- Remove ESP antigo
+  DisconnectAll(obj)
+  RemoveESPFolder(obj)
+  RemoveFromApplied(obj)
+
+  AddToApplied(obj)
+
+  local folder = Instance.new("Folder")
+  folder.Name = "ESPFolder"
+  folder.Parent = obj
+
+  --
+  -- Highlight
+  --
+
+  if highlightEnabled then
+    local highlight = Instance.new("Highlight")
+
+    highlight.Name = "Highlight"
+    highlight.Adornee = obj
+    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+
+    highlight.FillColor = color
+    highlight.OutlineColor = color
+
+    highlight.FillTransparency = 0.8
+    highlight.OutlineTransparency = 0.5
+
+    highlight.Enabled = espLib.ESPValues[espName]
+    highlight.Parent = folder
+  end
+
+  --
+  -- Billboard
+  --
+
+  local billboard = Instance.new("BillboardGui")
+
+  billboard.Name = "BillboardGui"
+  billboard.Adornee = settings.Object or obj
+
+  billboard.AlwaysOnTop = true
+  billboard.ClipsDescendants = false
+
+  billboard.Size = UDim2.fromOffset(200, 50)
+  billboard.MaxDistance = math.huge
+
+  billboard.StudsOffset = GetTextOffset(textPos)
+
+  billboard.Enabled = espLib.ESPValues[espName]
+  billboard.Parent = folder
+
+  --
+  -- Circle
+  --
+
+  local circle = Instance.new("Frame")
+
+  circle.Name = "Circle"
+
+  circle.AnchorPoint = Vector2.new(0.5, 0.5)
+  circle.Position = UDim2.fromScale(0.5, 0.5)
+
+  circle.Size = UDim2.fromOffset(10, 10)
+
+  circle.BackgroundColor3 = color
+  circle.BorderSizePixel = 0
+
+  circle.Visible = circleVisible
+  circle.Parent = billboard
+
+  local corner = Instance.new("UICorner")
+  corner.CornerRadius = UDim.new(1, 0)
+  corner.Parent = circle
+
+  local gradient = Instance.new("UIGradient")
+
+  gradient.Rotation = 90
+
+  gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
+    ColorSequenceKeypoint.new(1, Color3.new(0.5, 0.5, 0.5))
+  })
+
+  gradient.Parent = circle
+
+  local circleStroke = Instance.new("UIStroke")
+
+  circleStroke.Thickness = 2.5
+  circleStroke.Parent = circle
+
+  --
+  -- Text
+  --
+
+  local label = Instance.new("TextLabel")
+
+  label.Name = "TextLabel"
+
+  label.BackgroundTransparency = 1
+
+  label.Size = UDim2.fromScale(1, 1)
+  label.Position = UDim2.fromScale(0, 0)
+
+  label.Text = text
+
+  label.TextColor3 = color
+
+  label.Font = Enum.Font.Code
+
+  label.TextSize = 14
+  label.TextScaled = false
+
+  label.TextStrokeTransparency = 0
+  label.TextStrokeColor3 = Color3.new(0, 0, 0)
+
+  label.RichText = true
+
+  label.TextXAlignment = Enum.TextXAlignment.Center
+  label.TextYAlignment = Enum.TextYAlignment.Center
+
+  label.Visible = true
+  label.Parent = billboard
+
+  --
+  -- Connections
+  --
+
+  connections[obj] = {}
+
+  local function UpdateEnabled()
+    if not obj or not obj.Parent then
+      return
     end
+
+    local enabled = espLib.ESPValues[espName]
+
+    local currentHighlight = folder:FindFirstChild("Highlight")
+
+    if currentHighlight then
+      currentHighlight.Enabled = enabled
+    end
+
+    billboard.Enabled = enabled
   end
 
-  cons[obj] = nil
+  local function UpdateColor()
+    if not obj or not obj.Parent then
+      return
+    end
 
-  local espFolder = obj:FindFirstChild("ESPFolder")
+    local currentColor = color
 
-  if espFolder then
-    espFolder:Destroy()
+    if espLib.ESPValues.RGBESP then
+      currentColor = GetRGBValue()
+    end
+
+    local currentHighlight = folder:FindFirstChild("Highlight")
+
+    if currentHighlight then
+      currentHighlight.FillColor = currentColor
+      currentHighlight.OutlineColor = currentColor
+    end
+
+    circle.BackgroundColor3 = currentColor
+    label.TextColor3 = currentColor
   end
+
+  connections[obj].change = ESPChange.Event:Connect(function()
+    UpdateEnabled()
+  end)
+
+  connections[obj].destroying = obj.Destroying:Connect(function()
+    DisconnectAll(obj)
+    RemoveFromApplied(obj)
+  end)
+
+  connections[obj].rgb = RunService.RenderStepped:Connect(function()
+    if espLib.ESPValues.RGBESP then
+      UpdateColor()
+    end
+  end)
+
+  UpdateEnabled()
+  UpdateColor()
+end
+
+local function deapplyESP(obj)
+  obj = NormalizeObject(obj)
+
+  if not obj then
+    return
+  end
+
+  DisconnectAll(obj)
+  RemoveESPFolder(obj)
+  RemoveFromApplied(obj)
 end
 
 espLib.ApplyESP = applyESP
