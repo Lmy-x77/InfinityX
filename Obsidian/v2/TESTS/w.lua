@@ -309,6 +309,7 @@ local Templates = {
     --// Library \\--
     Window = {
         Title = "No Title",
+        HubTitle = nil,
         Footer = "No Footer",
         Position = UDim2.fromOffset(6, 6),
         Size = UDim2.fromOffset(720, 600),
@@ -4523,6 +4524,13 @@ do
             TextXAlignment = Enum.TextXAlignment.Left,
             Parent = Holder,
         })
+        table.insert(
+            Library.Corners,
+            New("UICorner", {
+                CornerRadius = UDim.new(0, 5),
+                Parent = Display,
+            })
+        )
 
         New("UIPadding", {
             PaddingLeft = UDim.new(0, 8),
@@ -6418,13 +6426,14 @@ function Library:CreateWindow(WindowInfo)
         end
 
         --// Título centralizado no header inteiro (estilo minimalista)
-        local X = Library:GetTextBounds(WindowInfo.Title, Library.Scheme.Font, 15, TopBar.AbsoluteSize.X - 140)
+        local HeaderTitleText = WindowInfo.HubTitle or WindowInfo.Title
+        local X = Library:GetTextBounds(HeaderTitleText, Library.Scheme.Font, 15, TopBar.AbsoluteSize.X - 140)
         WindowTitle = New("TextLabel", {
             AnchorPoint = Vector2.new(0.5, 0.5),
             BackgroundTransparency = 1,
             Position = UDim2.fromScale(0.5, 0.5),
             Size = UDim2.new(0, X, 0, 20),
-            Text = WindowInfo.Title,
+            Text = HeaderTitleText,
             TextSize = 15,
             TextTransparency = 0.15,
             ZIndex = 1,
@@ -6497,51 +6506,6 @@ function Library:CreateWindow(WindowInfo)
             Parent = CurrentTabInfo,
         })
 
-        SearchBox = New("TextBox", {
-            BackgroundColor3 = "MainColor",
-            PlaceholderText = "Search",
-            Size = WindowInfo.SearchbarSize,
-            TextScaled = true,
-            Visible = not (WindowInfo.DisableSearch or false),
-            Parent = RightWrapper,
-        })
-        New("UIFlexItem", {
-            FlexMode = Enum.UIFlexMode.Shrink,
-            Parent = SearchBox,
-        })
-        table.insert(
-            Library.Corners,
-            New("UICorner", {
-                CornerRadius = UDim.new(0, WindowInfo.CornerRadius),
-                Parent = SearchBox,
-            })
-        )
-        New("UIPadding", {
-            PaddingBottom = UDim.new(0, 8),
-            PaddingLeft = UDim.new(0, 8),
-            PaddingRight = UDim.new(0, 8),
-            PaddingTop = UDim.new(0, 8),
-            Parent = SearchBox,
-        })
-        New("UIStroke", {
-            Color = "OutlineColor",
-            Parent = SearchBox,
-        })
-
-        local SearchIcon = Library:GetIcon("search")
-        if SearchIcon then
-            New("ImageLabel", {
-                Image = SearchIcon.Url,
-                ImageColor3 = "FontColor",
-                ImageRectOffset = SearchIcon.ImageRectOffset,
-                ImageRectSize = SearchIcon.ImageRectSize,
-                ImageTransparency = 0.5,
-                Size = UDim2.fromScale(1, 1),
-                SizeConstraint = Enum.SizeConstraint.RelativeYY,
-                Parent = SearchBox,
-            })
-        end
-
         --// Header Controls: Search / Minimize / Maximize / Close
         local HeaderControls = New("Frame", {
             AnchorPoint = Vector2.new(1, 0.5),
@@ -6604,11 +6568,71 @@ function Library:CreateWindow(WindowInfo)
         end
 
         -- Search: alterna a searchbar existente
-        HeaderIconButtons["search"].Button.MouseButton1Click:Connect(function()
-            SearchBox.Visible = not SearchBox.Visible
-            if SearchBox.Visible then
-                SearchBox:CaptureFocus()
+        -- Search: popup flutuante, não sobrepõe nada, tema da UI
+        local SearchMenu = Library:AddContextMenu(
+            HeaderIconButtons["search"].Button,
+            UDim2.fromOffset(260, 40),
+            { -260 + NavigationConfig.HeaderButtonSize, NavigationConfig.HeaderButtonSize + 6 },
+            nil,
+            function(Active)
+                if Active then
+                    task.defer(function()
+                        SearchBox:CaptureFocus()
+                    end)
+                else
+                    SearchBox.Text = ""
+                    Library:UpdateSearch("")
+                end
             end
+        )
+        New("UIPadding", {
+            PaddingBottom = UDim.new(0, 6),
+            PaddingLeft = UDim.new(0, 6),
+            PaddingRight = UDim.new(0, 6),
+            PaddingTop = UDim.new(0, 6),
+            Parent = SearchMenu.Menu,
+        })
+
+        SearchBox = New("TextBox", {
+            BackgroundColor3 = "BackgroundColor",
+            BorderColor3 = "OutlineColor",
+            BorderSizePixel = 1,
+            PlaceholderText = "Search...",
+            Size = UDim2.fromScale(1, 1),
+            TextSize = 14,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = SearchMenu.Menu,
+        })
+        table.insert(
+            Library.Corners,
+            New("UICorner", {
+                CornerRadius = UDim.new(0, 6),
+                Parent = SearchBox,
+            })
+        )
+        New("UIPadding", {
+            PaddingLeft = UDim.new(0, 30),
+            PaddingRight = UDim.new(0, 8),
+            Parent = SearchBox,
+        })
+
+        local SearchIcon = Library:GetIcon("search")
+        if SearchIcon then
+            New("ImageLabel", {
+                AnchorPoint = Vector2.new(0, 0.5),
+                Image = SearchIcon.Url,
+                ImageColor3 = "FontColor",
+                ImageRectOffset = SearchIcon.ImageRectOffset,
+                ImageRectSize = SearchIcon.ImageRectSize,
+                ImageTransparency = 0.5,
+                Position = UDim2.fromOffset(8, 0.5 * SearchMenu.Menu.AbsoluteSize.Y),
+                Size = UDim2.fromOffset(14, 14),
+                Parent = SearchBox,
+            })
+        end
+
+        HeaderIconButtons["search"].Button.MouseButton1Click:Connect(function()
+            SearchMenu:Toggle()
         end)
 
         -- Minimize: esconde a janela mantendo o estado
@@ -6617,18 +6641,26 @@ function Library:CreateWindow(WindowInfo)
         end)
 
         -- Maximize/Restore: alterna entre tamanho atual e MinSize
-        local IsMaximized = true
+        -- Maximize/Restore: tela cheia de verdade
+        local IsFullscreen = false
         local PreMaxSize, PreMaxPos = WindowInfo.Size, MainFrame.Position
         HeaderIconButtons["square"].Button.MouseButton1Click:Connect(function()
-            if IsMaximized then
+            if not IsFullscreen then
                 PreMaxSize = MainFrame.Size
                 PreMaxPos = MainFrame.Position
-                MainFrame.Size = UDim2.fromOffset(Library.MinSize.X, Library.MinSize.Y)
+
+                local VP = workspace.CurrentCamera.ViewportSize
+                TweenService:Create(MainFrame, Library.TweenInfo, {
+                    Position = UDim2.fromOffset(0, 0),
+                    Size = UDim2.fromOffset(VP.X, VP.Y),
+                }):Play()
             else
-                MainFrame.Size = PreMaxSize
-                MainFrame.Position = PreMaxPos
+                TweenService:Create(MainFrame, Library.TweenInfo, {
+                    Position = PreMaxPos,
+                    Size = PreMaxSize,
+                }):Play()
             end
-            IsMaximized = not IsMaximized
+            IsFullscreen = not IsFullscreen
         end)
 
         -- Close: fecha a janela
@@ -7048,6 +7080,65 @@ function Library:CreateWindow(WindowInfo)
             end
         end
 
+        --// Tab Header (Nome + Descrição, dentro do conteúdo, estilo referência)
+        local TabHeaderInfo = New("Frame", {
+            BackgroundTransparency = 1,
+            Position = UDim2.fromOffset(2, 0),
+            Size = UDim2.new(1, -4, 0, 0),
+            AutomaticSize = Enum.AutomaticSize.Y,
+            Parent = TabContainer,
+        })
+        New("UIPadding", {
+            PaddingTop = UDim.new(0, 2),
+            PaddingBottom = UDim.new(0, 12),
+            Parent = TabHeaderInfo,
+        })
+        New("UIListLayout", {
+            Padding = UDim.new(0, 2),
+            Parent = TabHeaderInfo,
+        })
+
+        local TabHeaderTitle = New("TextLabel", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 22),
+            Text = Name,
+            TextSize = 20,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = TabHeaderInfo,
+        })
+        do
+            local BoldFont = Font.new(Library.Scheme.Font.Family, Enum.FontWeight.Bold)
+            TabHeaderTitle.FontFace = BoldFont
+            if Library.Registry[TabHeaderTitle] then
+                Library.Registry[TabHeaderTitle].FontFace = nil
+            end
+        end
+
+        local TabHeaderDesc = New("TextLabel", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 16),
+            Text = Description or "",
+            TextSize = 14,
+            TextTransparency = 0.5,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            TextWrapped = true,
+            Visible = Description ~= nil,
+            Parent = TabHeaderInfo,
+        })
+
+        --// Full-width groupbox column (para AddFullGroupbox)
+        local TabFull = New("Frame", {
+            BackgroundTransparency = 1,
+            Position = UDim2.fromOffset(2, 0),
+            Size = UDim2.new(1, -4, 0, 0),
+            AutomaticSize = Enum.AutomaticSize.Y,
+            Parent = TabContainer,
+        })
+        New("UIListLayout", {
+            Padding = UDim.new(0, 6),
+            Parent = TabFull,
+        })
+
         --// Warning Box \\--
         local WarningBoxHolder = New("Frame", {
             AutomaticSize = Enum.AutomaticSize.Y,
@@ -7226,12 +7317,25 @@ function Library:CreateWindow(WindowInfo)
         end
 
         function Tab:RefreshSides()
-            local Offset = WarningBoxHolder.Visible and WarningBox.Size.Y.Offset + 8 or 0
+            local Offset = TabHeaderInfo.AbsoluteSize.Y + TabFull.AbsoluteSize.Y
+            if WarningBoxHolder.Visible then
+                Offset += WarningBox.Size.Y.Offset + 8
+            end
+
+            WarningBoxHolder.Position = UDim2.fromOffset(0, TabHeaderInfo.AbsoluteSize.Y + TabFull.AbsoluteSize.Y + 7)
+
             for _, Side in Tab.Sides do
                 Side.Position = UDim2.new(Side.Position.X.Scale, 0, 0, Offset)
                 Side.Size = UDim2.new(0.5, -3, 1, -Offset)
             end
         end
+
+        TabHeaderInfo:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+            Tab:RefreshSides()
+        end)
+        TabFull:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+            Tab:RefreshSides()
+        end)
 
         function Tab:Resize(ResizeWarningBox: boolean?)
             if ResizeWarningBox then
@@ -7259,11 +7363,18 @@ function Library:CreateWindow(WindowInfo)
         end
 
         function Tab:AddGroupbox(Info)
+            local ParentFrame = TabLeft
+            if Info.Side == 2 then
+                ParentFrame = TabRight
+            elseif Info.Side == "Full" or Info.Side == 3 then
+                ParentFrame = TabFull
+            end
+
             local BoxHolder = New("Frame", {
                 AutomaticSize = Enum.AutomaticSize.Y,
                 BackgroundTransparency = 1,
                 Size = UDim2.fromScale(1, 0),
-                Parent = Info.Side == 1 and TabLeft or TabRight,
+                Parent = ParentFrame,
             })
             New("UIListLayout", {
                 Padding = UDim.new(0, 6),
@@ -7286,7 +7397,9 @@ function Library:CreateWindow(WindowInfo)
 
             do
                 GroupboxHolder = New("Frame", {
-                    BackgroundColor3 = "BackgroundColor",
+                    BackgroundColor3 = function()
+                        return Library:GetBetterColor(Library.Scheme.BackgroundColor, 2)
+                    end,
                     ClipsDescendants = true,
                     Size = UDim2.fromScale(1, 0),
                     Parent = BoxHolder,
@@ -7467,6 +7580,10 @@ function Library:CreateWindow(WindowInfo)
 
         function Tab:AddRightGroupbox(Name, IconName)
             return Tab:AddGroupbox({ Side = 2, Name = Name, IconName = IconName })
+        end
+
+        function Tab:AddFullGroupbox(Name, IconName)
+            return Tab:AddGroupbox({ Side = "Full", Name = Name, IconName = IconName })
         end
 
         function Tab:AddTabbox(Info)
@@ -7753,10 +7870,6 @@ function Library:CreateWindow(WindowInfo)
                 }):Play()
             end
 
-            if Description then
-                Window:ShowTabInfo(Name, Description)
-            end
-
             TabContainer.Visible = true
             Tab:RefreshSides()
 
@@ -7781,8 +7894,6 @@ function Library:CreateWindow(WindowInfo)
                 }):Play()
             end
             TabContainer.Visible = false
-
-            Window:HideTabInfo()
 
             Library.ActiveTab = nil
         end
