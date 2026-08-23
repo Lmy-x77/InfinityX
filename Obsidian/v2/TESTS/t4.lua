@@ -728,6 +728,62 @@ local function ApplySearchToTab(Tab, Search)
             end
         end
 
+        for _, Tabbox in (Groupbox.NestedTabboxes or {}) do
+            local VisibleTabs = 0
+            local TabVisibleElements = {}
+
+            for _, SubTab in Tabbox.Tabs do
+                TabVisibleElements[SubTab] = 0
+
+                for _, ElementInfo in SubTab.Elements do
+                    if ElementInfo.Type == "Divider" then
+                        ElementInfo.Holder.Visible = false
+                        continue
+                    elseif ElementInfo.SubButton then
+                        local Visible = false
+                        if ElementInfo.Text:lower():find(Search, 1, true) and ElementInfo.Visible then
+                            Visible = true
+                        else
+                            ElementInfo.Base.Visible = false
+                        end
+                        if ElementInfo.SubButton.Text:lower():find(Search, 1, true) and ElementInfo.SubButton.Visible then
+                            Visible = true
+                        else
+                            ElementInfo.SubButton.Base.Visible = false
+                        end
+                        ElementInfo.Holder.Visible = Visible
+                        if Visible then
+                            TabVisibleElements[SubTab] += 1
+                        end
+                        continue
+                    end
+
+                    if ElementInfo.Text and ElementInfo.Text:lower():find(Search, 1, true) and ElementInfo.Visible then
+                        ElementInfo.Holder.Visible = true
+                        TabVisibleElements[SubTab] += 1
+                    else
+                        ElementInfo.Holder.Visible = false
+                    end
+                end
+            end
+
+            for SubTab, Visible in TabVisibleElements do
+                SubTab.ButtonHolder.Visible = Visible > 0
+                if Visible > 0 then
+                    VisibleTabs += 1
+                    VisibleElements += Visible
+
+                    if Tabbox.ActiveTab == SubTab then
+                        SubTab:Resize()
+                    elseif Tabbox.ActiveTab and TabVisibleElements[Tabbox.ActiveTab] == 0 then
+                        SubTab:Show()
+                    end
+                end
+            end
+
+            Tabbox.BoxHolder.Visible = VisibleTabs > 0
+        end
+
         for _, Depbox in Groupbox.DependencyBoxes do
             if not Depbox.Visible then
                 continue
@@ -836,6 +892,26 @@ local function ResetTab(Tab)
                 ElementInfo.Base.Visible = ElementInfo.Visible
                 ElementInfo.SubButton.Base.Visible = ElementInfo.SubButton.Visible
             end
+        end
+
+        for _, Tabbox in (Groupbox.NestedTabboxes or {}) do
+            for _, SubTab in Tabbox.Tabs do
+                for _, ElementInfo in SubTab.Elements do
+                    ElementInfo.Holder.Visible = typeof(ElementInfo.Visible) == "boolean" and ElementInfo.Visible or true
+
+                    if ElementInfo.SubButton then
+                        ElementInfo.Base.Visible = ElementInfo.Visible
+                        ElementInfo.SubButton.Base.Visible = ElementInfo.SubButton.Visible
+                    end
+                end
+
+                SubTab.ButtonHolder.Visible = true
+            end
+
+            if Tabbox.ActiveTab then
+                Tabbox.ActiveTab:Resize()
+            end
+            Tabbox.BoxHolder.Visible = true
         end
 
         for _, Depbox in Groupbox.DependencyBoxes do
@@ -5915,9 +5991,8 @@ do
             return Tab
         end
 
-        if Groupbox.Tab and Groupbox.Tab.Tabboxes then
-            table.insert(Groupbox.Tab.Tabboxes, InnerTabbox)
-        end
+        Groupbox.NestedTabboxes = Groupbox.NestedTabboxes or {}
+        table.insert(Groupbox.NestedTabboxes, InnerTabbox)
 
         return InnerTabbox
     end
