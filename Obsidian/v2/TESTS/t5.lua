@@ -5828,7 +5828,7 @@ do
         -- Outer wrapper in the parent groupbox's list
         local TabboxWrapper = New("Frame", {
             BackgroundColor3 = function()
-                return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
+                return Library:GetBetterColor(Library.Scheme.BackgroundColor, 3)
             end,
             Size = UDim2.fromScale(1, 0),
             Parent = Container,
