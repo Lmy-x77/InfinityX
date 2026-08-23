@@ -640,7 +640,7 @@ local function CheckDepbox(Box, Search)
         end
 
         --// Check if Search matches Element's Name and if Element is Visible
-        if ElementInfo.Text and ElementInfo.Text:lower():match(Search) and ElementInfo.Visible then
+       if ElementInfo.Text and ElementInfo.Text:lower():find(Search, 1, true) and ElementInfo.Visible then
             ElementInfo.Holder.Visible = true
             VisibleElements += 1
         else
@@ -706,7 +706,7 @@ local function ApplySearchToTab(Tab, Search)
                 else
                     ElementInfo.Base.Visible = false
                 end
-                if ElementInfo.SubButton.Text:lower():match(Search) and ElementInfo.SubButton.Visible then
+                if ElementInfo.SubButton.Text:lower():find(Search, 1, true) and ElementInfo.SubButton.Visible then
                     Visible = true
                 else
                     ElementInfo.SubButton.Base.Visible = false
@@ -738,6 +738,13 @@ local function ApplySearchToTab(Tab, Search)
 
         --// Update Groupbox Size and Visibility if found any element
         if VisibleElements > 0 then
+            if Groupbox.Collapsible and Groupbox.Collapsed then
+                if Groupbox.PreSearchCollapsed == nil then
+                    Groupbox.PreSearchCollapsed = true
+                end
+                Groupbox:SetCollapsed(false, true)
+            end
+
             Groupbox:Resize()
             HasVisible = true
         end
@@ -839,6 +846,11 @@ local function ResetTab(Tab)
             RestoreDepbox(Depbox)
         end
 
+        if Groupbox.PreSearchCollapsed ~= nil then
+            Groupbox:SetCollapsed(Groupbox.PreSearchCollapsed, true)
+            Groupbox.PreSearchCollapsed = nil
+        end
+
         Groupbox:Resize()
         Groupbox.BoxHolder.Visible = true
     end
@@ -891,8 +903,8 @@ function Library:UpdateSearch(SearchText)
         ResetTab(Tab)
     end
 
-    local Search = SearchText:lower()
-    if Trim(Search) == "" then
+    local Search = Trim(SearchText):lower()
+    if Search == "" then
         Library.Searching = false
         Library.LastSearchTab = nil
         return
@@ -4668,7 +4680,7 @@ do
 
             local Count = 0
             for _, Value in Values do
-                if SearchBox and not tostring(Value):lower():match(SearchBox.Text:lower()) then
+                if SearchBox and not tostring(Value):lower():find(SearchBox.Text:lower(), 1, true) then
                     continue
                 end
 
@@ -6297,6 +6309,7 @@ function Library:CreateWindow(WindowInfo)
     local WindowIcon
     local RightWrapper
     local SearchBox
+    local SearchClearButton
     local CurrentTabInfo
     local CurrentTabLabel
     local CurrentTabDescription
@@ -6579,9 +6592,6 @@ function Library:CreateWindow(WindowInfo)
                     task.defer(function()
                         SearchBox:CaptureFocus()
                     end)
-                else
-                    SearchBox.Text = ""
-                    Library:UpdateSearch("")
                 end
             end
         )
@@ -6612,7 +6622,7 @@ function Library:CreateWindow(WindowInfo)
         )
         New("UIPadding", {
             PaddingLeft = UDim.new(0, 30),
-            PaddingRight = UDim.new(0, 8),
+            PaddingRight = UDim.new(0, 26),
             Parent = SearchBox,
         })
 
@@ -6630,6 +6640,25 @@ function Library:CreateWindow(WindowInfo)
                 Parent = SearchBox,
             })
         end
+
+        local ClearIcon = Library:GetIcon("x")
+        SearchClearButton = New("ImageButton", {
+            AnchorPoint = Vector2.new(1, 0.5),
+            BackgroundTransparency = 1,
+            Image = ClearIcon and ClearIcon.Url or "",
+            ImageColor3 = "FontColor",
+            ImageRectOffset = ClearIcon and ClearIcon.ImageRectOffset or Vector2.zero,
+            ImageRectSize = ClearIcon and ClearIcon.ImageRectSize or Vector2.zero,
+            ImageTransparency = 0.5,
+            Position = UDim2.new(1, -8, 0.5, 0),
+            Size = UDim2.fromOffset(12, 12),
+            Visible = false,
+            Parent = SearchBox,
+        })
+        SearchClearButton.MouseButton1Click:Connect(function()
+            SearchBox.Text = ""
+            SearchBox:CaptureFocus()
+        end)
 
         HeaderIconButtons["search"].Button.MouseButton1Click:Connect(function()
             SearchMenu:Toggle()
@@ -7322,6 +7351,7 @@ function Library:CreateWindow(WindowInfo)
                 Offset += WarningBox.Size.Y.Offset + 8
             end
 
+            TabFull.Position = UDim2.fromOffset(2, TabHeaderInfo.AbsoluteSize.Y) -- << linha nova
             WarningBoxHolder.Position = UDim2.fromOffset(0, TabHeaderInfo.AbsoluteSize.Y + TabFull.AbsoluteSize.Y + 7)
 
             for _, Side in Tab.Sides do
@@ -8865,6 +8895,7 @@ do
 
     --// Execution \\--
     SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+        SearchClearButton.Visible = SearchBox.Text ~= ""
         Library:UpdateSearch(SearchBox.Text)
     end)
 
