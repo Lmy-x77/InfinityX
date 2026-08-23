@@ -85,6 +85,20 @@ local function GetTextOffset(textPos)
   return Vector3.new(0, -3.5, 0)
 end
 
+local function GetTextPosition(textPos)
+  textPos = string.lower(tostring(textPos or "below"))
+
+  if textPos == "above" then
+    return UDim2.new(0, 0, 0.5, -35)
+  end
+
+  if textPos == "center" then
+    return UDim2.new(0, 0, 0.5, 0)
+  end
+
+  return UDim2.new(0, 0, 0.5, 35)
+end
+
 local function NormalizeObject(obj)
   if not obj then
     return nil
@@ -192,10 +206,10 @@ local function applyESP(obj, settings)
   billboard.AlwaysOnTop = true
   billboard.ClipsDescendants = false
 
-  billboard.Size = UDim2.fromOffset(200, 50)
+  billboard.Size = UDim2.fromOffset(200, 100)
   billboard.MaxDistance = math.huge
 
-  billboard.StudsOffset = GetTextOffset(textPos)
+  billboard.StudsOffset = Vector3.new(0, 0, 0)
 
   billboard.Enabled = espLib.ESPValues[espName]
   billboard.Parent = folder
@@ -249,13 +263,13 @@ local function applyESP(obj, settings)
 
   label.BackgroundTransparency = 1
 
-  label.Size = UDim2.fromScale(1, 1)
-  label.Position = UDim2.fromScale(0, 0)
+  label.AnchorPoint = Vector2.new(0, 0.5)
+  label.Size = UDim2.new(1, 0, 0, 30)
+
+  label.Position = GetTextPosition(textPos)
 
   label.Text = text
-
   label.TextColor3 = color
-
   label.Font = Enum.Font.Code
 
   label.TextSize = 14
