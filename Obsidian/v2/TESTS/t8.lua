@@ -191,6 +191,9 @@ local Library = {
 
     CantDragForced = false,
 
+    PendingEntrances = {},
+    HasShownOnce = false,
+
     Signals = {},
     UnloadSignals = {},
 
@@ -1576,6 +1579,72 @@ function Library:AddBlank(Frame: GuiObject, Size: UDim2)
         Size = Size or UDim2.fromScale(0, 0),
         Parent = Frame,
     })
+end
+
+--// Entrance Animations \\--
+function Library:RunElementEntrance(Holder: GuiObject, MatchColor: Color3, Delay: number)
+    if Library.Unloaded or not Holder or not Holder.Parent then
+        return
+    end
+
+    local OriginalPosition = Holder.Position
+    Holder.Position = OriginalPosition + UDim2.fromOffset(0, 6)
+
+    local Cover = New("Frame", {
+        BackgroundColor3 = MatchColor,
+        BackgroundTransparency = 0,
+        Size = UDim2.fromScale(1, 1),
+        ZIndex = (Holder.ZIndex or 1) + 10,
+        Parent = Holder,
+    })
+
+    task.delay(Delay, function()
+        if Library.Unloaded or not Holder.Parent then
+            if Cover and Cover.Parent then
+                Cover:Destroy()
+            end
+            return
+        end
+
+        TweenService:Create(Holder, TweenInfo.new(0.32, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            Position = OriginalPosition,
+        }):Play()
+
+        local FadeTween = TweenService:Create(Cover, TweenInfo.new(0.28, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            BackgroundTransparency = 1,
+        })
+        FadeTween:Play()
+        FadeTween.Completed:Once(function()
+            if Cover and Cover.Parent then
+                Cover:Destroy()
+            end
+        end)
+    end)
+end
+
+function Library:FlushPendingEntrances()
+    local Queue = Library.PendingEntrances
+    Library.PendingEntrances = {}
+
+    for Index, Entry in ipairs(Queue) do
+        local Delay = math.min((Index - 1) * 0.025, 0.5)
+        Library:RunElementEntrance(Entry.Holder, Entry.Color, Delay)
+    end
+end
+
+function Library:PlayElementEntrance(Groupbox, Holder: GuiObject)
+    if Library.Unloaded or not Holder then
+        return
+    end
+
+    local MatchColor = (Groupbox and Groupbox.Holder and Groupbox.Holder.BackgroundColor3)
+        or Library:GetBetterColor(Library.Scheme.BackgroundColor, 2)
+
+    if Library.HasShownOnce then
+        Library:RunElementEntrance(Holder, MatchColor, 0)
+    else
+        table.insert(Library.PendingEntrances, { Holder = Holder, Color = MatchColor })
+    end
 end
 
 --// Deprecated \\--
@@ -3400,6 +3469,8 @@ do
             table.insert(Labels, Label)
         end
 
+        Library:PlayElementEntrance(Groupbox, Label.Holder)
+
         return Label
     end
 
@@ -3697,6 +3768,8 @@ do
             table.insert(Buttons, Button)
         end
 
+        Library:PlayElementEntrance(Groupbox, Button.Holder)
+
         return Button
     end
 
@@ -3898,6 +3971,8 @@ do
         Toggle.Default = Toggle.Value
 
         Toggles[Idx] = Toggle
+
+        Library:PlayElementEntrance(Groupbox, Toggle.Holder)
 
         return Toggle
     end
@@ -4121,6 +4196,8 @@ do
 
         Toggles[Idx] = Toggle
 
+        Library:PlayElementEntrance(Groupbox, Toggle.Holder)
+
         return Toggle
     end
 
@@ -4284,6 +4361,8 @@ do
         Input.Default = Input.Value
 
         Options[Idx] = Input
+
+        Library:PlayElementEntrance(Groupbox, Input.Holder)
 
         return Input
     end
@@ -4541,6 +4620,8 @@ do
         Slider.Default = Slider.Value
 
         Options[Idx] = Slider
+
+        Library:PlayElementEntrance(Groupbox, Slider.Holder)
 
         return Slider
     end
@@ -4994,6 +5075,8 @@ do
 
         Options[Idx] = Dropdown
 
+        Library:PlayElementEntrance(Groupbox, Dropdown.Holder)
+
         return Dropdown
     end
 
@@ -5268,6 +5351,8 @@ do
 
         Options[Idx] = Viewport
 
+        Library:PlayElementEntrance(Groupbox, Viewport.Holder)
+
         return Viewport
     end
 
@@ -5413,6 +5498,8 @@ do
 
         Options[Idx] = Image
 
+        Library:PlayElementEntrance(Groupbox, Image.Holder)
+
         return Image
     end
 
@@ -5530,6 +5617,8 @@ do
 
         Options[Idx] = Video
 
+        Library:PlayElementEntrance(Groupbox, Video.Holder)
+
         return Video
     end
 
@@ -5599,6 +5688,8 @@ do
         table.insert(Groupbox.Elements, Passthrough)
 
         Options[Idx] = Passthrough
+
+        Library:PlayElementEntrance(Groupbox, Passthrough.Holder)
 
         return Passthrough
     end
@@ -5993,6 +6084,8 @@ do
 
         Groupbox.NestedTabboxes = Groupbox.NestedTabboxes or {}
         table.insert(Groupbox.NestedTabboxes, InnerTabbox)
+
+        Library:PlayElementEntrance(Groupbox, TabboxWrapper)
 
         return InnerTabbox
     end
@@ -6430,12 +6523,12 @@ function Library:CreateWindow(WindowInfo)
                 Parent = MainFrame,
             })
         )
-        table.insert(
-            Library.Scales,
-            New("UIScale", {
-                Parent = MainFrame,
-            })
-        )
+        local MainFrameScale = New("UIScale", {
+            Parent = MainFrame,
+        })
+        table.insert(Library.Scales, MainFrameScale)
+        local MainOutline, MainShadowOutline = Library:AddOutline(MainFrame)
+        
         Library:AddOutline(MainFrame)
         local HeaderSeparator = Library:MakeLine(MainFrame, {
             Position = UDim2.fromOffset(0, NavigationConfig.HeaderHeight - 1),
@@ -6897,6 +6990,55 @@ function Library:CreateWindow(WindowInfo)
             PaddingTop = UDim.new(0, 0),
             Parent = Container,
         })
+    end
+
+    local function PlayWindowEntrance()
+        MainFrameScale.Scale = math.max(Library.DPIScale - 0.08, 0.1)
+        MainFrame.BackgroundTransparency = 1
+        if MainOutline then
+            MainOutline.Transparency = 1
+        end
+        if MainShadowOutline then
+            MainShadowOutline.Transparency = 1
+        end
+
+        TweenService:Create(MainFrameScale, TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Scale = Library.DPIScale,
+        }):Play()
+        TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+            BackgroundTransparency = 0,
+        }):Play()
+        if MainOutline then
+            TweenService:Create(MainOutline, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+                Transparency = 0,
+            }):Play()
+        end
+        if MainShadowOutline then
+            TweenService:Create(MainShadowOutline, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+                Transparency = 0,
+            }):Play()
+        end
+
+        --// Sidebar slide-in
+        local TabsGoalPosition = Tabs.Position
+        Tabs.Position = TabsGoalPosition - UDim2.fromOffset(24, 0)
+        TweenService:Create(Tabs, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            Position = TabsGoalPosition,
+        }):Play()
+
+        --// Main content fade + move
+        local ContainerGoalPosition = Container.Position
+        Container.Position = ContainerGoalPosition + UDim2.fromOffset(0, 10)
+        TweenService:Create(Container, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+            Position = ContainerGoalPosition,
+        }):Play()
+
+        task.delay(0.18, function()
+            if Library.Unloaded then
+                return
+            end
+            Library:FlushPendingEntrances()
+        end)
     end
 
     --// Window Table \\--
@@ -7707,6 +7849,8 @@ function Library:CreateWindow(WindowInfo)
 
             Tab.Groupboxes[Info.Name] = Groupbox
 
+            Library:PlayElementEntrance({ Holder = Container }, GroupboxHolder)
+
             return Groupbox
         end
 
@@ -7955,6 +8099,8 @@ function Library:CreateWindow(WindowInfo)
                 Tabbox.Tabs[Name] = Tab
                 Tabbox:UpdateCorners()
 
+                Library:PlayElementEntrance({ Holder = Tabs }, TabButton)
+
                 return Tab
             end
 
@@ -7963,6 +8109,8 @@ function Library:CreateWindow(WindowInfo)
             else
                 table.insert(Tab.Tabboxes, Tabbox)
             end
+
+            Library:PlayElementEntrance({ Holder = Container }, TabboxHolder)
 
             return Tabbox
         end
@@ -8978,10 +9126,18 @@ do
         end)
         Library:MakeDraggable(ToggleBtnFrame, ToggleBtnFrame, true)
 
+        local WindowEntrancePlayed = false
+
         local OrigToggle = Library.Toggle
         function Library:Toggle(Value)
             OrigToggle(Library, Value)
-            UpdateToggleButton(false) 
+            UpdateToggleButton(false)
+
+            if Library.Toggled and not WindowEntrancePlayed then
+                WindowEntrancePlayed = true
+                Library.HasShownOnce = true
+                PlayWindowEntrance()
+            end
         end
         
         UpdateToggleButton(true)
