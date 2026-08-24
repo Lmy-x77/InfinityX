@@ -1,3 +1,33 @@
+Services = setmetatable({}, {
+  __index = function(self, name)
+    local success, cache = pcall(function()
+      return cloneref(game:GetService(name))
+    end)
+    if success then
+      rawset(self, name, cache)
+      return cache
+    else
+      error("Invalid Service: " .. tostring(name))
+    end
+  end
+})
+
+local Workspace = Services.Workspace
+local Players = Services.Players
+local ReplicatedStorage = Services.ReplicatedStorage
+local ReplicatedFirst = Services.ReplicatedFirst
+local TweenService = Services.TweenService
+local RunService = Services.RunService
+local TeleportService = Services.TeleportService
+local HttpService = Services.HttpService
+local VirtualUser = Services.VirtualUser
+local UserInputService = Services.UserInputService
+local MarketplaceService = Services.MarketplaceService
+local VirtualInputManager = Services.VirtualInputManager
+local CoreGui = Services.CoreGui
+local GuiService = Services.GuiService
+local Lighting = Services.Lighting
+
 local Fly = {
   Enabled = false,
   Speed = 50,
