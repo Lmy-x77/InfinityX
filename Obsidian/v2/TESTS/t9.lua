@@ -1587,9 +1587,6 @@ function Library:RunElementEntrance(Holder: GuiObject, MatchColor: Color3, Delay
         return
     end
 
-    local OriginalPosition = Holder.Position
-    Holder.Position = OriginalPosition + UDim2.fromOffset(0, 6)
-
     local Cover = New("Frame", {
         BackgroundColor3 = MatchColor,
         BackgroundTransparency = 0,
@@ -1599,18 +1596,14 @@ function Library:RunElementEntrance(Holder: GuiObject, MatchColor: Color3, Delay
     })
 
     task.delay(Delay, function()
-        if Library.Unloaded or not Holder.Parent then
+        if Library.Unloaded or not Cover.Parent then
             if Cover and Cover.Parent then
                 Cover:Destroy()
             end
             return
         end
 
-        TweenService:Create(Holder, TweenInfo.new(0.32, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-            Position = OriginalPosition,
-        }):Play()
-
-        local FadeTween = TweenService:Create(Cover, TweenInfo.new(0.28, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        local FadeTween = TweenService:Create(Cover, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
             BackgroundTransparency = 1,
         })
         FadeTween:Play()
@@ -6499,6 +6492,10 @@ function Library:CreateWindow(WindowInfo)
     local IsCompact = WindowInfo.SidebarCompacted
     local LastExpandedWidth = InitialLeftWidth
 
+    local MainFrameScale
+    local MainOutline
+    local MainShadowOutline
+
     do
         Library.KeybindFrame, Library.KeybindContainer = Library:AddDraggableMenu("Keybinds")
         Library.KeybindFrame.AnchorPoint = Vector2.new(0, 0.5)
@@ -6523,13 +6520,13 @@ function Library:CreateWindow(WindowInfo)
                 Parent = MainFrame,
             })
         )
-        local MainFrameScale = New("UIScale", {
+
+        MainFrameScale = New("UIScale", {
             Parent = MainFrame,
         })
         table.insert(Library.Scales, MainFrameScale)
-        local MainOutline, MainShadowOutline = Library:AddOutline(MainFrame)
-        
-        Library:AddOutline(MainFrame)
+        MainOutline, MainShadowOutline = Library:AddOutline(MainFrame)
+
         local HeaderSeparator = Library:MakeLine(MainFrame, {
             Position = UDim2.fromOffset(0, NavigationConfig.HeaderHeight - 1),
             Size = UDim2.new(1, 0, 0, 1),
@@ -9045,7 +9042,9 @@ function Library:CreateWindow(WindowInfo)
         Window:SetSidebarWidth(WindowInfo.SidebarCompactWidth)
     end
     if WindowInfo.AutoShow then
-        task.spawn(Library.Toggle)
+        task.defer(function()
+            Library:Toggle()
+        end)
     end
 
 do
