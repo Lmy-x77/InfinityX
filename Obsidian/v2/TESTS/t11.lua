@@ -1312,10 +1312,10 @@ local NotificationAreas = {}
 local StackLists = { Top = {}, Center = {}, Bottom = {} }
 
 local NotificationTypes = {
-    Success = { Icon = "check-circle", Color = Color3.fromRGB(90, 200, 130) },
-    Error   = { Icon = "x-circle",     Color = Color3.fromRGB(235, 90, 90) },
-    Warning = { Icon = "alert-triangle", Color = Color3.fromRGB(235, 180, 70) },
-    Info    = { Icon = "info",         Color = Color3.fromRGB(90, 160, 235) },
+    Success = { Icon = Library:GetIcon("check-circle"), Color = Color3.fromRGB(90, 200, 130) },
+    Error   = { Icon = Library:GetIcon("x-circle"),     Color = Color3.fromRGB(235, 90, 90) },
+    Warning = { Icon = Library:GetIcon("alert-triangle"), Color = Color3.fromRGB(235, 180, 70) },
+    Info    = { Icon = Library:GetIcon("info"),         Color = Color3.fromRGB(90, 160, 235) },
 }
 
 local function LayoutNotificationArea(PositionName: string)
