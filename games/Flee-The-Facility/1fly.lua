@@ -22,7 +22,7 @@ local Fly = {
 }
 
 function Fly:GetCharacter()
-  return Players.LocalPlayer.Character
+  return game.Players.LocalPlayer.Character
 end
 
 function Fly:GetRoot()
