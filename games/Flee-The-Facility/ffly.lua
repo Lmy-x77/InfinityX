@@ -38,8 +38,8 @@ function Fly:GetRoot()
 end
 
 function Fly:IsMobile()
-  return UserInputService.TouchEnabled
-    and not UserInputService.KeyboardEnabled
+  return game.UserInputService.TouchEnabled
+    and not game.UserInputService.KeyboardEnabled
 end
 
 function Fly:CreatePhysics()
@@ -91,7 +91,7 @@ function Fly:DestroyPhysics()
 end
 
 function Fly:StartPC()
-  self.PCInputBegan = UserInputService.InputBegan:Connect(function(input, processed)
+  self.PCInputBegan = game.UserInputService.InputBegan:Connect(function(input, processed)
     if processed then
       return
     end
@@ -120,7 +120,7 @@ function Fly:StartPC()
     end
   end)
 
-  self.PCInputEnded = UserInputService.InputEnded:Connect(function(input)
+  self.PCInputEnded = game.UserInputService.InputEnded:Connect(function(input)
     if input.KeyCode == Enum.KeyCode.W then
       self.Control.F = 0
 
@@ -145,7 +145,7 @@ function Fly:StartPC()
     end
   end)
 
-  RunService.RenderStepped:Connect(function()
+  game.RunService.RenderStepped:Connect(function()
     if not self.Enabled or self:IsMobile() then
       return
     end
@@ -179,12 +179,10 @@ end
 
 function Fly:StartMobile()
   local controlModule = require(
-    Players.LocalPlayer.PlayerScripts
-      :WaitForChild("PlayerModule")
-      :WaitForChild("ControlModule")
+    game.Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule"):WaitForChild("ControlModule")
   )
 
-  self.MobileConnection = RunService.RenderStepped:Connect(function()
+  self.MobileConnection = game.RunService.RenderStepped:Connect(function()
     if not self.Enabled or not self:IsMobile() then
       return
     end
