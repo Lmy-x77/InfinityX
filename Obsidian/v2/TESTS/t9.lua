@@ -1308,28 +1308,85 @@ do
 end
 
 --// Notification
-local NotificationArea
-local NotificationList
-do
-    NotificationArea = New("Frame", {
-        AnchorPoint = Vector2.new(1, 0),
+local NotificationAreas = {}
+local StackLists = { Top = {}, Center = {}, Bottom = {} }
+
+local NotificationTypes = {
+    Success = { Icon = "check-circle", Color = Color3.fromRGB(90, 200, 130) },
+    Error   = { Icon = "x-circle",     Color = Color3.fromRGB(235, 90, 90) },
+    Warning = { Icon = "alert-triangle", Color = Color3.fromRGB(235, 180, 70) },
+    Info    = { Icon = "info",         Color = Color3.fromRGB(90, 160, 235) },
+}
+
+local function LayoutNotificationArea(PositionName: string)
+    local Area = NotificationAreas[PositionName]
+    local IsLeft = Library.NotifySide:lower() == "left"
+    local AnchorX = IsLeft and 0 or 1
+    local PosX = IsLeft and 6 or -6
+
+    if PositionName == "Top" then
+        Area.AnchorPoint = Vector2.new(AnchorX, 0)
+        Area.Position = UDim2.new(AnchorX, PosX, 0, 6)
+    elseif PositionName == "Bottom" then
+        Area.AnchorPoint = Vector2.new(AnchorX, 1)
+        Area.Position = UDim2.new(AnchorX, PosX, 1, -6)
+    else
+        Area.AnchorPoint = Vector2.new(AnchorX, 0.5)
+        Area.Position = UDim2.new(AnchorX, PosX, 0.5, 0)
+    end
+end
+
+for _, PositionName in { "Top", "Center", "Bottom" } do
+    local Area = New("Frame", {
         BackgroundTransparency = 1,
-        Position = UDim2.new(1, -6, 0, 6),
-        Size = UDim2.new(0, 300, 1, -6),
+        Size = UDim2.new(0, 300, 1, -24),
         Parent = ScreenGui,
     })
     table.insert(
         Library.Scales,
         New("UIScale", {
-            Parent = NotificationArea,
+            Parent = Area,
         })
     )
 
-    NotificationList = New("UIListLayout", {
-        HorizontalAlignment = Enum.HorizontalAlignment.Right,
-        Padding = UDim.new(0, 8),
-        Parent = NotificationArea,
-    })
+    NotificationAreas[PositionName] = Area
+    LayoutNotificationArea(PositionName)
+end
+
+local function ReflowNotifications(PositionName: string, SkipCard: GuiObject?)
+    local List = StackLists[PositionName]
+
+    local function Apply(Card, YScale, YOffset)
+        local Target = UDim2.new(0, Card.Position.X.Offset, YScale, YOffset)
+
+        if Card == SkipCard then
+            Card.Position = Target
+        else
+            TweenService:Create(Card, Library.NotifyTweenInfo, { Position = Target }):Play()
+        end
+    end
+
+    local Cumulative = {}
+    local Cursor = 0
+    for Index, Card in List do
+        Cumulative[Index] = Cursor
+        Cursor += Card.AbsoluteSize.Y + 8
+    end
+    local TotalHeight = math.max(Cursor - 8, 0)
+
+    if PositionName == "Bottom" then
+        for Index, Card in List do
+            Apply(Card, 1, Cumulative[Index] - TotalHeight - 8)
+        end
+    elseif PositionName == "Center" then
+        for Index, Card in List do
+            Apply(Card, 0.5, Cumulative[Index] - TotalHeight / 2)
+        end
+    else
+        for Index, Card in List do
+            Apply(Card, 0, Cumulative[Index] + 8)
+        end
+    end
 end
 
 --// Lib Functions \\--
@@ -6101,14 +6158,9 @@ end
 function Library:SetNotifySide(Side: string)
     Library.NotifySide = Side
 
-    if Side:lower() == "left" then
-        NotificationArea.AnchorPoint = Vector2.new(0, 0)
-        NotificationArea.Position = UDim2.fromOffset(6, 6)
-        NotificationList.HorizontalAlignment = Enum.HorizontalAlignment.Left
-    else
-        NotificationArea.AnchorPoint = Vector2.new(1, 0)
-        NotificationArea.Position = UDim2.new(1, -6, 0, 6)
-        NotificationList.HorizontalAlignment = Enum.HorizontalAlignment.Right
+    for PositionName in NotificationAreas do
+        LayoutNotificationArea(PositionName)
+        ReflowNotifications(PositionName)
     end
 end
 
@@ -6117,268 +6169,195 @@ function Library:Notify(...)
     local Info = select(1, ...)
 
     if typeof(Info) == "table" then
-        Data.Title = tostring(Info.Title)
-        Data.Description = tostring(Info.Description)
-        Data.Time = Info.Time or 5
+        Data.Title = Info.Title ~= nil and tostring(Info.Title) or nil
+        Data.Description = Info.Description ~= nil and tostring(Info.Description) or ""
+        Data.Time = Info.Duration or Info.Time or 5
         Data.SoundId = Info.SoundId
         Data.Steps = Info.Steps
         Data.Persist = Info.Persist
-        Data.Icon = Info.Icon
-        Data.BigIcon = Info.BigIcon
+        Data.Type = Info.Type
+        Data.Icon = Info.Icon or Info.BigIcon
         Data.IconColor = Info.IconColor
+        Data.Position = NotificationAreas[Info.Position] and Info.Position or "Top"
     else
         Data.Description = tostring(Info)
         Data.Time = select(2, ...) or 5
         Data.SoundId = select(3, ...)
+        Data.Position = "Top"
     end
     Data.Destroyed = false
+
+    local Area = NotificationAreas[Data.Position]
+    local List = StackLists[Data.Position]
+
+    local TypeInfo = Data.Type and NotificationTypes[Data.Type]
+    local AccentColor = Data.IconColor or (TypeInfo and TypeInfo.Color)
+    local IconName = Data.Icon or (TypeInfo and TypeInfo.Icon)
 
     local DeletedInstance = false
     local DeleteConnection = nil
     if typeof(Data.Time) == "Instance" then
         DeleteConnection = Data.Time.Destroying:Connect(function()
             DeletedInstance = true
-
-            DeleteConnection:Disconnect()
-            DeleteConnection = nil
+            if DeleteConnection then
+                DeleteConnection:Disconnect()
+                DeleteConnection = nil
+            end
         end)
     end
 
-    local FakeBackground = New("Frame", {
-        AutomaticSize = Enum.AutomaticSize.Y,
-        BackgroundTransparency = 1,
-        Size = UDim2.fromScale(1, 0),
-        Visible = false,
-        Parent = NotificationArea,
-    })
+    local IsLeft = Library.NotifySide:lower() == "left"
+    local OffscreenX = IsLeft and -30 or 30
 
-    local Holder = New("Frame", {
+    --// Card \\--
+    local Card = New("Frame", {
         AutomaticSize = Enum.AutomaticSize.Y,
-        BackgroundColor3 = "MainColor",
-        Position = Library.NotifySide:lower() == "left" and UDim2.new(-1, -8, 0, -2) or UDim2.new(1, 8, 0, -2),
-        Size = UDim2.fromScale(1, 1),
-        ZIndex = 5,
-        Parent = FakeBackground,
+        BackgroundColor3 = function()
+            return Library:GetBetterColor(Library.Scheme.BackgroundColor, 3)
+        end,
+        Size = UDim2.new(1, 0, 0, 0),
+        Parent = Area,
     })
     table.insert(
         Library.Corners,
         New("UICorner", {
-            CornerRadius = UDim.new(0, Library.CornerRadius),
-            Parent = Holder,
+            CornerRadius = UDim.new(0, Library.CornerRadius + 2),
+            Parent = Card,
         })
     )
-    New("UIListLayout", {
-        Padding = UDim.new(0, 4),
-        Parent = Holder,
-    })
+    local CardOutline, CardShadow = Library:AddOutline(Card)
+
     New("UIPadding", {
-        PaddingBottom = UDim.new(0, 8),
-        PaddingLeft = UDim.new(0, 8),
-        PaddingRight = UDim.new(0, 8),
-        PaddingTop = UDim.new(0, 8),
-        Parent = Holder,
-    })
-    Library:AddOutline(Holder)
-
-    local ContentContainer = New("Frame", {
-        BackgroundTransparency = 1,
-        AutomaticSize = Enum.AutomaticSize.XY,
-        Size = UDim2.fromScale(1, 0),
-        Parent = Holder,
-    })
-    
-    if Data.BigIcon then
-        New("UIListLayout", {
-            Padding = UDim.new(0, 8),
-            FillDirection = Enum.FillDirection.Horizontal,
-            VerticalAlignment = Enum.VerticalAlignment.Center,
-            Parent = ContentContainer,
-        })
-    end
-
-    local BigIconLabel
-    if Data.BigIcon then
-        local ParsedIcon = Library:GetCustomIcon(Data.BigIcon)
-        if ParsedIcon then
-            BigIconLabel = New("ImageLabel", {
-                BackgroundTransparency = 1,
-                Size = UDim2.fromOffset(24, 24),
-                Image = ParsedIcon.Url,
-                ImageColor3 = Data.IconColor or "AccentColor",
-                ImageRectOffset = ParsedIcon.ImageRectOffset,
-                ImageRectSize = ParsedIcon.ImageRectSize,
-                Parent = ContentContainer,
-            })
-        end
-    end
-
-    local TextContainer = New("Frame", {
-        BackgroundTransparency = 1,
-        AutomaticSize = Enum.AutomaticSize.XY,
-        Size = UDim2.fromScale(0, 0),
-        Parent = ContentContainer,
+        PaddingBottom = UDim.new(0, 10),
+        PaddingLeft = UDim.new(0, 10),
+        PaddingRight = UDim.new(0, 10),
+        PaddingTop = UDim.new(0, 10),
+        Parent = Card,
     })
     New("UIListLayout", {
-        Padding = UDim.new(0, 4),
-        Parent = TextContainer,
+        Padding = UDim.new(0, 8),
+        Parent = Card,
     })
-    
-    local TitleContainer
-    if Data.Title then
-        TitleContainer = New("Frame", {
-            BackgroundTransparency = 1,
-            Size = UDim2.fromScale(0, 0),
-            Parent = TextContainer,
-        })
-    end
 
-    local IconLabel
-    if Data.Icon and TitleContainer then
-        local ParsedIcon = Library:GetCustomIcon(Data.Icon)
+    local Row = New("Frame", {
+        AutomaticSize = Enum.AutomaticSize.Y,
+        BackgroundTransparency = 1,
+        LayoutOrder = 1,
+        Size = UDim2.new(1, 0, 0, 0),
+        Parent = Card,
+    })
+    New("UIListLayout", {
+        FillDirection = Enum.FillDirection.Horizontal,
+        Padding = UDim.new(0, 10),
+        Parent = Row,
+    })
+
+    local IconHolder
+    if IconName then
+        local ParsedIcon = Library:GetCustomIcon(IconName)
+
+        IconHolder = New("Frame", {
+            BackgroundColor3 = AccentColor or "AccentColor",
+            BackgroundTransparency = 0.85,
+            LayoutOrder = 1,
+            Size = UDim2.fromOffset(30, 30),
+            Parent = Row,
+        })
+        table.insert(
+            Library.Corners,
+            New("UICorner", {
+                CornerRadius = UDim.new(0, Library.CornerRadius),
+                Parent = IconHolder,
+            })
+        )
+
         if ParsedIcon then
-            IconLabel = New("ImageLabel", {
-                BackgroundTransparency = 1,
-                AnchorPoint = Vector2.new(0, 0.5),
-                Position = UDim2.new(0, 0, 0.5, 1),
-                Size = UDim2.fromOffset(15, 15),
+            New("ImageLabel", {
+                AnchorPoint = Vector2.new(0.5, 0.5),
                 Image = ParsedIcon.Url,
-                ImageColor3 = Data.IconColor or "FontColor",
+                ImageColor3 = AccentColor or "AccentColor",
                 ImageRectOffset = ParsedIcon.ImageRectOffset,
                 ImageRectSize = ParsedIcon.ImageRectSize,
-                Parent = TitleContainer,
+                Position = UDim2.fromScale(0.5, 0.5),
+                Size = UDim2.fromOffset(16, 16),
+                Parent = IconHolder,
             })
         end
     end
+
+    local TextColumn = New("Frame", {
+        AutomaticSize = Enum.AutomaticSize.Y,
+        BackgroundTransparency = 1,
+        LayoutOrder = 2,
+        Size = UDim2.new(1, IconHolder and -40 or 0, 0, 0),
+        Parent = Row,
+    })
+    New("UIFlexItem", {
+        FlexMode = Enum.UIFlexMode.Grow,
+        Parent = TextColumn,
+    })
+    New("UIListLayout", {
+        Padding = UDim.new(0, 2),
+        Parent = TextColumn,
+    })
 
     local Title
-    local Desc
-    local TitleX = 0
-    local DescX = 0
-
-    local TimerFill
-
     if Data.Title then
+        local BoldFont = Font.new(Library.Scheme.Font.Family, Enum.FontWeight.Bold)
+
         Title = New("TextLabel", {
-            AutomaticSize = Enum.AutomaticSize.None,
+            AutomaticSize = Enum.AutomaticSize.Y,
             BackgroundTransparency = 1,
-            AnchorPoint = Vector2.new(0, 0.5),
-            Position = UDim2.new(0, (Data.Icon and 21 or 0), 0.5, 0),
-            Size = UDim2.fromScale(0, 0),
+            FontFace = BoldFont,
+            LayoutOrder = 1,
+            Size = UDim2.new(1, 0, 0, 0),
             Text = Data.Title,
             TextSize = 15,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            TextYAlignment = Enum.TextYAlignment.Center,
             TextWrapped = true,
-            Parent = TitleContainer,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = TextColumn,
         })
+        if Library.Registry[Title] then
+            Library.Registry[Title].FontFace = nil
+        end
     end
 
-    if Data.Description then
+    local Desc
+    if Data.Description ~= "" then
         Desc = New("TextLabel", {
-            AutomaticSize = Enum.AutomaticSize.None,
+            AutomaticSize = Enum.AutomaticSize.Y,
             BackgroundTransparency = 1,
-            Size = UDim2.fromScale(0, 0),
+            LayoutOrder = 2,
+            Size = UDim2.new(1, 0, 0, 0),
             Text = Data.Description,
-            TextSize = 14,
-            TextXAlignment = Enum.TextXAlignment.Left,
+            TextSize = 13,
+            TextTransparency = 0.38,
             TextWrapped = true,
-            Parent = TextContainer,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = TextColumn,
         })
     end
-
-    function Data:Resize()
-        local ExtraWidth = BigIconLabel and 32 or 0
-        local IconWidth = IconLabel and 21 or 0
-
-        if Title then
-            local X, Y =
-                Library:GetTextBounds(Title.Text, Title.FontFace, Title.TextSize, (NotificationArea.AbsoluteSize.X / Library.DPIScale) - 24 - ExtraWidth - IconWidth)
-            Title.Size = UDim2.fromOffset(X, Y)
-            TitleX = X + IconWidth
-            TitleContainer.Size = UDim2.fromOffset(TitleX, math.max(Y, IconLabel and 16 or 0))
-        end
-
-        if Desc then
-            local X, Y =
-                Library:GetTextBounds(Desc.Text, Desc.FontFace, Desc.TextSize, (NotificationArea.AbsoluteSize.X / Library.DPIScale) - 24 - ExtraWidth)
-            Desc.Size = UDim2.fromOffset(X, Y)
-            DescX = X
-        end
-
-        FakeBackground.Size = UDim2.fromOffset(math.max(TitleX, DescX) + 24 + ExtraWidth, 0)
-    end
-
-    function Data:ChangeTitle(Text)
-        if Title then
-            Data.Title = tostring(Text)
-            Title.Text = Data.Title
-            Data:Resize()
-        end
-    end
-
-    function Data:ChangeDescription(Text)
-        if Desc then
-            Data.Description = tostring(Text)
-            Desc.Text = Data.Description
-            Data:Resize()
-        end
-    end
-
-    function Data:ChangeStep(NewStep)
-        if TimerFill and Data.Steps then
-            NewStep = math.clamp(NewStep or 0, 0, Data.Steps)
-            TimerFill.Size = UDim2.fromScale(NewStep / Data.Steps, 1)
-        end
-    end
-
-    function Data:Destroy()
-        Data.Destroyed = true
-
-        if typeof(Data.Time) == "Instance" then
-            pcall(Data.Time.Destroy, Data.Time)
-        end
-
-        if DeleteConnection then
-            DeleteConnection:Disconnect()
-        end
-
-        TweenService
-            :Create(Holder, Library.NotifyTweenInfo, {
-                Position = Library.NotifySide:lower() == "left" and UDim2.new(-1, -8, 0, -2) or UDim2.new(1, 8, 0, -2),
-            })
-            :Play()
-
-        task.delay(Library.NotifyTweenInfo.Time, function()
-            Library.Notifications[FakeBackground] = nil
-            FakeBackground:Destroy()
-        end)
-    end
-
-    Data:Resize()
 
     local TimerHolder = New("Frame", {
         BackgroundTransparency = 1,
-        Size = UDim2.new(1, 0, 0, 7),
+        LayoutOrder = 2,
+        Size = UDim2.new(1, 0, 0, 4),
         Visible = (Data.Persist ~= true and typeof(Data.Time) ~= "Instance") or typeof(Data.Steps) == "number",
-        Parent = Holder,
+        Parent = Card,
     })
-    local TimerBar = New("Frame", {
-        BackgroundColor3 = "BackgroundColor",
-        BorderColor3 = "OutlineColor",
-        BorderSizePixel = 1,
-        Position = UDim2.fromOffset(0, 3),
-        Size = UDim2.new(1, 0, 0, 2),
+    local TimerTrack = New("Frame", {
+        BackgroundColor3 = "OutlineColor",
+        Size = UDim2.fromScale(1, 1),
         Parent = TimerHolder,
     })
-    TimerFill = New("Frame", {
-        BackgroundColor3 = "AccentColor",
+    table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = TimerTrack }))
+    local TimerFill = New("Frame", {
+        BackgroundColor3 = AccentColor or "AccentColor",
         Size = UDim2.fromScale(1, 1),
-        Parent = TimerBar,
+        Parent = TimerTrack,
     })
+    table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = TimerFill }))
 
-    if typeof(Data.Time) == "Instance" then
-        TimerFill.Size = UDim2.fromScale(0, 1)
-    end
     if Data.SoundId then
         local SoundId = Data.SoundId
         if typeof(SoundId) == "number" then
@@ -6393,14 +6372,91 @@ function Library:Notify(...)
         }):Destroy()
     end
 
-    Library.Notifications[FakeBackground] = Data
+    --// Empilhamento + entrada \\--
+    table.insert(List, Card)
+    Library.Notifications[Card] = Data
 
-    FakeBackground.Visible = true
-    TweenService:Create(Holder, Library.NotifyTweenInfo, {
-        Position = UDim2.fromOffset(0, 0),
+    ReflowNotifications(Data.Position, Card)
+    Card.Position = UDim2.new(0, OffscreenX, Card.Position.Y.Scale, Card.Position.Y.Offset)
+    Card.BackgroundTransparency = 1
+    CardOutline.Transparency = 1
+    CardShadow.Transparency = 1
+
+    local EnterTween = TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+    TweenService:Create(Card, EnterTween, {
+        Position = UDim2.new(0, 0, Card.Position.Y.Scale, Card.Position.Y.Offset),
+        BackgroundTransparency = 0,
     }):Play()
+    TweenService:Create(CardOutline, EnterTween, { Transparency = 0 }):Play()
+    TweenService:Create(CardShadow, EnterTween, { Transparency = 0 }):Play()
 
-    task.delay(Library.NotifyTweenInfo.Time, function()
+    Card:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+        if Library.Unloaded or Data.Destroyed then
+            return
+        end
+        ReflowNotifications(Data.Position)
+    end)
+
+    --// API \\--
+    function Data:ChangeTitle(Text)
+        if Title then
+            Data.Title = tostring(Text)
+            Title.Text = Data.Title
+        end
+    end
+
+    function Data:ChangeDescription(Text)
+        if Desc then
+            Data.Description = tostring(Text)
+            Desc.Text = Data.Description
+        end
+    end
+
+    function Data:ChangeStep(NewStep)
+        if TimerFill and Data.Steps then
+            NewStep = math.clamp(NewStep or 0, 0, Data.Steps)
+            TimerFill.Size = UDim2.fromScale(NewStep / Data.Steps, 1)
+        end
+    end
+
+    function Data:Resize()
+        ReflowNotifications(Data.Position)
+    end
+
+    function Data:Destroy()
+        if Data.Destroyed then
+            return
+        end
+        Data.Destroyed = true
+
+        local Index = table.find(List, Card)
+        if Index then
+            table.remove(List, Index)
+        end
+        ReflowNotifications(Data.Position)
+
+        if typeof(Data.Time) == "Instance" then
+            pcall(Data.Time.Destroy, Data.Time)
+        end
+        if DeleteConnection then
+            DeleteConnection:Disconnect()
+        end
+
+        local ExitTween = TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+        TweenService:Create(Card, ExitTween, {
+            Position = UDim2.new(0, OffscreenX, Card.Position.Y.Scale, Card.Position.Y.Offset),
+            BackgroundTransparency = 1,
+        }):Play()
+        TweenService:Create(CardOutline, ExitTween, { Transparency = 1 }):Play()
+        TweenService:Create(CardShadow, ExitTween, { Transparency = 1 }):Play()
+
+        task.delay(ExitTween.Time, function()
+            Library.Notifications[Card] = nil
+            Card:Destroy()
+        end)
+    end
+
+    task.delay(0.35, function()
         if Data.Persist then
             return
         elseif typeof(Data.Time) == "Instance" then
@@ -6408,11 +6464,9 @@ function Library:Notify(...)
                 task.wait()
             until DeletedInstance or Data.Destroyed
         else
-            TweenService
-                :Create(TimerFill, TweenInfo.new(Data.Time, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
-                    Size = UDim2.fromScale(0, 1),
-                })
-                :Play()
+            TweenService:Create(TimerFill, TweenInfo.new(Data.Time, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
+                Size = UDim2.fromScale(0, 1),
+            }):Play()
             task.wait(Data.Time)
         end
 
