@@ -6957,15 +6957,6 @@ function Library:CreateWindow(WindowInfo)
         })
 
         -- Fundo interno para preencher o footer inteiro
-        BottomBar = New("Frame", {
-            AnchorPoint = Vector2.new(0, 1),
-            BackgroundTransparency = 1,
-            Position = UDim2.new(0, 0, 1, 0),
-            Size = UDim2.new(1, 0, 0, FooterHeight),
-            ZIndex = 6,
-            Parent = MainFrame,
-        })
-
         local FooterFill = New("Frame", {
             BackgroundColor3 = function()
                 return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
@@ -6974,13 +6965,13 @@ function Library:CreateWindow(WindowInfo)
             Position = UDim2.new(0, 0, 0, 0),
             Size = UDim2.fromScale(1, 1),
             ZIndex = 2,
-            Parent = BottomBar,
+            Parent = BottomBackground,
         })
 
         -- Cantos inferiores arredondados acompanhando a MainFrame
         local FooterCorner = New("UICorner", {
             CornerRadius = UDim.new(0, WindowInfo.CornerRadius),
-            Parent = BottomBar,
+            Parent = FooterFill,
         })
 
         table.insert(Library.Corners, FooterCorner)
@@ -6993,7 +6984,7 @@ function Library:CreateWindow(WindowInfo)
             Position = UDim2.fromOffset(0, 0),
             Size = UDim2.new(1, 0, 0.5, 0),
             ZIndex = 3,
-            Parent = BottomBar,
+            Parent = FooterFill,
         })
 
         BottomSeparatorLine = Library:MakeLine(MainFrame, {
@@ -7002,6 +6993,15 @@ function Library:CreateWindow(WindowInfo)
             Size = UDim2.new(1, 0, 0, 1),
         })
         BottomSeparatorLine.ZIndex = 5
+
+        BottomBar = New("Frame", {
+            AnchorPoint = Vector2.new(0, 1),
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 0, 1, 0),
+            Size = UDim2.new(1, 0, 0, FooterHeight),
+            ZIndex = 6,
+            Parent = MainFrame,
+        })
 
         --// Footer
         FooterLabel = New("TextLabel", {
