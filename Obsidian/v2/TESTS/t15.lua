@@ -6545,6 +6545,8 @@ function Library:CreateWindow(WindowInfo)
     local Container
     local BackgroundImage
     local BottomBackground
+    local BottomBar
+    local BottomSeparatorLine
     local FooterLabel
 
     local InitialLeftWidth = NavigationConfig.SidebarWidth
@@ -6943,21 +6945,21 @@ function Library:CreateWindow(WindowInfo)
             BackgroundColor3 = function()
                 return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
             end,
-            Position = UDim2.fromScale(0, 1),
-            Size = UDim2.new(1, 0, 0, 20 + WindowInfo.CornerRadius),
+            Position = UDim2.new(0, InitialLeftWidth + 1, 1, 0),
+            Size = UDim2.new(1, -(InitialLeftWidth + 1), 0, 20 + WindowInfo.CornerRadius),
             Parent = MainFrame
         })
-        Library:MakeLine(MainFrame, {
+        BottomSeparatorLine = Library:MakeLine(MainFrame, {
             AnchorPoint = Vector2.new(0, 1),
-            Position = UDim2.new(0, 0, 1, -20),
-            Size = UDim2.new(1, 0, 0, 1),
+            Position = UDim2.new(0, InitialLeftWidth + 1, 1, -20),
+            Size = UDim2.new(1, -(InitialLeftWidth + 1), 0, 1),
         })
 
-        local BottomBar = New("Frame", {
+        BottomBar = New("Frame", {
             AnchorPoint = Vector2.new(0, 1),
             BackgroundTransparency = 1,
-            Position = UDim2.fromScale(0, 1),
-            Size = UDim2.new(1, 0, 0, 20),
+            Position = UDim2.new(0, InitialLeftWidth + 1, 1, 0),
+            Size = UDim2.new(1, -(InitialLeftWidth + 1), 0, 20),
             Parent = MainFrame,
         })
         table.insert(
@@ -7197,6 +7199,13 @@ function Library:CreateWindow(WindowInfo)
         Width = math.clamp(Width, 48, maxAllowedWidth)
 
         DividerLine.Position = UDim2.fromOffset(Width, 0)
+
+        BottomBackground.Position = UDim2.new(0, Width + 1, 1, 0)
+        BottomBackground.Size = UDim2.new(1, -(Width + 1), 0, 20 + WindowInfo.CornerRadius)
+        BottomSeparatorLine.Position = UDim2.new(0, Width + 1, 1, -20)
+        BottomSeparatorLine.Size = UDim2.new(1, -(Width + 1), 0, 1)
+        BottomBar.Position = UDim2.new(0, Width + 1, 1, 0)
+        BottomBar.Size = UDim2.new(1, -(Width + 1), 0, 20)
 
         TitleHolder.Size = UDim2.new(0, Width, 1, 0)
         RightWrapper.Size = UDim2.new(1, -Width - 57 - 1, 1, -16)
@@ -9299,9 +9308,9 @@ do
             Parent = InfoTabButton,
         })
 
-        Library:AddTooltip("Informações", nil, InfoTabButton)
+        Library:AddTooltip("Info", nil, InfoTabButton)
 
-        --// Painel de conteúdo \\--
+        --// Content panel \\--
         local InfoContainer = New("Frame", {
             BackgroundTransparency = 1,
             Size = UDim2.fromScale(1, 1),
@@ -9317,21 +9326,113 @@ do
             Size = UDim2.fromScale(1, 1),
             Parent = InfoContainer,
         })
-        New("UIListLayout", { Padding = UDim.new(0, 12), Parent = InfoScroll })
+        New("UIListLayout", { Padding = UDim.new(0, 10), Parent = InfoScroll })
         New("UIPadding", {
             PaddingBottom = UDim.new(0, 10),
-            PaddingLeft = UDim.new(0, 4),
-            PaddingRight = UDim.new(0, 4),
-            PaddingTop = UDim.new(0, 4),
+            PaddingLeft = UDim.new(0, 2),
+            PaddingRight = UDim.new(0, 2),
+            PaddingTop = UDim.new(0, 2),
             Parent = InfoScroll,
         })
 
-        --// Perfil \\--
+        --// Header, matching the other tabs \\--
+        local InfoHeader = New("Frame", {
+            BackgroundTransparency = 1,
+            AutomaticSize = Enum.AutomaticSize.Y,
+            Size = UDim2.new(1, 0, 0, 0),
+            Parent = InfoScroll,
+        })
+        New("UIListLayout", { Padding = UDim.new(0, 2), Parent = InfoHeader })
+        New("UIPadding", { PaddingBottom = UDim.new(0, 2), Parent = InfoHeader })
+
+        local InfoHeaderTitle = New("TextLabel", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 22),
+            Text = "Info",
+            TextSize = 20,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = InfoHeader,
+        })
+        do
+            InfoHeaderTitle.FontFace = Font.new(Library.Scheme.Font.Family, Enum.FontWeight.Bold)
+            if Library.Registry[InfoHeaderTitle] then
+                Library.Registry[InfoHeaderTitle].FontFace = nil
+            end
+        end
+        New("TextLabel", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 16),
+            Text = "Account, session and server details",
+            TextSize = 14,
+            TextTransparency = 0.5,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = InfoHeader,
+        })
+
+        --// Helpers \\--
+        local function AddSectionLabel(Text)
+            New("TextLabel", {
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 0, 14),
+                Text = string.upper(Text),
+                TextSize = 12,
+                TextTransparency = 0.45,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                Parent = InfoScroll,
+            })
+        end
+
+        local function AddCard()
+            local Card = New("Frame", {
+                BackgroundColor3 = function()
+                    return Library:GetBetterColor(Library.Scheme.BackgroundColor, 2)
+                end,
+                AutomaticSize = Enum.AutomaticSize.Y,
+                Size = UDim2.new(1, 0, 0, 0),
+                Parent = InfoScroll,
+            })
+            table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(0, WindowInfo.CornerRadius), Parent = Card }))
+            Library:AddOutline(Card)
+
+            local Inner = New("Frame", {
+                BackgroundTransparency = 1,
+                AutomaticSize = Enum.AutomaticSize.Y,
+                Size = UDim2.new(1, 0, 0, 0),
+                Parent = Card,
+            })
+            New("UIListLayout", { Padding = UDim.new(0, 8), Parent = Inner })
+            New("UIPadding", {
+                PaddingBottom = UDim.new(0, 10),
+                PaddingLeft = UDim.new(0, 10),
+                PaddingRight = UDim.new(0, 10),
+                PaddingTop = UDim.new(0, 10),
+                Parent = Inner,
+            })
+
+            return Inner
+        end
+
+        local function AddStatRow(Parent, Label)
+            local Row = New("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 16), Parent = Parent })
+            New("TextLabel", {
+                BackgroundTransparency = 1, Size = UDim2.fromScale(0.5, 1),
+                Text = Label, TextSize = 13, TextTransparency = 0.5,
+                TextXAlignment = Enum.TextXAlignment.Left, Parent = Row,
+            })
+            local Value = New("TextLabel", {
+                BackgroundTransparency = 1, Position = UDim2.fromScale(0.5, 0), Size = UDim2.fromScale(0.5, 1),
+                Text = "", TextSize = 13, TextXAlignment = Enum.TextXAlignment.Right, Parent = Row,
+            })
+            return Value
+        end
+
+        --// Profile card \\--
+        local ProfileCard = AddCard()
         local ProfileRow = New("Frame", {
             AutomaticSize = Enum.AutomaticSize.Y,
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 0, 0),
-            Parent = InfoScroll,
+            Parent = ProfileCard,
         })
         New("UIListLayout", {
             FillDirection = Enum.FillDirection.Horizontal,
@@ -9355,6 +9456,7 @@ do
             Image = "",
             Parent = AvatarFrame,
         })
+        New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = AvatarImage })
 
         task.spawn(function()
             local Success, Content = pcall(function()
@@ -9383,7 +9485,7 @@ do
             BackgroundTransparency = 1,
             Size = UDim2.fromOffset(0, 0),
             Text = LocalPlayer.DisplayName,
-            TextSize = 17,
+            TextSize = 16,
             TextXAlignment = Enum.TextXAlignment.Left,
             Parent = NameColumn,
         })
@@ -9405,65 +9507,30 @@ do
             Parent = NameColumn,
         })
 
-        New("Frame", {
-            BackgroundColor3 = "OutlineColor", BorderSizePixel = 0,
-            Size = UDim2.new(1, 0, 0, 1), Parent = InfoScroll,
-        })
+        --// Account card \\--
+        AddSectionLabel("Account")
+        local AccountCard = AddCard()
+        AddStatRow(AccountCard, "User ID").Text = tostring(LocalPlayer.UserId)
+        AddStatRow(AccountCard, "Place ID").Text = tostring(game.PlaceId)
+        AddStatRow(AccountCard, "Job ID").Text = (game.JobId ~= "" and game.JobId or "Studio")
 
-        --// Estatísticas \\--
-        local StatsList = New("Frame", {
-            AutomaticSize = Enum.AutomaticSize.Y,
-            BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 0, 0),
-            Parent = InfoScroll,
-        })
-        New("UIListLayout", { Padding = UDim.new(0, 6), Parent = StatsList })
-
-        local function AddStatRow(Label)
-            local Row = New("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 16), Parent = StatsList })
-            New("TextLabel", {
-                BackgroundTransparency = 1, Size = UDim2.fromScale(0.5, 1),
-                Text = Label, TextSize = 13, TextTransparency = 0.5,
-                TextXAlignment = Enum.TextXAlignment.Left, Parent = Row,
-            })
-            local Value = New("TextLabel", {
-                BackgroundTransparency = 1, Position = UDim2.fromScale(0.5, 0), Size = UDim2.fromScale(0.5, 1),
-                Text = "", TextSize = 13, TextXAlignment = Enum.TextXAlignment.Right, Parent = Row,
-            })
-            return Value
-        end
-
-        AddStatRow("User ID").Text = tostring(LocalPlayer.UserId)
-        AddStatRow("Place ID").Text = tostring(game.PlaceId)
-        AddStatRow("Job ID").Text = (game.JobId ~= "" and game.JobId or "Studio")
-        local PlayersValue = AddStatRow("Players in server")
-        local SessionValue = AddStatRow("Session duration")
+        --// Session card \\--
+        AddSectionLabel("Session")
+        local SessionCard = AddCard()
+        local PlayersValue = AddStatRow(SessionCard, "Players in server")
+        local SessionValue = AddStatRow(SessionCard, "Session duration")
 
         local function UpdatePlayerCount()
             PlayersValue.Text = string.format("%d/%d", #Players:GetPlayers(), Players.MaxPlayers)
         end
         UpdatePlayerCount()
 
-        New("Frame", {
-            BackgroundColor3 = "OutlineColor", BorderSizePixel = 0,
-            Size = UDim2.new(1, 0, 0, 1), Parent = InfoScroll,
-        })
-
-        --// Lista de jogadores (com status de amizade) \\--
-        New("TextLabel", {
-            BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 16),
-            Text = "Players", TextSize = 13, TextTransparency = 0.5,
-            TextXAlignment = Enum.TextXAlignment.Left, Parent = InfoScroll,
-        })
-
-        local PlayersListFrame = New("Frame", {
-            AutomaticSize = Enum.AutomaticSize.Y, BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 0, 0), Parent = InfoScroll,
-        })
-        New("UIListLayout", { Padding = UDim.new(0, 4), Parent = PlayersListFrame })
+        --// Players card \\--
+        AddSectionLabel("Players")
+        local PlayersCard = AddCard()
 
         local function RefreshPlayersList()
-            for _, Child in PlayersListFrame:GetChildren() do
+            for _, Child in PlayersCard:GetChildren() do
                 if Child:IsA("GuiObject") then
                     Child:Destroy()
                 end
@@ -9472,16 +9539,16 @@ do
             for _, Player in GetPlayers() do
                 local Tag = ""
                 if Player == LocalPlayer then
-                    Tag = "you"
+                    Tag = "You"
                 else
                     local Success, IsFriend = pcall(LocalPlayer.IsFriendsWith, LocalPlayer, Player.UserId)
                     Tag = (Success and IsFriend) and "Friend" or ""
                 end
 
-                local Row = New("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 16), Parent = PlayersListFrame })
+                local Row = New("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 20), Parent = PlayersCard })
 
                 New("TextLabel", {
-                    BackgroundTransparency = 1, Size = UDim2.fromScale(0.75, 1),
+                    BackgroundTransparency = 1, Size = UDim2.fromScale(0.7, 1),
                     Text = Player.DisplayName ~= Player.Name
                         and string.format("%s (@%s)", Player.DisplayName, Player.Name)
                         or Player.Name,
@@ -9489,13 +9556,30 @@ do
                     TextXAlignment = Enum.TextXAlignment.Left, Parent = Row,
                 })
 
-                local TagLabel = New("TextLabel", {
-                    BackgroundTransparency = 1, Position = UDim2.fromScale(0.75, 0), Size = UDim2.fromScale(0.25, 1),
-                    Text = Tag, TextSize = 13,
-                    TextXAlignment = Enum.TextXAlignment.Right, Parent = Row,
-                })
-                TagLabel.TextColor3 = Library.Scheme.AccentColor
-                Library.Registry[TagLabel].TextColor3 = "AccentColor"
+                if Tag ~= "" then
+                    local Badge = New("Frame", {
+                        AnchorPoint = Vector2.new(1, 0.5),
+                        BackgroundColor3 = "AccentColor",
+                        BackgroundTransparency = 0.85,
+                        Position = UDim2.fromScale(1, 0.5),
+                        Size = UDim2.fromOffset(0, 16),
+                        AutomaticSize = Enum.AutomaticSize.X,
+                        Parent = Row,
+                    })
+                    table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = Badge }))
+                    New("UIPadding", { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8), Parent = Badge })
+
+                    local BadgeLabel = New("TextLabel", {
+                        AutomaticSize = Enum.AutomaticSize.X,
+                        BackgroundTransparency = 1,
+                        Size = UDim2.fromScale(0, 1),
+                        Text = Tag,
+                        TextSize = 12,
+                        Parent = Badge,
+                    })
+                    BadgeLabel.TextColor3 = Library.Scheme.AccentColor
+                    Library.Registry[BadgeLabel].TextColor3 = "AccentColor"
+                end
             end
 
             UpdatePlayerCount()
@@ -9507,7 +9591,7 @@ do
             task.defer(RefreshPlayersList)
         end))
 
-        --// Tempo de sessão (atualiza a cada segundo) \\--
+        --// Session duration ticker \\--
         task.spawn(function()
             while not Library.Unloaded do
                 local Elapsed = os.clock() - Library.StartTime
@@ -9521,7 +9605,7 @@ do
             end
         end)
 
-        --// Show / Hide (mesmo padrão das outras tabs) \\--
+        --// Show / Hide, same pattern as the other tabs \\--
         local InfoNavAnim = TweenInfo.new(NavigationConfig.AnimationTime, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         local InfoTab = {}
 
