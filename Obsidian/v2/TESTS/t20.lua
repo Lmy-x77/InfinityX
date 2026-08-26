@@ -6945,21 +6945,21 @@ function Library:CreateWindow(WindowInfo)
             BackgroundColor3 = function()
                 return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
             end,
-            Position = UDim2.new(0, InitialLeftWidth + 1, 1, 0),
-            Size = UDim2.new(1, -(InitialLeftWidth + 1), 0, 20 + WindowInfo.CornerRadius),
+            Position = UDim2.new(0, 0, 1, 0),
+            Size = UDim2.new(1, 0, 0, 20 + WindowInfo.CornerRadius),
             Parent = MainFrame
         })
         BottomSeparatorLine = Library:MakeLine(MainFrame, {
             AnchorPoint = Vector2.new(0, 1),
-            Position = UDim2.new(0, InitialLeftWidth + 1, 1, -20),
-            Size = UDim2.new(1, -(InitialLeftWidth + 1), 0, 1),
+            Position = UDim2.new(0, 0, 1, -20),
+            Size = UDim2.new(1, 0, 0, 1),
         })
 
         BottomBar = New("Frame", {
             AnchorPoint = Vector2.new(0, 1),
             BackgroundTransparency = 1,
-            Position = UDim2.new(0, InitialLeftWidth + 1, 1, 0),
-            Size = UDim2.new(1, -(InitialLeftWidth + 1), 0, 20),
+            Position = UDim2.new(0, 0, 1, 0),
+            Size = UDim2.new(1, 0, 0, 20),
             Parent = MainFrame,
         })
         table.insert(
@@ -7199,13 +7199,6 @@ function Library:CreateWindow(WindowInfo)
         Width = math.clamp(Width, 48, maxAllowedWidth)
 
         DividerLine.Position = UDim2.fromOffset(Width, 0)
-
-        BottomBackground.Position = UDim2.new(0, Width + 1, 1, 0)
-        BottomBackground.Size = UDim2.new(1, -(Width + 1), 0, 20 + WindowInfo.CornerRadius)
-        BottomSeparatorLine.Position = UDim2.new(0, Width + 1, 1, -20)
-        BottomSeparatorLine.Size = UDim2.new(1, -(Width + 1), 0, 1)
-        BottomBar.Position = UDim2.new(0, Width + 1, 1, 0)
-        BottomBar.Size = UDim2.new(1, -(Width + 1), 0, 20)
 
         TitleHolder.Size = UDim2.new(0, Width, 1, 0)
         RightWrapper.Size = UDim2.new(1, -Width - 57 - 1, 1, -16)
