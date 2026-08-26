@@ -9491,11 +9491,13 @@ do
                     TextXAlignment = Enum.TextXAlignment.Left, Parent = Row,
                 })
 
-                New("TextLabel", {
+                local TagLabel = New("TextLabel", {
                     BackgroundTransparency = 1, Position = UDim2.fromScale(0.75, 0), Size = UDim2.fromScale(0.25, 1),
-                    Text = Tag, TextColor3 = "AccentColor", TextSize = 13,
+                    Text = Tag, TextSize = 13,
                     TextXAlignment = Enum.TextXAlignment.Right, Parent = Row,
                 })
+                TagLabel.TextColor3 = Library.Scheme.AccentColor
+                Library.Registry[TagLabel].TextColor3 = "AccentColor"
             end
 
             UpdatePlayerCount()
