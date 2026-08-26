@@ -6605,7 +6605,7 @@ function Library:CreateWindow(WindowInfo)
             BackgroundColor3 = "OutlineColor",
             BackgroundTransparency = 0.75,
             Position = UDim2.fromOffset(InitialLeftWidth, 0),
-            Size = UDim2.new(0, 1, 1, -FooterReserve),
+            Size = UDim2.new(0, 1, 1, -FooterHeight),
             Parent = MainFrame,
         })
 
@@ -6948,30 +6948,28 @@ function Library:CreateWindow(WindowInfo)
             BackgroundColor3 = function()
                 return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
             end,
+            BorderSizePixel = 0,
             Position = UDim2.new(0, 0, 1, 0),
-            Size = UDim2.new(1, 0, 0, 20 + WindowInfo.CornerRadius),
-            Parent = MainFrame
+            Size = UDim2.new(1, 0, 0, FooterHeight),
+            ZIndex = 2,
+            Parent = MainFrame,
         })
+
         BottomSeparatorLine = Library:MakeLine(MainFrame, {
             AnchorPoint = Vector2.new(0, 1),
-            Position = UDim2.new(0, 0, 1, -20),
+            Position = UDim2.new(0, 0, 1, -FooterHeight),
             Size = UDim2.new(1, 0, 0, 1),
         })
+        BottomSeparatorLine.ZIndex = 3
 
         BottomBar = New("Frame", {
             AnchorPoint = Vector2.new(0, 1),
             BackgroundTransparency = 1,
             Position = UDim2.new(0, 0, 1, 0),
-            Size = UDim2.new(1, 0, 0, 20),
+            Size = UDim2.new(1, 0, 0, FooterHeight),
+            ZIndex = 3,
             Parent = MainFrame,
         })
-        table.insert(
-            Library.Corners,
-            New("UICorner", {
-                CornerRadius = UDim.new(0, WindowInfo.CornerRadius),
-                Parent = BottomBackground,
-            })
-        )
 
         --// Footer
         FooterLabel = New("TextLabel", {
@@ -6980,6 +6978,7 @@ function Library:CreateWindow(WindowInfo)
             Text = WindowInfo.Footer,
             TextSize = 14,
             TextTransparency = 0.5,
+            ZIndex = 4,
             Parent = BottomBar,
         })
 
@@ -7147,8 +7146,29 @@ function Library:CreateWindow(WindowInfo)
         WindowInfo.CornerRadius = Radius
 
         ResizeButton.Position = UDim2.new(1, -Radius / 4, 0, 0)
-        BottomBackground.Size = UDim2.new(1, 0, 0, 20 + Radius)
+        FooterHeight = 20 + Radius
+        FooterReserve = FooterHeight
 
+        BottomBackground.Size = UDim2.new(1, 0, 0, FooterHeight)
+        BottomBar.Size = UDim2.new(1, 0, 0, FooterHeight)
+
+        BottomSeparatorLine.Position = UDim2.new(0, 0, 1, -FooterHeight)
+
+        DividerLine.Size = UDim2.new(0, 1, 1, -FooterHeight)
+
+        Tabs.Size = UDim2.new(
+            0,
+            Window:GetSidebarWidth(),
+            1,
+            -(49 + FooterHeight) - InfoTabOffset
+        )
+
+        Container.Size = UDim2.new(
+            1,
+            -Window:GetSidebarWidth() - 1,
+            1,
+            -(49 + FooterHeight)
+        )
         for _, Tab in Library.Tabs do
             if Tab.IsKeyTab then
                 continue
