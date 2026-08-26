@@ -6528,6 +6528,9 @@ function Library:CreateWindow(WindowInfo)
     Library.ToggleKeybind = WindowInfo.ToggleKeybind
     Library.GlobalSearch = WindowInfo.GlobalSearch
 
+    local FooterHeight = 20 + WindowInfo.CornerRadius
+    local FooterReserve = FooterHeight + 1
+
     local IsDefaultSearchbarSize = WindowInfo.SearchbarSize == UDim2.fromScale(1, 1)
     local MainFrame
     local DividerLine
@@ -6602,7 +6605,7 @@ function Library:CreateWindow(WindowInfo)
             BackgroundColor3 = "OutlineColor",
             BackgroundTransparency = 0.75,
             Position = UDim2.fromOffset(InitialLeftWidth, 0),
-            Size = UDim2.new(0, 1, 1, -21),
+            Size = UDim2.new(0, 1, 1, -FooterReserve),
             Parent = MainFrame,
         })
 
@@ -7019,7 +7022,7 @@ function Library:CreateWindow(WindowInfo)
             CanvasSize = UDim2.fromScale(0, 0),
             Position = UDim2.fromOffset(0, 49),
             ScrollBarThickness = 0,
-            Size = UDim2.new(0, InitialLeftWidth, 1, -70 - InfoTabOffset),
+            Size = UDim2.new(0, InitialLeftWidth, 1, -(49 + FooterReserve) - InfoTabOffset),
             Parent = MainFrame,
         })
         New("UIListLayout", {
@@ -7041,7 +7044,7 @@ function Library:CreateWindow(WindowInfo)
             end,
             Name = "Container",
             Position = UDim2.new(1, 0, 0, 49),
-            Size = UDim2.new(1, -InitialLeftWidth - 1, 1, -70),
+                        Size = UDim2.new(1, -InitialLeftWidth - 1, 1, -(49 + FooterReserve)),
             Parent = MainFrame,
         })
         New("UIPadding", {
@@ -7202,8 +7205,8 @@ function Library:CreateWindow(WindowInfo)
 
         TitleHolder.Size = UDim2.new(0, Width, 1, 0)
         RightWrapper.Size = UDim2.new(1, -Width - 57 - 1, 1, -16)
-        Tabs.Size = UDim2.new(0, Width, 1, -70 - InfoTabOffset)
-        Container.Size = UDim2.new(1, -Width - 1, 1, -70)
+        Tabs.Size = UDim2.new(0, Width, 1, -(49 + FooterReserve) - InfoTabOffset)
+        Container.Size = UDim2.new(1, -Width - 1, 1, -(49 + FooterReserve))
 
         if WindowInfo.EnableCompacting then
             ApplyCompact()
@@ -9257,7 +9260,7 @@ do
         local InfoButtonHolder = New("Frame", {
             AnchorPoint = Vector2.new(0, 1),
             BackgroundTransparency = 1,
-            Position = UDim2.new(0, 0, 1, -21),
+            Position = UDim2.new(0, 0, 1, -FooterReserve),
             Size = UDim2.new(0, Tabs.AbsoluteSize.X, 0, InfoTabHeight),
             Parent = MainFrame,
         })
