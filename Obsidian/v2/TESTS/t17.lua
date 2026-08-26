@@ -6602,7 +6602,7 @@ function Library:CreateWindow(WindowInfo)
             BackgroundColor3 = "OutlineColor",
             BackgroundTransparency = 0.75,
             Position = UDim2.fromOffset(InitialLeftWidth, 0),
-            Size = UDim2.new(0, 1, 1, -21),
+            Size = UDim2.new(0, 1, 1, -FooterHeight),
             Parent = MainFrame,
         })
 
@@ -6940,28 +6940,35 @@ function Library:CreateWindow(WindowInfo)
         end)
 
         --// Bottom Bar \\--
+        local FooterHeight = 26
+
         BottomBackground = New("Frame", {
             AnchorPoint = Vector2.new(0, 1),
             BackgroundColor3 = function()
                 return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
             end,
-            Position = UDim2.new(0, InitialLeftWidth + 1, 1, 0),
-            Size = UDim2.new(1, -(InitialLeftWidth + 1), 0, 20 + WindowInfo.CornerRadius),
+            Position = UDim2.new(0, 0, 1, 0),
+            Size = UDim2.new(1, 0, 0, FooterHeight + WindowInfo.CornerRadius),
+            ZIndex = 5,
             Parent = MainFrame
         })
+
         BottomSeparatorLine = Library:MakeLine(MainFrame, {
             AnchorPoint = Vector2.new(0, 1),
-            Position = UDim2.new(0, InitialLeftWidth + 1, 1, -20),
-            Size = UDim2.new(1, -(InitialLeftWidth + 1), 0, 1),
+            Position = UDim2.new(0, 0, 1, -FooterHeight),
+            Size = UDim2.new(1, 0, 0, 1),
+            ZIndex = 6,
         })
 
         BottomBar = New("Frame", {
             AnchorPoint = Vector2.new(0, 1),
             BackgroundTransparency = 1,
-            Position = UDim2.new(0, InitialLeftWidth + 1, 1, 0),
-            Size = UDim2.new(1, -(InitialLeftWidth + 1), 0, 20),
+            Position = UDim2.new(0, 0, 1, 0),
+            Size = UDim2.new(1, 0, 0, FooterHeight),
+            ZIndex = 7,
             Parent = MainFrame,
         })
+
         table.insert(
             Library.Corners,
             New("UICorner", {
@@ -6973,11 +6980,15 @@ function Library:CreateWindow(WindowInfo)
         --// Footer
         FooterLabel = New("TextLabel", {
             BackgroundTransparency = 1,
+            Position = UDim2.fromOffset(0, 0),
             Size = UDim2.fromScale(1, 1),
             Text = WindowInfo.Footer,
             TextSize = 14,
             TextTransparency = 0.5,
-            Parent = MainFrame,
+            TextXAlignment = Enum.TextXAlignment.Center,
+            TextYAlignment = Enum.TextYAlignment.Center,
+            ZIndex = 8,
+            Parent = BottomBar,
         })
 
         --// Resize Button
@@ -7040,8 +7051,13 @@ function Library:CreateWindow(WindowInfo)
                 return Library:GetBetterColor(Library.Scheme.BackgroundColor, 1)
             end,
             Name = "Container",
-            Position = UDim2.new(1, 0, 0, 49),
-            Size = UDim2.new(1, -InitialLeftWidth - 1, 1, -70),
+            Position = UDim2.new(1, 0, 0, NavigationConfig.HeaderHeight),
+            Size = UDim2.new(
+                1,
+                -InitialLeftWidth - 1,
+                1,
+                -(NavigationConfig.HeaderHeight + FooterHeight)
+            ),
             Parent = MainFrame,
         })
         New("UIPadding", {
@@ -7144,7 +7160,7 @@ function Library:CreateWindow(WindowInfo)
         WindowInfo.CornerRadius = Radius
 
         ResizeButton.Position = UDim2.new(1, -Radius / 4, 0, 0)
-        BottomBackground.Size = UDim2.new(1, 0, 0, 20 + Radius)
+        BottomBackground.Size = UDim2.new(1, 0, 0, FooterHeight + Radius)
 
         for _, Tab in Library.Tabs do
             if Tab.IsKeyTab then
@@ -7200,12 +7216,6 @@ function Library:CreateWindow(WindowInfo)
 
         DividerLine.Position = UDim2.fromOffset(Width, 0)
 
-        BottomBackground.Position = UDim2.new(0, Width + 1, 1, 0)
-        BottomBackground.Size = UDim2.new(1, -(Width + 1), 0, 20 + WindowInfo.CornerRadius)
-        BottomSeparatorLine.Position = UDim2.new(0, Width + 1, 1, -20)
-        BottomSeparatorLine.Size = UDim2.new(1, -(Width + 1), 0, 1)
-        BottomBar.Position = UDim2.new(0, Width + 1, 1, 0)
-        BottomBar.Size = UDim2.new(1, -(Width + 1), 0, 20)
 
         TitleHolder.Size = UDim2.new(0, Width, 1, 0)
         RightWrapper.Size = UDim2.new(1, -Width - 57 - 1, 1, -16)
