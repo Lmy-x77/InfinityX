@@ -6949,33 +6949,21 @@ function Library:CreateWindow(WindowInfo)
                 return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
             end,
             BorderSizePixel = 0,
-            ClipsDescendants = true,
             Position = UDim2.new(0, 0, 1, 0),
             Size = UDim2.new(1, 0, 0, FooterHeight),
             ZIndex = 2,
             Parent = MainFrame,
         })
 
-        -- Fundo interno para preencher o footer inteiro
-        local FooterFill = New("Frame", {
-            BackgroundColor3 = function()
-                return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
-            end,
-            BorderSizePixel = 0,
-            Position = UDim2.new(0, 0, 0, 0),
-            Size = UDim2.fromScale(1, 1),
-            ZIndex = 2,
-            Parent = BottomBackground,
-        })
-
-        -- Cantos inferiores arredondados acompanhando a MainFrame
+        -- Cantos inferiores arredondados (mesmo valor da Window)
         local FooterCorner = New("UICorner", {
             CornerRadius = UDim.new(0, WindowInfo.CornerRadius),
-            Parent = FooterFill,
+            Parent = BottomBackground,
         })
-
         table.insert(Library.Corners, FooterCorner)
 
+        -- Cobre a metade de cima para anular o arredondamento superior
+        -- (assim só os dois cantos de baixo ficam redondos)
         local FooterTopFill = New("Frame", {
             BackgroundColor3 = function()
                 return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
@@ -6984,7 +6972,7 @@ function Library:CreateWindow(WindowInfo)
             Position = UDim2.fromOffset(0, 0),
             Size = UDim2.new(1, 0, 0.5, 0),
             ZIndex = 3,
-            Parent = FooterFill,
+            Parent = BottomBackground,
         })
 
         BottomSeparatorLine = Library:MakeLine(MainFrame, {
