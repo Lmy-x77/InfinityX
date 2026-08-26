@@ -2223,7 +2223,7 @@ local ArrowIcon = Library:GetIcon("chevron-up")
 local ResizeIcon = Library:GetIcon("move-diagonal-2")
 local KeyIcon = Library:GetIcon("key")
 local MoveIcon = Library:GetIcon("move")
-local InfoIcon = Library:GetIcon("circle-help") or Library:GetIcon("help-circle")
+local InfoIcon = Library:GetIcon("circle-question-mark") or Library:GetIcon("circle-help") or Library:GetIcon("help-circle")
 
 function Library:SetIconModule(module: IconModule)
     FetchIcons = true
@@ -2235,7 +2235,7 @@ function Library:SetIconModule(module: IconModule)
     ResizeIcon = Library:GetIcon("move-diagonal-2")
     KeyIcon = Library:GetIcon("key")
     MoveIcon = Library:GetIcon("move")
-    InfoIcon = Library:GetIcon("circle-help") or Library:GetIcon("help-circle")
+    InfoIcon = Library:GetIcon("circle-question-mark") or Library:GetIcon("circle-help") or Library:GetIcon("help-circle")
 end
 
 local BaseAddons = {}
@@ -9252,19 +9252,16 @@ do
     end))
 
     if WindowInfo.InfoTab then
-        --// Botão fixo (fica sempre visível, fora do scroll) \\--
         local InfoButtonHolder = New("Frame", {
             AnchorPoint = Vector2.new(0, 1),
             BackgroundTransparency = 1,
             Position = UDim2.new(0, 0, 1, -21),
-            Size = UDim2.new(0, InitialLeftWidth, 0, InfoTabHeight),
+            Size = UDim2.new(0, Tabs.AbsoluteSize.X, 0, InfoTabHeight),
             Parent = MainFrame,
         })
-        New("UIListLayout", {
-            HorizontalAlignment = Enum.HorizontalAlignment.Center,
-            VerticalAlignment = Enum.VerticalAlignment.Center,
-            Parent = InfoButtonHolder,
-        })
+        Tabs:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+            InfoButtonHolder.Size = UDim2.new(0, Tabs.AbsoluteSize.X, 0, InfoTabHeight)
+        end)
         Library:MakeLine(InfoButtonHolder, {
             Position = UDim2.fromOffset(8, 0),
             Size = UDim2.new(1, -16, 0, 1),
@@ -9273,6 +9270,7 @@ do
         local InfoTabButton = New("TextButton", {
             BackgroundColor3 = "AccentColor",
             BackgroundTransparency = 1,
+            Position = UDim2.fromOffset(6, (InfoTabHeight - NavigationConfig.TabButtonHeight) / 2),
             Size = UDim2.new(1, -12, 0, NavigationConfig.TabButtonHeight),
             Text = "",
             Parent = InfoButtonHolder,
@@ -9437,9 +9435,9 @@ do
 
         AddStatRow("User ID").Text = tostring(LocalPlayer.UserId)
         AddStatRow("Place ID").Text = tostring(game.PlaceId)
-        AddStatRow("Job ID").Text = (game.JobId ~= "" and game.JobId or "Estúdio")
-        local PlayersValue = AddStatRow("Jogadores no servidor")
-        local SessionValue = AddStatRow("Tempo de sessão")
+        AddStatRow("Job ID").Text = (game.JobId ~= "" and game.JobId or "Studio")
+        local PlayersValue = AddStatRow("Players in server")
+        local SessionValue = AddStatRow("Session duration")
 
         local function UpdatePlayerCount()
             PlayersValue.Text = string.format("%d/%d", #Players:GetPlayers(), Players.MaxPlayers)
@@ -9454,7 +9452,7 @@ do
         --// Lista de jogadores (com status de amizade) \\--
         New("TextLabel", {
             BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 16),
-            Text = "Jogadores", TextSize = 13, TextTransparency = 0.5,
+            Text = "Players", TextSize = 13, TextTransparency = 0.5,
             TextXAlignment = Enum.TextXAlignment.Left, Parent = InfoScroll,
         })
 
@@ -9474,10 +9472,10 @@ do
             for _, Player in GetPlayers() do
                 local Tag = ""
                 if Player == LocalPlayer then
-                    Tag = "Você"
+                    Tag = "you"
                 else
                     local Success, IsFriend = pcall(LocalPlayer.IsFriendsWith, LocalPlayer, Player.UserId)
-                    Tag = (Success and IsFriend) and "Amigo" or ""
+                    Tag = (Success and IsFriend) and "Friend" or ""
                 end
 
                 local Row = New("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 16), Parent = PlayersListFrame })
