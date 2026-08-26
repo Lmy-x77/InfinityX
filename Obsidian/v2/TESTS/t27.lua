@@ -6528,7 +6528,7 @@ function Library:CreateWindow(WindowInfo)
     Library.ToggleKeybind = WindowInfo.ToggleKeybind
     Library.GlobalSearch = WindowInfo.GlobalSearch
 
-    local FooterHeight = 20 + WindowInfo.CornerRadius
+    local FooterHeight = 20
     local FooterReserve = FooterHeight
 
     local IsDefaultSearchbarSize = WindowInfo.SearchbarSize == UDim2.fromScale(1, 1)
@@ -6985,12 +6985,12 @@ function Library:CreateWindow(WindowInfo)
         --// Resize Button
         if WindowInfo.Resizable then
             ResizeButton = New("TextButton", {
-                AnchorPoint = Vector2.new(1, 0),
+                AnchorPoint = Vector2.new(1, 1),
                 BackgroundTransparency = 1,
-                Position = UDim2.new(1, -WindowInfo.CornerRadius / 4, 0, 0),
-                Size = UDim2.fromScale(1, 1),
-                SizeConstraint = Enum.SizeConstraint.RelativeYY,
+                Position = UDim2.new(1, -2, 1, -2),
+                Size = UDim2.fromOffset(16, 16),
                 Text = "",
+                ZIndex = 5,
                 Parent = BottomBar,
             })
 
@@ -7002,13 +7002,14 @@ function Library:CreateWindow(WindowInfo)
         end
 
         New("ImageLabel", {
+            BackgroundTransparency = 1,
             Image = ResizeIcon and ResizeIcon.Url or "",
             ImageColor3 = "FontColor",
             ImageRectOffset = ResizeIcon and ResizeIcon.ImageRectOffset or Vector2.zero,
             ImageRectSize = ResizeIcon and ResizeIcon.ImageRectSize or Vector2.zero,
             ImageTransparency = 0.5,
-            Position = UDim2.fromOffset(2, 2),
-            Size = UDim2.new(1, -4, 1, -4),
+            Size = UDim2.fromScale(1, 1),
+            ZIndex = 6,
             Parent = ResizeButton,
         })
 
@@ -7149,7 +7150,6 @@ function Library:CreateWindow(WindowInfo)
         FooterHeight = 20 + Radius
         FooterReserve = FooterHeight
 
-        BottomBackground.Size = UDim2.new(1, 0, 0, FooterHeight)
         BottomBar.Size = UDim2.new(1, 0, 0, FooterHeight)
 
         BottomSeparatorLine.Position = UDim2.new(0, 0, 1, -FooterHeight)
