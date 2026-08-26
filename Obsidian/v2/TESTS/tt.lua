@@ -6529,8 +6529,7 @@ function Library:CreateWindow(WindowInfo)
     Library.GlobalSearch = WindowInfo.GlobalSearch
 
     local FooterHeight = 20 + WindowInfo.CornerRadius
-    local FooterOverlap = 6
-    local FooterReserve = FooterHeight
+    local FooterReserve = FooterHeight + 1
 
     local IsDefaultSearchbarSize = WindowInfo.SearchbarSize == UDim2.fromScale(1, 1)
     local MainFrame
@@ -6950,12 +6949,12 @@ function Library:CreateWindow(WindowInfo)
                 return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
             end,
             Position = UDim2.new(0, 0, 1, 0),
-            Size = UDim2.new(1, 0, 0, FooterHeight + FooterOverlap),
+            Size = UDim2.new(1, 0, 0, 20 + WindowInfo.CornerRadius),
             Parent = MainFrame
         })
         BottomSeparatorLine = Library:MakeLine(MainFrame, {
             AnchorPoint = Vector2.new(0, 1),
-            Position = UDim2.new(0, 0, 1, -FooterHeight),
+            Position = UDim2.new(0, 0, 1, -20),
             Size = UDim2.new(1, 0, 0, 1),
         })
 
@@ -7148,13 +7147,7 @@ function Library:CreateWindow(WindowInfo)
         WindowInfo.CornerRadius = Radius
 
         ResizeButton.Position = UDim2.new(1, -Radius / 4, 0, 0)
-        FooterHeight = 20 + Radius
-        FooterReserve = FooterHeight
-        BottomBackground.Size = UDim2.new(1, 0, 0, FooterHeight + FooterOverlap)
-        BottomSeparatorLine.Position = UDim2.new(0, 0, 1, -FooterHeight)
-        DividerLine.Size = UDim2.new(0, 1, 1, -FooterReserve)
-        Tabs.Size = UDim2.new(0, Window:GetSidebarWidth(), 1, -(49 + FooterReserve) - InfoTabOffset)
-        Container.Size = UDim2.new(1, -Window:GetSidebarWidth() - 1, 1, -(49 + FooterReserve))
+        BottomBackground.Size = UDim2.new(1, 0, 0, 20 + Radius)
 
         for _, Tab in Library.Tabs do
             if Tab.IsKeyTab then
