@@ -6529,7 +6529,7 @@ function Library:CreateWindow(WindowInfo)
     Library.GlobalSearch = WindowInfo.GlobalSearch
 
     local FooterHeight = 20 + WindowInfo.CornerRadius
-    local FooterReserve = FooterHeight + 1
+    local FooterReserve = FooterHeight
 
     local IsDefaultSearchbarSize = WindowInfo.SearchbarSize == UDim2.fromScale(1, 1)
     local MainFrame
