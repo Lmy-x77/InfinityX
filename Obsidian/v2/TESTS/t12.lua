@@ -177,6 +177,7 @@ local Library = {
 
     Toggled = false,
     Unloaded = false,
+    StartTime = os.clock(),
 
     Labels = Labels,
     Buttons = Buttons,
@@ -329,6 +330,8 @@ local Templates = {
         ToggleKeybind = Enum.KeyCode.RightControl,
         MobileButtonsSide = "Left",
         UnlockMouseWhileOpen = true,
+
+        InfoTab = false,
 
         EnableSidebarResize = false,
         EnableCompacting = false,
@@ -2220,6 +2223,7 @@ local ArrowIcon = Library:GetIcon("chevron-up")
 local ResizeIcon = Library:GetIcon("move-diagonal-2")
 local KeyIcon = Library:GetIcon("key")
 local MoveIcon = Library:GetIcon("move")
+local InfoIcon = Library:GetIcon("circle-help") or Library:GetIcon("help-circle")
 
 function Library:SetIconModule(module: IconModule)
     FetchIcons = true
@@ -2231,6 +2235,7 @@ function Library:SetIconModule(module: IconModule)
     ResizeIcon = Library:GetIcon("move-diagonal-2")
     KeyIcon = Library:GetIcon("key")
     MoveIcon = Library:GetIcon("move")
+    InfoIcon = Library:GetIcon("circle-help") or Library:GetIcon("help-circle")
 end
 
 local BaseAddons = {}
@@ -6546,6 +6551,9 @@ function Library:CreateWindow(WindowInfo)
     local IsCompact = WindowInfo.SidebarCompacted
     local LastExpandedWidth = InitialLeftWidth
 
+    local InfoTabHeight = NavigationConfig.TabButtonHeight + NavigationConfig.SidebarBottomPadding
+    local InfoTabOffset = WindowInfo.InfoTab and InfoTabHeight or 0
+
     local MainFrameScale
     local MainOutline
     local MainShadowOutline
@@ -7009,7 +7017,7 @@ function Library:CreateWindow(WindowInfo)
             CanvasSize = UDim2.fromScale(0, 0),
             Position = UDim2.fromOffset(0, 49),
             ScrollBarThickness = 0,
-            Size = UDim2.new(0, InitialLeftWidth, 1, -70),
+            Size = UDim2.new(0, InitialLeftWidth, 1, -70 - InfoTabOffset),
             Parent = MainFrame,
         })
         New("UIListLayout", {
@@ -7192,7 +7200,7 @@ function Library:CreateWindow(WindowInfo)
 
         TitleHolder.Size = UDim2.new(0, Width, 1, 0)
         RightWrapper.Size = UDim2.new(1, -Width - 57 - 1, 1, -16)
-        Tabs.Size = UDim2.new(0, Width, 1, -70)
+        Tabs.Size = UDim2.new(0, Width, 1, -70 - InfoTabOffset)
         Container.Size = UDim2.new(1, -Width - 1, 1, -70)
 
         if WindowInfo.EnableCompacting then
@@ -9242,6 +9250,311 @@ do
     Library:GiveSignal(UserInputService.WindowFocusReleased:Connect(function()
         Library.IsRobloxFocused = false
     end))
+
+    if WindowInfo.InfoTab then
+        --// Botão fixo (fica sempre visível, fora do scroll) \\--
+        local InfoButtonHolder = New("Frame", {
+            AnchorPoint = Vector2.new(0, 1),
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 0, 1, -21),
+            Size = UDim2.new(0, InitialLeftWidth, 0, InfoTabHeight),
+            Parent = MainFrame,
+        })
+        New("UIListLayout", {
+            HorizontalAlignment = Enum.HorizontalAlignment.Center,
+            VerticalAlignment = Enum.VerticalAlignment.Center,
+            Parent = InfoButtonHolder,
+        })
+        Library:MakeLine(InfoButtonHolder, {
+            Position = UDim2.fromOffset(8, 0),
+            Size = UDim2.new(1, -16, 0, 1),
+        })
+
+        local InfoTabButton = New("TextButton", {
+            BackgroundColor3 = "AccentColor",
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, -12, 0, NavigationConfig.TabButtonHeight),
+            Text = "",
+            Parent = InfoButtonHolder,
+        })
+        table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(0, 6), Parent = InfoTabButton }))
+
+        local InfoTabIndicator = New("Frame", {
+            AnchorPoint = Vector2.new(0, 0.5),
+            BackgroundColor3 = "AccentColor",
+            BackgroundTransparency = 1,
+            Position = UDim2.fromScale(0, 0.5),
+            Size = UDim2.fromOffset(NavigationConfig.IndicatorWidth, 0),
+            Parent = InfoTabButton,
+        })
+        table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = InfoTabIndicator }))
+
+        local InfoTabIcon = New("ImageLabel", {
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Image = InfoIcon and InfoIcon.Url or "",
+            ImageColor3 = "AccentColor",
+            ImageRectOffset = InfoIcon and InfoIcon.ImageRectOffset or Vector2.zero,
+            ImageRectSize = InfoIcon and InfoIcon.ImageRectSize or Vector2.zero,
+            ImageTransparency = NavigationConfig.InactiveIconTransparency,
+            Position = UDim2.fromScale(0.5, 0.5),
+            Size = UDim2.fromOffset(NavigationConfig.IconSize, NavigationConfig.IconSize),
+            Parent = InfoTabButton,
+        })
+
+        Library:AddTooltip("Informações", nil, InfoTabButton)
+
+        --// Painel de conteúdo \\--
+        local InfoContainer = New("Frame", {
+            BackgroundTransparency = 1,
+            Size = UDim2.fromScale(1, 1),
+            Visible = false,
+            Parent = Container,
+        })
+        local InfoScroll = New("ScrollingFrame", {
+            AutomaticCanvasSize = Enum.AutomaticSize.Y,
+            BackgroundTransparency = 1,
+            CanvasSize = UDim2.fromScale(0, 0),
+            ScrollBarImageTransparency = 1,
+            ScrollBarThickness = 0,
+            Size = UDim2.fromScale(1, 1),
+            Parent = InfoContainer,
+        })
+        New("UIListLayout", { Padding = UDim.new(0, 12), Parent = InfoScroll })
+        New("UIPadding", {
+            PaddingBottom = UDim.new(0, 10),
+            PaddingLeft = UDim.new(0, 4),
+            PaddingRight = UDim.new(0, 4),
+            PaddingTop = UDim.new(0, 4),
+            Parent = InfoScroll,
+        })
+
+        --// Perfil \\--
+        local ProfileRow = New("Frame", {
+            AutomaticSize = Enum.AutomaticSize.Y,
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 0),
+            Parent = InfoScroll,
+        })
+        New("UIListLayout", {
+            FillDirection = Enum.FillDirection.Horizontal,
+            Padding = UDim.new(0, 12),
+            VerticalAlignment = Enum.VerticalAlignment.Center,
+            Parent = ProfileRow,
+        })
+
+        local AvatarFrame = New("Frame", {
+            BackgroundColor3 = "MainColor",
+            ClipsDescendants = true,
+            Size = UDim2.fromOffset(60, 60),
+            Parent = ProfileRow,
+        })
+        New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = AvatarFrame })
+        Library:AddOutline(AvatarFrame)
+
+        local AvatarImage = New("ImageLabel", {
+            BackgroundTransparency = 1,
+            Size = UDim2.fromScale(1, 1),
+            Image = "",
+            Parent = AvatarFrame,
+        })
+
+        task.spawn(function()
+            local Success, Content = pcall(function()
+                return Players:GetUserThumbnailAsync(
+                    LocalPlayer.UserId,
+                    Enum.ThumbnailType.HeadShot,
+                    Enum.ThumbnailSize.Size180x180
+                )
+            end)
+
+            if Success and AvatarImage.Parent then
+                AvatarImage.Image = Content
+            end
+        end)
+
+        local NameColumn = New("Frame", {
+            AutomaticSize = Enum.AutomaticSize.XY,
+            BackgroundTransparency = 1,
+            Size = UDim2.fromOffset(0, 0),
+            Parent = ProfileRow,
+        })
+        New("UIListLayout", { Padding = UDim.new(0, 2), Parent = NameColumn })
+
+        local DisplayNameLabel = New("TextLabel", {
+            AutomaticSize = Enum.AutomaticSize.XY,
+            BackgroundTransparency = 1,
+            Size = UDim2.fromOffset(0, 0),
+            Text = LocalPlayer.DisplayName,
+            TextSize = 17,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = NameColumn,
+        })
+        do
+            DisplayNameLabel.FontFace = Font.new(Library.Scheme.Font.Family, Enum.FontWeight.Bold)
+            if Library.Registry[DisplayNameLabel] then
+                Library.Registry[DisplayNameLabel].FontFace = nil
+            end
+        end
+
+        New("TextLabel", {
+            AutomaticSize = Enum.AutomaticSize.XY,
+            BackgroundTransparency = 1,
+            Size = UDim2.fromOffset(0, 0),
+            Text = "@" .. LocalPlayer.Name,
+            TextSize = 13,
+            TextTransparency = 0.5,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = NameColumn,
+        })
+
+        New("Frame", {
+            BackgroundColor3 = "OutlineColor", BorderSizePixel = 0,
+            Size = UDim2.new(1, 0, 0, 1), Parent = InfoScroll,
+        })
+
+        --// Estatísticas \\--
+        local StatsList = New("Frame", {
+            AutomaticSize = Enum.AutomaticSize.Y,
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 0),
+            Parent = InfoScroll,
+        })
+        New("UIListLayout", { Padding = UDim.new(0, 6), Parent = StatsList })
+
+        local function AddStatRow(Label)
+            local Row = New("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 16), Parent = StatsList })
+            New("TextLabel", {
+                BackgroundTransparency = 1, Size = UDim2.fromScale(0.5, 1),
+                Text = Label, TextSize = 13, TextTransparency = 0.5,
+                TextXAlignment = Enum.TextXAlignment.Left, Parent = Row,
+            })
+            local Value = New("TextLabel", {
+                BackgroundTransparency = 1, Position = UDim2.fromScale(0.5, 0), Size = UDim2.fromScale(0.5, 1),
+                Text = "", TextSize = 13, TextXAlignment = Enum.TextXAlignment.Right, Parent = Row,
+            })
+            return Value
+        end
+
+        AddStatRow("User ID").Text = tostring(LocalPlayer.UserId)
+        AddStatRow("Place ID").Text = tostring(game.PlaceId)
+        AddStatRow("Job ID").Text = (game.JobId ~= "" and game.JobId or "Estúdio")
+        local PlayersValue = AddStatRow("Jogadores no servidor")
+        local SessionValue = AddStatRow("Tempo de sessão")
+
+        local function UpdatePlayerCount()
+            PlayersValue.Text = string.format("%d/%d", #Players:GetPlayers(), Players.MaxPlayers)
+        end
+        UpdatePlayerCount()
+
+        New("Frame", {
+            BackgroundColor3 = "OutlineColor", BorderSizePixel = 0,
+            Size = UDim2.new(1, 0, 0, 1), Parent = InfoScroll,
+        })
+
+        --// Lista de jogadores (com status de amizade) \\--
+        New("TextLabel", {
+            BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 16),
+            Text = "Jogadores", TextSize = 13, TextTransparency = 0.5,
+            TextXAlignment = Enum.TextXAlignment.Left, Parent = InfoScroll,
+        })
+
+        local PlayersListFrame = New("Frame", {
+            AutomaticSize = Enum.AutomaticSize.Y, BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 0), Parent = InfoScroll,
+        })
+        New("UIListLayout", { Padding = UDim.new(0, 4), Parent = PlayersListFrame })
+
+        local function RefreshPlayersList()
+            for _, Child in PlayersListFrame:GetChildren() do
+                if Child:IsA("GuiObject") then
+                    Child:Destroy()
+                end
+            end
+
+            for _, Player in GetPlayers() do
+                local Tag = ""
+                if Player == LocalPlayer then
+                    Tag = "Você"
+                else
+                    local Success, IsFriend = pcall(LocalPlayer.IsFriendsWith, LocalPlayer, Player.UserId)
+                    Tag = (Success and IsFriend) and "Amigo" or ""
+                end
+
+                local Row = New("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 16), Parent = PlayersListFrame })
+
+                New("TextLabel", {
+                    BackgroundTransparency = 1, Size = UDim2.fromScale(0.75, 1),
+                    Text = Player.DisplayName ~= Player.Name
+                        and string.format("%s (@%s)", Player.DisplayName, Player.Name)
+                        or Player.Name,
+                    TextSize = 13, TextTruncate = Enum.TextTruncate.AtEnd,
+                    TextXAlignment = Enum.TextXAlignment.Left, Parent = Row,
+                })
+
+                New("TextLabel", {
+                    BackgroundTransparency = 1, Position = UDim2.fromScale(0.75, 0), Size = UDim2.fromScale(0.25, 1),
+                    Text = Tag, TextColor3 = "AccentColor", TextSize = 13,
+                    TextXAlignment = Enum.TextXAlignment.Right, Parent = Row,
+                })
+            end
+
+            UpdatePlayerCount()
+        end
+        RefreshPlayersList()
+
+        Library:GiveSignal(Players.PlayerAdded:Connect(RefreshPlayersList))
+        Library:GiveSignal(Players.PlayerRemoving:Connect(function()
+            task.defer(RefreshPlayersList)
+        end))
+
+        --// Tempo de sessão (atualiza a cada segundo) \\--
+        task.spawn(function()
+            while not Library.Unloaded do
+                local Elapsed = os.clock() - Library.StartTime
+                SessionValue.Text = string.format(
+                    "%02d:%02d:%02d",
+                    math.floor(Elapsed / 3600),
+                    math.floor((Elapsed % 3600) / 60),
+                    math.floor(Elapsed % 60)
+                )
+                task.wait(1)
+            end
+        end)
+
+        --// Show / Hide (mesmo padrão das outras tabs) \\--
+        local InfoNavAnim = TweenInfo.new(NavigationConfig.AnimationTime, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local InfoTab = {}
+
+        function InfoTab:Show()
+            if Library.ActiveTab then
+                Library.ActiveTab:Hide()
+            end
+
+            TweenService:Create(InfoTabButton, InfoNavAnim, { BackgroundTransparency = 0.92 }):Play()
+            TweenService:Create(InfoTabIndicator, InfoNavAnim, {
+                BackgroundTransparency = 0,
+                Size = UDim2.fromOffset(NavigationConfig.IndicatorWidth, NavigationConfig.IconSize + 10),
+            }):Play()
+            TweenService:Create(InfoTabIcon, InfoNavAnim, { ImageTransparency = NavigationConfig.ActiveIconTransparency }):Play()
+
+            InfoContainer.Visible = true
+            Library.ActiveTab = InfoTab
+        end
+
+        function InfoTab:Hide()
+            TweenService:Create(InfoTabButton, InfoNavAnim, { BackgroundTransparency = 1 }):Play()
+            TweenService:Create(InfoTabIndicator, InfoNavAnim, {
+                BackgroundTransparency = 1,
+                Size = UDim2.fromOffset(NavigationConfig.IndicatorWidth, 0),
+            }):Play()
+            TweenService:Create(InfoTabIcon, InfoNavAnim, { ImageTransparency = NavigationConfig.InactiveIconTransparency }):Play()
+
+            InfoContainer.Visible = false
+            Library.ActiveTab = nil
+        end
+
+        InfoTabButton.MouseButton1Click:Connect(InfoTab.Show)
+    end
 
     return Window
 end
