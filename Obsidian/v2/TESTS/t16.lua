@@ -6977,7 +6977,7 @@ function Library:CreateWindow(WindowInfo)
             Text = WindowInfo.Footer,
             TextSize = 14,
             TextTransparency = 0.5,
-            Parent = BottomBar,
+            Parent = MainFrame,
         })
 
         --// Resize Button
