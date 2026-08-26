@@ -7216,6 +7216,12 @@ function Library:CreateWindow(WindowInfo)
 
         DividerLine.Position = UDim2.fromOffset(Width, 0)
 
+        BottomBackground.Position = UDim2.new(0, Width + 1, 1, 0)
+        BottomBackground.Size = UDim2.new(1, -(Width + 1), 0, 20 + WindowInfo.CornerRadius)
+        BottomSeparatorLine.Position = UDim2.new(0, Width + 1, 1, -20)
+        BottomSeparatorLine.Size = UDim2.new(1, -(Width + 1), 0, 1)
+        BottomBar.Position = UDim2.new(0, Width + 1, 1, 0)
+        BottomBar.Size = UDim2.new(1, -(Width + 1), 0, 20)
 
         TitleHolder.Size = UDim2.new(0, Width, 1, 0)
         RightWrapper.Size = UDim2.new(1, -Width - 57 - 1, 1, -16)
