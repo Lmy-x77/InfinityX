@@ -6957,45 +6957,6 @@ function Library:CreateWindow(WindowInfo)
         })
 
         -- Fundo interno para preencher o footer inteiro
-        local FooterFill = New("Frame", {
-            BackgroundColor3 = function()
-                return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
-            end,
-            BorderSizePixel = 0,
-            Position = UDim2.new(0, 0, 0, 0),
-            Size = UDim2.fromScale(1, 1),
-            ZIndex = 2,
-            Parent = BottomBackground,
-        })
-
-        -- Cantos inferiores arredondados acompanhando a MainFrame
-        local FooterCorner = New("UICorner", {
-            CornerRadius = UDim.new(0, WindowInfo.CornerRadius),
-            Parent = FooterFill,
-        })
-
-        table.insert(Library.Corners, FooterCorner)
-
-        -- Cobre a parte arredondada de cima para manter somente
-        -- os cantos inferiores arredondados
-        local FooterTopFill = New("Frame", {
-            BackgroundColor3 = function()
-                return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
-            end,
-            BorderSizePixel = 0,
-            Position = UDim2.fromOffset(0, 0),
-            Size = UDim2.new(1, 0, 0.5, 0),
-            ZIndex = 3,
-            Parent = FooterFill,
-        })
-
-        BottomSeparatorLine = Library:MakeLine(MainFrame, {
-            AnchorPoint = Vector2.new(0, 1),
-            Position = UDim2.new(0, 0, 1, -FooterHeight),
-            Size = UDim2.new(1, 0, 0, 1),
-        })
-        BottomSeparatorLine.ZIndex = 5
-
         BottomBar = New("Frame", {
             AnchorPoint = Vector2.new(0, 1),
             BackgroundTransparency = 1,
@@ -7004,6 +6965,43 @@ function Library:CreateWindow(WindowInfo)
             ZIndex = 6,
             Parent = MainFrame,
         })
+
+        local FooterFill = New("Frame", {
+            BackgroundColor3 = function()
+                return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
+            end,
+            BorderSizePixel = 0,
+            Position = UDim2.new(0, 0, 0, 0),
+            Size = UDim2.fromScale(1, 1),
+            ZIndex = 2,
+            Parent = BottomBar,
+        })
+
+        -- Cantos inferiores arredondados acompanhando a MainFrame
+        local FooterCorner = New("UICorner", {
+            CornerRadius = UDim.new(0, WindowInfo.CornerRadius),
+            Parent = BottomBar,
+        })
+
+        table.insert(Library.Corners, FooterCorner)
+
+        local FooterTopFill = New("Frame", {
+            BackgroundColor3 = function()
+                return Library:GetBetterColor(Library.Scheme.BackgroundColor, 4)
+            end,
+            BorderSizePixel = 0,
+            Position = UDim2.fromOffset(0, 0),
+            Size = UDim2.new(1, 0, 0.5, 0),
+            ZIndex = 3,
+            Parent = BottomBar,
+        })
+
+        BottomSeparatorLine = Library:MakeLine(MainFrame, {
+            AnchorPoint = Vector2.new(0, 1),
+            Position = UDim2.new(0, 0, 1, -FooterHeight),
+            Size = UDim2.new(1, 0, 0, 1),
+        })
+        BottomSeparatorLine.ZIndex = 5
 
         --// Footer
         FooterLabel = New("TextLabel", {
