@@ -9548,11 +9548,11 @@ do
             local Btn = New("TextButton", {
                 BackgroundColor3 = "MainColor",
                 AutomaticSize = Enum.AutomaticSize.X,
-                Size = UDim2.fromOffset(0, 30),
+                Size = UDim2.fromOffset(0, 40),
                 Text = "",
                 Parent = Parent,
             })
-            table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(0, Library.CornerRadius), Parent = Btn }))
+            table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(0, 0.5), Parent = Btn }))
             Library:AddOutline(Btn)
 
             local Row = New("Frame", {
@@ -9617,14 +9617,14 @@ do
         AddQuickAction(ActionsRow, "copy", "Job ID", function()
             if setclipboard then
                 setclipboard(game.JobId)
-                Library:Notify({ Title = "Copiado", Description = "Job ID copiado.", Type = "Success", Duration = 2 })
+                Library:Notify({ Title = "InfinityX", Description = "Job ID copied.", Type = "Success", Duration = 2 })
             end
         end)
 
         AddQuickAction(ActionsRow, "user", "User ID", function()
             if setclipboard then
                 setclipboard(tostring(LocalPlayer.UserId))
-                Library:Notify({ Title = "Copiado", Description = "User ID copiado.", Type = "Success", Duration = 2 })
+                Library:Notify({ Title = "Infinity", Description = "User ID copied.", Type = "Success", Duration = 2 })
             end
         end)
 
