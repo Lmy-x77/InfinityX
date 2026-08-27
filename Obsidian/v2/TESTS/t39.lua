@@ -9548,7 +9548,7 @@ do
             local Btn = New("TextButton", {
                 BackgroundColor3 = "MainColor",
                 AutomaticSize = Enum.AutomaticSize.X,
-                Size = UDim2.fromOffset(5, 40),
+                Size = UDim2.fromOffset(0, 40),
                 Text = "",
                 Parent = Parent,
             })
@@ -9560,7 +9560,7 @@ do
                 AutomaticSize = Enum.AutomaticSize.X,
                 BackgroundTransparency = 1,
                 Position = UDim2.fromScale(0.5, 0.5),
-                Size = UDim2.fromOffset(0, 16),
+                Size = UDim2.fromOffset(0, 30),
                 Parent = Btn,
             })
             New("UIPadding", { PaddingLeft = UDim.new(0, 12), PaddingRight = UDim.new(0, 12), Parent = Btn })
