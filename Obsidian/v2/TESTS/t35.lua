@@ -9548,11 +9548,11 @@ do
             local Btn = New("TextButton", {
                 BackgroundColor3 = "MainColor",
                 AutomaticSize = Enum.AutomaticSize.X,
-                Size = UDim2.fromOffset(0, 40),
+                Size = UDim2.fromOffset(0, 50),
                 Text = "",
                 Parent = Parent,
             })
-            table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(0, 0.5), Parent = Btn }))
+            table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(0, 0.50), Parent = Btn }))
             Library:AddOutline(Btn)
 
             local Row = New("Frame", {
