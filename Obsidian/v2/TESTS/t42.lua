@@ -229,7 +229,7 @@ local UI_CONFIG = {
     ElementSpacing = 8,
     CornerRadius = 6,
     HeaderHeight = 35,
-    AnimTime = 0.18,
+    AnimTime = 0.30,
 }
 
 local NavigationConfig = {
