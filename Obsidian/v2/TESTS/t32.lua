@@ -5080,6 +5080,8 @@ do
             SearchBox:GetPropertyChangedSignal("Text"):Connect(Dropdown.BuildDropdownList)
         end
 
+        PlayerSearchBox:GetPropertyChangedSignal("Text"):Connect(RefreshPlayersList)
+
         local Defaults = {}
         if typeof(Info.Default) == "string" then
             local Index = table.find(Dropdown.Values, Info.Default)
@@ -9543,18 +9545,248 @@ do
             Parent = NameColumn,
         })
 
+        --// Quick Actions \\--
+        local function AddQuickAction(Parent, IconName, Text, Callback)
+            local Btn = New("TextButton", {
+                BackgroundColor3 = "MainColor",
+                AutomaticSize = Enum.AutomaticSize.X,
+                Size = UDim2.fromOffset(0, 30),
+                Text = "",
+                Parent = Parent,
+            })
+            table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(0, Library.CornerRadius), Parent = Btn }))
+            Library:AddOutline(Btn)
+
+            local Row = New("Frame", {
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                AutomaticSize = Enum.AutomaticSize.X,
+                BackgroundTransparency = 1,
+                Position = UDim2.fromScale(0.5, 0.5),
+                Size = UDim2.fromOffset(0, 16),
+                Parent = Btn,
+            })
+            New("UIPadding", { PaddingLeft = UDim.new(0, 12), PaddingRight = UDim.new(0, 12), Parent = Btn })
+            New("UIListLayout", {
+                FillDirection = Enum.FillDirection.Horizontal,
+                VerticalAlignment = Enum.VerticalAlignment.Center,
+                Padding = UDim.new(0, 6),
+                Parent = Row,
+            })
+
+            local Icon = Library:GetIcon(IconName)
+            if Icon then
+                New("ImageLabel", {
+                    Image = Icon.Url,
+                    ImageColor3 = "AccentColor",
+                    ImageRectOffset = Icon.ImageRectOffset,
+                    ImageRectSize = Icon.ImageRectSize,
+                    Size = UDim2.fromOffset(14, 14),
+                    Parent = Row,
+                })
+            end
+            New("TextLabel", {
+                AutomaticSize = Enum.AutomaticSize.X,
+                BackgroundTransparency = 1,
+                Size = UDim2.fromOffset(0, 16),
+                Text = Text,
+                TextSize = 13,
+                Parent = Row,
+            })
+
+            Btn.MouseEnter:Connect(function()
+                TweenService:Create(Btn, Library.TweenInfo, { BackgroundTransparency = 0.3 }):Play()
+            end)
+            Btn.MouseLeave:Connect(function()
+                TweenService:Create(Btn, Library.TweenInfo, { BackgroundTransparency = 0 }):Play()
+            end)
+
+            Btn.MouseButton1Click:Connect(Callback)
+            return Btn
+        end
+
+        local ActionsRow = New("Frame", {
+            AutomaticSize = Enum.AutomaticSize.Y,
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 0),
+            Parent = InfoScroll,
+        })
+        New("UIListLayout", {
+            FillDirection = Enum.FillDirection.Horizontal,
+            Padding = UDim.new(0, 8),
+            Parent = ActionsRow,
+        })
+
+        AddQuickAction(ActionsRow, "copy", "Job ID", function()
+            if setclipboard then
+                setclipboard(game.JobId)
+                Library:Notify({ Title = "Copiado", Description = "Job ID copiado.", Type = "Success", Duration = 2 })
+            end
+        end)
+
+        AddQuickAction(ActionsRow, "user", "User ID", function()
+            if setclipboard then
+                setclipboard(tostring(LocalPlayer.UserId))
+                Library:Notify({ Title = "Copiado", Description = "User ID copiado.", Type = "Success", Duration = 2 })
+            end
+        end)
+
+        AddQuickAction(ActionsRow, "refresh-cw", "Rejoin", function()
+            local TeleportService = cloneref(game:GetService("TeleportService"))
+            pcall(TeleportService.TeleportToPlaceInstance, TeleportService, game.PlaceId, game.JobId, LocalPlayer)
+        end)
+
         --// Account card \\--
         AddSectionLabel("Account")
         local AccountCard = AddCard()
         AddStatRow(AccountCard, "User ID").Text = tostring(LocalPlayer.UserId)
         AddStatRow(AccountCard, "Place ID").Text = tostring(game.PlaceId)
         AddStatRow(AccountCard, "Job ID").Text = (game.JobId ~= "" and game.JobId or "Studio")
+        AddStatRow(AccountCard, "Server").Text = (game.PrivateServerId ~= "" and "Private" or "Public")
+
+        if identifyexecutor then
+            local Success, ExecName, ExecVersion = pcall(identifyexecutor)
+            AddStatRow(AccountCard, "Executor").Text = Success and (ExecName .. (ExecVersion and (" " .. ExecVersion) or "")) or "Unknown"
+        end
 
         --// Session card \\--
         AddSectionLabel("Session")
         local SessionCard = AddCard()
         local PlayersValue = AddStatRow(SessionCard, "Players in server")
         local SessionValue = AddStatRow(SessionCard, "Session duration")
+
+        --// Performance card \\--
+        local StatsService = cloneref(game:GetService("Stats"))
+
+        local function GetPing()
+            local Success, Ping = pcall(function()
+                return StatsService.Network.ServerStatsItem["Data Ping"]:GetValue()
+            end)
+            return Success and math.floor(Ping) or 0
+        end
+
+        local FPSHistory, PingHistory = {}, {}
+        local HistorySize = 30
+
+        local function AddGraphCard(Title, Unit, InverseGood)
+            -- InverseGood = true quando "menor é melhor" (ex: ping). false quando "maior é melhor" (ex: FPS)
+            AddSectionLabel(Title)
+            local Card = AddCard()
+
+            local HeaderRow = New("Frame", {
+                BackgroundTransparency = 1,
+                AutomaticSize = Enum.AutomaticSize.Y,
+                Size = UDim2.new(1, 0, 0, 0),
+                Parent = Card,
+            })
+            New("UIListLayout", {
+                FillDirection = Enum.FillDirection.Horizontal,
+                VerticalAlignment = Enum.VerticalAlignment.Center,
+                Padding = UDim.new(0, 6),
+                Parent = HeaderRow,
+            })
+
+            local StatusDot = New("Frame", {
+                BackgroundColor3 = Color3.fromRGB(90, 200, 130),
+                Size = UDim2.fromOffset(8, 8),
+                Parent = HeaderRow,
+            })
+            New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = StatusDot })
+
+            local ValueLabel = New("TextLabel", {
+                AutomaticSize = Enum.AutomaticSize.X,
+                BackgroundTransparency = 1,
+                Size = UDim2.fromOffset(0, 20),
+                Text = "--",
+                TextSize = 18,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                Parent = HeaderRow,
+            })
+            do
+                ValueLabel.FontFace = Font.new(Library.Scheme.Font.Family, Enum.FontWeight.Bold)
+                if Library.Registry[ValueLabel] then Library.Registry[ValueLabel].FontFace = nil end
+            end
+
+            local GraphHolder = New("Frame", {
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 0, 34),
+                ClipsDescendants = true,
+                Parent = Card,
+            })
+            New("UIListLayout", {
+                FillDirection = Enum.FillDirection.Horizontal,
+                HorizontalAlignment = Enum.HorizontalAlignment.Right,
+                VerticalAlignment = Enum.VerticalAlignment.Bottom,
+                Padding = UDim.new(0, 2),
+                Parent = GraphHolder,
+            })
+
+            local Bars = {}
+
+            local function Refresh(History)
+                local Current = History[#History]
+                ValueLabel.Text = Current and (tostring(Current) .. Unit) or "--"
+
+                if Current then
+                    local Color = Color3.fromRGB(90, 200, 130) -- ok
+                    if InverseGood then
+                        if Current >= 150 then Color = Color3.fromRGB(235, 90, 90)
+                        elseif Current >= 80 then Color = Color3.fromRGB(235, 180, 70) end
+                    else
+                        if Current <= 20 then Color = Color3.fromRGB(235, 90, 90)
+                        elseif Current <= 40 then Color = Color3.fromRGB(235, 180, 70) end
+                    end
+                    TweenService:Create(StatusDot, Library.TweenInfo, { BackgroundColor3 = Color }):Play()
+                end
+
+                local Max = 1
+                for _, v in History do Max = math.max(Max, v) end
+
+                for i, v in History do
+                    local Bar = Bars[i]
+                    if not Bar then
+                        Bar = New("Frame", {
+                            BackgroundColor3 = "AccentColor",
+                            BackgroundTransparency = 0.15,
+                            Size = UDim2.new(0, 4, 0, 2),
+                            Parent = GraphHolder,
+                        })
+                        table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = Bar }))
+                        Bars[i] = Bar
+                    end
+                    Bar.LayoutOrder = i
+                    TweenService:Create(Bar, TweenInfo.new(0.15), {
+                        Size = UDim2.new(0, 4, 0, math.max(2, (v / Max) * 34)),
+                    }):Play()
+                end
+            end
+
+            return Refresh
+        end
+
+        local RefreshFPS = AddGraphCard("Desempenho (FPS)", " FPS", false)
+        local RefreshPing = AddGraphCard("Rede (Ping)", " ms", true)
+
+        local LastFrameClock = os.clock()
+        Library:GiveSignal(RunService.RenderStepped:Connect(function()
+            local Now = os.clock()
+            local FPS = math.floor(1 / math.max(Now - LastFrameClock, 1 / 240))
+            LastFrameClock = Now
+
+            table.insert(FPSHistory, FPS)
+            if #FPSHistory > HistorySize then table.remove(FPSHistory, 1) end
+        end))
+
+        task.spawn(function()
+            while not Library.Unloaded do
+                RefreshFPS(FPSHistory)
+
+                table.insert(PingHistory, GetPing())
+                if #PingHistory > HistorySize then table.remove(PingHistory, 1) end
+                RefreshPing(PingHistory)
+
+                task.wait(1)
+            end
+        end)
 
         local function UpdatePlayerCount()
             PlayersValue.Text = string.format("%d/%d", #Players:GetPlayers(), Players.MaxPlayers)
@@ -9563,6 +9795,20 @@ do
 
         --// Players card \\--
         AddSectionLabel("Players")
+
+        local PlayerSearchBox = New("TextBox", {
+            BackgroundColor3 = "MainColor",
+            BorderColor3 = "OutlineColor",
+            BorderSizePixel = 1,
+            PlaceholderText = "Buscar jogador...",
+            Size = UDim2.new(1, 0, 0, 26),
+            TextSize = 13,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = InfoScroll,
+        })
+        table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(0, Library.CornerRadius), Parent = PlayerSearchBox }))
+        New("UIPadding", { PaddingLeft = UDim.new(0, 8), Parent = PlayerSearchBox })
+
         local PlayersCard = AddCard()
 
         local function RefreshPlayersList()
@@ -9573,6 +9819,11 @@ do
             end
 
             for _, Player in GetPlayers() do
+                local Filter = PlayerSearchBox.Text:lower()
+                if Filter ~= "" and not Player.Name:lower():find(Filter, 1, true)
+                    and not Player.DisplayName:lower():find(Filter, 1, true) then
+                    continue
+                end
                 local Tag = ""
                 if Player == LocalPlayer then
                     Tag = "You"
