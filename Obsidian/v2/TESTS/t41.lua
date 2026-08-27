@@ -9634,12 +9634,34 @@ do
         end)
 
         --// Account card \\--
+        local function GetServerType()
+            local RobloxReplicatedStorage = game:GetService("RobloxReplicatedStorage")
+            local Remote = RobloxReplicatedStorage:FindFirstChild("GetServerType")
+
+            if Remote and Remote:IsA("RemoteFunction") then
+                local Success, Result = pcall(function()
+                    return Remote:InvokeServer()
+                end)
+
+                if Success and Result ~= nil then
+                if Result == "VIPServer" then
+                    return "Private"
+                end
+
+                return "Public"
+                end
+            end
+
+            return "Public"
+        end
+
         AddSectionLabel("Account")
         local AccountCard = AddCard()
+
         AddStatRow(AccountCard, "User ID").Text = tostring(LocalPlayer.UserId)
         AddStatRow(AccountCard, "Place ID").Text = tostring(game.PlaceId)
         AddStatRow(AccountCard, "Job ID").Text = (game.JobId ~= "" and game.JobId or "Studio")
-        AddStatRow(AccountCard, "Server").Text = (game.PrivateServerId ~= "" and "Private" or "Public")
+        AddStatRow(AccountCard, "Server").Text = GetServerType()
 
         if identifyexecutor then
             local Success, ExecName, ExecVersion = pcall(identifyexecutor)
@@ -9761,8 +9783,8 @@ do
             return Refresh
         end
 
-        local RefreshFPS = AddGraphCard("Desempenho (FPS)", " FPS", false)
-        local RefreshPing = AddGraphCard("Rede (Ping)", " ms", true)
+        local RefreshFPS = AddGraphCard("Performance (FPS)", " FPS", false)
+        local RefreshPing = AddGraphCard("Network (Ping)", " ms", true)
 
         local LastFrameClock = os.clock()
         Library:GiveSignal(RunService.RenderStepped:Connect(function()
