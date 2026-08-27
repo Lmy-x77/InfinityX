@@ -9548,7 +9548,7 @@ do
             local Btn = New("TextButton", {
                 BackgroundColor3 = "MainColor",
                 AutomaticSize = Enum.AutomaticSize.X,
-                Size = UDim2.fromOffset(0, 50),
+                Size = UDim2.fromOffset(5, 40),
                 Text = "",
                 Parent = Parent,
             })
