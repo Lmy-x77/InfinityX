@@ -229,7 +229,7 @@ local UI_CONFIG = {
     ElementSpacing = 8,
     CornerRadius = 6,
     HeaderHeight = 35,
-    AnimTime = 0.30,
+    AnimTime = 0.18,
 }
 
 local NavigationConfig = {
@@ -1647,12 +1647,30 @@ function Library:RunElementEntrance(Holder: GuiObject, MatchColor: Color3, Delay
         return
     end
 
+    -- Garante que o Holder já tem o tamanho final antes de criar o cover,
+    -- evitando o cover cortado/errado quando o AutomaticSize ainda não assentou
+    if Holder.AbsoluteSize.Y <= 0 then
+        task.defer(function()
+            Library:RunElementEntrance(Holder, MatchColor, Delay)
+        end)
+        return
+    end
+
     local Cover = New("Frame", {
         BackgroundColor3 = MatchColor,
         BackgroundTransparency = 0,
         Size = UDim2.fromScale(1, 1),
         ZIndex = (Holder.ZIndex or 1) + 10,
         Parent = Holder,
+    })
+
+    -- Leve brilho que passa por cima no momento da revelação
+    local Shine = New("Frame", {
+        BackgroundColor3 = "WhiteColor",
+        BackgroundTransparency = 0.82,
+        Size = UDim2.fromScale(1, 1),
+        ZIndex = Cover.ZIndex + 1,
+        Parent = Cover,
     })
 
     task.delay(Delay, function()
@@ -1663,10 +1681,20 @@ function Library:RunElementEntrance(Holder: GuiObject, MatchColor: Color3, Delay
             return
         end
 
-        local FadeTween = TweenService:Create(Cover, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            BackgroundTransparency = 1,
-        })
+        local FadeTween = TweenService:Create(
+            Cover,
+            TweenInfo.new(0.38, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+            { BackgroundTransparency = 1 }
+        )
+        local ShineTween = TweenService:Create(
+            Shine,
+            TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            { BackgroundTransparency = 1 }
+        )
+
         FadeTween:Play()
+        ShineTween:Play()
+
         FadeTween.Completed:Once(function()
             if Cover and Cover.Parent then
                 Cover:Destroy()
@@ -5786,6 +5814,12 @@ do
             Groupbox:Resize()
         end
 
+        DepGroupboxList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            if DepGroupbox.Visible then
+                DepGroupbox:Resize()
+            end
+        end)
+
         function Depbox:Update(CancelSearch)
             for _, Dependency in Depbox.Dependencies do
                 local Element = Dependency[1]
@@ -6485,6 +6519,8 @@ end
 
 function Library:CreateWindow(WindowInfo)
     WindowInfo = Library:Validate(WindowInfo, Templates.Window)
+    Library.HasShownOnce = false
+    Library.PendingEntrances = {}
     local ViewportSize: Vector2 = workspace.CurrentCamera.ViewportSize
     if RunService:IsStudio() and ViewportSize.X <= 5 and ViewportSize.Y <= 5 then
         repeat
@@ -7898,6 +7934,10 @@ function Library:CreateWindow(WindowInfo)
                 end
             end
 
+            GroupboxList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                Groupbox:Resize()
+            end)
+
             function Groupbox:SetCollapsed(Collapsed, SkipAnim)
                 if not Groupbox.Collapsible then
                     return
@@ -9234,18 +9274,28 @@ do
 
         local WindowEntrancePlayed = false
 
-        local OrigToggle = Library.Toggle
-        function Library:Toggle(Value)
-            OrigToggle(Library, Value)
-            UpdateToggleButton(false)
+        if not Library._ToggleEntranceHooked then
+            Library._ToggleEntranceHooked = true
 
+            local OrigToggle = Library.Toggle
+            function Library:Toggle(Value)
+                OrigToggle(Library, Value)
+                UpdateToggleButton(false)
+
+                if Library.Toggled and not WindowEntrancePlayed then
+                    WindowEntrancePlayed = true
+                    Library.HasShownOnce = true
+                    PlayWindowEntrance()
+                end
+            end
+        else
             if Library.Toggled and not WindowEntrancePlayed then
                 WindowEntrancePlayed = true
                 Library.HasShownOnce = true
-                PlayWindowEntrance()
+                task.defer(PlayWindowEntrance)
             end
         end
-        
+
         UpdateToggleButton(true)
     end
 
