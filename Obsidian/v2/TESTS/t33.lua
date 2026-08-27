@@ -5080,8 +5080,6 @@ do
             SearchBox:GetPropertyChangedSignal("Text"):Connect(Dropdown.BuildDropdownList)
         end
 
-        PlayerSearchBox:GetPropertyChangedSignal("Text"):Connect(RefreshPlayersList)
-
         local Defaults = {}
         if typeof(Info.Default) == "string" then
             local Index = table.find(Dropdown.Values, Info.Default)
@@ -9795,20 +9793,6 @@ do
 
         --// Players card \\--
         AddSectionLabel("Players")
-
-        local PlayerSearchBox = New("TextBox", {
-            BackgroundColor3 = "MainColor",
-            BorderColor3 = "OutlineColor",
-            BorderSizePixel = 1,
-            PlaceholderText = "Buscar jogador...",
-            Size = UDim2.new(1, 0, 0, 26),
-            TextSize = 13,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            Parent = InfoScroll,
-        })
-        table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(0, Library.CornerRadius), Parent = PlayerSearchBox }))
-        New("UIPadding", { PaddingLeft = UDim.new(0, 8), Parent = PlayerSearchBox })
-
         local PlayersCard = AddCard()
 
         local function RefreshPlayersList()
@@ -9819,11 +9803,6 @@ do
             end
 
             for _, Player in GetPlayers() do
-                local Filter = PlayerSearchBox.Text:lower()
-                if Filter ~= "" and not Player.Name:lower():find(Filter, 1, true)
-                    and not Player.DisplayName:lower():find(Filter, 1, true) then
-                    continue
-                end
                 local Tag = ""
                 if Player == LocalPlayer then
                     Tag = "You"
