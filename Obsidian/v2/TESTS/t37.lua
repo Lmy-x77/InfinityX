@@ -9552,7 +9552,7 @@ do
                 Text = "",
                 Parent = Parent,
             })
-            table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(0, 2), Parent = Btn }))
+            table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(0, 4), Parent = Btn }))
             Library:AddOutline(Btn)
 
             local Row = New("Frame", {
