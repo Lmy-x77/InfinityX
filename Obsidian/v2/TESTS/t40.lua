@@ -9548,7 +9548,7 @@ do
             local Btn = New("TextButton", {
                 BackgroundColor3 = "MainColor",
                 AutomaticSize = Enum.AutomaticSize.X,
-                Size = UDim2.fromOffset(0, 40),
+                Size = UDim2.fromOffset(0, 35),
                 Text = "",
                 Parent = Parent,
             })
@@ -9560,10 +9560,10 @@ do
                 AutomaticSize = Enum.AutomaticSize.X,
                 BackgroundTransparency = 1,
                 Position = UDim2.fromScale(0.5, 0.5),
-                Size = UDim2.fromOffset(0, 30),
+                Size = UDim2.fromOffset(0, 16),
                 Parent = Btn,
             })
-            New("UIPadding", { PaddingLeft = UDim.new(0, 12), PaddingRight = UDim.new(0, 12), Parent = Btn })
+            New("UIPadding", { PaddingLeft = UDim.new(0, 24), PaddingRight = UDim.new(0, 24), Parent = Btn })
             New("UIListLayout", {
                 FillDirection = Enum.FillDirection.Horizontal,
                 VerticalAlignment = Enum.VerticalAlignment.Center,
