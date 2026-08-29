@@ -193,6 +193,8 @@ local Library = {
     CantDragForced = false,
 
     PendingEntrances = {},
+    PendingTabEntrances = {},
+    ActiveEntranceTweens = {},
     HasShownOnce = false,
 
     Signals = {},
@@ -1712,6 +1714,63 @@ function Library:FlushPendingEntrances()
         local Delay = math.min((Index - 1) * 0.025, 0.5)
         Library:RunElementEntrance(Entry.Holder, Entry.Color, Delay)
     end
+end
+
+function Library:RunTabEntrance(TabButtonInstance, Delay)
+    if Library.Unloaded or not TabButtonInstance or not TabButtonInstance.Parent then
+        return
+    end
+
+    task.delay(Delay, function()
+        if Library.Unloaded or not TabButtonInstance.Parent then
+            return
+        end
+
+        Library:RunElementEntrance(
+            TabButtonInstance,
+            Library:GetBetterColor(Library.Scheme.BackgroundColor, -1),
+            0
+        )
+
+        for _, Child in TabButtonInstance:GetChildren() do
+            if Child:IsA("ImageLabel") then
+                local OriginalPosition = Child.Position
+                Child.Position = OriginalPosition + UDim2.fromOffset(0, 4)
+
+                local Tween = TweenService:Create(
+                    Child,
+                    TweenInfo.new(0.28, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+                    { Position = OriginalPosition }
+                )
+                table.insert(Library.ActiveEntranceTweens, Tween)
+                Tween:Play()
+            end
+        end
+    end)
+end
+
+function Library:PlayTabEntrance(TabButtonInstance)
+    if Library.Unloaded or not TabButtonInstance then
+        return
+    end
+
+    if Library.HasShownOnce then
+        Library:RunTabEntrance(TabButtonInstance, 0)
+    else
+        table.insert(Library.PendingTabEntrances, TabButtonInstance)
+    end
+end
+
+function Library:FlushPendingTabEntrances()
+    local Queue = Library.PendingTabEntrances
+    Library.PendingTabEntrances = {}
+
+    for Index, TabButtonInstance in ipairs(Queue) do
+        local Delay = math.min((Index - 1) * 0.045, 0.4)
+        Library:RunTabEntrance(TabButtonInstance, Delay)
+    end
+
+    return math.min((math.max(#Queue, 1) - 1) * 0.045, 0.4) + 0.3
 end
 
 function Library:PlayElementEntrance(Groupbox, Holder: GuiObject)
@@ -7116,7 +7175,20 @@ function Library:CreateWindow(WindowInfo)
     end
 
     local function PlayWindowEntrance()
-        MainFrameScale.Scale = math.max(Library.DPIScale - 0.08, 0.1)
+        -- Protege contra CreateWindow chamado mais de uma vez: cancela tweens de entrada
+        -- anteriores em vez de deixá-los acumular ou rodar em paralelo com os novos.
+        for _, T in Library.ActiveEntranceTweens do
+            if T and T.PlaybackState == Enum.PlaybackState.Playing then
+                T:Cancel()
+            end
+        end
+        table.clear(Library.ActiveEntranceTweens)
+
+        local GoalPosition = MainFrame.Position
+        local StartPosition = GoalPosition + UDim2.fromOffset(0, 14)
+
+        MainFrameScale.Scale = math.max(Library.DPIScale - 0.05, 0.1)
+        MainFrame.Position = StartPosition
         MainFrame.BackgroundTransparency = 1
         if MainOutline then
             MainOutline.Transparency = 1
@@ -7125,42 +7197,59 @@ function Library:CreateWindow(WindowInfo)
             MainShadowOutline.Transparency = 1
         end
 
-        TweenService:Create(MainFrameScale, TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-            Scale = Library.DPIScale,
-        }):Play()
-        TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+        local EntranceInfo = TweenInfo.new(0.42, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+        local ScaleTween = TweenService:Create(MainFrameScale, EntranceInfo, { Scale = Library.DPIScale })
+        local FadeTween = TweenService:Create(MainFrame, EntranceInfo, {
+            Position = GoalPosition,
             BackgroundTransparency = 0,
-        }):Play()
+        })
+
+        table.insert(Library.ActiveEntranceTweens, ScaleTween)
+        table.insert(Library.ActiveEntranceTweens, FadeTween)
+        ScaleTween:Play()
+        FadeTween:Play()
+
         if MainOutline then
-            TweenService:Create(MainOutline, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-                Transparency = 0,
-            }):Play()
+            local T = TweenService:Create(MainOutline, EntranceInfo, { Transparency = 0 })
+            table.insert(Library.ActiveEntranceTweens, T)
+            T:Play()
         end
         if MainShadowOutline then
-            TweenService:Create(MainShadowOutline, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
-                Transparency = 0,
-            }):Play()
+            local T = TweenService:Create(MainShadowOutline, EntranceInfo, { Transparency = 0 })
+            table.insert(Library.ActiveEntranceTweens, T)
+            T:Play()
         end
 
         --// Sidebar slide-in
         local TabsGoalPosition = Tabs.Position
-        Tabs.Position = TabsGoalPosition - UDim2.fromOffset(24, 0)
-        TweenService:Create(Tabs, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-            Position = TabsGoalPosition,
-        }):Play()
+        Tabs.Position = TabsGoalPosition - UDim2.fromOffset(16, 0)
+        local TabsTween = TweenService:Create(Tabs, EntranceInfo, { Position = TabsGoalPosition })
+        table.insert(Library.ActiveEntranceTweens, TabsTween)
+        TabsTween:Play()
 
         --// Main content fade + move
         local ContainerGoalPosition = Container.Position
         Container.Position = ContainerGoalPosition + UDim2.fromOffset(0, 10)
-        TweenService:Create(Container, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
-            Position = ContainerGoalPosition,
-        }):Play()
+        local ContainerTween = TweenService:Create(Container, EntranceInfo, { Position = ContainerGoalPosition })
+        table.insert(Library.ActiveEntranceTweens, ContainerTween)
+        ContainerTween:Play()
 
-        task.delay(0.18, function()
+        -- Sequência: chrome da janela → botões das tabs (stagger) → elementos da tab ativa
+        -- (stagger), encadeado por eventos Completed em vez de delays fixos arbitrários.
+        FadeTween.Completed:Once(function()
             if Library.Unloaded then
                 return
             end
-            Library:FlushPendingEntrances()
+
+            local TabsDuration = Library:FlushPendingTabEntrances()
+
+            task.delay(math.max(TabsDuration - 0.1, 0), function()
+                if Library.Unloaded then
+                    return
+                end
+                Library:FlushPendingEntrances()
+            end)
         end)
     end
 
@@ -7425,11 +7514,24 @@ function Library:CreateWindow(WindowInfo)
                 Parent = TabContainer,
             })
 
+           local TabBodyLayout = New("UIListLayout", {
+                Padding = UDim.new(0, 8),
+                Parent = TabScroll,
+            })
+
+            local ColumnsRow = New("Frame", {
+                AutomaticSize = Enum.AutomaticSize.Y,
+                BackgroundTransparency = 1,
+                LayoutOrder = 3,
+                Size = UDim2.new(1, 0, 0, 0),
+                Parent = TabScroll,
+            })
+
             TabLeft = New("Frame", {
                 AutomaticSize = Enum.AutomaticSize.Y,
                 BackgroundTransparency = 1,
                 Size = UDim2.new(0.5, -3, 0, 0),
-                Parent = TabScroll,
+                Parent = ColumnsRow,
             })
             New("UIListLayout", {
                 Padding = UDim.new(0, 2),
@@ -7461,7 +7563,7 @@ function Library:CreateWindow(WindowInfo)
                 BackgroundTransparency = 1,
                 Position = UDim2.fromScale(1, 0),
                 Size = UDim2.new(0.5, -3, 0, 0),
-                Parent = TabScroll,
+                Parent = ColumnsRow,
             })
             New("UIListLayout", {
                 Padding = UDim.new(0, 2),
@@ -7491,6 +7593,7 @@ function Library:CreateWindow(WindowInfo)
         --// Tab Header (Nome + Descrição, dentro do conteúdo, estilo referência)
         local TabHeaderInfo = New("Frame", {
             BackgroundTransparency = 1,
+            LayoutOrder = 1,
             Position = UDim2.fromOffset(2, 0),
             Size = UDim2.new(1, -4, 0, 0),
             AutomaticSize = Enum.AutomaticSize.Y,
@@ -7537,6 +7640,7 @@ function Library:CreateWindow(WindowInfo)
         --// Full-width groupbox column (para AddFullGroupbox)
         local TabFull = New("Frame", {
             BackgroundTransparency = 1,
+            LayoutOrder = 4,
             Position = UDim2.fromOffset(2, 0),
             Size = UDim2.new(1, -4, 0, 0),
             AutomaticSize = Enum.AutomaticSize.Y,
@@ -7551,6 +7655,7 @@ function Library:CreateWindow(WindowInfo)
         local WarningBoxHolder = New("Frame", {
             AutomaticSize = Enum.AutomaticSize.Y,
             BackgroundTransparency = 1,
+            LayoutOrder = 2,
             Position = UDim2.fromOffset(0, 7),
             Size = UDim2.fromScale(1, 0),
             Visible = false,
@@ -7725,24 +7830,29 @@ function Library:CreateWindow(WindowInfo)
             end
         end
 
-        function Tab:RefreshSides()
-            --// Header primeiro
-            local Offset = TabHeaderInfo.AbsoluteSize.Y
+        function Tab:RefreshSides() end
 
-            --// Warning box logo abaixo do header
-            if WarningBoxHolder.Visible then
-                WarningBoxHolder.Position = UDim2.fromOffset(0, Offset + 7)
-                Offset += WarningBox.Size.Y.Offset + 8 + 7
+        function Tab:Resize(ResizeWarningBox: boolean?)
+            if ResizeWarningBox then
+                local MaximumSize = math.floor(TabContainer.AbsoluteSize.Y / 3.25)
+                local _, YText = Library:GetTextBounds(
+                    WarningText.Text,
+                    Library.Scheme.Font,
+                    WarningText.TextSize,
+                    WarningText.AbsoluteSize.X
+                )
+
+                local YBox = 24 + YText
+                if Tab.WarningBox.LockSize == true and YBox >= MaximumSize then
+                    WarningBoxScrollingFrame.CanvasSize = UDim2.fromOffset(0, YBox)
+                    YBox = MaximumSize
+                else
+                    WarningBoxScrollingFrame.CanvasSize = UDim2.fromOffset(0, 0)
+                end
+
+                WarningText.Size = UDim2.new(1, -4, 0, YText)
+                WarningBox.Size = UDim2.new(1, -5, 0, YBox + 4)
             end
-
-            --// Left/Right lado a lado, abaixo do header (e do warning box, se houver)
-            for _, Side in Tab.Sides do
-                Side.Position = UDim2.new(Side.Position.X.Scale, 0, 0, Offset)
-            end
-
-            --// Full groupboxes ficam por último, abaixo da coluna mais alta
-            local ColumnsHeight = math.max(TabLeft.AbsoluteSize.Y, TabRight.AbsoluteSize.Y)
-            TabFull.Position = UDim2.fromOffset(2, Offset + ColumnsHeight + 8)
         end
 
         TabHeaderInfo:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
@@ -8191,22 +8301,48 @@ function Library:CreateWindow(WindowInfo)
                 }
 
                 function Tab:Show()
-                    if Tabbox.ActiveTab then
-                        Tabbox.ActiveTab:Hide()
+                    if Library.ActiveTab then
+                        Library.ActiveTab:Hide()
                     end
 
-                    TweenService:Create(ButtonLabel, TabTweenInfo, { TextTransparency = 0 }):Play()
-                    if ButtonIcon then
-                        TweenService:Create(ButtonIcon, TabTweenInfo, { ImageTransparency = 0 }):Play()
+                    TweenService:Create(TabButton, NavAnim, {
+                        BackgroundTransparency = 0.92,
+                    }):Play()
+                    TweenService:Create(TabIndicator, NavAnim, {
+                        BackgroundTransparency = 0,
+                        Size = UDim2.fromOffset(NavigationConfig.IndicatorWidth, NavigationConfig.IconSize + 10),
+                    }):Play()
+                    if TabIcon then
+                        TweenService:Create(TabIcon, NavAnim, {
+                            ImageTransparency = NavigationConfig.ActiveIconTransparency,
+                        }):Play()
                     end
-                    -- Show accent indicator
-                    TweenService:Create(Indicator, TabTweenInfo, { BackgroundTransparency = 0, Size = UDim2.new(0.5, 0, 0, 2) }):Play()
-                    Line.Visible = false
 
-                    Container.Visible = true
+                    TabContainer.Visible = true
+                    Library.ActiveTab = Tab
 
-                    Tabbox.ActiveTab = Tab
-                    Tab:Resize()
+                    -- Fade + leve subida + scale ao trocar de tab. Anima o TabScroll (o frame de
+                    -- rolagem em si), nunca seus filhos — que continuam 100% controlados pelo
+                    -- TabBodyLayout. Cancela uma troca anterior se o usuário clicar rápido demais.
+                    if Tab._SwitchTween then
+                        Tab._SwitchTween:Cancel()
+                    end
+
+                    local SwitchScale = TabScroll:FindFirstChildOfClass("UIScale") or New("UIScale", { Parent = TabScroll })
+                    TabScroll.Position = UDim2.fromOffset(0, 6)
+                    SwitchScale.Scale = 0.985
+
+                    local SwitchInfo = TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+                    local SwitchTween = TweenService:Create(TabScroll, SwitchInfo, { Position = UDim2.fromOffset(0, 0) })
+                    local SwitchScaleTween = TweenService:Create(SwitchScale, SwitchInfo, { Scale = 1 })
+
+                    Tab._SwitchTween = SwitchTween
+                    SwitchTween:Play()
+                    SwitchScaleTween:Play()
+
+                    if Library.Searching then
+                        Library:UpdateSearch(Library.SearchText)
+                    end
                 end
 
                 function Tab:Hide()
@@ -8344,6 +8480,8 @@ function Library:CreateWindow(WindowInfo)
         end)
         TabButton.MouseButton1Click:Connect(Tab.Show)
         Library:AddTooltip(Name, nil, TabButton)
+
+        Library:PlayTabEntrance(TabButton)
 
         Library.Tabs[Name] = Tab
 
