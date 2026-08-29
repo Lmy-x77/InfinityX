@@ -9713,11 +9713,14 @@ do
         AddStatRow(AccountCard, "Place ID").Text = tostring(game.PlaceId)
         AddStatRow(AccountCard, "Job ID").Text = (game.JobId ~= "" and game.JobId or "Studio")
         AddStatRow(AccountCard, "Server").Text = GetServerType()
-        AddStatRow(AccountCard, "Script Version").Text = WindowInfo.ScriptVersion or "nil"
 
         if identifyexecutor then
             local Success, ExecName, ExecVersion = pcall(identifyexecutor)
             AddStatRow(AccountCard, "Executor").Text = Success and (ExecName .. (ExecVersion and (" " .. ExecVersion) or "")) or "Unknown"
+        end
+
+        if WindowInfo.ScriptVersion ~= "" or nil then
+            AddStatRow(AccountCard, "Script Version").Text = WindowInfo.ScriptVersion
         end
 
         --// Session card \\--
