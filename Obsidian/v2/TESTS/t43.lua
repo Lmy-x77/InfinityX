@@ -314,6 +314,7 @@ local Templates = {
     Window = {
         Title = "No Title",
         HubTitle = nil,
+        ScriptVersion = "",
         Footer = "No Footer",
         Position = UDim2.fromOffset(6, 6),
         Size = UDim2.fromOffset(720, 600),
@@ -9712,6 +9713,7 @@ do
         AddStatRow(AccountCard, "Place ID").Text = tostring(game.PlaceId)
         AddStatRow(AccountCard, "Job ID").Text = (game.JobId ~= "" and game.JobId or "Studio")
         AddStatRow(AccountCard, "Server").Text = GetServerType()
+        AddStatRow(AccountCard, "Script Version").Text = WindowInfo.ScriptVersion or "nil"
 
         if identifyexecutor then
             local Success, ExecName, ExecVersion = pcall(identifyexecutor)
