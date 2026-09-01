@@ -4577,7 +4577,7 @@ do
             Size = UDim2.fromScale(1, 1),
             Text = "",
             TextSize = 14,
-            ZIndex = 2,
+            ZIndex = Bar.ZIndex + 1,
             Parent = Bar,
         })
         New("UIStroke", {
