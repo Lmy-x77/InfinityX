@@ -2025,7 +2025,7 @@ function Library:AddContextMenu(
             Size = typeof(Size) == "function" and Size() or Size,
             TopImage = "rbxasset://textures/ui/Scroll/scroll-middle.png",
             Visible = false,
-            ZIndex = 10,
+            ZIndex = Holder.ZIndex + 10,
             Parent = ScreenGui,
         })
     else
@@ -2035,7 +2035,7 @@ function Library:AddContextMenu(
             BorderSizePixel = 1,
             Size = typeof(Size) == "function" and Size() or Size,
             Visible = false,
-            ZIndex = 10,
+            ZIndex = Holder.ZIndex + 10,
             Parent = ScreenGui,
         })
     end
