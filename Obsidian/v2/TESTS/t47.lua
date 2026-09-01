@@ -8736,8 +8736,11 @@ function Library:CreateWindow(WindowInfo)
         local DialogFrame
         local DialogOverlay
         local DialogContainer
+        local DialogScroll
         local ButtonsHolder
         local FooterButtonsList = {}
+        local DialogVerticalMargin = 48 -- espaço mínimo entre o dialog e o topo/rodapé da MainFrame
+        local MainFrameSizeConn
 
         DialogOverlay = New("TextButton", {
             AutoButtonColor = false,
@@ -8887,13 +8890,25 @@ function Library:CreateWindow(WindowInfo)
             DescriptionLabel.TextColor3 = Info.DescriptionColor
         end
 
-        DialogContainer = New("Frame", {
+        DialogScroll = New("ScrollingFrame", {
             BackgroundTransparency = 1,
-            Size = UDim2.fromScale(1, 0),
-            AutomaticSize = Enum.AutomaticSize.Y,
+            BorderSizePixel = 0,
+            AutomaticCanvasSize = Enum.AutomaticSize.Y,
+            CanvasSize = UDim2.new(0, 0, 0, 0),
+            ScrollBarImageColor3 = "OutlineColor",
+            ScrollBarThickness = 3,
+            Size = UDim2.new(1, 0, 0, 0),
             LayoutOrder = 4,
             ZIndex = 9002,
             Parent = InnerContainer,
+        })
+
+        DialogContainer = New("Frame", {
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 0, 0),
+            AutomaticSize = Enum.AutomaticSize.Y,
+            ZIndex = 9002,
+            Parent = DialogScroll,
         })
         local _DialogContainerLayout = New("UIListLayout", {
             Padding = UDim.new(0, 8),
@@ -8902,6 +8917,7 @@ function Library:CreateWindow(WindowInfo)
         })
         New("UIPadding", {
             PaddingBottom = UDim.new(0, 5),
+            PaddingRight = UDim.new(0, 6),
             Parent = DialogContainer,
         })
         
@@ -8973,10 +8989,35 @@ function Library:CreateWindow(WindowInfo)
                     break
                 end
             end
-            DialogContainer.Visible = HasElements
+            DialogScroll.Visible = HasElements
 
             ButtonsHolder.Visible = HasButtons
             _Sep2.Visible = HasButtons
+
+            -- Trava a altura do dialog para nunca passar da MainFrame, com scroll se precisar
+            task.defer(function()
+                if not DialogFrame or not DialogFrame.Parent then
+                    return
+                end
+
+                local AvailableHeight = math.max(MainFrame.AbsoluteSize.Y - DialogVerticalMargin * 2, 100)
+
+                local OtherHeight = HeaderContainer.AbsoluteSize.Y
+                local Gaps = 0
+
+                if HasElements then
+                    Gaps += 10
+                end
+                if HasButtons then
+                    OtherHeight += ButtonsHolder.AbsoluteSize.Y + 1
+                    Gaps += 20
+                end
+
+                local MaxContainerHeight = math.max(AvailableHeight - OtherHeight - Gaps - 30, 40)
+                local ContentHeight = DialogContainer.AbsoluteSize.Y
+
+                DialogScroll.Size = UDim2.new(1, 0, 0, math.min(ContentHeight, MaxContainerHeight))
+            end)
         end
 
         function Dialog:SetTitle(Title)
@@ -8991,6 +9032,11 @@ function Library:CreateWindow(WindowInfo)
 
         function Dialog:Dismiss()
             Library.ActiveDialog = nil
+            if MainFrameSizeConn then
+                MainFrameSizeConn:Disconnect()
+                MainFrameSizeConn = nil
+            end
+
             local CloseTween = TweenService:Create(DialogScale, Library.TweenInfo, { Scale = 0.95 })
             TweenService:Create(DialogOverlay, Library.TweenInfo, { BackgroundTransparency = 1 }):Play()
             CloseTween:Play()
@@ -9190,6 +9236,10 @@ function Library:CreateWindow(WindowInfo)
 
         setmetatable(Dialog, BaseGroupbox)
         Library.Dialogues[Idx] = Dialog
+
+        MainFrameSizeConn = MainFrame:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+            Dialog:Resize()
+        end)
 
         Dialog:Resize()
         
