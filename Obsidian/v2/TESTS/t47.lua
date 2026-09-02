@@ -4874,32 +4874,184 @@ do
                 Visible = false,
                 Parent = Display,
             })
+
             New("UIPadding", {
                 PaddingLeft = UDim.new(0, 8),
                 Parent = SearchBox,
             })
         end
 
-        local MenuTable = Library:AddContextMenu(
-            Display,
-            function()
-                return UDim2.fromOffset(Display.AbsoluteSize.X / Library.DPIScale, 0)
-            end,
-            function()
-                return { 0.5, Display.AbsoluteSize.Y + 1.5 }
-            end,
-            2,
-            function(Active: boolean)
+        local SeamCoverHeight = 6
+        local DropdownSeamCover = New("Frame", {
+            BackgroundColor3 = Library.Scheme.MainColor,
+            BorderSizePixel = 0,
+            Size = UDim2.fromOffset(0, SeamCoverHeight),
+            Visible = false,
+            ZIndex = Display.ZIndex + 11,
+            Parent = ScreenGui,
+        })
+
+        local DropdownDivider = New("Frame", {
+            BackgroundColor3 = Library.Scheme.OutlineColor,
+            BackgroundTransparency = 0.4,
+            BorderSizePixel = 0,
+            Size = UDim2.fromOffset(0, 1),
+            Visible = false,
+            ZIndex = Display.ZIndex + 12,
+            Parent = ScreenGui,
+        })
+
+        local function RepositionDropdownSeam()
+            local Pos = Display.AbsolutePosition
+            local AbsSize = Display.AbsoluteSize
+
+            DropdownSeamCover.Position = UDim2.fromOffset(
+                Pos.X,
+                Pos.Y + AbsSize.Y
+            )
+            DropdownSeamCover.Size = UDim2.fromOffset(
+                AbsSize.X,
+                SeamCoverHeight
+            )
+            DropdownDivider.Position = UDim2.fromOffset(
+                Pos.X,
+                Pos.Y + AbsSize.Y
+            )
+            DropdownDivider.Size = UDim2.fromOffset(
+                AbsSize.X,
+                1
+            )
+        end
+
+        RepositionDropdownSeam()
+
+        Library:GiveSignal(
+            Display:GetPropertyChangedSignal("AbsolutePosition"):Connect(
+                RepositionDropdownSeam
+            )
+        )
+        Library:GiveSignal(
+            Display:GetPropertyChangedSignal("AbsoluteSize"):Connect(
+                RepositionDropdownSeam
+            )
+        )
+
+        local MenuTable
+        MenuTable = Library:AddContextMenu(Display, function()
+                return UDim2.fromOffset(
+                    Display.AbsoluteSize.X / Library.DPIScale,
+                    0
+                )
+            end, function()
+                return {
+                    0.5,
+                    Display.AbsoluteSize.Y
+                }
+            end, 2, function(Active: boolean)
                 Display.TextTransparency = (Active and SearchBox) and 1 or 0
+
                 ArrowImage.ImageTransparency = Active and 0 or 0.5
                 ArrowImage.Rotation = Active and 180 or 0
+
                 if SearchBox then
                     SearchBox.Text = ""
                     SearchBox.Visible = Active
                 end
+
+                DropdownSeamCover.Visible = Active
+                DropdownDivider.Visible = Active
+
+                if Active then
+                    local DropdownMenu = MenuTable.Menu
+                    local TargetSize = DropdownMenu.Size
+
+                    DropdownMenu.Size = UDim2.new(
+                        TargetSize.X.Scale,
+                        TargetSize.X.Offset,
+                        0,
+                        0
+                    )
+                    TweenService:Create(
+                        DropdownMenu,
+                        TweenInfo.new(
+                            0.18,
+                            Enum.EasingStyle.Quint,
+                            Enum.EasingDirection.Out
+                        ),
+                        {
+                            Size = TargetSize
+                        }
+                    ):Play()
+                end
             end
         )
+
         Dropdown.Menu = MenuTable
+        do
+            local DropdownMenu = MenuTable.Menu
+
+            DropdownMenu.BorderSizePixel = 0
+            DropdownMenu.BackgroundColor3 = Library.Scheme.MainColor
+
+            if Library.Registry[DropdownMenu] then
+                Library.Registry[DropdownMenu].BackgroundColor3 = "MainColor"
+            else
+                Library.Registry[DropdownMenu] = {
+                    BackgroundColor3 = "MainColor"
+                }
+            end
+
+            table.insert(
+                Library.Corners,
+                New("UICorner", {
+                    CornerRadius = UDim.new(0, 5),
+                    Parent = DropdownMenu,
+                })
+            )
+
+            Library:AddOutline(DropdownMenu)
+        end
+
+        do
+            local OriginalMenuClose = MenuTable.Close
+            local ClosingTween = nil
+
+            function MenuTable:Close()
+                if not MenuTable.Active or ClosingTween then
+                    return
+                end
+
+                local DropdownMenu = MenuTable.Menu
+                local CurrentSize = DropdownMenu.Size
+
+                ClosingTween = TweenService:Create(
+                    DropdownMenu,
+                    TweenInfo.new(
+                        0.14,
+                        Enum.EasingStyle.Quad,
+                        Enum.EasingDirection.In
+                    ),
+                    {
+                        Size = UDim2.new(
+                            CurrentSize.X.Scale,
+                            CurrentSize.X.Offset,
+                            0,
+                            0
+                        )
+                    }
+                )
+
+                ClosingTween:Play()
+
+                ClosingTween.Completed:Once(function()
+                    ClosingTween = nil
+
+                    DropdownSeamCover.Visible = false
+                    DropdownDivider.Visible = false
+                    OriginalMenuClose(MenuTable)
+                end)
+            end
+        end
 
         function Dropdown:RecalculateListSize(Count)
             local Y = math.clamp((Count or GetTableSize(Dropdown.Values)) * 21, 0, Info.MaxVisibleDropdownItems * 21)
