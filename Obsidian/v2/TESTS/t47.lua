@@ -3922,9 +3922,17 @@ do
         local Groupbox = self
         local Container = Groupbox.Container
 
+        --// Se já existe uma Toggle registrada com esse Idx (ex: dialog recriado ao reabrir),
+        --// mantém o Value que ela tinha em vez de resetar para o Default.
+        local ExistingToggle = Toggles[Idx]
+        local InitialValue = Info.Default
+        if ExistingToggle ~= nil and ExistingToggle.Value ~= nil then
+            InitialValue = ExistingToggle.Value
+        end
+
         local Toggle = {
             Text = Info.Text,
-            Value = Info.Default,
+            Value = InitialValue,
 
             Tooltip = Info.Tooltip,
             DisabledTooltip = Info.DisabledTooltip,
@@ -4130,9 +4138,17 @@ do
         local Groupbox = self
         local Container = Groupbox.Container
 
+        --// Se já existe uma Toggle registrada com esse Idx (ex: dialog recriado ao reabrir),
+        --// mantém o Value que ela tinha em vez de resetar para o Default.
+        local ExistingToggle = Toggles[Idx]
+        local InitialValue = Info.Default
+        if ExistingToggle ~= nil and ExistingToggle.Value ~= nil then
+            InitialValue = ExistingToggle.Value
+        end
+
         local Toggle = {
             Text = Info.Text,
-            Value = Info.Default,
+            Value = InitialValue,
 
             Tooltip = Info.Tooltip,
             DisabledTooltip = Info.DisabledTooltip,
@@ -4987,6 +5003,7 @@ do
         )
 
         Dropdown.Menu = MenuTable
+
         do
             local DropdownMenu = MenuTable.Menu
 
