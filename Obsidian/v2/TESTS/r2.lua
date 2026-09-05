@@ -6816,6 +6816,7 @@ function Library:CreateWindow(WindowInfo)
     local BottomBar
     local BottomSeparatorLine
     local FooterLabel
+    local HeaderControls
 
     local InitialLeftWidth = NavigationConfig.SidebarWidth
     local IsCompact = WindowInfo.SidebarCompacted
@@ -7024,7 +7025,7 @@ function Library:CreateWindow(WindowInfo)
         })
 
         --// Header Controls: Search / Minimize / Maximize / Close
-        local HeaderControls = New("Frame", {
+        HeaderControls = New("Frame", {
             AnchorPoint = Vector2.new(1, 0.5),
             BackgroundTransparency = 1,
             Position = UDim2.new(1, -14, 0.5, 0),
@@ -7343,6 +7344,34 @@ function Library:CreateWindow(WindowInfo)
         })
     end
 
+    --// Cinematic Entrance Extras \\--
+    local EntranceBackdrop = New("Frame", {
+        BackgroundColor3 = "DarkColor",
+        BackgroundTransparency = 1,
+        Size = UDim2.fromScale(1, 1),
+        ZIndex = 0,
+        Parent = ScreenGui,
+    })
+
+    local ShineSweep = New("Frame", {
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        BackgroundColor3 = "WhiteColor",
+        BackgroundTransparency = 1,
+        Rotation = 18,
+        Size = UDim2.new(0, 70, 3, 0),
+        Position = UDim2.new(-0.35, 0, 0.5, 0),
+        ZIndex = 50,
+        Parent = MainFrame,
+    })
+    New("UIGradient", {
+        Transparency = NumberSequence.new({
+            NumberSequenceKeypoint.new(0, 1),
+            NumberSequenceKeypoint.new(0.5, 0.62),
+            NumberSequenceKeypoint.new(1, 1),
+        }),
+        Parent = ShineSweep,
+    })
+
     local function PlayWindowEntrance()
         -- Protege contra CreateWindow chamado mais de uma vez: cancela tweens de entrada
         -- anteriores em vez de deixá-los acumular ou rodar em paralelo com os novos.
@@ -7354,22 +7383,79 @@ function Library:CreateWindow(WindowInfo)
         table.clear(Library.ActiveEntranceTweens)
 
         local GoalPosition = MainFrame.Position
-        local StartPosition = GoalPosition + UDim2.fromOffset(0, 14)
+        local StartPosition = GoalPosition + UDim2.fromOffset(0, 22)
+        local BaseScale = Library.DPIScale
 
-        MainFrameScale.Scale = math.max(Library.DPIScale - 0.05, 0.1)
+        MainFrameScale.Scale = math.max(BaseScale - 0.09, 0.1)
         MainFrame.Position = StartPosition
         MainFrame.BackgroundTransparency = 1
         if MainOutline then
             MainOutline.Transparency = 1
+            MainOutline.Thickness = 0
         end
         if MainShadowOutline then
             MainShadowOutline.Transparency = 1
+            MainShadowOutline.Thickness = 0
         end
 
-        local EntranceInfo = TweenInfo.new(0.42, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+        --// Brand pop (ícone + título do header) \\--
+        local TitleGoalPosition = WindowTitle.Position
+        WindowTitle.TextTransparency = 1
+        WindowTitle.Position = TitleGoalPosition + UDim2.fromOffset(0, 4)
 
-        local ScaleTween = TweenService:Create(MainFrameScale, EntranceInfo, { Scale = Library.DPIScale })
-        local FadeTween = TweenService:Create(MainFrame, EntranceInfo, {
+        local IconScale = New("UIScale", { Scale = 0.6, Parent = WindowIcon })
+        if WindowIcon:IsA("ImageLabel") then
+            WindowIcon.ImageTransparency = 1
+        else
+            WindowIcon.TextTransparency = 1
+        end
+
+        --// Botões do header (search / minimize / maximize / close) preparados pro stagger \\--
+        local HeaderButtons = {}
+        if HeaderControls then
+            for _, Btn in ipairs(HeaderControls:GetChildren()) do
+                if Btn:IsA("TextButton") then
+                    local BtnIcon = Btn:FindFirstChildOfClass("ImageLabel")
+                    local BtnScale = New("UIScale", { Scale = 0.4, Parent = Btn })
+
+                    if BtnIcon then
+                        BtnIcon.ImageTransparency = 1
+                    end
+
+                    table.insert(HeaderButtons, { Button = Btn, Icon = BtnIcon, Scale = BtnScale })
+                end
+            end
+        end
+
+        --// Backdrop cinematográfico: escurece rápido e some assim que a janela assenta \\--
+        EntranceBackdrop.BackgroundTransparency = 1
+        local BackdropIn = TweenService:Create(
+            EntranceBackdrop,
+            TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            { BackgroundTransparency = 0.6 }
+        )
+        table.insert(Library.ActiveEntranceTweens, BackdropIn)
+        BackdropIn:Play()
+
+        BackdropIn.Completed:Once(function()
+            if Library.Unloaded then
+                return
+            end
+
+            local BackdropOut = TweenService:Create(
+                EntranceBackdrop,
+                TweenInfo.new(0.55, Enum.EasingStyle.Quad, Enum.EasingDirection.In, 0, false, 0.1),
+                { BackgroundTransparency = 1 }
+            )
+            table.insert(Library.ActiveEntranceTweens, BackdropOut)
+            BackdropOut:Play()
+        end)
+
+        local FadeInfo = TweenInfo.new(0.45, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+        local PopInfo = TweenInfo.new(0.55, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+
+        local ScaleTween = TweenService:Create(MainFrameScale, PopInfo, { Scale = BaseScale })
+        local FadeTween = TweenService:Create(MainFrame, FadeInfo, {
             Position = GoalPosition,
             BackgroundTransparency = 0,
         })
@@ -7380,36 +7466,109 @@ function Library:CreateWindow(WindowInfo)
         FadeTween:Play()
 
         if MainOutline then
-            local T = TweenService:Create(MainOutline, EntranceInfo, { Transparency = 0 })
+            local T = TweenService:Create(MainOutline, FadeInfo, { Transparency = 0, Thickness = 1 })
             table.insert(Library.ActiveEntranceTweens, T)
             T:Play()
         end
         if MainShadowOutline then
-            local T = TweenService:Create(MainShadowOutline, EntranceInfo, { Transparency = 0 })
+            local T = TweenService:Create(MainShadowOutline, FadeInfo, { Transparency = 0, Thickness = 1.5 })
             table.insert(Library.ActiveEntranceTweens, T)
             T:Play()
         end
 
+        --// Revelação da marca, um pouco depois da janela começar a aparecer \\--
+        local BrandInfo = TweenInfo.new(0.32, Enum.EasingStyle.Quint, Enum.EasingDirection.Out, 0, false, 0.12)
+
+        local IconTween = TweenService:Create(IconScale, BrandInfo, { Scale = 1 })
+        local TitleTween = TweenService:Create(WindowTitle, BrandInfo, {
+            Position = TitleGoalPosition,
+            TextTransparency = 0.15,
+        })
+        table.insert(Library.ActiveEntranceTweens, IconTween)
+        table.insert(Library.ActiveEntranceTweens, TitleTween)
+        IconTween:Play()
+        TitleTween:Play()
+
+        if WindowIcon:IsA("ImageLabel") then
+            local T = TweenService:Create(WindowIcon, BrandInfo, { ImageTransparency = 0 })
+            table.insert(Library.ActiveEntranceTweens, T)
+            T:Play()
+        else
+            local T = TweenService:Create(WindowIcon, BrandInfo, { TextTransparency = 0 })
+            table.insert(Library.ActiveEntranceTweens, T)
+            T:Play()
+        end
+
+        IconTween.Completed:Once(function()
+            if IconScale then
+                IconScale:Destroy()
+            end
+        end)
+
+        --// Botões do header entram em cascata, da esquerda pra direita \\--
+        for Index, Entry in ipairs(HeaderButtons) do
+            local Delay = 0.2 + (Index - 1) * 0.045
+            local BtnPopInfo = TweenInfo.new(0.28, Enum.EasingStyle.Back, Enum.EasingDirection.Out, 0, false, Delay)
+
+            local ScaleT = TweenService:Create(Entry.Scale, BtnPopInfo, { Scale = 1 })
+            table.insert(Library.ActiveEntranceTweens, ScaleT)
+            ScaleT:Play()
+
+            if Entry.Icon then
+                local IconInfo = TweenInfo.new(0.28, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, Delay)
+                local IconT = TweenService:Create(Entry.Icon, IconInfo, { ImageTransparency = 0.35 })
+                table.insert(Library.ActiveEntranceTweens, IconT)
+                IconT:Play()
+            end
+
+            ScaleT.Completed:Once(function()
+                if Entry.Scale then
+                    Entry.Scale:Destroy()
+                end
+            end)
+        end
+
         --// Sidebar slide-in
         local TabsGoalPosition = Tabs.Position
-        Tabs.Position = TabsGoalPosition - UDim2.fromOffset(16, 0)
-        local TabsTween = TweenService:Create(Tabs, EntranceInfo, { Position = TabsGoalPosition })
+        Tabs.Position = TabsGoalPosition - UDim2.fromOffset(18, 0)
+        local TabsTween = TweenService:Create(Tabs, FadeInfo, { Position = TabsGoalPosition })
         table.insert(Library.ActiveEntranceTweens, TabsTween)
         TabsTween:Play()
 
         --// Main content fade + move
         local ContainerGoalPosition = Container.Position
-        Container.Position = ContainerGoalPosition + UDim2.fromOffset(0, 10)
-        local ContainerTween = TweenService:Create(Container, EntranceInfo, { Position = ContainerGoalPosition })
+        Container.Position = ContainerGoalPosition + UDim2.fromOffset(0, 12)
+        local ContainerTween = TweenService:Create(Container, FadeInfo, { Position = ContainerGoalPosition })
         table.insert(Library.ActiveEntranceTweens, ContainerTween)
         ContainerTween:Play()
 
-        -- Sequência: chrome da janela → botões das tabs (stagger) → elementos da tab ativa
-        -- (stagger), encadeado por eventos Completed em vez de delays fixos arbitrários.
+        -- Sequência: chrome da janela → sheen de brilho → botões das tabs (stagger) → elementos
+        -- da tab ativa (stagger), encadeado por eventos Completed em vez de delays fixos arbitrários.
         FadeTween.Completed:Once(function()
             if Library.Unloaded then
                 return
             end
+
+            local PrevClips = MainFrame.ClipsDescendants
+            MainFrame.ClipsDescendants = true
+
+            ShineSweep.Position = UDim2.new(-0.35, 0, 0.5, 0)
+            ShineSweep.BackgroundTransparency = 0
+
+            local SweepTween = TweenService:Create(
+                ShineSweep,
+                TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut),
+                { Position = UDim2.new(1.35, 0, 0.5, 0) }
+            )
+            table.insert(Library.ActiveEntranceTweens, SweepTween)
+            SweepTween:Play()
+
+            SweepTween.Completed:Once(function()
+                ShineSweep.BackgroundTransparency = 1
+                if not Library.Unloaded then
+                    MainFrame.ClipsDescendants = PrevClips
+                end
+            end)
 
             local TabsDuration = Library:FlushPendingTabEntrances()
 
