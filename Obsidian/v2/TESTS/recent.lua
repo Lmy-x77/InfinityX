@@ -7355,21 +7355,48 @@ function Library:CreateWindow(WindowInfo)
 
     local ShineSweep = New("Frame", {
         AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundColor3 = "WhiteColor",
         BackgroundTransparency = 1,
-        Rotation = 18,
-        Size = UDim2.new(0, 70, 3, 0),
-        Position = UDim2.new(-0.35, 0, 0.5, 0),
+        Rotation = 20,
+        Size = UDim2.new(0, 150, 3, 0),
+        Position = UDim2.new(-0.4, 0, 0.5, 0),
         ZIndex = 50,
         Parent = MainFrame,
+    })
+
+    local ShineGlow = New("Frame", {
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        BackgroundColor3 = "AccentColor",
+        BackgroundTransparency = 1,
+        Position = UDim2.fromScale(0.5, 0.5),
+        Size = UDim2.fromScale(1, 1),
+        ZIndex = 50,
+        Parent = ShineSweep,
     })
     New("UIGradient", {
         Transparency = NumberSequence.new({
             NumberSequenceKeypoint.new(0, 1),
-            NumberSequenceKeypoint.new(0.5, 0.62),
+            NumberSequenceKeypoint.new(0.5, 0.7),
             NumberSequenceKeypoint.new(1, 1),
         }),
+        Parent = ShineGlow,
+    })
+
+    local ShineCore = New("Frame", {
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        BackgroundColor3 = "WhiteColor",
+        BackgroundTransparency = 1,
+        Position = UDim2.fromScale(0.5, 0.5),
+        Size = UDim2.new(0, 28, 1, 0),
+        ZIndex = 51,
         Parent = ShineSweep,
+    })
+    New("UIGradient", {
+        Transparency = NumberSequence.new({
+            NumberSequenceKeypoint.new(0, 1),
+            NumberSequenceKeypoint.new(0.5, 0.3),
+            NumberSequenceKeypoint.new(1, 1),
+        }),
+        Parent = ShineCore,
     })
 
     local function PlayWindowEntrance()
@@ -7549,22 +7576,33 @@ function Library:CreateWindow(WindowInfo)
                 return
             end
 
+            -- Estima quanto tempo a geração da sidebar + elementos vai levar,
+            -- pra sincronizar a duração do sweep com o "desenhar" da UI.
+            local PendingTabCount = #Library.PendingTabEntrances
+            local PendingElementCount = #Library.PendingEntrances
+            local TabsSpan = math.min(math.max(PendingTabCount - 1, 0) * 0.045, 0.4)
+            local ElementsSpan = math.min(math.max(PendingElementCount - 1, 0) * 0.025, 0.5)
+            local SweepDuration = math.clamp(TabsSpan + ElementsSpan + 0.55, 0.6, 1.8)
+
             local PrevClips = MainFrame.ClipsDescendants
             MainFrame.ClipsDescendants = true
 
-            ShineSweep.Position = UDim2.new(-0.35, 0, 0.5, 0)
-            ShineSweep.BackgroundTransparency = 0
+            ShineSweep.Position = UDim2.new(-0.4, 0, 0.5, 0)
+            ShineSweep.Rotation = 20
+            ShineGlow.BackgroundTransparency = 0
+            ShineCore.BackgroundTransparency = 0
 
             local SweepTween = TweenService:Create(
                 ShineSweep,
-                TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut),
-                { Position = UDim2.new(1.35, 0, 0.5, 0) }
+                TweenInfo.new(SweepDuration, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+                { Position = UDim2.new(1.4, 0, 0.5, 0), Rotation = 26 }
             )
             table.insert(Library.ActiveEntranceTweens, SweepTween)
             SweepTween:Play()
 
             SweepTween.Completed:Once(function()
-                ShineSweep.BackgroundTransparency = 1
+                ShineGlow.BackgroundTransparency = 1
+                ShineCore.BackgroundTransparency = 1
                 if not Library.Unloaded then
                     MainFrame.ClipsDescendants = PrevClips
                 end
