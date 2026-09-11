@@ -4017,7 +4017,19 @@ do
 
                 local SettingsDialog = Library.Window:AddDialog(SettingsIdx, {
                     Title = Info.SettingsTitle or Toggle.Text,
-                    Description = Info.SettingsDescription or "",
+                    Description = Toggle.Text .. " Settings",
+                    AutoDismiss = true,
+                    OutsideClickDismiss = true,
+                    FooterButtons = {
+                        {
+                            Id = "Save",
+                            Title = "Save & Close",
+                            Variant = "Primary",
+                            Callback = function(dialog)
+                                print("Saved!")
+                            end
+                        }
+                    }
                 })
 
                 Library:SafeCallback(Info.Settings, SettingsDialog)
@@ -4277,7 +4289,19 @@ do
 
                 local SettingsDialog = Library.Window:AddDialog(SettingsIdx, {
                     Title = Info.SettingsTitle or Toggle.Text,
-                    Description = Info.SettingsDescription or "",
+                    Description = Toggle.Text .. " Settings",
+                    AutoDismiss = true,
+                    OutsideClickDismiss = true,
+                    FooterButtons = {
+                        {
+                            Id = "Save",
+                            Title = "Save & Close",
+                            Variant = "Primary",
+                            Callback = function(dialog)
+                                print("Saved!")
+                            end
+                        }
+                    }
                 })
 
                 Library:SafeCallback(Info.Settings, SettingsDialog)
