@@ -367,6 +367,7 @@ local Templates = {
         Risky = false,
         Disabled = false,
         Visible = true,
+        Settings = false,
     },
     Input = {
         Text = "Input",
@@ -2312,6 +2313,7 @@ local ResizeIcon = Library:GetIcon("move-diagonal-2")
 local KeyIcon = Library:GetIcon("key")
 local MoveIcon = Library:GetIcon("move")
 local InfoIcon = Library:GetIcon("circle-question-mark") or Library:GetIcon("circle-help") or Library:GetIcon("help-circle")
+local SettingsIcon = Library:GetIcon("settings")
 
 function Library:SetIconModule(module: IconModule)
     FetchIcons = true
@@ -2324,6 +2326,7 @@ function Library:SetIconModule(module: IconModule)
     KeyIcon = Library:GetIcon("key")
     MoveIcon = Library:GetIcon("move")
     InfoIcon = Library:GetIcon("circle-question-mark") or Library:GetIcon("circle-help") or Library:GetIcon("help-circle")
+    SettingsIcon = Library:GetIcon("settings")
 end
 
 local BaseAddons = {}
@@ -3976,6 +3979,63 @@ do
             Parent = Label,
         })
 
+        local SettingsButton
+        if typeof(Info.Settings) == "function" then
+            SettingsButton = New("ImageButton", {
+                BackgroundTransparency = 1,
+                Image = SettingsIcon and SettingsIcon.Url or "",
+                ImageColor3 = "FontColor",
+                ImageRectOffset = SettingsIcon and SettingsIcon.ImageRectOffset or Vector2.zero,
+                ImageRectSize = SettingsIcon and SettingsIcon.ImageRectSize or Vector2.zero,
+                ImageTransparency = 0.5,
+                Size = UDim2.fromOffset(16, 16),
+                Parent = Label,
+            })
+
+            SettingsButton.MouseEnter:Connect(function()
+                if Toggle.Disabled then
+                    return
+                end
+                TweenService:Create(SettingsButton, Library.TweenInfo, { ImageTransparency = 0 }):Play()
+            end)
+            SettingsButton.MouseLeave:Connect(function()
+                if Toggle.Disabled then
+                    return
+                end
+                TweenService:Create(SettingsButton, Library.TweenInfo, { ImageTransparency = 0.5 }):Play()
+            end)
+
+            SettingsButton.MouseButton1Click:Connect(function()
+                if Toggle.Disabled or not Library.Window then
+                    return
+                end
+
+                local SettingsIdx = "__ToggleSettings_" .. tostring(Idx)
+                if Library.Dialogues[SettingsIdx] then
+                    return
+                end
+
+                local SettingsDialog = Library.Window:AddDialog(SettingsIdx, {
+                    Title = Info.SettingsTitle or Toggle.Text,
+                    Description = "Configure" .. Toggle.Text .. " performance and settings",
+                    AutoDismiss = true,
+                    OutsideClickDismiss = true,
+                    FooterButtons = {
+                        {
+                            Id = "Save",
+                            Title = "Save & Close",
+                            Variant = "Primary",
+                            Callback = function(dialog)
+                                print("Saved!")
+                            end
+                        }
+                    }
+                })
+
+                Library:SafeCallback(Info.Settings, SettingsDialog)
+            end)
+        end
+
         local Checkbox = New("Frame", {
             BackgroundColor3 = "MainColor",
             Size = UDim2.fromScale(1, 1),
@@ -4191,6 +4251,63 @@ do
             Parent = Label,
         })
 
+        local SettingsButton
+        if typeof(Info.Settings) == "function" then
+            SettingsButton = New("ImageButton", {
+                BackgroundTransparency = 1,
+                Image = SettingsIcon and SettingsIcon.Url or "",
+                ImageColor3 = "FontColor",
+                ImageRectOffset = SettingsIcon and SettingsIcon.ImageRectOffset or Vector2.zero,
+                ImageRectSize = SettingsIcon and SettingsIcon.ImageRectSize or Vector2.zero,
+                ImageTransparency = 0.5,
+                Size = UDim2.fromOffset(16, 16),
+                Parent = Label,
+            })
+
+            SettingsButton.MouseEnter:Connect(function()
+                if Toggle.Disabled then
+                    return
+                end
+                TweenService:Create(SettingsButton, Library.TweenInfo, { ImageTransparency = 0 }):Play()
+            end)
+            SettingsButton.MouseLeave:Connect(function()
+                if Toggle.Disabled then
+                    return
+                end
+                TweenService:Create(SettingsButton, Library.TweenInfo, { ImageTransparency = 0.5 }):Play()
+            end)
+
+            SettingsButton.MouseButton1Click:Connect(function()
+                if Toggle.Disabled or not Library.Window then
+                    return
+                end
+
+                local SettingsIdx = "__ToggleSettings_" .. tostring(Idx)
+                if Library.Dialogues[SettingsIdx] then
+                    return
+                end
+
+                local SettingsDialog = Library.Window:AddDialog(SettingsIdx, {
+                    Title = Info.SettingsTitle or Toggle.Text,
+                    Description = "Configure" .. Toggle.Text .. " performance and settings",
+                    AutoDismiss = true,
+                    OutsideClickDismiss = true,
+                    FooterButtons = {
+                        {
+                            Id = "Save",
+                            Title = "Save & Close",
+                            Variant = "Primary",
+                            Callback = function(dialog)
+                                print("Saved!")
+                            end
+                        }
+                    }
+                })
+
+                Library:SafeCallback(Info.Settings, SettingsDialog)
+            end)
+        end
+
         local Switch = New("Frame", {
             AnchorPoint = Vector2.new(1, 0),
             BackgroundColor3 = "MainColor",
@@ -4274,24 +4391,26 @@ do
             Toggle.Changed = Func
         end
 
-        function Toggle:SetValue(Value)
-            if Toggle.Disabled then
-                return
-            end
+        function Toggle:SetDisabled(Disabled: boolean)
+            Toggle.Disabled = Disabled
 
-            Toggle.Value = Value
-            Toggle:Display()
+            if Toggle.TooltipTable then
+                Toggle.TooltipTable.Disabled = Toggle.Disabled
+            end
 
             for _, Addon in Toggle.Addons do
                 if Addon.Type == "KeyPicker" and Addon.SyncToggleState then
-                    Addon.Toggled = Toggle.Value
                     Addon:Update()
                 end
             end
 
-            Library:UpdateDependencyBoxes()
-            Library:SafeCallback(Toggle.Callback, Toggle.Value)
-            Library:SafeCallback(Toggle.Changed, Toggle.Value)
+            if SettingsButton then
+                SettingsButton.Active = not Toggle.Disabled
+                SettingsButton.ImageTransparency = Toggle.Disabled and 0.85 or 0.5
+            end
+
+            Button.Active = not Toggle.Disabled
+            Toggle:Display()
         end
 
         function Toggle:SetDisabled(Disabled: boolean)
@@ -4532,9 +4651,15 @@ do
         local Groupbox = self
         local Container = Groupbox.Container
 
+        local ExistingSlider = Options[Idx]
+        local InitialSliderValue = Info.Default
+        if ExistingSlider ~= nil and ExistingSlider.Value ~= nil then
+            InitialSliderValue = ExistingSlider.Value
+        end
+
         local Slider = {
             Text = Info.Text,
-            Value = Info.Default,
+            Value = InitialSliderValue,
 
             Min = Info.Min,
             Max = Info.Max,
@@ -4798,6 +4923,8 @@ do
             Info.Values = GetTeams()
             Info.AllowNull = true
         end
+
+        local ExistingDropdown = Options[Idx]
 
         local Dropdown = {
             Text = typeof(Info.Text) == "string" and Info.Text or nil,
@@ -5366,6 +5493,16 @@ do
                 if not Info.Multi then
                     break
                 end
+            end
+        end
+
+        if ExistingDropdown ~= nil and ExistingDropdown.Value ~= nil then
+            if Info.Multi then
+                if typeof(ExistingDropdown.Value) == "table" then
+                    Dropdown.Value = ExistingDropdown.Value
+                end
+            elseif table.find(Dropdown.Values, ExistingDropdown.Value) then
+                Dropdown.Value = ExistingDropdown.Value
             end
         end
 
@@ -10341,6 +10478,8 @@ do
 
         InfoTabButton.MouseButton1Click:Connect(InfoTab.Show)
     end
+
+    Library.Window = Window
 
     return Window
 end
