@@ -4391,6 +4391,26 @@ do
             Toggle.Changed = Func
         end
 
+        function Toggle:SetValue(Value)
+            if Toggle.Disabled then
+                return
+            end
+
+            Toggle.Value = Value
+            Toggle:Display()
+
+            for _, Addon in Toggle.Addons do
+                if Addon.Type == "KeyPicker" and Addon.SyncToggleState then
+                    Addon.Toggled = Toggle.Value
+                    Addon:Update()
+                end
+            end
+
+            Library:UpdateDependencyBoxes()
+            Library:SafeCallback(Toggle.Callback, Toggle.Value)
+            Library:SafeCallback(Toggle.Changed, Toggle.Value)
+        end
+
         function Toggle:SetDisabled(Disabled: boolean)
             Toggle.Disabled = Disabled
 
@@ -4407,23 +4427,6 @@ do
             if SettingsButton then
                 SettingsButton.Active = not Toggle.Disabled
                 SettingsButton.ImageTransparency = Toggle.Disabled and 0.85 or 0.5
-            end
-
-            Button.Active = not Toggle.Disabled
-            Toggle:Display()
-        end
-
-        function Toggle:SetDisabled(Disabled: boolean)
-            Toggle.Disabled = Disabled
-
-            if Toggle.TooltipTable then
-                Toggle.TooltipTable.Disabled = Toggle.Disabled
-            end
-
-            for _, Addon in Toggle.Addons do
-                if Addon.Type == "KeyPicker" and Addon.SyncToggleState then
-                    Addon:Update()
-                end
             end
 
             Button.Active = not Toggle.Disabled
