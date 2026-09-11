@@ -4017,7 +4017,7 @@ do
 
                 local SettingsDialog = Library.Window:AddDialog(SettingsIdx, {
                     Title = Info.SettingsTitle or Toggle.Text,
-                    Description = "Configure" .. Toggle.Text .. " performance and settings",
+                    Description = "Configure " .. Toggle.Text .. " performance and settings",
                     AutoDismiss = true,
                     OutsideClickDismiss = true,
                     FooterButtons = {
@@ -4289,7 +4289,7 @@ do
 
                 local SettingsDialog = Library.Window:AddDialog(SettingsIdx, {
                     Title = Info.SettingsTitle or Toggle.Text,
-                    Description = "Configure" .. Toggle.Text .. " performance and settings",
+                    Description = "Configure " .. Toggle.Text .. " performance and settings",
                     AutoDismiss = true,
                     OutsideClickDismiss = true,
                     FooterButtons = {
