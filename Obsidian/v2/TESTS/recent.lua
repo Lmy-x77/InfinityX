@@ -367,6 +367,7 @@ local Templates = {
         Risky = false,
         Disabled = false,
         Visible = true,
+        Settings = false,
     },
     Input = {
         Text = "Input",
@@ -2312,6 +2313,7 @@ local ResizeIcon = Library:GetIcon("move-diagonal-2")
 local KeyIcon = Library:GetIcon("key")
 local MoveIcon = Library:GetIcon("move")
 local InfoIcon = Library:GetIcon("circle-question-mark") or Library:GetIcon("circle-help") or Library:GetIcon("help-circle")
+local SettingsIcon = Library:GetIcon("settings")
 
 function Library:SetIconModule(module: IconModule)
     FetchIcons = true
@@ -2324,6 +2326,7 @@ function Library:SetIconModule(module: IconModule)
     KeyIcon = Library:GetIcon("key")
     MoveIcon = Library:GetIcon("move")
     InfoIcon = Library:GetIcon("circle-question-mark") or Library:GetIcon("circle-help") or Library:GetIcon("help-circle")
+    SettingsIcon = Library:GetIcon("settings")
 end
 
 local BaseAddons = {}
@@ -3976,6 +3979,51 @@ do
             Parent = Label,
         })
 
+        local SettingsButton
+        if typeof(Info.Settings) == "function" then
+            SettingsButton = New("ImageButton", {
+                BackgroundTransparency = 1,
+                Image = SettingsIcon and SettingsIcon.Url or "",
+                ImageColor3 = "FontColor",
+                ImageRectOffset = SettingsIcon and SettingsIcon.ImageRectOffset or Vector2.zero,
+                ImageRectSize = SettingsIcon and SettingsIcon.ImageRectSize or Vector2.zero,
+                ImageTransparency = 0.5,
+                Size = UDim2.fromOffset(16, 16),
+                Parent = Label,
+            })
+
+            SettingsButton.MouseEnter:Connect(function()
+                if Toggle.Disabled then
+                    return
+                end
+                TweenService:Create(SettingsButton, Library.TweenInfo, { ImageTransparency = 0 }):Play()
+            end)
+            SettingsButton.MouseLeave:Connect(function()
+                if Toggle.Disabled then
+                    return
+                end
+                TweenService:Create(SettingsButton, Library.TweenInfo, { ImageTransparency = 0.5 }):Play()
+            end)
+
+            SettingsButton.MouseButton1Click:Connect(function()
+                if Toggle.Disabled or not Library.Window then
+                    return
+                end
+
+                local SettingsIdx = "__ToggleSettings_" .. tostring(Idx)
+                if Library.Dialogues[SettingsIdx] then
+                    return
+                end
+
+                local SettingsDialog = Library.Window:AddDialog(SettingsIdx, {
+                    Title = Info.SettingsTitle or Toggle.Text,
+                    Description = Info.SettingsDescription or "",
+                })
+
+                Library:SafeCallback(Info.Settings, SettingsDialog)
+            end)
+        end
+
         local Checkbox = New("Frame", {
             BackgroundColor3 = "MainColor",
             Size = UDim2.fromScale(1, 1),
@@ -4191,6 +4239,51 @@ do
             Parent = Label,
         })
 
+        local SettingsButton
+        if typeof(Info.Settings) == "function" then
+            SettingsButton = New("ImageButton", {
+                BackgroundTransparency = 1,
+                Image = SettingsIcon and SettingsIcon.Url or "",
+                ImageColor3 = "FontColor",
+                ImageRectOffset = SettingsIcon and SettingsIcon.ImageRectOffset or Vector2.zero,
+                ImageRectSize = SettingsIcon and SettingsIcon.ImageRectSize or Vector2.zero,
+                ImageTransparency = 0.5,
+                Size = UDim2.fromOffset(16, 16),
+                Parent = Label,
+            })
+
+            SettingsButton.MouseEnter:Connect(function()
+                if Toggle.Disabled then
+                    return
+                end
+                TweenService:Create(SettingsButton, Library.TweenInfo, { ImageTransparency = 0 }):Play()
+            end)
+            SettingsButton.MouseLeave:Connect(function()
+                if Toggle.Disabled then
+                    return
+                end
+                TweenService:Create(SettingsButton, Library.TweenInfo, { ImageTransparency = 0.5 }):Play()
+            end)
+
+            SettingsButton.MouseButton1Click:Connect(function()
+                if Toggle.Disabled or not Library.Window then
+                    return
+                end
+
+                local SettingsIdx = "__ToggleSettings_" .. tostring(Idx)
+                if Library.Dialogues[SettingsIdx] then
+                    return
+                end
+
+                local SettingsDialog = Library.Window:AddDialog(SettingsIdx, {
+                    Title = Info.SettingsTitle or Toggle.Text,
+                    Description = Info.SettingsDescription or "",
+                })
+
+                Library:SafeCallback(Info.Settings, SettingsDialog)
+            end)
+        end
+
         local Switch = New("Frame", {
             AnchorPoint = Vector2.new(1, 0),
             BackgroundColor3 = "MainColor",
@@ -4274,24 +4367,26 @@ do
             Toggle.Changed = Func
         end
 
-        function Toggle:SetValue(Value)
-            if Toggle.Disabled then
-                return
-            end
+        function Toggle:SetDisabled(Disabled: boolean)
+            Toggle.Disabled = Disabled
 
-            Toggle.Value = Value
-            Toggle:Display()
+            if Toggle.TooltipTable then
+                Toggle.TooltipTable.Disabled = Toggle.Disabled
+            end
 
             for _, Addon in Toggle.Addons do
                 if Addon.Type == "KeyPicker" and Addon.SyncToggleState then
-                    Addon.Toggled = Toggle.Value
                     Addon:Update()
                 end
             end
 
-            Library:UpdateDependencyBoxes()
-            Library:SafeCallback(Toggle.Callback, Toggle.Value)
-            Library:SafeCallback(Toggle.Changed, Toggle.Value)
+            if SettingsButton then
+                SettingsButton.Active = not Toggle.Disabled
+                SettingsButton.ImageTransparency = Toggle.Disabled and 0.85 or 0.5
+            end
+
+            Button.Active = not Toggle.Disabled
+            Toggle:Display()
         end
 
         function Toggle:SetDisabled(Disabled: boolean)
@@ -4532,9 +4627,15 @@ do
         local Groupbox = self
         local Container = Groupbox.Container
 
+        local ExistingSlider = Options[Idx]
+        local InitialSliderValue = Info.Default
+        if ExistingSlider ~= nil and ExistingSlider.Value ~= nil then
+            InitialSliderValue = ExistingSlider.Value
+        end
+
         local Slider = {
             Text = Info.Text,
-            Value = Info.Default,
+            Value = InitialSliderValue,
 
             Min = Info.Min,
             Max = Info.Max,
@@ -4798,6 +4899,8 @@ do
             Info.Values = GetTeams()
             Info.AllowNull = true
         end
+
+        local ExistingDropdown = Options[Idx]
 
         local Dropdown = {
             Text = typeof(Info.Text) == "string" and Info.Text or nil,
@@ -5366,6 +5469,16 @@ do
                 if not Info.Multi then
                     break
                 end
+            end
+        end
+
+        if ExistingDropdown ~= nil and ExistingDropdown.Value ~= nil then
+            if Info.Multi then
+                if typeof(ExistingDropdown.Value) == "table" then
+                    Dropdown.Value = ExistingDropdown.Value
+                end
+            elseif table.find(Dropdown.Values, ExistingDropdown.Value) then
+                Dropdown.Value = ExistingDropdown.Value
             end
         end
 
@@ -6816,7 +6929,6 @@ function Library:CreateWindow(WindowInfo)
     local BottomBar
     local BottomSeparatorLine
     local FooterLabel
-    local HeaderControls
 
     local InitialLeftWidth = NavigationConfig.SidebarWidth
     local IsCompact = WindowInfo.SidebarCompacted
@@ -7025,7 +7137,7 @@ function Library:CreateWindow(WindowInfo)
         })
 
         --// Header Controls: Search / Minimize / Maximize / Close
-        HeaderControls = New("Frame", {
+        local HeaderControls = New("Frame", {
             AnchorPoint = Vector2.new(1, 0.5),
             BackgroundTransparency = 1,
             Position = UDim2.new(1, -14, 0.5, 0),
@@ -7344,61 +7456,6 @@ function Library:CreateWindow(WindowInfo)
         })
     end
 
-    --// Cinematic Entrance Extras \\--
-    local EntranceBackdrop = New("Frame", {
-        BackgroundColor3 = "DarkColor",
-        BackgroundTransparency = 1,
-        Size = UDim2.fromScale(1, 1),
-        ZIndex = 0,
-        Parent = ScreenGui,
-    })
-
-    local ShineSweep = New("Frame", {
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundTransparency = 1,
-        Rotation = 20,
-        Size = UDim2.new(0, 150, 3, 0),
-        Position = UDim2.new(-0.4, 0, 0.5, 0),
-        ZIndex = 50,
-        Parent = MainFrame,
-    })
-
-    local ShineGlow = New("Frame", {
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundColor3 = "AccentColor",
-        BackgroundTransparency = 1,
-        Position = UDim2.fromScale(0.5, 0.5),
-        Size = UDim2.fromScale(1, 1),
-        ZIndex = 50,
-        Parent = ShineSweep,
-    })
-    New("UIGradient", {
-        Transparency = NumberSequence.new({
-            NumberSequenceKeypoint.new(0, 1),
-            NumberSequenceKeypoint.new(0.5, 0.7),
-            NumberSequenceKeypoint.new(1, 1),
-        }),
-        Parent = ShineGlow,
-    })
-
-    local ShineCore = New("Frame", {
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundColor3 = "WhiteColor",
-        BackgroundTransparency = 1,
-        Position = UDim2.fromScale(0.5, 0.5),
-        Size = UDim2.new(0, 28, 1, 0),
-        ZIndex = 51,
-        Parent = ShineSweep,
-    })
-    New("UIGradient", {
-        Transparency = NumberSequence.new({
-            NumberSequenceKeypoint.new(0, 1),
-            NumberSequenceKeypoint.new(0.5, 0.3),
-            NumberSequenceKeypoint.new(1, 1),
-        }),
-        Parent = ShineCore,
-    })
-
     local function PlayWindowEntrance()
         -- Protege contra CreateWindow chamado mais de uma vez: cancela tweens de entrada
         -- anteriores em vez de deixá-los acumular ou rodar em paralelo com os novos.
@@ -7410,79 +7467,22 @@ function Library:CreateWindow(WindowInfo)
         table.clear(Library.ActiveEntranceTweens)
 
         local GoalPosition = MainFrame.Position
-        local StartPosition = GoalPosition + UDim2.fromOffset(0, 22)
-        local BaseScale = Library.DPIScale
+        local StartPosition = GoalPosition + UDim2.fromOffset(0, 14)
 
-        MainFrameScale.Scale = math.max(BaseScale - 0.09, 0.1)
+        MainFrameScale.Scale = math.max(Library.DPIScale - 0.05, 0.1)
         MainFrame.Position = StartPosition
         MainFrame.BackgroundTransparency = 1
         if MainOutline then
             MainOutline.Transparency = 1
-            MainOutline.Thickness = 0
         end
         if MainShadowOutline then
             MainShadowOutline.Transparency = 1
-            MainShadowOutline.Thickness = 0
         end
 
-        --// Brand pop (ícone + título do header) \\--
-        local TitleGoalPosition = WindowTitle.Position
-        WindowTitle.TextTransparency = 1
-        WindowTitle.Position = TitleGoalPosition + UDim2.fromOffset(0, 4)
+        local EntranceInfo = TweenInfo.new(0.42, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
 
-        local IconScale = New("UIScale", { Scale = 0.6, Parent = WindowIcon })
-        if WindowIcon:IsA("ImageLabel") then
-            WindowIcon.ImageTransparency = 1
-        else
-            WindowIcon.TextTransparency = 1
-        end
-
-        --// Botões do header (search / minimize / maximize / close) preparados pro stagger \\--
-        local HeaderButtons = {}
-        if HeaderControls then
-            for _, Btn in ipairs(HeaderControls:GetChildren()) do
-                if Btn:IsA("TextButton") then
-                    local BtnIcon = Btn:FindFirstChildOfClass("ImageLabel")
-                    local BtnScale = New("UIScale", { Scale = 0.4, Parent = Btn })
-
-                    if BtnIcon then
-                        BtnIcon.ImageTransparency = 1
-                    end
-
-                    table.insert(HeaderButtons, { Button = Btn, Icon = BtnIcon, Scale = BtnScale })
-                end
-            end
-        end
-
-        --// Backdrop cinematográfico: escurece rápido e some assim que a janela assenta \\--
-        EntranceBackdrop.BackgroundTransparency = 1
-        local BackdropIn = TweenService:Create(
-            EntranceBackdrop,
-            TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-            { BackgroundTransparency = 0.6 }
-        )
-        table.insert(Library.ActiveEntranceTweens, BackdropIn)
-        BackdropIn:Play()
-
-        BackdropIn.Completed:Once(function()
-            if Library.Unloaded then
-                return
-            end
-
-            local BackdropOut = TweenService:Create(
-                EntranceBackdrop,
-                TweenInfo.new(0.55, Enum.EasingStyle.Quad, Enum.EasingDirection.In, 0, false, 0.1),
-                { BackgroundTransparency = 1 }
-            )
-            table.insert(Library.ActiveEntranceTweens, BackdropOut)
-            BackdropOut:Play()
-        end)
-
-        local FadeInfo = TweenInfo.new(0.45, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-        local PopInfo = TweenInfo.new(0.55, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-
-        local ScaleTween = TweenService:Create(MainFrameScale, PopInfo, { Scale = BaseScale })
-        local FadeTween = TweenService:Create(MainFrame, FadeInfo, {
+        local ScaleTween = TweenService:Create(MainFrameScale, EntranceInfo, { Scale = Library.DPIScale })
+        local FadeTween = TweenService:Create(MainFrame, EntranceInfo, {
             Position = GoalPosition,
             BackgroundTransparency = 0,
         })
@@ -7493,120 +7493,36 @@ function Library:CreateWindow(WindowInfo)
         FadeTween:Play()
 
         if MainOutline then
-            local T = TweenService:Create(MainOutline, FadeInfo, { Transparency = 0, Thickness = 1 })
+            local T = TweenService:Create(MainOutline, EntranceInfo, { Transparency = 0 })
             table.insert(Library.ActiveEntranceTweens, T)
             T:Play()
         end
         if MainShadowOutline then
-            local T = TweenService:Create(MainShadowOutline, FadeInfo, { Transparency = 0, Thickness = 1.5 })
+            local T = TweenService:Create(MainShadowOutline, EntranceInfo, { Transparency = 0 })
             table.insert(Library.ActiveEntranceTweens, T)
             T:Play()
-        end
-
-        --// Revelação da marca, um pouco depois da janela começar a aparecer \\--
-        local BrandInfo = TweenInfo.new(0.32, Enum.EasingStyle.Quint, Enum.EasingDirection.Out, 0, false, 0.12)
-
-        local IconTween = TweenService:Create(IconScale, BrandInfo, { Scale = 1 })
-        local TitleTween = TweenService:Create(WindowTitle, BrandInfo, {
-            Position = TitleGoalPosition,
-            TextTransparency = 0.15,
-        })
-        table.insert(Library.ActiveEntranceTweens, IconTween)
-        table.insert(Library.ActiveEntranceTweens, TitleTween)
-        IconTween:Play()
-        TitleTween:Play()
-
-        if WindowIcon:IsA("ImageLabel") then
-            local T = TweenService:Create(WindowIcon, BrandInfo, { ImageTransparency = 0 })
-            table.insert(Library.ActiveEntranceTweens, T)
-            T:Play()
-        else
-            local T = TweenService:Create(WindowIcon, BrandInfo, { TextTransparency = 0 })
-            table.insert(Library.ActiveEntranceTweens, T)
-            T:Play()
-        end
-
-        IconTween.Completed:Once(function()
-            if IconScale then
-                IconScale:Destroy()
-            end
-        end)
-
-        --// Botões do header entram em cascata, da esquerda pra direita \\--
-        for Index, Entry in ipairs(HeaderButtons) do
-            local Delay = 0.2 + (Index - 1) * 0.045
-            local BtnPopInfo = TweenInfo.new(0.28, Enum.EasingStyle.Back, Enum.EasingDirection.Out, 0, false, Delay)
-
-            local ScaleT = TweenService:Create(Entry.Scale, BtnPopInfo, { Scale = 1 })
-            table.insert(Library.ActiveEntranceTweens, ScaleT)
-            ScaleT:Play()
-
-            if Entry.Icon then
-                local IconInfo = TweenInfo.new(0.28, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, Delay)
-                local IconT = TweenService:Create(Entry.Icon, IconInfo, { ImageTransparency = 0.35 })
-                table.insert(Library.ActiveEntranceTweens, IconT)
-                IconT:Play()
-            end
-
-            ScaleT.Completed:Once(function()
-                if Entry.Scale then
-                    Entry.Scale:Destroy()
-                end
-            end)
         end
 
         --// Sidebar slide-in
         local TabsGoalPosition = Tabs.Position
-        Tabs.Position = TabsGoalPosition - UDim2.fromOffset(18, 0)
-        local TabsTween = TweenService:Create(Tabs, FadeInfo, { Position = TabsGoalPosition })
+        Tabs.Position = TabsGoalPosition - UDim2.fromOffset(16, 0)
+        local TabsTween = TweenService:Create(Tabs, EntranceInfo, { Position = TabsGoalPosition })
         table.insert(Library.ActiveEntranceTweens, TabsTween)
         TabsTween:Play()
 
         --// Main content fade + move
         local ContainerGoalPosition = Container.Position
-        Container.Position = ContainerGoalPosition + UDim2.fromOffset(0, 12)
-        local ContainerTween = TweenService:Create(Container, FadeInfo, { Position = ContainerGoalPosition })
+        Container.Position = ContainerGoalPosition + UDim2.fromOffset(0, 10)
+        local ContainerTween = TweenService:Create(Container, EntranceInfo, { Position = ContainerGoalPosition })
         table.insert(Library.ActiveEntranceTweens, ContainerTween)
         ContainerTween:Play()
 
-        -- Sequência: chrome da janela → sheen de brilho → botões das tabs (stagger) → elementos
-        -- da tab ativa (stagger), encadeado por eventos Completed em vez de delays fixos arbitrários.
+        -- Sequência: chrome da janela → botões das tabs (stagger) → elementos da tab ativa
+        -- (stagger), encadeado por eventos Completed em vez de delays fixos arbitrários.
         FadeTween.Completed:Once(function()
             if Library.Unloaded then
                 return
             end
-
-            -- Estima quanto tempo a geração da sidebar + elementos vai levar,
-            -- pra sincronizar a duração do sweep com o "desenhar" da UI.
-            local PendingTabCount = #Library.PendingTabEntrances
-            local PendingElementCount = #Library.PendingEntrances
-            local TabsSpan = math.min(math.max(PendingTabCount - 1, 0) * 0.045, 0.4)
-            local ElementsSpan = math.min(math.max(PendingElementCount - 1, 0) * 0.025, 0.5)
-            local SweepDuration = math.clamp(TabsSpan + ElementsSpan + 0.55, 0.6, 1.8)
-
-            local PrevClips = MainFrame.ClipsDescendants
-            MainFrame.ClipsDescendants = true
-
-            ShineSweep.Position = UDim2.new(-0.4, 0, 0.5, 0)
-            ShineSweep.Rotation = 20
-            ShineGlow.BackgroundTransparency = 0
-            ShineCore.BackgroundTransparency = 0
-
-            local SweepTween = TweenService:Create(
-                ShineSweep,
-                TweenInfo.new(SweepDuration, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
-                { Position = UDim2.new(1.4, 0, 0.5, 0), Rotation = 26 }
-            )
-            table.insert(Library.ActiveEntranceTweens, SweepTween)
-            SweepTween:Play()
-
-            SweepTween.Completed:Once(function()
-                ShineGlow.BackgroundTransparency = 1
-                ShineCore.BackgroundTransparency = 1
-                if not Library.Unloaded then
-                    MainFrame.ClipsDescendants = PrevClips
-                end
-            end)
 
             local TabsDuration = Library:FlushPendingTabEntrances()
 
@@ -10538,6 +10454,8 @@ do
 
         InfoTabButton.MouseButton1Click:Connect(InfoTab.Show)
     end
+
+    Library.Window = Window
 
     return Window
 end
