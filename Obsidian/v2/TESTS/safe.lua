@@ -4017,7 +4017,7 @@ do
 
                 local SettingsDialog = Library.Window:AddDialog(SettingsIdx, {
                     Title = Info.SettingsTitle or Toggle.Text,
-                    Description = Toggle.Text .. " Settings",
+                    Description = "Configure " .. Toggle.Text .. " performance and settings",
                     AutoDismiss = true,
                     OutsideClickDismiss = true,
                     FooterButtons = {
@@ -4289,7 +4289,7 @@ do
 
                 local SettingsDialog = Library.Window:AddDialog(SettingsIdx, {
                     Title = Info.SettingsTitle or Toggle.Text,
-                    Description = Toggle.Text .. " Settings",
+                    Description = "Configure " .. Toggle.Text .. " performance and settings",
                     AutoDismiss = true,
                     OutsideClickDismiss = true,
                     FooterButtons = {
@@ -4391,6 +4391,26 @@ do
             Toggle.Changed = Func
         end
 
+        function Toggle:SetValue(Value)
+            if Toggle.Disabled then
+                return
+            end
+
+            Toggle.Value = Value
+            Toggle:Display()
+
+            for _, Addon in Toggle.Addons do
+                if Addon.Type == "KeyPicker" and Addon.SyncToggleState then
+                    Addon.Toggled = Toggle.Value
+                    Addon:Update()
+                end
+            end
+
+            Library:UpdateDependencyBoxes()
+            Library:SafeCallback(Toggle.Callback, Toggle.Value)
+            Library:SafeCallback(Toggle.Changed, Toggle.Value)
+        end
+
         function Toggle:SetDisabled(Disabled: boolean)
             Toggle.Disabled = Disabled
 
@@ -4407,23 +4427,6 @@ do
             if SettingsButton then
                 SettingsButton.Active = not Toggle.Disabled
                 SettingsButton.ImageTransparency = Toggle.Disabled and 0.85 or 0.5
-            end
-
-            Button.Active = not Toggle.Disabled
-            Toggle:Display()
-        end
-
-        function Toggle:SetDisabled(Disabled: boolean)
-            Toggle.Disabled = Disabled
-
-            if Toggle.TooltipTable then
-                Toggle.TooltipTable.Disabled = Toggle.Disabled
-            end
-
-            for _, Addon in Toggle.Addons do
-                if Addon.Type == "KeyPicker" and Addon.SyncToggleState then
-                    Addon:Update()
-                end
             end
 
             Button.Active = not Toggle.Disabled
@@ -8446,8 +8449,14 @@ function Library:CreateWindow(WindowInfo)
                 Parent = BoxHolder,
             })
 
+            local TabboxHeaderHeight = 44
+            local TrackInset = 6
+            local TrackPad = 3
+
             local TabboxHolder
+            local TabboxTrack
             local TabboxButtons
+            local Highlight
 
             do
                 TabboxHolder = New("Frame", {
@@ -8466,19 +8475,62 @@ function Library:CreateWindow(WindowInfo)
                 )
                 Library:AddOutline(TabboxHolder)
 
-                TabboxButtons = New("Frame", {
-                    BackgroundTransparency = 1,
-                    Size = UDim2.new(1, 0, 0, 34),
+                --// Trilha recuada que guarda os botões das abas
+                TabboxTrack = New("Frame", {
+                    BackgroundColor3 = function()
+                        return Library:GetBetterColor(Library.Scheme.BackgroundColor, -1)
+                    end,
+                    Position = UDim2.fromOffset(TrackInset, TrackInset),
+                    Size = UDim2.new(1, -TrackInset * 2, 0, TabboxHeaderHeight - TrackInset * 2),
                     Parent = TabboxHolder,
+                })
+                table.insert(
+                    Library.Corners,
+                    New("UICorner", {
+                        CornerRadius = UDim.new(0, Library.CornerRadius / 2),
+                        Parent = TabboxTrack,
+                    })
+                )
+                Library:AddOutline(TabboxTrack)
+
+                --// Pill que desliza até a aba ativa
+                Highlight = New("Frame", {
+                    BackgroundColor3 = "AccentColor",
+                    BackgroundTransparency = 0.82,
+                    Position = UDim2.fromOffset(TrackPad, TrackPad),
+                    Size = UDim2.new(0, 0, 1, -TrackPad * 2),
+                    ZIndex = 2,
+                    Parent = TabboxTrack,
+                })
+                table.insert(
+                    Library.Corners,
+                    New("UICorner", {
+                        CornerRadius = UDim.new(0, Library.CornerRadius / 2),
+                        Parent = Highlight,
+                    })
+                )
+
+                TabboxButtons = New("Frame", {
+                    AutomaticSize = Enum.AutomaticSize.X,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.fromOffset(TrackPad, TrackPad),
+                    Size = UDim2.new(0, 0, 1, -TrackPad * 2),
+                    ZIndex = 3,
+                    Parent = TabboxTrack,
                 })
                 New("UIListLayout", {
                     FillDirection = Enum.FillDirection.Horizontal,
-                    HorizontalFlex = Enum.UIFlexAlignment.Fill,
+                    VerticalAlignment = Enum.VerticalAlignment.Center,
+                    Padding = UDim.new(0, 2),
                     Parent = TabboxButtons,
+                })
+
+                Library:MakeLine(TabboxHolder, {
+                    Position = UDim2.fromOffset(0, TabboxHeaderHeight),
+                    Size = UDim2.new(1, 0, 0, 1),
                 })
             end
 
-            local TotalButtons, TotalTabs = 0, 1
             local Tabbox = {
                 ActiveTab = nil,
 
@@ -8493,19 +8545,42 @@ function Library:CreateWindow(WindowInfo)
                 end
             end
 
+            local TabAnim = TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+            local HighlightAnim = TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+            function Tabbox:MoveHighlight(Button, SkipAnim)
+                task.defer(function()
+                    if not (Button and Button.Parent) then
+                        return
+                    end
+
+                    local TargetPos = UDim2.new(0, TabboxButtons.Position.X.Offset + Button.Position.X.Offset, 0, TrackPad)
+                    local TargetSize = UDim2.new(0, Button.AbsoluteSize.X, 1, -TrackPad * 2)
+
+                    if SkipAnim then
+                        Highlight.Position = TargetPos
+                        Highlight.Size = TargetSize
+                    else
+                        TweenService:Create(Highlight, HighlightAnim, { Position = TargetPos, Size = TargetSize }):Play()
+                    end
+                end)
+            end
+
             function Tabbox:AddTab(Name, IconName)
-                local TabIndex = TotalTabs
-
-                TotalButtons = TotalButtons + 1
-                TotalTabs = TotalTabs + 1
-
                 local BoxIcon = Library:GetCustomIcon(IconName)
 
                 local Button = New("TextButton", {
+                    AutomaticSize = Enum.AutomaticSize.X,
                     BackgroundTransparency = 1,
-                    Size = UDim2.fromOffset(0, 34),
+                    Size = UDim2.new(0, 0, 1, 0),
                     Text = "",
+                    ZIndex = 3,
                     Parent = TabboxButtons,
+                })
+                New("UIPadding", {
+                    PaddingLeft = UDim.new(0, 12),
+                    PaddingRight = UDim.new(0, 12),
+                    Parent = Button,
                 })
 
                 local ButtonContent = New("Frame", {
@@ -8520,7 +8595,7 @@ function Library:CreateWindow(WindowInfo)
                     FillDirection = Enum.FillDirection.Horizontal,
                     HorizontalAlignment = Enum.HorizontalAlignment.Center,
                     VerticalAlignment = Enum.VerticalAlignment.Center,
-                    Padding = UDim.new(0, 8),
+                    Padding = UDim.new(0, 6),
                     Parent = ButtonContent,
                 })
 
@@ -8532,7 +8607,7 @@ function Library:CreateWindow(WindowInfo)
                         ImageRectOffset = BoxIcon.ImageRectOffset,
                         ImageRectSize = BoxIcon.ImageRectSize,
                         ImageTransparency = 0.5,
-                        Size = UDim2.fromOffset(16, 16),
+                        Size = UDim2.fromOffset(14, 14),
                         Parent = ButtonContent,
                     })
                 end
@@ -8542,38 +8617,15 @@ function Library:CreateWindow(WindowInfo)
                     BackgroundTransparency = 1,
                     Size = UDim2.fromOffset(0, 16),
                     Text = Name,
-                    TextSize = 15,
+                    TextSize = 14,
                     TextTransparency = 0.5,
                     Parent = ButtonContent,
                 })
 
-                -- Accent indicator bar at the bottom of the button
-                local Indicator = New("Frame", {
-                    AnchorPoint = Vector2.new(0.5, 1),
-                    BackgroundColor3 = "AccentColor",
-                    BackgroundTransparency = 1,
-                    Position = UDim2.new(0.5, 0, 1, -1),
-                    Size = UDim2.new(0.5, 0, 0, 2),
-                    Parent = Button,
-                })
-                table.insert(
-                    Library.Corners,
-                    New("UICorner", {
-                        CornerRadius = UDim.new(1, 0),
-                        Parent = Indicator,
-                    })
-                )
-
-                local Line = Library:MakeLine(Button, {
-                    AnchorPoint = Vector2.new(0, 1),
-                    Position = UDim2.new(0, 0, 1, 1),
-                    Size = UDim2.new(1, 0, 0, 1),
-                })
-
                 local Container = New("Frame", {
                     BackgroundTransparency = 1,
-                    Position = UDim2.fromOffset(0, 35),
-                    Size = UDim2.new(1, 0, 1, -35),
+                    Position = UDim2.fromOffset(0, TabboxHeaderHeight + 1),
+                    Size = UDim2.new(1, 0, 1, -(TabboxHeaderHeight + 1)),
                     Visible = false,
                     Parent = TabboxHolder,
                 })
@@ -8589,17 +8641,9 @@ function Library:CreateWindow(WindowInfo)
                     Parent = Container,
                 })
 
-                local TabTweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-
                 local Tab = {
                     ButtonHolder = Button,
                     Container = Container,
-
-                    ButtonCovers = {
-                        BottomCover = Indicator,
-                        LeftCover = Indicator,
-                        RightCover = Indicator
-                    },
 
                     Tab = Tab,
                     Elements = {},
@@ -8607,44 +8651,20 @@ function Library:CreateWindow(WindowInfo)
                 }
 
                 function Tab:Show()
-                    if Library.ActiveTab then
-                        Library.ActiveTab:Hide()
+                    if Tabbox.ActiveTab and Tabbox.ActiveTab ~= Tab then
+                        Tabbox.ActiveTab:Hide()
                     end
 
-                    TweenService:Create(TabButton, NavAnim, {
-                        BackgroundTransparency = 0.92,
-                    }):Play()
-                    TweenService:Create(TabIndicator, NavAnim, {
-                        BackgroundTransparency = 0,
-                        Size = UDim2.fromOffset(NavigationConfig.IndicatorWidth, NavigationConfig.IconSize + 10),
-                    }):Play()
-                    if TabIcon then
-                        TweenService:Create(TabIcon, NavAnim, {
-                            ImageTransparency = NavigationConfig.ActiveIconTransparency,
-                        }):Play()
+                    TweenService:Create(ButtonLabel, TabAnim, { TextTransparency = 0 }):Play()
+                    if ButtonIcon then
+                        TweenService:Create(ButtonIcon, TabAnim, { ImageTransparency = 0 }):Play()
                     end
 
-                    TabContainer.Visible = true
-                    Library.ActiveTab = Tab
+                    Container.Visible = true
+                    Tabbox.ActiveTab = Tab
 
-                    -- Fade + leve subida + scale ao trocar de tab. Anima o TabScroll (o frame de
-                    -- rolagem em si), nunca seus filhos — que continuam 100% controlados pelo
-                    -- TabBodyLayout. Cancela uma troca anterior se o usuário clicar rápido demais.
-                    if Tab._SwitchTween then
-                        Tab._SwitchTween:Cancel()
-                    end
-
-                    local SwitchScale = TabScroll:FindFirstChildOfClass("UIScale") or New("UIScale", { Parent = TabScroll })
-                    TabScroll.Position = UDim2.fromOffset(0, 6)
-                    SwitchScale.Scale = 0.985
-
-                    local SwitchInfo = TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-                    local SwitchTween = TweenService:Create(TabScroll, SwitchInfo, { Position = UDim2.fromOffset(0, 0) })
-                    local SwitchScaleTween = TweenService:Create(SwitchScale, SwitchInfo, { Scale = 1 })
-
-                    Tab._SwitchTween = SwitchTween
-                    SwitchTween:Play()
-                    SwitchScaleTween:Play()
+                    Tabbox:MoveHighlight(Button, not Tabbox._Placed)
+                    Tabbox._Placed = true
 
                     if Library.Searching then
                         Library:UpdateSearch(Library.SearchText)
@@ -8652,16 +8672,12 @@ function Library:CreateWindow(WindowInfo)
                 end
 
                 function Tab:Hide()
-                    TweenService:Create(ButtonLabel, TabTweenInfo, { TextTransparency = 0.5 }):Play()
+                    TweenService:Create(ButtonLabel, TabAnim, { TextTransparency = 0.5 }):Play()
                     if ButtonIcon then
-                        TweenService:Create(ButtonIcon, TabTweenInfo, { ImageTransparency = 0.5 }):Play()
+                        TweenService:Create(ButtonIcon, TabAnim, { ImageTransparency = 0.5 }):Play()
                     end
-                    -- Hide accent indicator
-                    TweenService:Create(Indicator, TabTweenInfo, { BackgroundTransparency = 1, Size = UDim2.new(0, 0, 0, 2) }):Play()
-                    Line.Visible = true
-                    Container.Visible = false
 
-                    Tabbox.ActiveTab = nil
+                    Container.Visible = false
                 end
 
                 function Tab:Resize()
@@ -8669,12 +8685,23 @@ function Library:CreateWindow(WindowInfo)
                         return
                     end
 
-                    TabboxHolder.Size = UDim2.new(1, 0, 0, (List.AbsoluteContentSize.Y / Library.DPIScale) + 49)
+                    TabboxHolder.Size = UDim2.new(1, 0, 0, (List.AbsoluteContentSize.Y / Library.DPIScale) + TabboxHeaderHeight + 15)
                 end
 
-                function Tab:UpdateCorners()
-                    -- No-op: corner covers no longer needed
-                end
+                function Tab:UpdateCorners() end
+
+                Button.MouseEnter:Connect(function()
+                    if Tabbox.ActiveTab == Tab then
+                        return
+                    end
+                    TweenService:Create(ButtonLabel, TabAnim, { TextTransparency = 0.2 }):Play()
+                end)
+                Button.MouseLeave:Connect(function()
+                    if Tabbox.ActiveTab == Tab then
+                        return
+                    end
+                    TweenService:Create(ButtonLabel, TabAnim, { TextTransparency = 0.5 }):Play()
+                end)
 
                 --// Execution \\--
                 if not Tabbox.ActiveTab then
@@ -8687,8 +8714,6 @@ function Library:CreateWindow(WindowInfo)
 
                 Tabbox.Tabs[Name] = Tab
                 Tabbox:UpdateCorners()
-
-                Library:PlayElementEntrance({ Holder = Tabs }, TabButton)
 
                 return Tab
             end
