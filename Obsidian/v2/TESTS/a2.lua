@@ -6426,23 +6426,18 @@ do
         ----------------------------------------------------------------
 
         local TabTrack = New("Frame", {
-            BackgroundColor3 = function()
-                return Library:GetBetterColor(
-                    Library.Scheme.BackgroundColor,
-                    -1
-                )
-            end,
+            BackgroundTransparency = 1,
 
             Position = UDim2.fromOffset(
-                HeaderPadding,
-                HeaderPadding
+                InnerTrackInset,
+                InnerTrackInset
             ),
 
             Size = UDim2.new(
                 1,
-                -HeaderPadding * 2,
+                -InnerTrackInset * 2,
                 0,
-                InnerHeaderHeight - HeaderPadding * 2
+                InnerHeaderHeight - InnerTrackInset * 2
             ),
 
             Parent = TabboxWrapper,
@@ -6459,21 +6454,20 @@ do
             })
         )
 
-        Library:AddOutline(TabTrack)
-
         ----------------------------------------------------------------
         -- ACTIVE BACKGROUND
         ----------------------------------------------------------------
 
         local InnerHighlight = New("Frame", {
             BackgroundColor3 = "AccentColor",
-            BackgroundTransparency = 0.90,
+
+            BackgroundTransparency = 0,
 
             Position = UDim2.fromOffset(0, 0),
 
-            Size = UDim2.fromOffset(0, 0),
+            Size = UDim2.fromOffset(0, 2),
 
-            ZIndex = 1,
+            ZIndex = 4,
 
             Parent = TabTrack,
         })
@@ -6481,10 +6475,7 @@ do
         table.insert(
             Library.Corners,
             New("UICorner", {
-                CornerRadius = UDim.new(
-                    0,
-                    Library.CornerRadius / 2
-                ),
+                CornerRadius = UDim.new(1, 0),
                 Parent = InnerHighlight,
             })
         )
@@ -6521,18 +6512,17 @@ do
         ----------------------------------------------------------------
 
         local TabButtonRow = New("Frame", {
+            AnchorPoint = Vector2.new(0.5, 0.5),
+
+            AutomaticSize = Enum.AutomaticSize.X,
+
             BackgroundTransparency = 1,
 
-            Position = UDim2.fromOffset(
-                ButtonPadding,
-                ButtonPadding
-            ),
+            Position = UDim2.fromScale(0.5, 0.5),
 
-            Size = UDim2.new(
-                1,
-                -ButtonPadding * 2,
-                1,
-                -ButtonPadding * 2
+            Size = UDim2.fromOffset(
+                0,
+                InnerHeaderHeight - 8
             ),
 
             ZIndex = 3,
@@ -6543,10 +6533,10 @@ do
         local TabLayout = New("UIListLayout", {
             FillDirection = Enum.FillDirection.Horizontal,
 
-            HorizontalAlignment = Enum.HorizontalAlignment.Left,
+            HorizontalAlignment = Enum.HorizontalAlignment.Center,
             VerticalAlignment = Enum.VerticalAlignment.Center,
 
-            Padding = UDim.new(0, ButtonGap),
+            Padding = UDim.new(0, 8),
 
             SortOrder = Enum.SortOrder.LayoutOrder,
 
@@ -6588,101 +6578,44 @@ do
 
         function InnerTabbox:MoveHighlight(Button, SkipAnim)
             task.defer(function()
-
-                if not (
-                    Button
-                    and Button.Parent
-                    and TabTrack.Parent
-                ) then
+                if not (Button and Button.Parent) then
                     return
                 end
 
-                --------------------------------------------------------
-                -- IMPORTANT:
-                -- Usa AbsolutePosition em vez de Button.Position.
-                -- Isso elimina o problema de ficar preso na primeira aba.
-                --------------------------------------------------------
+                local TrackX = TabTrack.AbsolutePosition.X
+                local ButtonX = Button.AbsolutePosition.X
 
-                local TrackPosition =
-                    TabTrack.AbsolutePosition.X
+                local RelativeX = ButtonX - TrackX
+                local ButtonWidth = Button.AbsoluteSize.X
 
-                local ButtonPosition =
-                    Button.AbsolutePosition.X
-
-                local RelativeX =
-                    ButtonPosition - TrackPosition
-
-                local ButtonWidth =
-                    Button.AbsoluteSize.X
+                local IndicatorWidth = math.max(ButtonWidth - 12, 10)
 
                 local TargetPosition = UDim2.fromOffset(
-                    RelativeX,
-                    3
+                    RelativeX + (ButtonWidth - IndicatorWidth) / 2,
+                    TabTrack.AbsoluteSize.Y - 3
                 )
 
-                local TargetSize = UDim2.new(
-                    0,
-                    ButtonWidth,
-                    1,
-                    -6
+                local TargetSize = UDim2.fromOffset(
+                    IndicatorWidth,
+                    2
                 )
-
-                --------------------------------------------------------
-                -- ACTIVE INDICATOR
-                --------------------------------------------------------
-
-                local IndicatorWidth =
-                    math.max(ButtonWidth - 16, 12)
-
-                local IndicatorPosition =
-                    UDim2.new(
-                        0.5,
-                        0,
-                        1,
-                        -1
-                    )
 
                 if SkipAnim then
-
-                    InnerHighlight.Position =
-                        TargetPosition
-
-                    InnerHighlight.Size =
-                        TargetSize
-
-                    ActiveIndicator.Size =
-                        UDim2.fromOffset(
-                            IndicatorWidth,
-                            2
-                        )
-
-                    ActiveIndicator.Position =
-                        IndicatorPosition
-
+                    InnerHighlight.Position = TargetPosition
+                    InnerHighlight.Size = TargetSize
                 else
-
                     TweenService:Create(
                         InnerHighlight,
-                        IndicatorAnim,
+                        TweenInfo.new(
+                            0.20,
+                            Enum.EasingStyle.Quint,
+                            Enum.EasingDirection.Out
+                        ),
                         {
                             Position = TargetPosition,
                             Size = TargetSize,
                         }
                     ):Play()
-
-                    TweenService:Create(
-                        ActiveIndicator,
-                        IndicatorAnim,
-                        {
-                            Size = UDim2.fromOffset(
-                                IndicatorWidth,
-                                2
-                            ),
-
-                            Position = IndicatorPosition,
-                        }
-                    ):Play()
-
                 end
             end)
         end
@@ -6718,16 +6651,11 @@ do
             ------------------------------------------------------------
 
             local Button = New("TextButton", {
-
-                AutomaticSize = Enum.AutomaticSize.X,
-
                 BackgroundTransparency = 1,
 
-                Size = UDim2.new(
-                    0,
-                    0,
-                    1,
-                    0
+                Size = UDim2.fromOffset(
+                    28,
+                    28
                 ),
 
                 Text = "",
@@ -6806,67 +6734,37 @@ do
             ------------------------------------------------------------
 
             local ButtonIcon
-
             if BoxIcon then
-
                 ButtonIcon = New("ImageLabel", {
+                    AnchorPoint = Vector2.new(0.5, 0.5),
 
                     Image = BoxIcon.Url,
 
                     ImageColor3 =
                         BoxIcon.Custom
                         and "WhiteColor"
-                        or "FontColor",
+                        or "AccentColor",
 
-                    ImageRectOffset =
-                        BoxIcon.ImageRectOffset,
+                    ImageRectOffset = BoxIcon.ImageRectOffset,
+                    ImageRectSize = BoxIcon.ImageRectSize,
 
-                    ImageRectSize =
-                        BoxIcon.ImageRectSize,
+                    ImageTransparency = 0.45,
 
-                    ImageTransparency = 0.48,
+                    Position = UDim2.fromScale(
+                        0.5,
+                        0.5
+                    ),
 
                     Size = UDim2.fromOffset(
-                        14,
-                        14
+                        17,
+                        17
                     ),
 
                     ZIndex = 3,
 
-                    Parent = ButtonContent,
+                    Parent = Button,
                 })
-
             end
-
-            ------------------------------------------------------------
-            -- LABEL
-            ------------------------------------------------------------
-
-            local ButtonLabel = New("TextLabel", {
-
-                AutomaticSize =
-                    Enum.AutomaticSize.X,
-
-                BackgroundTransparency = 1,
-
-                Size = UDim2.fromOffset(
-                    0,
-                    18
-                ),
-
-                Text = tostring(Name),
-
-                TextSize = 12,
-
-                TextTransparency = 0.48,
-
-                TextXAlignment =
-                    Enum.TextXAlignment.Left,
-
-                ZIndex = 3,
-
-                Parent = ButtonContent,
-            })
 
             ------------------------------------------------------------
             -- CONTENT CONTAINER
@@ -6954,51 +6852,21 @@ do
             ------------------------------------------------------------
 
             function Tab:Show()
-
-                if
-                    InnerTabbox.ActiveTab
+                if InnerTabbox.ActiveTab
                     and InnerTabbox.ActiveTab ~= Tab
                 then
-
                     InnerTabbox.ActiveTab:Hide()
-
                 end
 
-                --------------------------------------------------------
-                -- TEXT
-                --------------------------------------------------------
-
-                TweenService:Create(
-                    ButtonLabel,
-                    InnerTabAnim,
-                    {
-                        TextTransparency = 0,
-                    }
-                ):Play()
-
-                --------------------------------------------------------
-                -- ICON
-                --------------------------------------------------------
-
                 if ButtonIcon then
-
                     TweenService:Create(
                         ButtonIcon,
                         InnerTabAnim,
                         {
-                            ImageTransparency = 0,
-                            ImageColor3 =
-                                BoxIcon.Custom
-                                and Library.Scheme.WhiteColor
-                                or Library.Scheme.AccentColor,
+                            ImageTransparency = 0
                         }
                     ):Play()
-
                 end
-
-                --------------------------------------------------------
-                -- SHOW CONTAINER
-                --------------------------------------------------------
 
                 TabContainer.Visible = true
 
@@ -7012,7 +6880,6 @@ do
                 InnerTabbox._Placed = true
 
                 Tab:Resize()
-
             end
 
             ------------------------------------------------------------
@@ -7020,34 +6887,17 @@ do
             ------------------------------------------------------------
 
             function Tab:Hide()
-
-                TweenService:Create(
-                    ButtonLabel,
-                    InnerTabAnim,
-                    {
-                        TextTransparency = 0.48,
-                    }
-                ):Play()
-
                 if ButtonIcon then
-
                     TweenService:Create(
                         ButtonIcon,
                         InnerTabAnim,
                         {
-                            ImageTransparency = 0.48,
-
-                            ImageColor3 =
-                                BoxIcon.Custom
-                                and Library.Scheme.WhiteColor
-                                or Library.Scheme.FontColor,
+                            ImageTransparency = 0.45
                         }
                     ):Play()
-
                 end
 
                 TabContainer.Visible = false
-
             end
 
             ------------------------------------------------------------
