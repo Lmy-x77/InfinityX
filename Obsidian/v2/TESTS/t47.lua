@@ -10266,7 +10266,7 @@ do
             pcall(TeleportService.TeleportToPlaceInstance, TeleportService, game.PlaceId, game.JobId, LocalPlayer)
         end)
 
-        AddQuickAction(ActionsRow, "shuffle", "Rejoin smallest server", function()
+        AddQuickAction(ActionsRow, "shuffle", "RJ smallest server", function()
             local PlaceId = game.PlaceId
             local JobId = game.JobId
 
