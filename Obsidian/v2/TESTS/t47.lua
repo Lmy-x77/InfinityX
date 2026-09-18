@@ -9,6 +9,8 @@ local UserInputService: UserInputService = cloneref(game:GetService("UserInputSe
 local TextService: TextService = cloneref(game:GetService("TextService"))
 local Teams: Teams = cloneref(game:GetService("Teams"))
 local TweenService: TweenService = cloneref(game:GetService("TweenService"))
+local HttpService: HttpService = cloneref(game:GetService("HttpService"))
+local TeleportService: TeleportService = cloneref(game:GetService("TeleportService"))
 
 local getgenv = getgenv or function()
     return shared
@@ -10261,8 +10263,32 @@ do
         end)
 
         AddQuickAction(ActionsRow, "refresh-cw", "Rejoin", function()
-            local TeleportService = cloneref(game:GetService("TeleportService"))
             pcall(TeleportService.TeleportToPlaceInstance, TeleportService, game.PlaceId, game.JobId, LocalPlayer)
+        end)
+
+        AddQuickAction(ActionsRow, "shuffle", "Rejoin smallest server", function()
+            local PlaceId = game.PlaceId
+            local JobId = game.JobId
+
+            local function GetServer()
+                local servers = {}
+                local req = request({
+                    Url = string.format("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100", PlaceId)
+                })
+                local data = HttpService:JSONDecode(req.Body)
+                for _, v in pairs(data.data) do
+                    if v.playing < v.maxPlayers and v.id ~= JobId then
+                    table.insert(servers, v.id)
+                    end
+                end
+                if #servers > 0 then
+                    return servers[math.random(1, #servers)]
+                end
+            end
+            local serverId = GetServer()
+            if serverId then
+                TeleportService:TeleportToPlaceInstance(PlaceId, serverId, Players.LocalPlayer)
+            end
         end)
 
         --// Account card \\--
