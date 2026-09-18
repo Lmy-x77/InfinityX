@@ -6680,7 +6680,7 @@ function Library:Notify(...)
         Parent = Card,
     })
     New("UIPadding", {
-        PaddingBottom = UDim.new(0, 14),
+        PaddingBottom = UDim.new(0, 18),
         PaddingLeft = UDim.new(0, 12),
         PaddingRight = UDim.new(0, 10),
         PaddingTop = UDim.new(0, 12),
@@ -6821,20 +6821,28 @@ function Library:Notify(...)
         Data:Destroy()
     end)
 
-    --// Barra de progresso (fina, colada no rodapé) \\--
     local TimerTrack = New("Frame", {
         AnchorPoint = Vector2.new(0, 1),
         BackgroundColor3 = "OutlineColor",
         BackgroundTransparency = 0.5,
-        Position = UDim2.fromScale(0, 1),
-        Size = UDim2.new(1, 0, 0, 2),
+        Position = UDim2.new(0, 12, 1, -7),
+        Size = UDim2.new(1, -24, 0, 3),
         Visible = HasTimer,
         Parent = Card,
     })
+    New("UICorner", {
+        CornerRadius = UDim.new(1, 0),
+        Parent = TimerTrack,
+    })
+
     local TimerFill = New("Frame", {
         BackgroundColor3 = AccentValue,
         Size = UsesSteps and UDim2.fromScale(0, 1) or UDim2.fromScale(1, 1),
         Parent = TimerTrack,
+    })
+    New("UICorner", {
+        CornerRadius = UDim.new(1, 0),
+        Parent = TimerFill,
     })
 
     if Data.SoundId then
