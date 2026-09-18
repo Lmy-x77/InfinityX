@@ -1319,27 +1319,18 @@ local NotificationAreas = {}
 local StackLists = { Top = {}, Center = {}, Bottom = {} }
 
 local NotificationTypes = {
-    Success = { Icon = Library:GetIcon("check-circle"), Color = Color3.fromRGB(90, 200, 130) },
-    Error   = { Icon = Library:GetIcon("x-circle"),     Color = Color3.fromRGB(235, 90, 90) },
-    Warning = { Icon = Library:GetIcon("alert-triangle"), Color = Color3.fromRGB(235, 180, 70) },
-    Info    = { Icon = Library:GetIcon("info"),         Color = Color3.fromRGB(90, 160, 235) },
+    Success = { Icons = { "circle-check", "check-circle", "check" }, Color = Color3.fromRGB(90, 200, 130) },
+    Error   = { Icons = { "circle-x", "x-circle", "x" },             Color = Color3.fromRGB(235, 90, 90) },
+    Warning = { Icons = { "triangle-alert", "alert-triangle" },      Color = Color3.fromRGB(235, 180, 70) },
+    Info    = { Icons = { "info", "circle-help", "help-circle" },    Color = Color3.fromRGB(90, 160, 235) },
 }
 
-local function LayoutNotificationArea(PositionName: string)
-    local Area = NotificationAreas[PositionName]
-    local IsLeft = Library.NotifySide:lower() == "left"
-    local AnchorX = IsLeft and 0 or 1
-    local PosX = IsLeft and 6 or -6
-
-    if PositionName == "Top" then
-        Area.AnchorPoint = Vector2.new(AnchorX, 0)
-        Area.Position = UDim2.new(AnchorX, PosX, 0, 6)
-    elseif PositionName == "Bottom" then
-        Area.AnchorPoint = Vector2.new(AnchorX, 1)
-        Area.Position = UDim2.new(AnchorX, PosX, 1, -6)
-    else
-        Area.AnchorPoint = Vector2.new(AnchorX, 0.5)
-        Area.Position = UDim2.new(AnchorX, PosX, 0.5, 0)
+local function ResolveNotificationIcon(Names)
+    for _, Name in Names do
+        local Icon = Library:GetIcon(Name)
+        if Icon then
+            return Icon
+        end
     end
 end
 
@@ -6374,43 +6365,14 @@ do
             Groupbox.TitleLine = nil
         end
 
-        ----------------------------------------------------------------
-        -- CONFIG
-        ----------------------------------------------------------------
-
-        local InnerHeaderHeight = 44
-        local HeaderPadding = 5
-        local ButtonPadding = 10
-        local ButtonGap = 3
-
-        local InnerTabAnim = TweenInfo.new(
-            0.16,
-            Enum.EasingStyle.Quad,
-            Enum.EasingDirection.Out
-        )
-
-        local IndicatorAnim = TweenInfo.new(
-            0.22,
-            Enum.EasingStyle.Quint,
-            Enum.EasingDirection.Out
-        )
-
-        ----------------------------------------------------------------
-        -- OUTER
-        ----------------------------------------------------------------
-
+        -- Outer wrapper in the parent groupbox's list
         local TabboxWrapper = New("Frame", {
             BackgroundColor3 = function()
-                return Library:GetBetterColor(
-                    Library.Scheme.BackgroundColor,
-                    3
-                )
+                return Library:GetBetterColor(Library.Scheme.BackgroundColor, 3)
             end,
-
             Size = UDim2.fromScale(1, 0),
             Parent = Container,
         })
-
         table.insert(
             Library.Corners,
             New("UICorner", {
@@ -6418,642 +6380,161 @@ do
                 Parent = TabboxWrapper,
             })
         )
-
         Library:AddOutline(TabboxWrapper)
 
-        ----------------------------------------------------------------
-        -- HEADER
-        ----------------------------------------------------------------
-
-        local TabTrack = New("Frame", {
+        -- Tab button row inside the styled container
+        local TabButtonRow = New("Frame", {
             BackgroundTransparency = 1,
-
-            Position = UDim2.fromOffset(
-                InnerTrackInset,
-                InnerTrackInset
-            ),
-
-            Size = UDim2.new(
-                1,
-                -InnerTrackInset * 2,
-                0,
-                InnerHeaderHeight - InnerTrackInset * 2
-            ),
-
+            Size = UDim2.new(1, 0, 0, 36),
             Parent = TabboxWrapper,
         })
-
-        table.insert(
-            Library.Corners,
-            New("UICorner", {
-                CornerRadius = UDim.new(
-                    0,
-                    Library.CornerRadius / 2
-                ),
-                Parent = TabTrack,
-            })
-        )
-
-        ----------------------------------------------------------------
-        -- ACTIVE BACKGROUND
-        ----------------------------------------------------------------
-
-        local InnerHighlight = New("Frame", {
-            BackgroundColor3 = "AccentColor",
-
-            BackgroundTransparency = 0,
-
-            Position = UDim2.fromOffset(0, 0),
-
-            Size = UDim2.fromOffset(0, 2),
-
-            ZIndex = 4,
-
-            Parent = TabTrack,
-        })
-
-        table.insert(
-            Library.Corners,
-            New("UICorner", {
-                CornerRadius = UDim.new(1, 0),
-                Parent = InnerHighlight,
-            })
-        )
-
-        ----------------------------------------------------------------
-        -- ACTIVE INDICATOR
-        ----------------------------------------------------------------
-
-        local ActiveIndicator = New("Frame", {
-            AnchorPoint = Vector2.new(0.5, 1),
-
-            BackgroundColor3 = "AccentColor",
-            BackgroundTransparency = 0,
-
-            Position = UDim2.new(0.5, 0, 1, 0),
-
-            Size = UDim2.fromOffset(0, 2),
-
-            ZIndex = 4,
-
-            Parent = InnerHighlight,
-        })
-
-        table.insert(
-            Library.Corners,
-            New("UICorner", {
-                CornerRadius = UDim.new(1, 0),
-                Parent = ActiveIndicator,
-            })
-        )
-
-        ----------------------------------------------------------------
-        -- BUTTON ROW
-        ----------------------------------------------------------------
-
-        local TabButtonRow = New("Frame", {
-            AnchorPoint = Vector2.new(0.5, 0.5),
-
-            AutomaticSize = Enum.AutomaticSize.X,
-
-            BackgroundTransparency = 1,
-
-            Position = UDim2.fromScale(0.5, 0.5),
-
-            Size = UDim2.fromOffset(
-                0,
-                InnerHeaderHeight - 8
-            ),
-
-            ZIndex = 3,
-
-            Parent = TabTrack,
-        })
-
-        local TabLayout = New("UIListLayout", {
+        New("UIListLayout", {
             FillDirection = Enum.FillDirection.Horizontal,
-
-            HorizontalAlignment = Enum.HorizontalAlignment.Center,
+            HorizontalFlex = Enum.UIFlexAlignment.Fill,
             VerticalAlignment = Enum.VerticalAlignment.Center,
-
-            Padding = UDim.new(0, 8),
-
-            SortOrder = Enum.SortOrder.LayoutOrder,
-
+            Padding = UDim.new(0, 0),
             Parent = TabButtonRow,
         })
 
-        ----------------------------------------------------------------
-        -- DIVIDER
-        ----------------------------------------------------------------
-
-        Library:MakeLine(TabboxWrapper, {
-            Position = UDim2.fromOffset(
-                0,
-                InnerHeaderHeight
-            ),
-
-            Size = UDim2.new(1, 0, 0, 1),
-        })
-
-        ----------------------------------------------------------------
-        -- TABBOX OBJECT
-        ----------------------------------------------------------------
-
         local InnerTabbox = {
             ActiveTab = nil,
-
             Tabs = {},
-
             Groupbox = Groupbox,
-
             BoxHolder = TabboxWrapper,
-
-            _Placed = false,
         }
 
-        ----------------------------------------------------------------
-        -- MOVE ACTIVE INDICATOR
-        ----------------------------------------------------------------
-
-        function InnerTabbox:MoveHighlight(Button, SkipAnim)
-            task.defer(function()
-                if not (Button and Button.Parent) then
-                    return
-                end
-
-                local TrackX = TabTrack.AbsolutePosition.X
-                local ButtonX = Button.AbsolutePosition.X
-
-                local RelativeX = ButtonX - TrackX
-                local ButtonWidth = Button.AbsoluteSize.X
-
-                local IndicatorWidth = math.max(ButtonWidth - 12, 10)
-
-                local TargetPosition = UDim2.fromOffset(
-                    RelativeX + (ButtonWidth - IndicatorWidth) / 2,
-                    TabTrack.AbsoluteSize.Y - 3
-                )
-
-                local TargetSize = UDim2.fromOffset(
-                    IndicatorWidth,
-                    2
-                )
-
-                if SkipAnim then
-                    InnerHighlight.Position = TargetPosition
-                    InnerHighlight.Size = TargetSize
-                else
-                    TweenService:Create(
-                        InnerHighlight,
-                        TweenInfo.new(
-                            0.20,
-                            Enum.EasingStyle.Quint,
-                            Enum.EasingDirection.Out
-                        ),
-                        {
-                            Position = TargetPosition,
-                            Size = TargetSize,
-                        }
-                    ):Play()
-                end
-            end)
-        end
-
-        ----------------------------------------------------------------
-        -- RECALCULATE HIGHLIGHT AFTER LAYOUT CHANGES
-        ----------------------------------------------------------------
-
-        TabLayout:GetPropertyChangedSignal(
-            "AbsoluteContentSize"
-        ):Connect(function()
-
-            if InnerTabbox.ActiveTab then
-                InnerTabbox:MoveHighlight(
-                    InnerTabbox.ActiveTab.ButtonHolder,
-                    true
-                )
-            end
-
-        end)
-
-        ----------------------------------------------------------------
-        -- ADD TAB
-        ----------------------------------------------------------------
+        local TotalButtons = 0
+        local InnerTabTweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
         function InnerTabbox:AddTab(Name, IconName)
+            TotalButtons = TotalButtons + 1
 
-            local BoxIcon =
-                Library:GetCustomIcon(IconName)
+            local BoxIcon = Library:GetCustomIcon(IconName)
 
-            ------------------------------------------------------------
-            -- BUTTON
-            ------------------------------------------------------------
-
+            -- Icon button for this tab
             local Button = New("TextButton", {
                 BackgroundTransparency = 1,
-
-                Size = UDim2.fromOffset(
-                    28,
-                    28
-                ),
-
+                Size = UDim2.fromOffset(0, 34),
                 Text = "",
-
-                ZIndex = 3,
-
                 Parent = TabButtonRow,
             })
-
-            New("UIPadding", {
-
-                PaddingLeft = UDim.new(
-                    0,
-                    10
-                ),
-
-                PaddingRight = UDim.new(
-                    0,
-                    10
-                ),
-
-                Parent = Button,
-            })
-
-            ------------------------------------------------------------
-            -- BUTTON CONTENT
-            ------------------------------------------------------------
-
-            local ButtonContent = New("Frame", {
-
-                AutomaticSize = Enum.AutomaticSize.X,
-
-                BackgroundTransparency = 1,
-
-                AnchorPoint = Vector2.new(
-                    0.5,
-                    0.5
-                ),
-
-                Position = UDim2.fromScale(
-                    0.5,
-                    0.5
-                ),
-
-                Size = UDim2.fromOffset(
-                    0,
-                    18
-                ),
-
-                ZIndex = 3,
-
-                Parent = Button,
-            })
-
-            New("UIListLayout", {
-
-                FillDirection =
-                    Enum.FillDirection.Horizontal,
-
-                HorizontalAlignment =
-                    Enum.HorizontalAlignment.Center,
-
-                VerticalAlignment =
-                    Enum.VerticalAlignment.Center,
-
-                Padding = UDim.new(
-                    0,
-                    6
-                ),
-
-                Parent = ButtonContent,
-            })
-
-            ------------------------------------------------------------
-            -- ICON
-            ------------------------------------------------------------
 
             local ButtonIcon
             if BoxIcon then
                 ButtonIcon = New("ImageLabel", {
                     AnchorPoint = Vector2.new(0.5, 0.5),
-
                     Image = BoxIcon.Url,
-
-                    ImageColor3 =
-                        BoxIcon.Custom
-                        and "WhiteColor"
-                        or "AccentColor",
-
+                    ImageColor3 = BoxIcon.Custom and "WhiteColor" or "AccentColor",
                     ImageRectOffset = BoxIcon.ImageRectOffset,
                     ImageRectSize = BoxIcon.ImageRectSize,
-
-                    ImageTransparency = 0.45,
-
-                    Position = UDim2.fromScale(
-                        0.5,
-                        0.5
-                    ),
-
-                    Size = UDim2.fromOffset(
-                        17,
-                        17
-                    ),
-
-                    ZIndex = 3,
-
+                    ImageTransparency = 0.5,
+                    Position = UDim2.fromScale(0.5, 0.5),
+                    Size = UDim2.fromOffset(20, 20),
                     Parent = Button,
                 })
             end
 
-            ------------------------------------------------------------
-            -- CONTENT CONTAINER
-            ------------------------------------------------------------
-
-            local TabContainer = New("Frame", {
-
+            -- Accent indicator bar at the bottom
+            local Indicator = New("Frame", {
+                AnchorPoint = Vector2.new(0.5, 1),
+                BackgroundColor3 = "AccentColor",
                 BackgroundTransparency = 1,
+                Position = UDim2.new(0.5, 0, 1, 0),
+                Size = UDim2.new(0.6, 0, 0, 2),
+                Parent = Button,
+            })
+            table.insert(
+                Library.Corners,
+                New("UICorner", {
+                    CornerRadius = UDim.new(1, 0),
+                    Parent = Indicator,
+                })
+            )
 
-                Position = UDim2.fromOffset(
-                    0,
-                    InnerHeaderHeight + 1
-                ),
-
-                Size = UDim2.new(
-                    1,
-                    0,
-                    0,
-                    0
-                ),
-
+            -- Content container for this tab's elements (inside the styled wrapper)
+            local TabContainer = New("Frame", {
+                BackgroundTransparency = 1,
+                Position = UDim2.fromOffset(0, 37),
+                Size = UDim2.new(1, 0, 0, 0),
                 Visible = false,
-
                 Parent = TabboxWrapper,
             })
-
             local TabList = New("UIListLayout", {
-
-                Padding = UDim.new(
-                    0,
-                    8
-                ),
-
+                Padding = UDim.new(0, 8),
                 Parent = TabContainer,
             })
-
             New("UIPadding", {
-
-                PaddingBottom = UDim.new(
-                    0,
-                    7
-                ),
-
-                PaddingLeft = UDim.new(
-                    0,
-                    7
-                ),
-
-                PaddingRight = UDim.new(
-                    0,
-                    7
-                ),
-
-                PaddingTop = UDim.new(
-                    0,
-                    7
-                ),
-
+                PaddingBottom = UDim.new(0, 6),
+                PaddingLeft = UDim.new(0, 7),
+                PaddingRight = UDim.new(0, 7),
+                PaddingTop = UDim.new(0, 5),
                 Parent = TabContainer,
             })
-
-            ------------------------------------------------------------
-            -- TAB OBJECT
-            ------------------------------------------------------------
 
             local Tab = {
-
                 ButtonHolder = Button,
-
                 Container = TabContainer,
 
                 Tab = Groupbox.Tab or Groupbox,
-
                 Elements = {},
-
                 DependencyBoxes = {},
-
-                ButtonIcon = ButtonIcon,
-
-                ButtonLabel = ButtonLabel,
             }
 
-            ------------------------------------------------------------
-            -- SHOW
-            ------------------------------------------------------------
-
             function Tab:Show()
-                if InnerTabbox.ActiveTab
-                    and InnerTabbox.ActiveTab ~= Tab
-                then
+                if InnerTabbox.ActiveTab then
                     InnerTabbox.ActiveTab:Hide()
                 end
 
                 if ButtonIcon then
-                    TweenService:Create(
-                        ButtonIcon,
-                        InnerTabAnim,
-                        {
-                            ImageTransparency = 0
-                        }
-                    ):Play()
+                    TweenService:Create(ButtonIcon, InnerTabTweenInfo, { ImageTransparency = 0 }):Play()
                 end
-
+                TweenService:Create(Indicator, InnerTabTweenInfo, { BackgroundTransparency = 0, Size = UDim2.new(0.6, 0, 0, 2) }):Play()
                 TabContainer.Visible = true
 
                 InnerTabbox.ActiveTab = Tab
-
-                InnerTabbox:MoveHighlight(
-                    Button,
-                    not InnerTabbox._Placed
-                )
-
-                InnerTabbox._Placed = true
-
                 Tab:Resize()
             end
 
-            ------------------------------------------------------------
-            -- HIDE
-            ------------------------------------------------------------
-
             function Tab:Hide()
                 if ButtonIcon then
-                    TweenService:Create(
-                        ButtonIcon,
-                        InnerTabAnim,
-                        {
-                            ImageTransparency = 0.45
-                        }
-                    ):Play()
+                    TweenService:Create(ButtonIcon, InnerTabTweenInfo, { ImageTransparency = 0.5 }):Play()
                 end
-
+                TweenService:Create(Indicator, InnerTabTweenInfo, { BackgroundTransparency = 1, Size = UDim2.new(0, 0, 0, 2) }):Play()
                 TabContainer.Visible = false
+
+                InnerTabbox.ActiveTab = nil
             end
 
-            ------------------------------------------------------------
-            -- RESIZE
-            ------------------------------------------------------------
-
             function Tab:Resize()
-
                 if InnerTabbox.ActiveTab ~= Tab then
                     return
                 end
 
-                local ContentHeight =
-                    TabList.AbsoluteContentSize.Y
-                    / Library.DPIScale
-                    + 14
-
-                TabContainer.Size =
-                    UDim2.new(
-                        1,
-                        0,
-                        0,
-                        ContentHeight
-                    )
-
-                TabboxWrapper.Size =
-                    UDim2.new(
-                        1,
-                        0,
-                        0,
-                        InnerHeaderHeight
-                        + 1
-                        + ContentHeight
-                    )
-
+                local ContentHeight = TabList.AbsoluteContentSize.Y / Library.DPIScale + 11
+                TabContainer.Size = UDim2.new(1, 0, 0, ContentHeight)
+                TabboxWrapper.Size = UDim2.new(1, 0, 0, 37 + ContentHeight)
                 Groupbox:Resize()
-
             end
 
-            ------------------------------------------------------------
-            -- HOVER
-            ------------------------------------------------------------
-
-            Button.MouseEnter:Connect(function()
-
-                if InnerTabbox.ActiveTab == Tab then
-                    return
-                end
-
-                TweenService:Create(
-                    ButtonLabel,
-                    InnerTabAnim,
-                    {
-                        TextTransparency = 0.18,
-                    }
-                ):Play()
-
-                if ButtonIcon then
-
-                    TweenService:Create(
-                        ButtonIcon,
-                        InnerTabAnim,
-                        {
-                            ImageTransparency = 0.20,
-                        }
-                    ):Play()
-
-                end
-
-            end)
-
-            Button.MouseLeave:Connect(function()
-
-                if InnerTabbox.ActiveTab == Tab then
-                    return
-                end
-
-                TweenService:Create(
-                    ButtonLabel,
-                    InnerTabAnim,
-                    {
-                        TextTransparency = 0.48,
-                    }
-                ):Play()
-
-                if ButtonIcon then
-
-                    TweenService:Create(
-                        ButtonIcon,
-                        InnerTabAnim,
-                        {
-                            ImageTransparency = 0.48,
-                        }
-                    ):Play()
-
-                end
-
-            end)
-
-            ------------------------------------------------------------
-            -- INITIAL TAB
-            ------------------------------------------------------------
-
+            -- Auto-show first tab
             if not InnerTabbox.ActiveTab then
                 Tab:Show()
             end
 
-            ------------------------------------------------------------
-            -- CLICK
-            ------------------------------------------------------------
+            Button.MouseButton1Click:Connect(Tab.Show)
+            Library:AddTooltip(Name, nil, Button)
 
-            Button.MouseButton1Click:Connect(
-                Tab.Show
-            )
-
-            ------------------------------------------------------------
-            -- TOOLTIP
-            ------------------------------------------------------------
-
-            Library:AddTooltip(
-                Name,
-                nil,
-                Button
-            )
-
-            ------------------------------------------------------------
-            -- METATABLE
-            ------------------------------------------------------------
-
-            setmetatable(
-                Tab,
-                BaseGroupbox
-            )
+            setmetatable(Tab, BaseGroupbox)
 
             InnerTabbox.Tabs[Name] = Tab
 
             return Tab
-
         end
 
-        ----------------------------------------------------------------
-        -- REGISTER
-        ----------------------------------------------------------------
+        Groupbox.NestedTabboxes = Groupbox.NestedTabboxes or {}
+        table.insert(Groupbox.NestedTabboxes, InnerTabbox)
 
-        Groupbox.NestedTabboxes =
-            Groupbox.NestedTabboxes or {}
-
-        table.insert(
-            Groupbox.NestedTabboxes,
-            InnerTabbox
-        )
-
-        Library:PlayElementEntrance(
-            Groupbox,
-            TabboxWrapper
-        )
+        Library:PlayElementEntrance(Groupbox, TabboxWrapper)
 
         return InnerTabbox
     end
@@ -7108,9 +6589,21 @@ function Library:Notify(...)
     local Area = NotificationAreas[Data.Position]
     local List = StackLists[Data.Position]
 
+    --// Cor / ícone \\--
     local TypeInfo = Data.Type and NotificationTypes[Data.Type]
     local AccentColor = Data.IconColor or (TypeInfo and TypeInfo.Color)
-    local IconName = Data.Icon or (TypeInfo and TypeInfo.Icon)
+    local AccentValue = AccentColor or "AccentColor"
+    local IconSource = Data.Icon or (TypeInfo and ResolveNotificationIcon(TypeInfo.Icons))
+
+    local ParsedIcon
+    if typeof(IconSource) == "table" then
+        ParsedIcon = IconSource
+    elseif IconSource then
+        ParsedIcon = Library:GetCustomIcon(IconSource)
+    end
+
+    local UsesSteps = typeof(Data.Steps) == "number"
+    local HasTimer = UsesSteps or (Data.Persist ~= true and typeof(Data.Time) ~= "Instance")
 
     local DeletedInstance = false
     local DeleteConnection = nil
@@ -7125,14 +6618,16 @@ function Library:Notify(...)
     end
 
     local IsLeft = Library.NotifySide:lower() == "left"
-    local OffscreenX = IsLeft and -30 or 30
+    local OffscreenX = IsLeft and -40 or 40
 
     --// Card \\--
-    local Card = New("Frame", {
+    local Card = New("CanvasGroup", {
         AutomaticSize = Enum.AutomaticSize.Y,
         BackgroundColor3 = function()
             return Library:GetBetterColor(Library.Scheme.BackgroundColor, 3)
         end,
+        BorderSizePixel = 0,
+        GroupTransparency = 1,
         Size = UDim2.new(1, 0, 0, 0),
         Parent = Area,
     })
@@ -7143,43 +6638,51 @@ function Library:Notify(...)
             Parent = Card,
         })
     )
-    local CardOutline, CardShadow = Library:AddOutline(Card)
+    Library:AddOutline(Card)
 
-    New("UIPadding", {
-        PaddingBottom = UDim.new(0, 10),
-        PaddingLeft = UDim.new(0, 10),
-        PaddingRight = UDim.new(0, 10),
-        PaddingTop = UDim.new(0, 10),
+    -- Brilho suave da cor do tipo, vindo da esquerda
+    local Glow = New("Frame", {
+        BackgroundColor3 = AccentValue,
+        Size = UDim2.fromScale(1, 1),
         Parent = Card,
     })
-    New("UIListLayout", {
-        Padding = UDim.new(0, 8),
-        Parent = Card,
+    New("UIGradient", {
+        Transparency = NumberSequence.new({
+            NumberSequenceKeypoint.new(0, 0.84),
+            NumberSequenceKeypoint.new(0.65, 1),
+            NumberSequenceKeypoint.new(1, 1),
+        }),
+        Parent = Glow,
     })
 
-    local Row = New("Frame", {
+    local Content = New("Frame", {
         AutomaticSize = Enum.AutomaticSize.Y,
         BackgroundTransparency = 1,
-        LayoutOrder = 1,
         Size = UDim2.new(1, 0, 0, 0),
         Parent = Card,
+    })
+    New("UIPadding", {
+        PaddingBottom = UDim.new(0, 14),
+        PaddingLeft = UDim.new(0, 12),
+        PaddingRight = UDim.new(0, 10),
+        PaddingTop = UDim.new(0, 12),
+        Parent = Content,
     })
     New("UIListLayout", {
         FillDirection = Enum.FillDirection.Horizontal,
         Padding = UDim.new(0, 10),
-        Parent = Row,
+        Parent = Content,
     })
 
+    --// Ícone (chip) \\--
     local IconHolder
-    if IconName then
-        local ParsedIcon = Library:GetCustomIcon(IconName)
-
+    if ParsedIcon then
         IconHolder = New("Frame", {
-            BackgroundColor3 = AccentColor or "AccentColor",
-            BackgroundTransparency = 0.85,
+            BackgroundColor3 = AccentValue,
+            BackgroundTransparency = 0.86,
             LayoutOrder = 1,
-            Size = UDim2.fromOffset(30, 30),
-            Parent = Row,
+            Size = UDim2.fromOffset(32, 32),
+            Parent = Content,
         })
         table.insert(
             Library.Corners,
@@ -7188,49 +6691,50 @@ function Library:Notify(...)
                 Parent = IconHolder,
             })
         )
-
-        if ParsedIcon then
-            New("ImageLabel", {
-                AnchorPoint = Vector2.new(0.5, 0.5),
-                Image = ParsedIcon.Url,
-                ImageColor3 = AccentColor or "AccentColor",
-                ImageRectOffset = ParsedIcon.ImageRectOffset,
-                ImageRectSize = ParsedIcon.ImageRectSize,
-                Position = UDim2.fromScale(0.5, 0.5),
-                Size = UDim2.fromOffset(16, 16),
-                Parent = IconHolder,
-            })
-        end
+        New("UIStroke", {
+            Color = AccentValue,
+            Transparency = 0.7,
+            Parent = IconHolder,
+        })
+        New("ImageLabel", {
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Image = ParsedIcon.Url,
+            ImageColor3 = ParsedIcon.Custom and "WhiteColor" or AccentValue,
+            ImageRectOffset = ParsedIcon.ImageRectOffset,
+            ImageRectSize = ParsedIcon.ImageRectSize,
+            Position = UDim2.fromScale(0.5, 0.5),
+            Size = UDim2.fromOffset(16, 16),
+            Parent = IconHolder,
+        })
     end
 
+    --// Texto \\--
     local TextColumn = New("Frame", {
         AutomaticSize = Enum.AutomaticSize.Y,
         BackgroundTransparency = 1,
         LayoutOrder = 2,
-        Size = UDim2.new(1, IconHolder and -40 or 0, 0, 0),
-        Parent = Row,
+        Size = UDim2.new(1, -((IconHolder and 42 or 0) + 28), 0, 0),
+        Parent = Content,
     })
     New("UIFlexItem", {
         FlexMode = Enum.UIFlexMode.Grow,
         Parent = TextColumn,
     })
     New("UIListLayout", {
-        Padding = UDim.new(0, 2),
+        Padding = UDim.new(0, 3),
         Parent = TextColumn,
     })
 
     local Title
     if Data.Title then
-        local BoldFont = Font.new(Library.Scheme.Font.Family, Enum.FontWeight.Bold)
-
         Title = New("TextLabel", {
             AutomaticSize = Enum.AutomaticSize.Y,
             BackgroundTransparency = 1,
-            FontFace = BoldFont,
+            FontFace = Font.new(Library.Scheme.Font.Family, Enum.FontWeight.Bold),
             LayoutOrder = 1,
             Size = UDim2.new(1, 0, 0, 0),
             Text = Data.Title,
-            TextSize = 15,
+            TextSize = 14,
             TextWrapped = true,
             TextXAlignment = Enum.TextXAlignment.Left,
             Parent = TextColumn,
@@ -7248,33 +6752,72 @@ function Library:Notify(...)
             LayoutOrder = 2,
             Size = UDim2.new(1, 0, 0, 0),
             Text = Data.Description,
-            TextSize = 13,
-            TextTransparency = 0.38,
+            TextSize = Title and 13 or 14,
+            TextTransparency = Title and 0.4 or 0.1,
             TextWrapped = true,
             TextXAlignment = Enum.TextXAlignment.Left,
             Parent = TextColumn,
         })
     end
 
-    local TimerHolder = New("Frame", {
+    --// Botão de fechar \\--
+    local CloseIcon = Library:GetIcon("x")
+    local CloseButton = New("TextButton", {
         BackgroundTransparency = 1,
-        LayoutOrder = 2,
-        Size = UDim2.new(1, 0, 0, 4),
-        Visible = (Data.Persist ~= true and typeof(Data.Time) ~= "Instance") or typeof(Data.Steps) == "number",
+        LayoutOrder = 3,
+        Size = UDim2.fromOffset(18, 18),
+        Text = CloseIcon and "" or "×",
+        TextSize = 16,
+        TextTransparency = 0.5,
+        Parent = Content,
+    })
+    local CloseImage
+    if CloseIcon then
+        CloseImage = New("ImageLabel", {
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Image = CloseIcon.Url,
+            ImageColor3 = "FontColor",
+            ImageRectOffset = CloseIcon.ImageRectOffset,
+            ImageRectSize = CloseIcon.ImageRectSize,
+            ImageTransparency = 0.5,
+            Position = UDim2.fromScale(0.5, 0.5),
+            Size = UDim2.fromOffset(12, 12),
+            Parent = CloseButton,
+        })
+    end
+    CloseButton.MouseEnter:Connect(function()
+        if CloseImage then
+            TweenService:Create(CloseImage, Library.TweenInfo, { ImageTransparency = 0 }):Play()
+        else
+            TweenService:Create(CloseButton, Library.TweenInfo, { TextTransparency = 0 }):Play()
+        end
+    end)
+    CloseButton.MouseLeave:Connect(function()
+        if CloseImage then
+            TweenService:Create(CloseImage, Library.TweenInfo, { ImageTransparency = 0.5 }):Play()
+        else
+            TweenService:Create(CloseButton, Library.TweenInfo, { TextTransparency = 0.5 }):Play()
+        end
+    end)
+    CloseButton.MouseButton1Click:Connect(function()
+        Data:Destroy()
+    end)
+
+    --// Barra de progresso (fina, colada no rodapé) \\--
+    local TimerTrack = New("Frame", {
+        AnchorPoint = Vector2.new(0, 1),
+        BackgroundColor3 = "OutlineColor",
+        BackgroundTransparency = 0.5,
+        Position = UDim2.fromScale(0, 1),
+        Size = UDim2.new(1, 0, 0, 2),
+        Visible = HasTimer,
         Parent = Card,
     })
-    local TimerTrack = New("Frame", {
-        BackgroundColor3 = "OutlineColor",
-        Size = UDim2.fromScale(1, 1),
-        Parent = TimerHolder,
-    })
-    table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = TimerTrack }))
     local TimerFill = New("Frame", {
-        BackgroundColor3 = AccentColor or "AccentColor",
-        Size = UDim2.fromScale(1, 1),
+        BackgroundColor3 = AccentValue,
+        Size = UsesSteps and UDim2.fromScale(0, 1) or UDim2.fromScale(1, 1),
         Parent = TimerTrack,
     })
-    table.insert(Library.Corners, New("UICorner", { CornerRadius = UDim.new(1, 0), Parent = TimerFill }))
 
     if Data.SoundId then
         local SoundId = Data.SoundId
@@ -7296,17 +6839,12 @@ function Library:Notify(...)
 
     ReflowNotifications(Data.Position, Card)
     Card.Position = UDim2.new(0, OffscreenX, Card.Position.Y.Scale, Card.Position.Y.Offset)
-    Card.BackgroundTransparency = 1
-    CardOutline.Transparency = 1
-    CardShadow.Transparency = 1
 
-    local EnterTween = TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+    local EnterTween = TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
     TweenService:Create(Card, EnterTween, {
         Position = UDim2.new(0, 0, Card.Position.Y.Scale, Card.Position.Y.Offset),
-        BackgroundTransparency = 0,
+        GroupTransparency = 0,
     }):Play()
-    TweenService:Create(CardOutline, EnterTween, { Transparency = 0 }):Play()
-    TweenService:Create(CardShadow, EnterTween, { Transparency = 0 }):Play()
 
     Card:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
         if Library.Unloaded or Data.Destroyed then
@@ -7331,9 +6869,15 @@ function Library:Notify(...)
     end
 
     function Data:ChangeStep(NewStep)
-        if TimerFill and Data.Steps then
+        if UsesSteps then
             NewStep = math.clamp(NewStep or 0, 0, Data.Steps)
-            TimerFill.Size = UDim2.fromScale(NewStep / Data.Steps, 1)
+            local Alpha = Data.Steps > 0 and (NewStep / Data.Steps) or 1
+
+            TweenService:Create(
+                TimerFill,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                { Size = UDim2.fromScale(Alpha, 1) }
+            ):Play()
         end
     end
 
@@ -7360,13 +6904,11 @@ function Library:Notify(...)
             DeleteConnection:Disconnect()
         end
 
-        local ExitTween = TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+        local ExitTween = TweenInfo.new(0.25, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
         TweenService:Create(Card, ExitTween, {
             Position = UDim2.new(0, OffscreenX, Card.Position.Y.Scale, Card.Position.Y.Offset),
-            BackgroundTransparency = 1,
+            GroupTransparency = 1,
         }):Play()
-        TweenService:Create(CardOutline, ExitTween, { Transparency = 1 }):Play()
-        TweenService:Create(CardShadow, ExitTween, { Transparency = 1 }):Play()
 
         task.delay(ExitTween.Time, function()
             Library.Notifications[Card] = nil
@@ -7374,7 +6916,7 @@ function Library:Notify(...)
         end)
     end
 
-    task.delay(0.35, function()
+    task.spawn(function()
         if Data.Persist then
             return
         elseif typeof(Data.Time) == "Instance" then
@@ -7382,9 +6924,13 @@ function Library:Notify(...)
                 task.wait()
             until DeletedInstance or Data.Destroyed
         else
-            TweenService:Create(TimerFill, TweenInfo.new(Data.Time, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
-                Size = UDim2.fromScale(0, 1),
-            }):Play()
+            if not UsesSteps then
+                TweenService:Create(
+                    TimerFill,
+                    TweenInfo.new(Data.Time, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut),
+                    { Size = UDim2.fromScale(0, 1) }
+                ):Play()
+            end
             task.wait(Data.Time)
         end
 
@@ -8959,14 +8505,8 @@ function Library:CreateWindow(WindowInfo)
                 Parent = BoxHolder,
             })
 
-            local TabboxHeaderHeight = 44
-            local TrackInset = 6
-            local TrackPad = 3
-
             local TabboxHolder
-            local TabboxTrack
             local TabboxButtons
-            local Highlight
 
             do
                 TabboxHolder = New("Frame", {
@@ -8985,62 +8525,19 @@ function Library:CreateWindow(WindowInfo)
                 )
                 Library:AddOutline(TabboxHolder)
 
-                --// Trilha recuada que guarda os botões das abas
-                TabboxTrack = New("Frame", {
-                    BackgroundColor3 = function()
-                        return Library:GetBetterColor(Library.Scheme.BackgroundColor, -1)
-                    end,
-                    Position = UDim2.fromOffset(TrackInset, TrackInset),
-                    Size = UDim2.new(1, -TrackInset * 2, 0, TabboxHeaderHeight - TrackInset * 2),
-                    Parent = TabboxHolder,
-                })
-                table.insert(
-                    Library.Corners,
-                    New("UICorner", {
-                        CornerRadius = UDim.new(0, Library.CornerRadius / 2),
-                        Parent = TabboxTrack,
-                    })
-                )
-                Library:AddOutline(TabboxTrack)
-
-                --// Pill que desliza até a aba ativa
-                Highlight = New("Frame", {
-                    BackgroundColor3 = "AccentColor",
-                    BackgroundTransparency = 0.82,
-                    Position = UDim2.fromOffset(TrackPad, TrackPad),
-                    Size = UDim2.new(0, 0, 1, -TrackPad * 2),
-                    ZIndex = 2,
-                    Parent = TabboxTrack,
-                })
-                table.insert(
-                    Library.Corners,
-                    New("UICorner", {
-                        CornerRadius = UDim.new(0, Library.CornerRadius / 2),
-                        Parent = Highlight,
-                    })
-                )
-
                 TabboxButtons = New("Frame", {
-                    AutomaticSize = Enum.AutomaticSize.X,
                     BackgroundTransparency = 1,
-                    Position = UDim2.fromOffset(TrackPad, TrackPad),
-                    Size = UDim2.new(0, 0, 1, -TrackPad * 2),
-                    ZIndex = 3,
-                    Parent = TabboxTrack,
+                    Size = UDim2.new(1, 0, 0, 34),
+                    Parent = TabboxHolder,
                 })
                 New("UIListLayout", {
                     FillDirection = Enum.FillDirection.Horizontal,
-                    VerticalAlignment = Enum.VerticalAlignment.Center,
-                    Padding = UDim.new(0, 2),
+                    HorizontalFlex = Enum.UIFlexAlignment.Fill,
                     Parent = TabboxButtons,
-                })
-
-                Library:MakeLine(TabboxHolder, {
-                    Position = UDim2.fromOffset(0, TabboxHeaderHeight),
-                    Size = UDim2.new(1, 0, 0, 1),
                 })
             end
 
+            local TotalButtons, TotalTabs = 0, 1
             local Tabbox = {
                 ActiveTab = nil,
 
@@ -9055,56 +8552,19 @@ function Library:CreateWindow(WindowInfo)
                 end
             end
 
-            local TabAnim = TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-            local HighlightAnim = TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-
-            function Tabbox:MoveHighlight(Button, SkipAnim)
-                task.defer(function()
-                    if not (Button and Button.Parent) then
-                        return
-                    end
-
-                    local TrackPosition = TabTrack.AbsolutePosition.X
-                    local ButtonPosition = Button.AbsolutePosition.X
-                    local RelativeX = ButtonPosition - TrackPosition
-
-                    local TargetPos = UDim2.fromOffset(
-                        RelativeX,
-                        3
-                    )
-
-                    local TargetSize = UDim2.new(
-                        0,
-                        Button.AbsoluteSize.X,
-                        1,
-                        -6
-                    )
-                    local TargetSize = UDim2.new(0, Button.AbsoluteSize.X, 1, -TrackPad * 2)
-
-                    if SkipAnim then
-                        Highlight.Position = TargetPos
-                        Highlight.Size = TargetSize
-                    else
-                        TweenService:Create(Highlight, HighlightAnim, { Position = TargetPos, Size = TargetSize }):Play()
-                    end
-                end)
-            end
-
             function Tabbox:AddTab(Name, IconName)
+                local TabIndex = TotalTabs
+
+                TotalButtons = TotalButtons + 1
+                TotalTabs = TotalTabs + 1
+
                 local BoxIcon = Library:GetCustomIcon(IconName)
 
                 local Button = New("TextButton", {
-                    AutomaticSize = Enum.AutomaticSize.X,
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(0, 0, 1, 0),
+                    Size = UDim2.fromOffset(0, 34),
                     Text = "",
-                    ZIndex = 3,
                     Parent = TabboxButtons,
-                })
-                New("UIPadding", {
-                    PaddingLeft = UDim.new(0, 12),
-                    PaddingRight = UDim.new(0, 12),
-                    Parent = Button,
                 })
 
                 local ButtonContent = New("Frame", {
@@ -9119,7 +8579,7 @@ function Library:CreateWindow(WindowInfo)
                     FillDirection = Enum.FillDirection.Horizontal,
                     HorizontalAlignment = Enum.HorizontalAlignment.Center,
                     VerticalAlignment = Enum.VerticalAlignment.Center,
-                    Padding = UDim.new(0, 6),
+                    Padding = UDim.new(0, 8),
                     Parent = ButtonContent,
                 })
 
@@ -9131,7 +8591,7 @@ function Library:CreateWindow(WindowInfo)
                         ImageRectOffset = BoxIcon.ImageRectOffset,
                         ImageRectSize = BoxIcon.ImageRectSize,
                         ImageTransparency = 0.5,
-                        Size = UDim2.fromOffset(14, 14),
+                        Size = UDim2.fromOffset(16, 16),
                         Parent = ButtonContent,
                     })
                 end
@@ -9141,15 +8601,38 @@ function Library:CreateWindow(WindowInfo)
                     BackgroundTransparency = 1,
                     Size = UDim2.fromOffset(0, 16),
                     Text = Name,
-                    TextSize = 14,
+                    TextSize = 15,
                     TextTransparency = 0.5,
                     Parent = ButtonContent,
                 })
 
+                -- Accent indicator bar at the bottom of the button
+                local Indicator = New("Frame", {
+                    AnchorPoint = Vector2.new(0.5, 1),
+                    BackgroundColor3 = "AccentColor",
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0.5, 0, 1, -1),
+                    Size = UDim2.new(0.5, 0, 0, 2),
+                    Parent = Button,
+                })
+                table.insert(
+                    Library.Corners,
+                    New("UICorner", {
+                        CornerRadius = UDim.new(1, 0),
+                        Parent = Indicator,
+                    })
+                )
+
+                local Line = Library:MakeLine(Button, {
+                    AnchorPoint = Vector2.new(0, 1),
+                    Position = UDim2.new(0, 0, 1, 1),
+                    Size = UDim2.new(1, 0, 0, 1),
+                })
+
                 local Container = New("Frame", {
                     BackgroundTransparency = 1,
-                    Position = UDim2.fromOffset(0, TabboxHeaderHeight + 1),
-                    Size = UDim2.new(1, 0, 1, -(TabboxHeaderHeight + 1)),
+                    Position = UDim2.fromOffset(0, 35),
+                    Size = UDim2.new(1, 0, 1, -35),
                     Visible = false,
                     Parent = TabboxHolder,
                 })
@@ -9165,9 +8648,17 @@ function Library:CreateWindow(WindowInfo)
                     Parent = Container,
                 })
 
+                local TabTweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
                 local Tab = {
                     ButtonHolder = Button,
                     Container = Container,
+
+                    ButtonCovers = {
+                        BottomCover = Indicator,
+                        LeftCover = Indicator,
+                        RightCover = Indicator
+                    },
 
                     Tab = Tab,
                     Elements = {},
@@ -9175,20 +8666,44 @@ function Library:CreateWindow(WindowInfo)
                 }
 
                 function Tab:Show()
-                    if Tabbox.ActiveTab and Tabbox.ActiveTab ~= Tab then
-                        Tabbox.ActiveTab:Hide()
+                    if Library.ActiveTab then
+                        Library.ActiveTab:Hide()
                     end
 
-                    TweenService:Create(ButtonLabel, TabAnim, { TextTransparency = 0 }):Play()
-                    if ButtonIcon then
-                        TweenService:Create(ButtonIcon, TabAnim, { ImageTransparency = 0 }):Play()
+                    TweenService:Create(TabButton, NavAnim, {
+                        BackgroundTransparency = 0.92,
+                    }):Play()
+                    TweenService:Create(TabIndicator, NavAnim, {
+                        BackgroundTransparency = 0,
+                        Size = UDim2.fromOffset(NavigationConfig.IndicatorWidth, NavigationConfig.IconSize + 10),
+                    }):Play()
+                    if TabIcon then
+                        TweenService:Create(TabIcon, NavAnim, {
+                            ImageTransparency = NavigationConfig.ActiveIconTransparency,
+                        }):Play()
                     end
 
-                    Container.Visible = true
-                    Tabbox.ActiveTab = Tab
+                    TabContainer.Visible = true
+                    Library.ActiveTab = Tab
 
-                    Tabbox:MoveHighlight(Button, not Tabbox._Placed)
-                    Tabbox._Placed = true
+                    -- Fade + leve subida + scale ao trocar de tab. Anima o TabScroll (o frame de
+                    -- rolagem em si), nunca seus filhos — que continuam 100% controlados pelo
+                    -- TabBodyLayout. Cancela uma troca anterior se o usuário clicar rápido demais.
+                    if Tab._SwitchTween then
+                        Tab._SwitchTween:Cancel()
+                    end
+
+                    local SwitchScale = TabScroll:FindFirstChildOfClass("UIScale") or New("UIScale", { Parent = TabScroll })
+                    TabScroll.Position = UDim2.fromOffset(0, 6)
+                    SwitchScale.Scale = 0.985
+
+                    local SwitchInfo = TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+                    local SwitchTween = TweenService:Create(TabScroll, SwitchInfo, { Position = UDim2.fromOffset(0, 0) })
+                    local SwitchScaleTween = TweenService:Create(SwitchScale, SwitchInfo, { Scale = 1 })
+
+                    Tab._SwitchTween = SwitchTween
+                    SwitchTween:Play()
+                    SwitchScaleTween:Play()
 
                     if Library.Searching then
                         Library:UpdateSearch(Library.SearchText)
@@ -9196,12 +8711,16 @@ function Library:CreateWindow(WindowInfo)
                 end
 
                 function Tab:Hide()
-                    TweenService:Create(ButtonLabel, TabAnim, { TextTransparency = 0.5 }):Play()
+                    TweenService:Create(ButtonLabel, TabTweenInfo, { TextTransparency = 0.5 }):Play()
                     if ButtonIcon then
-                        TweenService:Create(ButtonIcon, TabAnim, { ImageTransparency = 0.5 }):Play()
+                        TweenService:Create(ButtonIcon, TabTweenInfo, { ImageTransparency = 0.5 }):Play()
                     end
-
+                    -- Hide accent indicator
+                    TweenService:Create(Indicator, TabTweenInfo, { BackgroundTransparency = 1, Size = UDim2.new(0, 0, 0, 2) }):Play()
+                    Line.Visible = true
                     Container.Visible = false
+
+                    Tabbox.ActiveTab = nil
                 end
 
                 function Tab:Resize()
@@ -9209,23 +8728,12 @@ function Library:CreateWindow(WindowInfo)
                         return
                     end
 
-                    TabboxHolder.Size = UDim2.new(1, 0, 0, (List.AbsoluteContentSize.Y / Library.DPIScale) + TabboxHeaderHeight + 15)
+                    TabboxHolder.Size = UDim2.new(1, 0, 0, (List.AbsoluteContentSize.Y / Library.DPIScale) + 49)
                 end
 
-                function Tab:UpdateCorners() end
-
-                Button.MouseEnter:Connect(function()
-                    if Tabbox.ActiveTab == Tab then
-                        return
-                    end
-                    TweenService:Create(ButtonLabel, TabAnim, { TextTransparency = 0.2 }):Play()
-                end)
-                Button.MouseLeave:Connect(function()
-                    if Tabbox.ActiveTab == Tab then
-                        return
-                    end
-                    TweenService:Create(ButtonLabel, TabAnim, { TextTransparency = 0.5 }):Play()
-                end)
+                function Tab:UpdateCorners()
+                    -- No-op: corner covers no longer needed
+                end
 
                 --// Execution \\--
                 if not Tabbox.ActiveTab then
@@ -9238,6 +8746,8 @@ function Library:CreateWindow(WindowInfo)
 
                 Tabbox.Tabs[Name] = Tab
                 Tabbox:UpdateCorners()
+
+                Library:PlayElementEntrance({ Holder = Tabs }, TabButton)
 
                 return Tab
             end
