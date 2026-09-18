@@ -1334,6 +1334,24 @@ local function ResolveNotificationIcon(Names)
     end
 end
 
+local function LayoutNotificationArea(PositionName: string)
+    local Area = NotificationAreas[PositionName]
+    local IsLeft = Library.NotifySide:lower() == "left"
+    local AnchorX = IsLeft and 0 or 1
+    local PosX = IsLeft and 6 or -6
+
+    if PositionName == "Top" then
+        Area.AnchorPoint = Vector2.new(AnchorX, 0)
+        Area.Position = UDim2.new(AnchorX, PosX, 0, 6)
+    elseif PositionName == "Bottom" then
+        Area.AnchorPoint = Vector2.new(AnchorX, 1)
+        Area.Position = UDim2.new(AnchorX, PosX, 1, -6)
+    else
+        Area.AnchorPoint = Vector2.new(AnchorX, 0.5)
+        Area.Position = UDim2.new(AnchorX, PosX, 0.5, 0)
+    end
+end
+
 for _, PositionName in { "Top", "Center", "Bottom" } do
     local Area = New("Frame", {
         BackgroundTransparency = 1,
