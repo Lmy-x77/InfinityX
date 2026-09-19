@@ -1,9 +1,23 @@
+Services = setmetatable({}, {
+  __index = function(self, name)
+    local success, cache = pcall(function()
+      return cloneref(game:GetService(name))
+    end)
+    if success then
+      rawset(self, name, cache)
+      return cache
+    else
+      error("Invalid Service: " .. tostring(name))
+    end
+  end
+})
+
 local notify = {}
 
-local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
-local TextService = game:GetService("TextService")
-local CoreGui = game:GetService("CoreGui")
+local TweenService = Services.TweenService
+local RunService = Services.RunService
+local TextService = Services.TextService
+local CoreGui = Services.CoreGui
 
 local CONFIG = {
 	Logo = "rbxassetid://92308401887821",
