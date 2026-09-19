@@ -1,55 +1,29 @@
---[[
-	╔══════════════════════════════════════════════╗
-	║         InfinityX • Mobile Buttons           ║
-	╚══════════════════════════════════════════════╝
-
-	Usage:
-		local lib = loadstring(game:HttpGet("..."))()
-
-		local farm = lib.CreateButton("Auto Farm", {
-			Position = "Left",              -- "Left" | "Right" | "Up" | "Below"
-			Callback = function()
-				print("clicked")
-			end,
-		})
-
-		lib.CreateButton("Speed", {
-			Position = "Left",
-			Toggle = true,                  -- keeps an on/off state
-			Default = false,
-			Callback = function(state)
-				print("speed:", state)
-			end,
-		})
-
-		lib.CreateButton("Hidden one", { Position = "Left", Visible = false })
-
-	Button methods:
-		button:SetVisible(bool) / :Show() / :Hide()   -- hidden buttons leave NO empty gap
-		button:SetState(bool)  / :GetState()          -- toggle buttons
-		button:SetText(text)
-		button:SetPosition("Left" | "Right" | "Up" | "Below")
-		button:Destroy()
-
-	Library:
-		lib.SetVisible(name, bool)      lib.GetButton(name)
-		lib.SetAllVisible(bool)         lib.SetMargin(n)     lib.SetSpacing(n)
-		lib.Destroy()
-]]
+Services = setmetatable({}, {
+  __index = function(self, name)
+    local success, cache = pcall(function()
+      return cloneref(game:GetService(name))
+    end)
+    if success then
+      rawset(self, name, cache)
+      return cache
+    else
+      error("Invalid Service: " .. tostring(name))
+    end
+  end
+})
 
 local lib = {}
 
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-local CoreGui = game:GetService("CoreGui")
+local TweenService = Services.TweenService
+local UserInputService = Services.UserInputService
+local CoreGui = Services.CoreGui
 
---// ───────────── CONFIG ─────────────
 lib.Config = {
-	Margin = 16, -- distance from the screen edges
-	Spacing = 8, -- gap between buttons
-	ButtonSize = Vector2.new(116, 42), -- touch friendly
+	Margin = 16,
+	Spacing = 8,
+	ButtonSize = Vector2.new(116, 42),
 	CornerRadius = 10,
-	MobileOnly = false, -- true = only shows on touch devices
+	MobileOnly = false,
 	DisplayOrder = 500,
 }
 
@@ -63,7 +37,6 @@ local T = {
 
 lib.Buttons = {}
 
---// ───────────── HELPERS ─────────────
 local function new(class, props, children)
 	local inst = Instance.new(class)
 	local parent = props.Parent
@@ -100,7 +73,6 @@ local function getParent()
 	return CoreGui
 end
 
---// ───────────── SIDES ─────────────
 local SIDES = {
 	Left = {
 		Anchor = Vector2.new(0, 0.5),
@@ -163,7 +135,6 @@ local function sidePosition(side)
 	end
 end
 
---// ───────────── GUI + CONTAINERS ─────────────
 local parentGui = getParent()
 
 do
@@ -208,7 +179,6 @@ for side, info in pairs(SIDES) do
 	containers[side] = { Frame = container, Layout = layout }
 end
 
---// ───────────── BUTTON CLASS ─────────────
 local Button = {}
 Button.__index = Button
 
@@ -258,7 +228,7 @@ function Button:SetVisible(state)
 		tween(self.Scale, 0.12, { Scale = 0.85 }, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
 		task.delay(0.12, function()
 			if not self.Destroyed and not self.Visible then
-				self.Instance.Visible = false -- hidden = removed from the layout (no gap)
+				self.Instance.Visible = false
 			end
 		end)
 	end
@@ -307,7 +277,6 @@ function Button:Destroy()
 	self.Instance:Destroy()
 end
 
---// ───────────── API ─────────────
 function lib.CreateButton(name, options)
 	assert(type(name) == "string", "CreateButton: name must be a string")
 	options = options or {}
@@ -350,7 +319,6 @@ function lib.CreateButton(name, options)
 		Parent = btn,
 	})
 
-	-- fill that lights up (toggle on / click feedback)
 	local fill = new("Frame", {
 		Name = "Fill",
 		Size = UDim2.fromScale(1, 1),
@@ -419,7 +387,6 @@ function lib.CreateButton(name, options)
 	end
 	lib.Buttons[name] = self
 
-	-- press feedback
 	btn.MouseButton1Down:Connect(function()
 		tween(scale, 0.1, { Scale = 0.94 })
 	end)
@@ -441,7 +408,6 @@ function lib.CreateButton(name, options)
 		self:_fire()
 	end)
 
-	-- initial visuals
 	if isToggle then
 		fill.BackgroundTransparency = self.State and 0 or 1
 		stroke.Transparency = self.State and 0.25 or 0.6
