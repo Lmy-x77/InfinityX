@@ -17,6 +17,9 @@ local RunService = Services.RunService
 local Lighting = Services.Lighting
 local UserInputService = Services.UserInputService
 local CoreGui = Services.CoreGui
+local MarketplaceService = Services.MarketplaceService
+local Players = Services.Players
+
 
 local CONFIG = {
 	Title = "Game Not Supported",
@@ -39,7 +42,7 @@ local T = {
 	White = Color3.new(1, 1, 1),
 }
 
-local WIDTH, HEIGHT = 480, 272
+local WIDTH, HEIGHT = 480, 332
 
 local function new(class, props, children)
 	local inst = Instance.new(class)
@@ -166,7 +169,7 @@ for i = 1, 9 do
 		BorderSizePixel = 0,
 		Parent = glowHolder,
 	})
-	addCorner(layer, 16 + i * 6)
+	addCorner(layer, 18 + i * 6)
 	table.insert(glowLayers, layer)
 end
 
@@ -178,7 +181,7 @@ local card = new("CanvasGroup", {
 	ZIndex = 2,
 	Parent = root,
 })
-addCorner(card, 16)
+addCorner(card, 18)
 
 local bg = new("Frame", {
 	Name = "Background",
@@ -196,6 +199,20 @@ new("UIGradient", {
 		ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 8, 17)),
 	}),
 	Parent = bg,
+})
+
+local sheen = new("Frame", {
+	Name = "Sheen",
+	Size = UDim2.new(1, 0, 0, 100),
+	BackgroundColor3 = T.White,
+	BorderSizePixel = 0,
+	ZIndex = 2,
+	Parent = card,
+})
+new("UIGradient", {
+	Rotation = 90,
+	Transparency = NumberSequence.new(0.95, 1),
+	Parent = sheen,
 })
 
 new("ImageLabel", {
@@ -219,7 +236,7 @@ local border = new("Frame", {
 	ZIndex = 3,
 	Parent = root,
 })
-addCorner(border, 16)
+addCorner(border, 18)
 local borderStroke = addStroke(border, T.White, 1.5, 1)
 local borderGradient = new("UIGradient", {
 	Color = ColorSequence.new({
@@ -418,89 +435,268 @@ label({
 	Parent = card,
 })
 
-local chipRow = new("Frame", {
-	Name = "Chips",
-	Position = UDim2.fromOffset(24, 162),
-	Size = UDim2.new(1, -48, 0, 28),
+local function drawGameIcon(holder, color)
+	new("Frame", {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromOffset(13, 13),
+		Size = UDim2.fromOffset(15, 10),
+		BackgroundTransparency = 1,
+		ZIndex = 6,
+		Parent = holder,
+	}, { new("UICorner", { CornerRadius = UDim.new(0, 5) }), new("UIStroke", { Color = color, Thickness = 1.5 }) })
+	for _, size in ipairs({ Vector2.new(5, 2), Vector2.new(2, 5) }) do
+		local bar = new("Frame", {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.fromOffset(9, 13),
+			Size = UDim2.fromOffset(size.X, size.Y),
+			BackgroundColor3 = color,
+			BorderSizePixel = 0,
+			ZIndex = 7,
+			Parent = holder,
+		})
+		addCorner(bar, 1)
+	end
+	local dot = new("Frame", {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromOffset(17, 13),
+		Size = UDim2.fromOffset(3, 3),
+		BackgroundColor3 = color,
+		BorderSizePixel = 0,
+		ZIndex = 7,
+		Parent = holder,
+	})
+	addCorner(dot, 2)
+end
+
+local function drawUserIcon(holder, color)
+	local head = new("Frame", {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromOffset(13, 9),
+		Size = UDim2.fromOffset(6, 6),
+		BackgroundTransparency = 1,
+		ZIndex = 6,
+		Parent = holder,
+	})
+	addCorner(head, 3)
+	addStroke(head, color, 1.5, 0)
+	local body = new("Frame", {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = UDim2.fromOffset(13, 18),
+		Size = UDim2.fromOffset(11, 5),
+		BackgroundTransparency = 1,
+		ZIndex = 6,
+		Parent = holder,
+	})
+	addCorner(body, 4)
+	addStroke(body, color, 1.5, 0)
+end
+
+local function textIcon(glyph)
+	return function(holder, color)
+		label({
+			Size = UDim2.fromScale(1, 1),
+			Text = glyph,
+			Font = Enum.Font.GothamBold,
+			TextSize = 12,
+			TextColor3 = color,
+			ZIndex = 6,
+			Parent = holder,
+		})
+	end
+end
+
+local function makeTile(parent, o)
+	local tile = new("Frame", {
+		Name = o.Name,
+		LayoutOrder = o.Order or 0,
+		Position = o.Position or UDim2.new(),
+		Size = o.Size,
+		BackgroundColor3 = T.White,
+		BackgroundTransparency = 0.94,
+		BorderSizePixel = 0,
+		ZIndex = 3,
+		Parent = parent,
+	})
+	addCorner(tile, 10)
+	local tileStroke = addStroke(tile, T.White, 1, 0.92)
+
+	local iconBox = new("Frame", {
+		Position = UDim2.fromOffset(8, 8),
+		Size = UDim2.fromOffset(26, 26),
+		BackgroundColor3 = T.Accent,
+		BackgroundTransparency = 0.82,
+		BorderSizePixel = 0,
+		ZIndex = 4,
+		Parent = tile,
+	})
+	addCorner(iconBox, 8)
+	addStroke(iconBox, T.Accent, 1, 0.65)
+	if o.Icon then
+		o.Icon(iconBox, T.AccentSoft)
+	end
+
+	local rightPad = o.RightPad or 0
+	label({
+		Position = UDim2.fromOffset(44, 6),
+		Size = UDim2.new(1, -(52 + rightPad), 0, 12),
+		Text = o.Key,
+		Font = Enum.Font.GothamMedium,
+		TextSize = 10,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextColor3 = T.Muted,
+		ZIndex = 4,
+		Parent = tile,
+	})
+	local value = label({
+		Position = UDim2.fromOffset(44, 20),
+		Size = UDim2.new(1, -(52 + rightPad), 0, 16),
+		Text = o.Value,
+		Font = Enum.Font.GothamBold,
+		TextSize = 12,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextTruncate = Enum.TextTruncate.AtEnd,
+		TextColor3 = T.Text,
+		ZIndex = 4,
+		Parent = tile,
+	})
+
+	tile.MouseEnter:Connect(function()
+		tween(tile, 0.18, { BackgroundTransparency = 0.89 })
+		tween(tileStroke, 0.18, { Transparency = 0.8 })
+	end)
+	tile.MouseLeave:Connect(function()
+		tween(tile, 0.18, { BackgroundTransparency = 0.94 })
+		tween(tileStroke, 0.18, { Transparency = 0.92 })
+	end)
+
+	return tile, value
+end
+
+local gameTile, gameValue = makeTile(card, {
+	Name = "GameTile",
+	Position = UDim2.fromOffset(24, 158),
+	Size = UDim2.new(1, -48, 0, 42),
+	Key = "GAME",
+	Value = "Loading...",
+	Icon = drawGameIcon,
+	RightPad = 118,
+})
+
+local statusPill = new("Frame", {
+	Name = "StatusPill",
+	AnchorPoint = Vector2.new(1, 0.5),
+	Position = UDim2.new(1, -10, 0.5, 0),
+	AutomaticSize = Enum.AutomaticSize.X,
+	Size = UDim2.fromOffset(0, 24),
+	BackgroundColor3 = T.Danger,
+	BackgroundTransparency = 0.86,
+	BorderSizePixel = 0,
+	ZIndex = 4,
+	Parent = gameTile,
+})
+addCorner(statusPill, 12)
+addStroke(statusPill, T.Danger, 1, 0.6)
+new("UIPadding", { PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 12), Parent = statusPill })
+new("UIListLayout", {
+	FillDirection = Enum.FillDirection.Horizontal,
+	VerticalAlignment = Enum.VerticalAlignment.Center,
+	SortOrder = Enum.SortOrder.LayoutOrder,
+	Padding = UDim.new(0, 6),
+	Parent = statusPill,
+})
+local statusDot = new("Frame", {
+	LayoutOrder = 1,
+	Size = UDim2.fromOffset(6, 6),
+	BackgroundColor3 = T.Danger,
+	BorderSizePixel = 0,
+	ZIndex = 5,
+	Parent = statusPill,
+})
+addCorner(statusDot, 3)
+TweenService:Create(
+	statusDot,
+	TweenInfo.new(0.9, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
+	{ BackgroundTransparency = 0.7 }
+):Play()
+label({
+	LayoutOrder = 2,
+	AutomaticSize = Enum.AutomaticSize.X,
+	Size = UDim2.new(0, 0, 1, 0),
+	Text = "UNSUPPORTED",
+	Font = Enum.Font.GothamBold,
+	TextSize = 10,
+	TextColor3 = Color3.fromRGB(252, 165, 165),
+	ZIndex = 5,
+	Parent = statusPill,
+})
+
+local statRow = new("Frame", {
+	Name = "Stats",
+	Position = UDim2.fromOffset(24, 208),
+	Size = UDim2.new(1, -48, 0, 42),
 	BackgroundTransparency = 1,
 	ZIndex = 3,
 	Parent = card,
 })
 new("UIListLayout", {
 	FillDirection = Enum.FillDirection.Horizontal,
-	VerticalAlignment = Enum.VerticalAlignment.Center,
 	SortOrder = Enum.SortOrder.LayoutOrder,
 	Padding = UDim.new(0, 8),
-	Parent = chipRow,
+	Parent = statRow,
 })
 
-local function makeChip(order, key, value, dotColor, pulse)
-	local chip = new("Frame", {
-		Name = "Chip" .. order,
-		LayoutOrder = order,
-		AutomaticSize = Enum.AutomaticSize.X,
-		Size = UDim2.fromOffset(0, 28),
-		BackgroundColor3 = T.White,
-		BackgroundTransparency = 0.94,
-		BorderSizePixel = 0,
-		ZIndex = 3,
-		Parent = chipRow,
-	})
-	addCorner(chip, 8)
-	addStroke(chip, T.White, 1, 0.92)
-	new("UIPadding", { PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 12), Parent = chip })
-	new("UIListLayout", {
-		FillDirection = Enum.FillDirection.Horizontal,
-		VerticalAlignment = Enum.VerticalAlignment.Center,
-		SortOrder = Enum.SortOrder.LayoutOrder,
-		Padding = UDim.new(0, 6),
-		Parent = chip,
-	})
+local tileSize = UDim2.new(1 / 3, -6, 0, 42)
 
-	local dot = new("Frame", {
-		LayoutOrder = 1,
-		Size = UDim2.fromOffset(6, 6),
-		BackgroundColor3 = dotColor,
-		BorderSizePixel = 0,
-		ZIndex = 4,
-		Parent = chip,
-	})
-	addCorner(dot, 3)
+makeTile(statRow, {
+	Name = "PlaceIdTile",
+	Order = 1,
+	Size = tileSize,
+	Key = "PLACE ID",
+	Value = tostring(game.PlaceId),
+	Icon = textIcon("#"),
+})
 
-	if pulse then
-		TweenService:Create(
-			dot,
-			TweenInfo.new(0.9, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
-			{ BackgroundTransparency = 0.7 }
-		):Play()
+local _, playersValue = makeTile(statRow, {
+	Name = "PlayersTile",
+	Order = 2,
+	Size = tileSize,
+	Key = "PLAYERS",
+	Value = "-",
+	Icon = drawUserIcon,
+})
+
+local executorName = "Unknown"
+pcall(function()
+	if identifyexecutor then
+		executorName = tostring((identifyexecutor()))
 	end
+end)
 
-	label({
-		LayoutOrder = 2,
-		AutomaticSize = Enum.AutomaticSize.X,
-		Size = UDim2.new(0, 0, 1, 0),
-		Text = key,
-		Font = Enum.Font.GothamMedium,
-		TextSize = 10,
-		TextColor3 = T.Muted,
-		ZIndex = 4,
-		Parent = chip,
-	})
-	label({
-		LayoutOrder = 3,
-		AutomaticSize = Enum.AutomaticSize.X,
-		Size = UDim2.new(0, 0, 1, 0),
-		Text = value,
-		Font = Enum.Font.GothamBold,
-		TextSize = 11,
-		TextColor3 = T.Text,
-		ZIndex = 4,
-		Parent = chip,
-	})
-end
+makeTile(statRow, {
+	Name = "ExecutorTile",
+	Order = 3,
+	Size = tileSize,
+	Key = "EXECUTOR",
+	Value = executorName,
+	Icon = textIcon("</>"),
+})
 
-makeChip(1, "PLACE ID", tostring(game.PlaceId), T.Accent, false)
-makeChip(2, "STATUS", "Unsupported", T.Danger, true)
+task.spawn(function()
+	local ok, info = pcall(function()
+		return MarketplaceService:GetProductInfo(game.PlaceId)
+	end)
+	local name = (ok and info and info.Name) or game.Name
+	if gui.Parent then
+		gameValue.Text = name
+	end
+end)
+
+task.spawn(function()
+	while gui.Parent do
+		playersValue.Text = #Players:GetPlayers() .. " / " .. Players.MaxPlayers
+		task.wait(2)
+	end
+end)
 
 local buttonRow = new("Frame", {
 	Name = "Buttons",
@@ -595,7 +791,8 @@ local function makeButton(order, width, text, primary)
 	end
 
 	local content = new("Frame", {
-		Size = UDim2.fromScale(1, 1),
+		Position = primary and UDim2.fromOffset(40, 0) or UDim2.fromOffset(0, 0),
+		Size = primary and UDim2.new(1, -54, 1, 0) or UDim2.fromScale(1, 1),
 		BackgroundTransparency = 1,
 		ZIndex = 5,
 		Parent = btn,
@@ -610,16 +807,16 @@ local function makeButton(order, width, text, primary)
 	})
 
 	local icon = new("Frame", {
-		LayoutOrder = 1,
+		Position = UDim2.fromOffset(16, 11),
 		Size = UDim2.fromOffset(16, 16),
 		BackgroundTransparency = 1,
 		Visible = primary,
 		ZIndex = 5,
-		Parent = content,
+		Parent = btn,
 	})
 
 	local txt = label({
-		LayoutOrder = 2,
+		LayoutOrder = 1,
 		AutomaticSize = Enum.AutomaticSize.X,
 		Size = UDim2.new(0, 0, 1, 0),
 		Text = text,
@@ -661,7 +858,7 @@ local function makeButton(order, width, text, primary)
 end
 
 local dismiss = makeButton(1, 104, "Dismiss", false)
-local copyBtn = makeButton(2, 176, "Copy Discord Link", true)
+local copyBtn = makeButton(2, 170, "Copy Discord Link", true)
 drawCopyIcon(copyBtn.Icon, T.White, T.Accent)
 
 local connections = {}
@@ -784,7 +981,7 @@ local function copyDiscord()
 			return loadstring(game:HttpGet(CONFIG.NotifyLib, true))()
 		end)
 		if success and lib and lib.notify then
-			pcall(lib.notify, "Discord link copied to clipboard!")
+			pcall(lib.success, "Discord link copied to clipboard!")
 		end
 	end)
 
