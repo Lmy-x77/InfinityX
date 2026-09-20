@@ -9,6 +9,8 @@ local UserInputService: UserInputService = cloneref(game:GetService("UserInputSe
 local TextService: TextService = cloneref(game:GetService("TextService"))
 local Teams: Teams = cloneref(game:GetService("Teams"))
 local TweenService: TweenService = cloneref(game:GetService("TweenService"))
+local HttpService: HttpService = cloneref(game:GetService("HttpService"))
+local TeleportService: TeleportService = cloneref(game:GetService("TeleportService"))
 
 local getgenv = getgenv or function()
     return shared
@@ -8030,15 +8032,21 @@ function Library:CreateWindow(WindowInfo)
 
         --// Full-width groupbox column (para AddFullGroupbox)
         local TabFull = New("Frame", {
+            AutomaticSize = Enum.AutomaticSize.Y,
             BackgroundTransparency = 1,
             LayoutOrder = 4,
-            Position = UDim2.fromOffset(2, 0),
-            Size = UDim2.new(1, -4, 0, 0),
-            AutomaticSize = Enum.AutomaticSize.Y,
+            Size = UDim2.fromScale(1, 0),
             Parent = TabScroll,
         })
         New("UIListLayout", {
-            Padding = UDim.new(0, 6),
+            Padding = UDim.new(0, 2),
+            Parent = TabFull,
+        })
+        New("UIPadding", {
+            PaddingBottom = UDim.new(0, 2),
+            PaddingLeft = UDim.new(0, 2),
+            PaddingRight = UDim.new(0, 2),
+            PaddingTop = UDim.new(0, 2),
             Parent = TabFull,
         })
 
@@ -10261,8 +10269,32 @@ do
         end)
 
         AddQuickAction(ActionsRow, "refresh-cw", "Rejoin", function()
-            local TeleportService = cloneref(game:GetService("TeleportService"))
             pcall(TeleportService.TeleportToPlaceInstance, TeleportService, game.PlaceId, game.JobId, LocalPlayer)
+        end)
+
+        AddQuickAction(ActionsRow, "shuffle", "RJ smallest", function()
+            local PlaceId = game.PlaceId
+            local JobId = game.JobId
+
+            local function GetServer()
+                local servers = {}
+                local req = request({
+                    Url = string.format("https://games.roblox.com/v1/games/%d/servers/Public?sortOrder=Asc&limit=100", PlaceId)
+                })
+                local data = HttpService:JSONDecode(req.Body)
+                for _, v in pairs(data.data) do
+                    if v.playing < v.maxPlayers and v.id ~= JobId then
+                    table.insert(servers, v.id)
+                    end
+                end
+                if #servers > 0 then
+                    return servers[math.random(1, #servers)]
+                end
+            end
+            local serverId = GetServer()
+            if serverId then
+                TeleportService:TeleportToPlaceInstance(PlaceId, serverId, Players.LocalPlayer)
+            end
         end)
 
         --// Account card \\--
