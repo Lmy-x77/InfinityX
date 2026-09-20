@@ -7908,7 +7908,7 @@ function Library:CreateWindow(WindowInfo)
             })
 
            local TabBodyLayout = New("UIListLayout", {
-                Padding = UDim.new(0, 8),
+                Padding = UDim.new(0, 0),
                 Parent = TabScroll,
             })
 
@@ -8032,15 +8032,21 @@ function Library:CreateWindow(WindowInfo)
 
         --// Full-width groupbox column (para AddFullGroupbox)
         local TabFull = New("Frame", {
+            AutomaticSize = Enum.AutomaticSize.Y,
             BackgroundTransparency = 1,
             LayoutOrder = 4,
-            Position = UDim2.fromOffset(2, 0),
-            Size = UDim2.new(1, -4, 0, 0),
-            AutomaticSize = Enum.AutomaticSize.Y,
+            Size = UDim2.fromScale(1, 0),
             Parent = TabScroll,
         })
         New("UIListLayout", {
-            Padding = UDim.new(0, 6),
+            Padding = UDim.new(0, 2),
+            Parent = TabFull,
+        })
+        New("UIPadding", {
+            PaddingBottom = UDim.new(0, 2),
+            PaddingLeft = UDim.new(0, 2),
+            PaddingRight = UDim.new(0, 2),
+            PaddingTop = UDim.new(0, 0),
             Parent = TabFull,
         })
 
