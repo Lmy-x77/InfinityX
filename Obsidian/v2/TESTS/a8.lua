@@ -7908,7 +7908,7 @@ function Library:CreateWindow(WindowInfo)
             })
 
            local TabBodyLayout = New("UIListLayout", {
-                Padding = UDim.new(0, 8),
+                Padding = UDim.new(0, 0),
                 Parent = TabScroll,
             })
 
@@ -8046,7 +8046,7 @@ function Library:CreateWindow(WindowInfo)
             PaddingBottom = UDim.new(0, 2),
             PaddingLeft = UDim.new(0, 2),
             PaddingRight = UDim.new(0, 2),
-            PaddingTop = UDim.new(0, 2),
+            PaddingTop = UDim.new(0, 0),
             Parent = TabFull,
         })
 
