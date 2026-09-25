@@ -13,9 +13,12 @@ local CONFIG = {
 	MinScale = 0.8,
 	MaxScale = 1.05,
 	Logo = "rbxassetid://92308401887821",
+	ParticleCountDesktop = 46,
+	ParticleCountMobile = 22,
 }
 
 local T = {
+	Background = Color3.fromRGB(12, 9, 19),
 	Accent = Color3.fromRGB(140, 80, 255),
 	Accent2 = Color3.fromRGB(236, 72, 153),
 	AccentSoft = Color3.fromRGB(167, 139, 250),
@@ -220,6 +223,175 @@ local function makeDraggable(main, handle)
 	end)
 end
 
+local function makeGlowOrb(parent, size, pos, color, driftTo, dur)
+	local orb = new("Frame", {
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		Position = pos,
+		Size = UDim2.fromOffset(size, size),
+		BackgroundColor3 = color,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ZIndex = 2,
+		Parent = parent,
+	})
+	addCorner(orb, size)
+	tween(orb, 1.4, { BackgroundTransparency = 0.9 })
+
+	task.spawn(function()
+		while orb.Parent do
+			local t = TweenService:Create(
+				orb,
+				TweenInfo.new(dur, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+				{ Position = driftTo }
+			)
+			t:Play()
+			t.Completed:Wait()
+			driftTo, pos = pos, driftTo
+		end
+	end)
+
+	return orb
+end
+
+local function makeBracket(parent, cornerAnchor, xSign, ySign)
+	local margin = 36
+	local arm = 24
+	local thick = 2
+
+	local holder = new("Frame", {
+		AnchorPoint = cornerAnchor,
+		Position = UDim2.new(cornerAnchor.X, xSign * margin, cornerAnchor.Y, ySign * margin),
+		Size = UDim2.fromOffset(arm, arm),
+		BackgroundTransparency = 1,
+		ZIndex = 2,
+		Parent = parent,
+	})
+
+	local h = new("Frame", {
+		Position = UDim2.new(cornerAnchor.X, 0, cornerAnchor.Y, 0),
+		AnchorPoint = cornerAnchor,
+		Size = UDim2.fromOffset(arm, thick),
+		BackgroundColor3 = T.Accent,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Parent = holder,
+	})
+	local v = new("Frame", {
+		Position = UDim2.new(cornerAnchor.X, 0, cornerAnchor.Y, 0),
+		AnchorPoint = cornerAnchor,
+		Size = UDim2.fromOffset(thick, arm),
+		BackgroundColor3 = T.Accent,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Parent = holder,
+	})
+
+	tween(h, 0.8, { BackgroundTransparency = 0.6 })
+	tween(v, 0.8, { BackgroundTransparency = 0.6 })
+end
+
+local function spawnParticle(parent)
+	local size = math.random(2, 4)
+	local particle = new("Frame", {
+		Size = UDim2.fromOffset(size, size),
+		Position = UDim2.fromScale(math.random(), 1.05),
+		BackgroundColor3 = math.random() > 0.5 and T.Accent or T.Accent2,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ZIndex = 3,
+		Parent = parent,
+	})
+	addCorner(particle, size)
+
+	task.spawn(function()
+		task.wait(math.random() * 4)
+
+		while particle.Parent do
+			local startX = math.random()
+			local sway = (math.random() - 0.5) * 0.14
+			local duration = math.random(90, 170) / 10
+			local maxOpacity = math.random(35, 70) / 100
+
+			particle.Position = UDim2.fromScale(startX, 1.05)
+
+			tween(particle, duration * 0.18, { BackgroundTransparency = 1 - maxOpacity })
+
+			local drift = TweenService:Create(
+				particle,
+				TweenInfo.new(duration, Enum.EasingStyle.Linear),
+				{ Position = UDim2.fromScale(math.clamp(startX + sway, 0, 1), -0.05) }
+			)
+			drift:Play()
+
+			task.wait(duration * 0.8)
+			tween(particle, duration * 0.2, { BackgroundTransparency = 1 })
+			drift.Completed:Wait()
+		end
+	end)
+
+	return particle
+end
+
+local function buildBackground(gui)
+	local bg = new("Frame", {
+		Name = "Background",
+		Size = UDim2.fromScale(1, 1),
+		BackgroundColor3 = T.Background,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ZIndex = 1,
+		Parent = gui,
+	})
+
+	local gradient = new("UIGradient", {
+		Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 15, 46)),
+			ColorSequenceKeypoint.new(0.5, Color3.fromRGB(64, 34, 112)),
+			ColorSequenceKeypoint.new(1, Color3.fromRGB(18, 11, 30)),
+		}),
+		Rotation = 0,
+		Parent = bg,
+	})
+
+	task.spawn(function()
+		while bg.Parent do
+			local t = TweenService:Create(gradient, TweenInfo.new(10, Enum.EasingStyle.Linear), {
+				Rotation = gradient.Rotation + 360,
+			})
+			t:Play()
+			t.Completed:Wait()
+		end
+	end)
+
+	new("Frame", {
+		Size = UDim2.fromScale(1, 1),
+		BackgroundColor3 = Color3.fromRGB(8, 6, 14),
+		BackgroundTransparency = 0.4,
+		BorderSizePixel = 0,
+		ZIndex = 2,
+		Parent = bg,
+	})
+
+	makeGlowOrb(bg, 420, UDim2.fromScale(0.16, 0.24), T.Accent, UDim2.fromScale(0.22, 0.3), 7)
+	makeGlowOrb(bg, 360, UDim2.fromScale(0.86, 0.74), T.Accent2, UDim2.fromScale(0.8, 0.68), 8)
+	makeGlowOrb(bg, 260, UDim2.fromScale(0.5, 0.9), T.Accent, UDim2.fromScale(0.56, 0.84), 9)
+
+	makeBracket(bg, Vector2.new(0, 0), 1, 1)
+	makeBracket(bg, Vector2.new(1, 0), -1, 1)
+	makeBracket(bg, Vector2.new(0, 1), 1, -1)
+	makeBracket(bg, Vector2.new(1, 1), -1, -1)
+
+	local particleCount = (UserInputService.TouchEnabled and not UserInputService.MouseEnabled)
+		and CONFIG.ParticleCountMobile
+		or CONFIG.ParticleCountDesktop
+
+	for _ = 1, particleCount do
+		spawnParticle(bg)
+	end
+
+	return bg
+end
+
 local function createNotifier(parentGui)
 	local layer = new("Frame", {
 		Name = "Notifications",
@@ -345,6 +517,10 @@ function UiLibrary:CreateWindow(titleText, options)
 	})
 	self._Gui = gui
 
+	local background = buildBackground(gui)
+	self._Background = background
+	tween(background, 0.6, { BackgroundTransparency = 0 })
+
 	local main = new("Frame", {
 		Name = "Main",
 		AnchorPoint = Vector2.new(0.5, 0.5),
@@ -352,7 +528,8 @@ function UiLibrary:CreateWindow(titleText, options)
 		Size = UDim2.fromOffset(options.Width or CONFIG.Width, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundTransparency = 1,
-		Parent = gui,
+		ZIndex = 10,
+		Parent = background,
 	})
 	self._Main = main
 
@@ -360,11 +537,14 @@ function UiLibrary:CreateWindow(titleText, options)
 		Size = UDim2.fromScale(1, 1),
 		BackgroundTransparency = 1,
 		ClipsDescendants = true,
+		ZIndex = 10,
 		Parent = main,
 	})
-	addCorner(card, 14)
-	addCardBackground(card)
+	addCorner(card, 16)
+	local cardBg = addCardBackground(card)
+	self._CardBg = cardBg
 	local border = addStroke(card, T.White, 1, 1)
+	self._Border = border
 	local borderGradient = new("UIGradient", {
 		Rotation = 105,
 		Color = ColorSequence.new({
@@ -374,7 +554,28 @@ function UiLibrary:CreateWindow(titleText, options)
 		}),
 		Parent = border,
 	})
-	tween(border, 0.3, { Transparency = 0.35 })
+	tween(border, 0.4, { Transparency = 0.35 })
+
+	local accent = new("Frame", {
+		Size = UDim2.new(1, 0, 0, 2),
+		BackgroundColor3 = T.White,
+		BorderSizePixel = 0,
+		ZIndex = 11,
+		Parent = card,
+	})
+	local accentGradient = new("UIGradient", {
+		Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, T.Accent),
+			ColorSequenceKeypoint.new(0.5, T.Accent2),
+			ColorSequenceKeypoint.new(1, T.Accent),
+		}),
+		Parent = accent,
+	})
+	TweenService:Create(
+		accentGradient,
+		TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
+		{ Offset = Vector2.new(0.4, 0) }
+	):Play()
 
 	local scaleUI = new("UIScale", { Scale = computeScale(), Parent = main })
 	self._ScaleConnection = workspace.CurrentCamera
@@ -385,6 +586,7 @@ function UiLibrary:CreateWindow(titleText, options)
 	local content = new("Frame", {
 		Size = UDim2.fromScale(1, 1),
 		BackgroundTransparency = 1,
+		ZIndex = 12,
 		Parent = card,
 	})
 	new("UIPadding", {
@@ -799,12 +1001,30 @@ function UiLibrary:SetVisible(visible)
 end
 
 function UiLibrary:Destroy()
+	if self._Destroyed then
+		return
+	end
+	self._Destroyed = true
+
 	if self._ScaleConnection then
 		self._ScaleConnection:Disconnect()
 	end
-	if self._Gui then
-		self._Gui:Destroy()
+
+	if self._Background then
+		tween(self._Background, 0.35, { BackgroundTransparency = 1 })
 	end
+	if self._CardBg then
+		tween(self._CardBg, 0.3, { BackgroundTransparency = 1 })
+	end
+	if self._Border then
+		tween(self._Border, 0.3, { Transparency = 1 })
+	end
+
+	task.delay(0.4, function()
+		if self._Gui then
+			self._Gui:Destroy()
+		end
+	end)
 end
 
 
