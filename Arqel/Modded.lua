@@ -90,6 +90,32 @@ Arqel.Theme = {
     Pending = Color3.fromRGB(54, 59, 70)
 }
 
+local ThemeDefaults = {
+    Accent = Color3.fromRGB(179, 136, 255),
+    AccentHover = Color3.fromRGB(168, 117, 255),
+    Background = Color3.fromRGB(11, 13, 16),
+    Header = Color3.fromRGB(16, 19, 24),
+    Input = Color3.fromRGB(20, 24, 32),
+    Surface = Color3.fromRGB(18, 22, 29),
+    SurfaceHover = Color3.fromRGB(22, 27, 36),
+    Text = Color3.fromRGB(245, 243, 250),
+    TextDim = Color3.fromRGB(145, 145, 158),
+    Success = Color3.fromRGB(88, 196, 125),
+    Error = Color3.fromRGB(210, 82, 99),
+    Warning = Color3.fromRGB(214, 164, 76),
+    StatusIdle = Color3.fromRGB(125, 129, 140),
+    Discord = Color3.fromRGB(145, 122, 235),
+    DiscordHover = Color3.fromRGB(164, 140, 250),
+    Divider = Color3.fromRGB(37, 42, 53),
+    Pending = Color3.fromRGB(54, 59, 70)
+}
+
+for name, defaultValue in pairs(ThemeDefaults) do
+    if typeof(Arqel.Theme[name]) ~= "Color3" then
+        Arqel.Theme[name] = defaultValue
+    end
+end
+
 --callbacks
 Arqel.Callbacks = {
     OnVerify = nil,
@@ -187,17 +213,18 @@ local function isMobile()
 end
 
 local function getScale()
-    local viewport = Workspace.CurrentCamera.ViewportSize
+    local camera = Workspace.CurrentCamera
+    if not camera then return 1 end
+    local viewport = camera.ViewportSize
     return math.clamp(math.min(viewport.X, viewport.Y) / 900, 0.65, 1.3)
 end
 
 local function hasFileSystem()
-    local ok1 = pcall(function() return type(writefile) == "function" end)
-    local ok2 = pcall(function() return type(readfile) == "function" end)
-    local ok3 = pcall(function() return type(isfile) == "function" end)
-    local ok4 = pcall(function() return type(makefolder) == "function" end)
-    local ok5 = pcall(function() return type(isfolder) == "function" end)
-    return ok1 and ok2 and ok3 and ok4 and ok5
+    return type(writefile) == "function"
+        and type(readfile) == "function"
+        and type(isfile) == "function"
+        and type(makefolder) == "function"
+        and type(isfolder) == "function"
 end
 
 local fileSystemSupported = hasFileSystem()
@@ -2018,7 +2045,7 @@ local function BuildKeyUI()
     local function createPanel(parent, height, layoutOrder)
         local frame = Instance.new("Frame")
         frame.Size = UDim2.new(1, 0, 0, height)
-        frame.BackgroundColor3 = Arqel.Theme.Surface
+        frame.BackgroundColor3 = Arqel.Theme.Surface or Arqel.Theme.Input or Arqel.Theme.Background
         frame.BorderSizePixel = 0
         frame.LayoutOrder = layoutOrder or 1
         frame.ClipsDescendants = true
@@ -2963,7 +2990,7 @@ local function BuildKeyUI()
     acquireBtn.MouseEnter:Connect(function()
         if acquireBtn.Active then
             TweenService:Create(acquireBtn, TweenInfo.new(0.14, Enum.EasingStyle.Quart), {
-                BackgroundColor3 = Arqel.Theme.SurfaceHover
+                BackgroundColor3 = Arqel.Theme.SurfaceHover or Arqel.Theme.Input
             }):Play()
             TweenService:Create(acquireStroke, TweenInfo.new(0.14, Enum.EasingStyle.Quart), {
                 Color = Arqel.Theme.Accent,
