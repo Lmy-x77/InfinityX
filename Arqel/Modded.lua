@@ -1993,7 +1993,7 @@ local function BuildKeyUI()
     local contentPadding = Instance.new("UIPadding")
     contentPadding.PaddingTop = UDim.new(0, 2)
     contentPadding.PaddingBottom = UDim.new(0, 4)
-    content.Padding = contentPadding
+    content.Padding = content
 
     local contentLayout = Instance.new("UIListLayout")
     contentLayout.Padding = UDim.new(0, mobile and 9 or 10)
