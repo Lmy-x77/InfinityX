@@ -15,6 +15,7 @@ Services = setmetatable({}, {
 local Players = Services.Players
 local TweenService = Services.TweenService
 local Lighting = Services.Lighting
+local RunService = Services.RunService
 
 local player = Players.LocalPlayer
 local camera = workspace.CurrentCamera
@@ -32,6 +33,7 @@ local CONFIG = {
 	ReferenceHeight = 600,
 	MinScale = 0.55,
 	MaxScale = 1.15,
+	ParticleCount = 30,
 }
 
 local T = {
@@ -99,6 +101,48 @@ local function getParent()
 	return player:WaitForChild("PlayerGui")
 end
 
+local function spawnParticle(parent)
+	local size = math.random(2, 4)
+
+	local particle = new("Frame", {
+		Size = UDim2.fromOffset(size, size),
+		Position = UDim2.fromScale(math.random(), 1.05),
+		BackgroundColor3 = math.random() > 0.5 and T.Accent or T.Accent2,
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		ZIndex = 3,
+		Parent = parent,
+	})
+	addCorner(particle, size)
+
+	task.spawn(function()
+		task.wait(math.random() * 2.4)
+
+		while particle.Parent do
+			local x = math.random()
+			local sway = (math.random() - 0.5) * 0.16
+			local duration = math.random(90, 170) / 10
+			local maxOpacity = math.random(35, 70) / 100
+
+			particle.Position = UDim2.fromScale(x, 1.05)
+			tween(particle, duration * 0.18, { BackgroundTransparency = 1 - maxOpacity })
+
+			local drift = TweenService:Create(
+				particle,
+				TweenInfo.new(duration, Enum.EasingStyle.Linear),
+				{ Position = UDim2.fromScale(math.clamp(x + sway, 0, 1), -0.05) }
+			)
+			drift:Play()
+
+			task.wait(duration * 0.8)
+			tween(particle, duration * 0.2, { BackgroundTransparency = 1 })
+			drift.Completed:Wait()
+		end
+	end)
+
+	return particle
+end
+
 local parentGui = getParent()
 do
 	local old = parentGui:FindFirstChild("InfinityXIntro")
@@ -157,19 +201,15 @@ local bgGradient = new("UIGradient", {
 		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(70, 38, 120)),
 		ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 12, 34)),
 	}),
-	Rotation = 0,
+	Rotation = -9,
 	Parent = bg,
 })
 
-task.spawn(function()
-	while bg.Parent do
-		local t = TweenService:Create(bgGradient, TweenInfo.new(8, Enum.EasingStyle.Linear), {
-			Rotation = bgGradient.Rotation + 360,
-		})
-		t:Play()
-		t.Completed:Wait()
-	end
-end)
+TweenService:Create(
+	bgGradient,
+	TweenInfo.new(10, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
+	{ Rotation = 9 }
+):Play()
 
 new("Frame", {
 	Size = UDim2.fromScale(1, 1),
@@ -192,7 +232,7 @@ local function makeOrb(size, pos, color, driftTo, dur)
 		Parent = bg,
 	})
 	addCorner(orb, size)
-	tween(orb, 1.4, { BackgroundTransparency = 0.88 })
+	tween(orb, 1.4, { BackgroundTransparency = 0.9 })
 
 	task.spawn(function()
 		while orb.Parent do
@@ -212,6 +252,10 @@ end
 
 makeOrb(360, UDim2.fromScale(0.2, 0.28), T.Accent, UDim2.fromScale(0.26, 0.34), 6)
 makeOrb(300, UDim2.fromScale(0.82, 0.7), T.Accent2, UDim2.fromScale(0.76, 0.64), 7)
+
+for i = 1, CONFIG.ParticleCount do
+	spawnParticle(bg)
+end
 
 local function makeBracket(cornerAnchor, xSign, ySign)
 	local margin = 42
@@ -296,20 +340,44 @@ local logoWrap = new("Frame", {
 	Parent = stack,
 })
 
-for i = 1, 3 do
-	local size = 64 + i * 14
-	local ring = new("Frame", {
-		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.fromScale(0.5, 0.5),
-		Size = UDim2.fromOffset(size, size),
-		BackgroundColor3 = T.Accent,
-		BackgroundTransparency = 1,
-		BorderSizePixel = 0,
-		ZIndex = 5,
-		Parent = logoWrap,
-	})
-	addCorner(ring, size / 2)
-end
+local logoGlow = new("Frame", {
+	AnchorPoint = Vector2.new(0.5, 0.5),
+	Position = UDim2.fromScale(0.5, 0.5),
+	Size = UDim2.fromOffset(112, 112),
+	BackgroundColor3 = T.Accent,
+	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
+	ZIndex = 4,
+	Parent = logoWrap,
+})
+addCorner(logoGlow, 56)
+
+local ringFrame = new("Frame", {
+	AnchorPoint = Vector2.new(0.5, 0.5),
+	Position = UDim2.fromScale(0.5, 0.5),
+	Size = UDim2.fromOffset(82, 82),
+	BackgroundTransparency = 1,
+	ZIndex = 5,
+	Parent = logoWrap,
+})
+addCorner(ringFrame, 41)
+local ringStroke = addStroke(ringFrame, T.White, 1.5, 1)
+local ringGradient = new("UIGradient", {
+	Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, T.Accent),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(40, 30, 65)),
+		ColorSequenceKeypoint.new(1, T.Accent2),
+	}),
+	Parent = ringStroke,
+})
+
+task.spawn(function()
+	local t0 = os.clock()
+	while ringFrame.Parent do
+		ringGradient.Rotation = ((os.clock() - t0) * 55) % 360
+		RunService.RenderStepped:Wait()
+	end
+end)
 
 local logoChip = new("Frame", {
 	AnchorPoint = Vector2.new(0.5, 0.5),
@@ -364,9 +432,16 @@ local letters = {}
 for i = 1, #CONFIG.Word do
 	local char = CONFIG.Word:sub(i, i)
 
-	local letterLabel = label({
+	local holder = new("Frame", {
 		LayoutOrder = i,
 		Size = UDim2.fromOffset(40, 74),
+		BackgroundTransparency = 1,
+		Parent = wordmark,
+	})
+
+	local letterLabel = label({
+		Position = UDim2.fromOffset(0, math.random(6, 12)),
+		Size = UDim2.fromScale(1, 1),
 		Text = char,
 		Font = Enum.Font.GothamBold,
 		TextSize = 52,
@@ -375,7 +450,7 @@ for i = 1, #CONFIG.Word do
 		TextStrokeTransparency = 1,
 		TextStrokeColor3 = T.Accent,
 		ZIndex = 6,
-		Parent = wordmark,
+		Parent = holder,
 	})
 	new("UIGradient", {
 		Rotation = 90,
@@ -495,6 +570,8 @@ task.wait(0.2)
 tween(logoScale, 0.48, { Scale = 1 }, Enum.EasingStyle.Back)
 tween(logoChip, 0.4, { BackgroundTransparency = 0 })
 tween(logoChipStroke, 0.4, { Transparency = 0.25 })
+tween(logoGlow, 0.6, { BackgroundTransparency = 0.88 })
+tween(ringStroke, 0.55, { Transparency = 0.35 })
 if logoImage then
 	tween(logoImage, 0.42, { ImageTransparency = 0 })
 end
@@ -503,11 +580,16 @@ task.wait(0.38)
 
 for _, letterLabel in ipairs(letters) do
 	local scale = letterLabel:FindFirstChildOfClass("UIScale")
-	tween(letterLabel, 0.42, { TextTransparency = 0, TextStrokeTransparency = 0.6 }, Enum.EasingStyle.Quart)
+	local jitter = (math.random() - 0.5) * 0.06
+	tween(letterLabel, 0.42 + jitter, {
+		TextTransparency = 0,
+		TextStrokeTransparency = 0.6,
+		Position = UDim2.fromOffset(0, 0),
+	}, Enum.EasingStyle.Quart)
 	if scale then
-		tween(scale, 0.42, { Scale = 1 }, Enum.EasingStyle.Back)
+		tween(scale, 0.42 + jitter, { Scale = 1 }, Enum.EasingStyle.Back)
 	end
-	task.wait(CONFIG.LetterStagger)
+	task.wait(CONFIG.LetterStagger + (math.random() - 0.5) * 0.02)
 end
 
 task.wait(0.12)
@@ -552,6 +634,8 @@ tween(underline, 0.35, { Size = UDim2.new(0, 0, 0, 2) }, Enum.EasingStyle.Quad, 
 tween(logoScale, 0.42, { Scale = 1.2 }, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
 tween(logoChip, 0.42, { BackgroundTransparency = 1 })
 tween(logoChipStroke, 0.42, { Transparency = 1 })
+tween(logoGlow, 0.4, { BackgroundTransparency = 1 })
+tween(ringStroke, 0.4, { Transparency = 1 })
 if logoImage then
 	tween(logoImage, 0.42, { ImageTransparency = 1 })
 end
